@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>submit-concern</title>
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --bg1:#0ea5e9;
+            --bg2:#6366f1;
+            --card:#0b1220cc;
+            --card2:#0b1220;
+            --text:#e5e7eb;
+            --muted:#94a3b8;
+            --input:#0f172a;
+            --border:#22324a;
+            --ring:#60a5fa;
+            --ok:#22c55e;
+            --bad:#ef4444;
+            --btn:#22c55e;
+            --btn2:#16a34a;
+        }
+
+        *{ box-sizing:border-box; }
+        body{
+            margin:0;
+            font-family: Inter, system-ui, Arial, sans-serif;
+            color:var(--text);
+            min-height:100vh;
+            background:
+                    radial-gradient(1200px 600px at 20% 10%, rgba(14,165,233,.35), transparent 60%),
+                    radial-gradient(900px 500px at 90% 20%, rgba(99,102,241,.35), transparent 55%),
+                    linear-gradient(135deg, #070a12, #0b1020 60%, #070a12);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+        }
+
+        .wrap{
+            width:100%;
+            max-width:980px;
+            display:grid;
+            grid-template-columns: 1.1fr .9fr;
+            gap:18px;
+        }
+
+        @media (max-width: 900px){
+            .wrap{ grid-template-columns: 1fr; }
+        }
+
+        .hero{
+            border:1px solid rgba(255,255,255,.06);
+            border-radius:18px;
+            padding:28px;
+            background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+            backdrop-filter: blur(10px);
+        }
+
+        .brand{
+            display:flex;
+            align-items:center;
+            gap:12px;
+            margin-bottom:18px;
+        }
+
+        .logo{
+            width:44px; height:44px;
+            border-radius:14px;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+            box-shadow: 0 12px 30px rgba(14,165,233,.18);
+            display:grid;
+            place-items:center;
+            font-weight:800;
+            color:#06101b;
+        }
+
+        .hero h1{
+            font-size:28px;
+            margin:6px 0 6px;
+            line-height:1.15;
+        }
+        .hero p{
+            margin:0;
+            color:var(--muted);
+            line-height:1.6;
+            font-size:14px;
+        }
+
+        .tips{
+            margin-top:18px;
+            display:grid;
+            gap:10px;
+        }
+        .tip{
+            display:flex;
+            gap:10px;
+            padding:12px;
+            border-radius:14px;
+            border:1px solid rgba(255,255,255,.06);
+            background: rgba(15,23,42,.45);
+        }
+        .dot{
+            width:10px; height:10px; border-radius:50%;
+            margin-top:6px;
+            background: linear-gradient(135deg, var(--bg1), var(--bg2));
+            flex:0 0 auto;
+        }
+        .tip b{
+            display:block;
+            font-size:13px;
+            margin-bottom:2px;
+        }
+        .tip span{
+            color:var(--muted);
+            font-size:12.5px;
+            line-height:1.5;
+        }
+
+        .card{
+            border-radius:18px;
+            border:1px solid rgba(255,255,255,.08);
+            background: rgba(11,18,32,.70);
+            backdrop-filter: blur(10px);
+            overflow:hidden;
+            box-shadow: 0 18px 70px rgba(0,0,0,.45);
+        }
+
+        .cardHeader{
+            padding:18px 20px;
+            background: linear-gradient(135deg, rgba(14,165,233,.20), rgba(99,102,241,.20));
+            border-bottom:1px solid rgba(255,255,255,.06);
+        }
+        .cardHeader h2{
+            margin:0;
+            font-size:16px;
+            font-weight:700;
+            letter-spacing:.2px;
+        }
+        .cardHeader small{
+            display:block;
+            margin-top:4px;
+            color:var(--muted);
+            font-size:12.5px;
+            line-height:1.4;
+        }
+
+        form{
+            padding:18px 20px 22px;
+            display:grid;
+            gap:14px;
+        }
+
+        .grid2{
+            display:grid;
+            grid-template-columns: 1fr 1fr;
+            gap:12px;
+        }
+        @media (max-width: 520px){
+            .grid2{ grid-template-columns: 1fr; }
+        }
+
+        label{
+            display:block;
+            font-size:12.5px;
+            color:var(--muted);
+            margin:0 0 6px;
+        }
+
+        input, textarea, select{
+            width:100%;
+            background: rgba(15,23,42,.65);
+            border:1px solid rgba(34,50,74,.9);
+            color:var(--text);
+            border-radius:12px;
+            padding:12px 12px;
+            outline:none;
+            transition: .15s ease;
+            font-size:14px;
+        }
+
+        textarea{ min-height:120px; resize:vertical; }
+
+        input:focus, textarea:focus, select:focus{
+            border-color: rgba(96,165,250,.8);
+            box-shadow: 0 0 0 4px rgba(96,165,250,.15);
+        }
+
+        .hint{
+            margin-top:6px;
+            font-size:12px;
+            color:var(--muted);
+        }
+
+        .row{
+            display:grid;
+            gap:6px;
+        }
+
+        .actions{
+            display:flex;
+            gap:10px;
+            align-items:center;
+            margin-top:4px;
+        }
+
+        .btn{
+            border:0;
+            cursor:pointer;
+            border-radius:12px;
+            padding:12px 14px;
+            font-weight:700;
+            color:#04100a;
+            background: linear-gradient(135deg, var(--btn), var(--btn2));
+            box-shadow: 0 14px 35px rgba(34,197,94,.18);
+            transition:.15s ease;
+            flex: 1 1 auto;
+        }
+        .btn:hover{ transform: translateY(-1px); }
+        .btn:active{ transform: translateY(0px); }
+
+        .ghost{
+            border:1px solid rgba(255,255,255,.10);
+            background: rgba(15,23,42,.35);
+            color: var(--text);
+            padding:12px 14px;
+            border-radius:12px;
+            cursor:pointer;
+            flex: 0 0 auto;
+        }
+
+        .msg{
+            padding:12px 14px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,.08);
+            background: rgba(15,23,42,.35);
+            font-size:13px;
+            line-height:1.5;
+        }
+        .msg.ok{ border-color: rgba(34,197,94,.35); }
+        .msg.bad{ border-color: rgba(239,68,68,.35); }
+
+        .footerNote{
+            padding:0 20px 18px;
+            color: var(--muted);
+            font-size:12px;
+            line-height:1.45;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrap">
+
+    <!-- Left: Hero / Tips -->
+    <section class="hero">
+        <div class="brand">
+            <div class="logo">SC</div>
+            <div>
+                <div style="font-weight:800; letter-spacing:.2px;">Student Concern System</div>
+                <div style="color:var(--muted); font-size:12.5px;">Submit & track concerns with evidence</div>
+            </div>
+        </div>
+
+        <h1>Submit a Concern</h1>
+        <p>
+            Share your issue clearly so the staff can resolve it faster.
+            Add evidence if needed.
+        </p>
+
+        <div class="tips">
+            <div class="tip">
+                <div class="dot"></div>
+                <div>
+                    <b>Be specific</b>
+                    <span>Include what happened, where, and when.</span>
+                </div>
+            </div>
+            <div class="tip">
+                <div class="dot"></div>
+                <div>
+                    <b>Choose the right category</b>
+                    <span>This helps routing to the correct department.</span>
+                </div>
+            </div>
+            <div class="tip">
+                <div class="dot"></div>
+                <div>
+                    <b>Upload evidence (optional)</b>
+                    <span>Screenshots or documents can speed up resolution.</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Right: Form Card -->
+    <section class="card">
+        <div class="cardHeader">
+            <h2>Concern Form</h2>
+            <small>Please fill all required fields (*)</small>
+        </div>
+
+        <!-- Optional server messages (Thymeleaf) -->
+        <!--
+        <div style="padding: 0 20px; margin-top: 16px;">
+          <div class="msg ok" th:if="${success}" th:text="${success}"></div>
+          <div class="msg bad" th:if="${error}" th:text="${error}"></div>
+        </div>
+        -->
+
+        <!-- If you upload file, KEEP enctype -->
+        <form action="/concerns/submit" method="post" enctype="multipart/form-data">
+
+            <div class="grid2">
+                <div class="row">
+                    <label for="studentId">Student ID *</label>
+                    <input id="studentId" name="studentId" type="number" placeholder="e.g., 3" required />
+                    <div class="hint">Must exist in the Student table.</div>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for="title">Subject *</label>
+                <input id="title" name="subject" type="text" placeholder="Short summary of the issue" required />
+            </div>
+
+            <div class="row">
+                <label for="description">Message *</label>
+                <textarea id="description" name="message" placeholder="Explain the issue clearly..." required></textarea>
+            </div>
+
+            <div class="grid2">
+                <div class="row">
+                    <label for="aiPriorityLevel">Priority</label>
+                    <select id="aiPriorityLevel" name="aiPriorityLevel">
+                        <option value="" selected>Auto / Not set</option>
+                        <option>Low</option>
+                        <option>Medium</option>
+                        <option>High</option>
+                        <option>Urgent</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <label for="evidence">Evidence (optional)</label>
+                    <input id="evidence" name="file" type="file" />
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn" type="submit">Submit Concern</button>
+                <button class="ghost" type="reset">Clear</button>
+            </div>
+        </form>
+
+    </section>
+
+</div>
+
+</body>
+</html>
