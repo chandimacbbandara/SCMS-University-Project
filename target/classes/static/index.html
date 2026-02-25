@@ -3,120 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Concern Management System</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Akademy of Knowledge Bridge - Student Concern Management</title>
+    <link rel="stylesheet" href="/CSS/main.css">
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="logo">
-                <h1>SCMS</h1>
-                <p>Student Concern Management</p>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <h1>Akademy of Knowledge Bridge</h1>
             </div>
-            <ul class="nav-menu" id="navMenu">
-                <li class="nav-item">
-                    <a href="#home" class="nav-link active">Home</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#concerns" class="nav-link">My Concerns</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#report" class="nav-link">Report Concern</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#status" class="nav-link">Track Status</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#contact" class="nav-link">Contact</a>
-                </li>
-                <li class="nav-item">
-                    <a href="#profile" class="nav-link">Profile</a>
-                </li>
-            </ul>
-            <div class="hamburger" id="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Report Issue</a></li>
+                    <li><a href="#">Admin Login</a></li>
+                </ul>
+            </nav>
         </div>
-    </nav>
+    </header>
 
-    <!-- Home Section -->
-    <section id="home" class="hero">
-        <div class="hero-content">
-            <h2>Welcome to Student Concern Management System</h2>
-            <p>Your Voice Matters. Report, Track, and Resolve Your Concerns</p>
-            <button class="btn btn-primary" onclick="navigateTo('report')">Report a Concern</button>
-            <button class="btn btn-secondary" onclick="navigateTo('concerns')">View My Concerns</button>
-        </div>
-        <div class="hero-image">
-            <div class="illustration">📋</div>
-        </div>
-    </section>
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Welcome to Akademy of Knowledge Bridge</h2>
+                <p>Ensuring every student's concern is heard and addressed professionally within our academic community.</p>
+                <button class="cta-button">Report a Concern</button>
+            </div>
+            <div class="hero-image">
+                <img src="/images/img1.jpeg" alt="Academic Excellence">
+            </div>
+        </section>
 
-    <!-- Quick Actions -->
-    <section class="quick-actions">
-        <h3>Quick Actions</h3>
-        <div class="actions-grid">
-            <div class="action-card" onclick="navigateTo('report')">
-                <div class="action-icon">📝</div>
-                <h4>Report Concern</h4>
-                <p>Submit a new concern or complaint</p>
+        <section class="gallery">
+            <h3>Supporting our Scholars at Akademy of Knowledge Bridge</h3>
+            <div class="image-grid">
+                <div class="card">
+                    <div class="card-image"><img src="/images/img2.jpeg" alt="Academic support"></div>
+                    <p>Academic Excellence Concerns</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img3.jpeg" alt="Campus life"></div>
+                    <p>Student Living & Campus Life</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img4.jpeg" alt="Administration"></div>
+                    <p>Administrative Professional Services</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img5.jpeg" alt="Mental Health"></div>
+                    <p>Scholar Mental Well-being</p>
+                </div>
             </div>
-            <div class="action-card" onclick="navigateTo('concerns')">
-                <div class="action-icon">📋</div>
-                <h4>My Concerns</h4>
-                <p>View all your submitted concerns</p>
-            </div>
-            <div class="action-card" onclick="navigateTo('status')">
-                <div class="action-icon">📊</div>
-                <h4>Track Status</h4>
-                <p>Monitor concern resolution progress</p>
-            </div>
-            <div class="action-card" onclick="navigateTo('contact')">
-                <div class="action-icon">💬</div>
-                <h4>Contact Support</h4>
-                <p>Get help from our support team</p>
-            </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
-    <!-- Features Section -->
-    <section class="features">
-        <h3>Why Use SCMS?</h3>
-        <div class="features-grid">
-            <div class="feature-card">
-                <div class="feature-icon">✓</div>
-                <h4>Easy Reporting</h4>
-                <p>Simple and quick process to report your concerns</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">📱</div>
-                <h4>Real-time Tracking</h4>
-                <p>Monitor your concern status in real-time</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">🔒</div>
-                <h4>Confidential</h4>
-                <p>Your concerns are handled with complete confidentiality</p>
-            </div>
-            <div class="feature-card">
-                <div class="feature-icon">⚡</div>
-                <h4>Fast Resolution</h4>
-                <p>Quick and efficient resolution process</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
+    <footer>
         <div class="footer-content">
-            <p>&copy; 2026 Student Concern Management System. All rights reserved.</p>
-            <p>Contact us: support@scms.edu</p>
+            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
+            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
         </div>
     </footer>
 
-    <script src="script.js"></script>
+    <script src="/JS/main.js"></script>
 </body>
 </html>
