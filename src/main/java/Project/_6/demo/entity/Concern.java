@@ -40,6 +40,10 @@ public class Concern {
     @JoinColumn(name = "StudentID_FK")
     private Student student;
 
+    @ManyToOne
+    @JoinColumn(name = "AdminID_FK")
+    private Admin admin;
+
     @PrePersist
     protected void onCreate() {
         this.createdTime = LocalDateTime.now();
