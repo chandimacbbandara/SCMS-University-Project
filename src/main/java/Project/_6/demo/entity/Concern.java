@@ -1,29 +1,31 @@
 package Project._6.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "Concern")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Concern {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ConcernID")
+    @Column(name = "ConcernID")
     private Integer concernId;
 
-    @Column(name = "Subject", nullable = false)
+    @Column(name = "Subject", nullable = false, length = 255)
     private String subject;
 
-    @Lob
-    @Column(name = "Message", nullable = false)
+    @Column(name = "Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
     private String message;
 
-    @Lob
-    @Column(name = "Evidence")
-    private byte[] evidence;
+    @Column(name = "Evidence", length = 500)
+    private String evidencePath;
 
     @Column(name = "AI_Priority_Level", length = 20)
     private String aiPriorityLevel;
@@ -31,13 +33,18 @@ public class Concern {
     @Column(name = "Status", length = 50)
     private String status;
 
-    @Column(name = "CreatedTime", insertable = false, updatable = false, columnDefinition = "DATETIME DEFAULT GETDATE()")
+    @Column(name = "CreatedTime")
     private LocalDateTime createdTime;
 
     @ManyToOne
     @JoinColumn(name = "StudentID_FK")
     private Student student;
 
-    @Column(name = "AdminID_FK")
-    private Integer adminId;
+    @PrePersist
+    protected void onCreate() {
+        this.createdTime = LocalDateTime.now();
+        if (this.status == null) {
+            this.status = "Pending";
+        }
+    }
 }
