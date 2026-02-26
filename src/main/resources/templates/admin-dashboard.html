@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Akademy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <style>
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .dashboard-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-header h2 {
+            color: #1a237e;
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .dashboard-header p {
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* Stats Cards */
+        .stats-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 180px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-top: 4px solid #1a237e;
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card.pending { border-top-color: #ff9800; }
+        .stat-card.in-progress { border-top-color: #2196f3; }
+        .stat-card.complete { border-top-color: #4caf50; }
+
+        .stat-card .stat-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #1a237e;
+        }
+
+        .stat-card.pending .stat-number { color: #ff9800; }
+        .stat-card.in-progress .stat-number { color: #2196f3; }
+        .stat-card.complete .stat-number { color: #4caf50; }
+
+        .stat-card .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        /* Filter Panel */
+        .filter-panel {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .filter-panel h3 {
+            color: #1a237e;
+            font-size: 18px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-panel h3 .filter-icon {
+            font-size: 20px;
+        }
+
+        .filter-form {
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            color: #1a237e;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-group select,
+        .filter-group input[type="date"] {
+            padding: 10px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #fafafa;
+            min-width: 170px;
+            transition: border-color 0.3s;
+        }
+
+        .filter-group select:focus,
+        .filter-group input[type="date"]:focus {
+            outline: none;
+            border-color: #1a237e;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .filter-apply-btn {
+            padding: 10px 24px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-apply-btn:hover {
+            background: linear-gradient(135deg, #283593, #3949ab);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 35, 126, 0.3);
+        }
+
+        .filter-clear-btn {
+            padding: 10px 20px;
+            background: #fff;
+            color: #888;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .filter-clear-btn:hover {
+            background: #f5f5f5;
+            border-color: #bbb;
+            color: #555;
+        }
+
+        /* Concerns Table */
+        .concerns-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .concerns-table thead {
+            background: #1a237e;
+            color: #fff;
+        }
+
+        .concerns-table th {
+            padding: 15px 18px;
+            text-align: left;
+            font-size: 14px;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .concerns-table td {
+            padding: 14px 18px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+        }
+
+        .concerns-table tbody tr:hover {
+            background: #f5f5ff;
+        }
+
+        .concerns-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-inprogress {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-complete {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .view-btn {
+            display: inline-block;
+            padding: 7px 18px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: #fff;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .view-btn:hover {
+            background: linear-gradient(135deg, #283593, #3949ab);
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(26, 35, 126, 0.3);
+        }
+
+        .no-concerns {
+            text-align: center;
+            padding: 60px 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            color: #999;
+        }
+
+        .no-concerns h3 {
+            font-size: 22px;
+            margin-bottom: 10px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        .back-link:hover {
+            color: #ffc107;
+        }
+
+        @media (max-width: 768px) {
+            .concerns-table thead { display: none; }
+            .concerns-table, .concerns-table tbody, .concerns-table tr, .concerns-table td {
+                display: block;
+                width: 100%;
+            }
+            .concerns-table tr {
+                margin-bottom: 15px;
+                border-radius: 8px;
+                overflow: hidden;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            }
+            .concerns-table td {
+                text-align: right;
+                padding: 10px 15px;
+                position: relative;
+                padding-left: 50%;
+            }
+            .concerns-table td::before {
+                content: attr(data-label);
+                position: absolute;
+                left: 15px;
+                font-weight: 700;
+                color: #1a237e;
+                text-transform: uppercase;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <h1>Akademy of Knowledge Bridge</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/submit-concern">Report Issue</a></li>
+                    <li><a href="/admin/dashboard" style="color: #ffc107;">Admin Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+
+            <div class="dashboard-header">
+                <h2>Admin Dashboard</h2>
+                <p>Manage and respond to student concerns</p>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <div class="stat-number" th:text="${totalConcerns}">0</div>
+                    <div class="stat-label">Total Concerns</div>
+                </div>
+                <div class="stat-card pending">
+                    <div class="stat-number" th:text="${pendingCount}">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+                <div class="stat-card in-progress">
+                    <div class="stat-number" th:text="${inProgressCount}">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card complete">
+                    <div class="stat-number" th:text="${completeCount}">0</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+
+            <!-- Combined Filter Panel -->
+            <div class="filter-panel">
+                <h3><span class="filter-icon">&#9776;</span> Filter Concerns</h3>
+                <form th:action="@{/admin/dashboard}" method="get" class="filter-form">
+                    <div class="filter-group">
+                        <label>Status</label>
+                        <select name="status">
+                            <option value="All" th:selected="${selectedStatus == 'All'}">All Status</option>
+                            <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Pending</option>
+                            <option value="In Progress" th:selected="${selectedStatus == 'In Progress'}">In Progress</option>
+                            <option value="Complete" th:selected="${selectedStatus == 'Complete'}">Complete</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Category</label>
+                        <select name="category">
+                            <option value="All" th:selected="${selectedCategory == 'All'}">All Categories</option>
+                            <option value="Education (Creative and IT)" th:selected="${selectedCategory == 'Education (Creative and IT)'}">Education (Creative and IT)</option>
+                            <option value="Institute Problem" th:selected="${selectedCategory == 'Institute Problem'}">Institute Related Problem</option>
+                            <option value="Registration" th:selected="${selectedCategory == 'Registration'}">Registration & Enrollment</option>
+                            <option value="Administrative" th:selected="${selectedCategory == 'Administrative'}">Administrative Services</option>
+                            <option value="Financial" th:selected="${selectedCategory == 'Financial'}">Financial & Payments</option>
+                            <option value="Other" th:selected="${selectedCategory == 'Other'}">Other General Concern</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Time Period</label>
+                        <select name="timePeriod">
+                            <option value="All" th:selected="${selectedTimePeriod == 'All'}">All Time</option>
+                            <option value="Today" th:selected="${selectedTimePeriod == 'Today'}">Today</option>
+                            <option value="Last7Days" th:selected="${selectedTimePeriod == 'Last7Days'}">Last 7 Days</option>
+                            <option value="Last30Days" th:selected="${selectedTimePeriod == 'Last30Days'}">Last 30 Days</option>
+                            <option value="Older" th:selected="${selectedTimePeriod == 'Older'}">Older than 30 Days</option>
+                        </select>
+                    </div>
+                    <div class="filter-actions">
+                        <button type="submit" class="filter-apply-btn">Apply Filters</button>
+                        <a th:href="@{/admin/dashboard}" class="filter-clear-btn">Clear</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Concerns Table -->
+            <div th:if="${#lists.isEmpty(concerns)}" class="no-concerns">
+                <h3>No concerns found</h3>
+                <p>There are no student concerns matching the selected filter.</p>
+            </div>
+
+            <table th:if="${!#lists.isEmpty(concerns)}" class="concerns-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Category</th>
+                        <th>Status</th>
+                        <th>Submitted</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="concern : ${concerns}">
+                        <td data-label="ID">
+                            <strong th:text="'CON-' + ${concern.concernId}">CON-1</strong>
+                        </td>
+                        <td data-label="Student">
+                            <span th:if="${concern.student != null and concern.student.user != null}"
+                                  th:text="${concern.student.user.firstName + ' ' + concern.student.user.lastName}">
+                                Student Name
+                            </span>
+                            <br th:if="${concern.student != null}"/>
+                            <small th:if="${concern.student != null}" style="color:#888;"
+                                   th:text="${concern.student.studentId}">STU001</small>
+                        </td>
+                        <td data-label="Subject" th:text="${concern.subject}">Subject</td>
+                        <td data-label="Category">
+                            <span th:if="${concern.student != null}" th:text="${concern.student.category}">-</span>
+                        </td>
+                        <td data-label="Status">
+                            <span class="status-badge"
+                                  th:classappend="${concern.status == 'Pending'} ? 'status-pending' : (${concern.status == 'In Progress'} ? 'status-inprogress' : (${concern.status == 'Complete'} ? 'status-complete' : 'status-complete'))"
+                                  th:text="${concern.status}">Pending</span>
+                        </td>
+                        <td data-label="Submitted">
+                            <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy HH:mm')}">01 Jan 2026</span>
+                        </td>
+                        <td data-label="Action">
+                            <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">View &amp; Reply</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
+            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
