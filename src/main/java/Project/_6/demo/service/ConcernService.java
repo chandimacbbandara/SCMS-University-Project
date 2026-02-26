@@ -1,87 +1,104 @@
 package Project._6.demo.service;
 
+import Project._6.demo.dto.ConcernSubmissionDTO;
 import Project._6.demo.entity.Concern;
-import Project._6.demo.entity.Evidence;
 import Project._6.demo.entity.Student;
+import Project._6.demo.entity.User;
 import Project._6.demo.repository.ConcernRepository;
-import Project._6.demo.repository.EvidenceRepository;
 import Project._6.demo.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import Project._6.demo.repository.UserRepository;
+
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ConcernService {
 
-    @Autowired
-    private ConcernRepository concernRepository;
+    private final ConcernRepository concernRepository;
+    private final StudentRepository studentRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+    private static final String UPLOAD_DIR = "uploads/";
 
-    @Autowired
-    private EvidenceRepository evidenceRepository;
-
-    @Autowired
-    private FileStorageService fileStorageService;
-
-    // Submit concern WITH optional file
-    public Concern submitConcern(Long studentId, Concern concern, MultipartFile file) throws IOException {
-
-        if (studentId == null) {
-            throw new IllegalArgumentException("studentId cannot be null");
-        }
-        if (concern == null) {
-            throw new IllegalArgumentException("concern cannot be null");
-        }
-
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
-
-        concern.setStudent(student);
-
-        // Set default status if not already set
-        if (concern.getStatus() == null || concern.getStatus().isBlank()) {
-            concern.setStatus("Pending");
-        }
-
-        // Save evidence as byte array in Concern table if file exists
-        if (file != null && !file.isEmpty()) {
-            concern.setEvidence(file.getBytes());
-        }
-
-        return concernRepository.save(concern);
+    public ConcernService(ConcernRepository concernRepository,
+                          StudentRepository studentRepository,
+                          UserRepository userRepository) {
+        this.concernRepository = concernRepository;
+        this.studentRepository = studentRepository;
+        this.userRepository = userRepository;
     }
 
-    public List<Concern> getStudentConcerns(Long studentId) {
-        return concernRepository.findByStudentStudentId(studentId);
-    }
+    @Transactional
+    public Concern submitConcern(ConcernSubmissionDTO dto, MultipartFile evidence) throws IOException {
 
-    public Concern withdrawConcern(Integer concernId) {
-        Concern concern = concernRepository.findById(concernId)
-                .orElseThrow(() -> new RuntimeException("Concern not found with id: " + concernId));
+        // Find or create the student
+        Student student = findOrCreateStudent(dto);
 
-        concern.setStatus("Withdrawn");
-        return concernRepository.save(concern);
-    }
+        // Handle evidence file upload
+        String evidencePath = null;
+        if (evidence != null && !evidence.isEmpty()) {
+            evidencePath = saveEvidence(evidence);
+        }
 
-
-    // Submit concern WITHOUT file (helper method)
-    public Concern submitConcernWithoutFile(Long studentId, String subject, String message, String aiPriorityLevel) {
-
-        Student student = studentRepository.findById(studentId)
-                .orElseThrow(() -> new RuntimeException("Student not found with id: " + studentId));
-
+        // Create the concern
         Concern concern = new Concern();
-        concern.setStudent(student);
-        concern.setSubject(subject);
-        concern.setMessage(message);
-        concern.setAiPriorityLevel(aiPriorityLevel);
+        concern.setSubject(dto.getSubject());
+        concern.setMessage(dto.getMessage());
+        concern.setEvidencePath(evidencePath);
         concern.setStatus("Pending");
+        concern.setStudent(student);
 
         return concernRepository.save(concern);
+    }
+
+    private Student findOrCreateStudent(ConcernSubmissionDTO dto) {
+        Optional<Student> existingStudent = studentRepository.findByStudentId(dto.getStudentId());
+
+        if (existingStudent.isPresent()) {
+            return existingStudent.get();
+        }
+
+        // Create a new User first
+        User user = new User();
+        user.setEmail(dto.getEmail());
+        user.setPassword("temp_" + UUID.randomUUID().toString().substring(0, 8)); // temporary password
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user = userRepository.save(user);
+
+        // Create the Student linked to the User
+        Student student = new Student();
+        student.setUser(user);
+        student.setStudentId(dto.getStudentId());
+        student.setCategory(dto.getCategory());
+        return studentRepository.save(student);
+    }
+
+    private String saveEvidence(MultipartFile file) throws IOException {
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String storedFilename = UUID.randomUUID().toString() + extension;
+
+        Path filePath = uploadPath.resolve(storedFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return storedFilename;
     }
 }

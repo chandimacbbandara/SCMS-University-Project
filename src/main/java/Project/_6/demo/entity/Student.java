@@ -1,23 +1,37 @@
 package Project._6.demo.entity;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "Student")
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Student {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="StudentID")
-    private Long studentId;
+    @Column(name = "UserID")
+    private Integer userId;
 
-    private String name;
-    private String email;
-    @JsonIgnore
-    private String password;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "UserID")
+    private User user;
 
+    @Column(name = "StudentID", unique = true, nullable = false, length = 20)
+    private String studentId;
 
+    @Column(name = "DOB")
+    private LocalDate dob;
+
+    @Lob
+    @Column(name = "StudentDPhoto")
+    private byte[] studentPhoto;
+
+    @Column(name = "Category", length = 50)
+    private String category;
 }
