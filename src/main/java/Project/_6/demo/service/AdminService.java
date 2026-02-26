@@ -14,9 +14,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -37,35 +39,45 @@ public class AdminService {
     }
 
     /**
-     * Get all concerns ordered by newest first
+     * Get all concerns ordered by newest first, with Complete at the bottom
      */
     public List<Concern> getAllConcerns() {
-        return concernRepository.findAllByOrderByCreatedTimeDesc();
+        return sortCompleteLast(concernRepository.findAllByOrderByCreatedTimeDesc());
     }
 
     /**
      * Get concerns by status
      */
     public List<Concern> getConcernsByStatus(String status) {
-        return concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+        return sortCompleteLast(concernRepository.findByStatusOrderByCreatedTimeDesc(status));
     }
 
     /**
      * Get concerns filtered by status and/or time range
      */
-    public List<Concern> getFilteredConcerns(String status, LocalDateTime from, LocalDateTime to) {
+    public List<Concern> getFilteredConcerns(String status, String category, LocalDateTime from, LocalDateTime to) {
         boolean hasStatus = status != null && !status.isEmpty() && !status.equals("All");
+        boolean hasCategory = category != null && !category.isEmpty() && !category.equals("All");
         boolean hasTime = from != null && to != null;
 
+        List<Concern> concerns;
         if (hasStatus && hasTime) {
-            return concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
+            concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
         } else if (hasStatus) {
-            return concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+            concerns = concernRepository.findByStatusOrderByCreatedTimeDesc(status);
         } else if (hasTime) {
-            return concernRepository.findByCreatedTimeBetweenOrderByCreatedTimeDesc(from, to);
+            concerns = concernRepository.findByCreatedTimeBetweenOrderByCreatedTimeDesc(from, to);
         } else {
-            return concernRepository.findAllByOrderByCreatedTimeDesc();
+            concerns = concernRepository.findAllByOrderByCreatedTimeDesc();
         }
+
+        if (hasCategory) {
+            concerns = concerns.stream()
+                    .filter(c -> c.getStudent() != null && category.equals(c.getStudent().getCategory()))
+                    .collect(Collectors.toList());
+        }
+
+        return sortCompleteLast(concerns);
     }
 
     /**
@@ -163,7 +175,17 @@ public class AdminService {
         return concernRepository.countByStatus("In Progress");
     }
 
-    public long getResolvedCount() {
-        return concernRepository.countByStatus("Resolved");
+    public long getCompleteCount() {
+        return concernRepository.countByStatus("Complete");
+    }
+
+    /**
+     * Sort concerns so that Complete ones appear at the bottom of the list
+     */
+    private List<Concern> sortCompleteLast(List<Concern> concerns) {
+        return concerns.stream()
+                .sorted(Comparator.comparing((Concern c) -> "Complete".equals(c.getStatus()) ? 1 : 0)
+                        .thenComparing(Comparator.comparing(Concern::getCreatedTime).reversed()))
+                .collect(Collectors.toList());
     }
 }

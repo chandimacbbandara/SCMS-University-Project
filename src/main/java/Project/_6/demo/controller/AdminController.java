@@ -31,6 +31,7 @@ public class AdminController {
     public String showDashboard(
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "timePeriod", required = false) String timePeriod,
+            @RequestParam(value = "category", required = false) String category,
             Model model) {
 
         // Resolve time period to date range
@@ -60,15 +61,16 @@ public class AdminController {
             to = null;
         }
 
-        List<Concern> concerns = adminService.getFilteredConcerns(status, from, to);
+        List<Concern> concerns = adminService.getFilteredConcerns(status, category, from, to);
 
         model.addAttribute("concerns", concerns);
         model.addAttribute("selectedStatus", status != null ? status : "All");
         model.addAttribute("selectedTimePeriod", timePeriod != null ? timePeriod : "All");
+        model.addAttribute("selectedCategory", category != null ? category : "All");
         model.addAttribute("totalConcerns", adminService.getTotalConcerns());
         model.addAttribute("pendingCount", adminService.getPendingCount());
         model.addAttribute("inProgressCount", adminService.getInProgressCount());
-        model.addAttribute("resolvedCount", adminService.getResolvedCount());
+        model.addAttribute("completeCount", adminService.getCompleteCount());
 
         return "admin-dashboard";
     }
