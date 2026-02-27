@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,12 +13,23 @@
                 <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
                 <h1>Akademy of Knowledge Bridge</h1>
             </div>
-            <nav>
+            <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">About</a></li>
-                    <li><a href="/submit-concern">Report Issue</a></li>
-                    <li><a href="/admin/dashboard">Admin Dashboard</a></li>
+                    <li><a href="/">Home</a></li>
+                    
+                    <!-- If not logged in -->
+                    <li th:if="${student == null and admin == null}"><a href="/login">Login</a></li>
+                    <li th:if="${student == null and admin == null}"><a href="/register">Register</a></li>
+                    
+                    <!-- If student logged in -->
+                    <li th:if="${student != null}"><a href="/student/dashboard" style="color: #ffc107;">My Dashboard</a></li>
+                    
+                    <!-- If admin logged in -->
+                    <li th:if="${admin != null}"><a href="/admin/dashboard" style="color: #ffc107;">Admin Panel</a></li>
+                    
+                    <li><a href="/submit-concern" th:style="${student != null} ? 'color: #fff' : ''">Report Issue</a></li>
+
+                    <li th:if="${student != null or admin != null}"><a href="/logout" style="color: #ef5350;">Logout</a></li>
                 </ul>
             </nav>
         </div>

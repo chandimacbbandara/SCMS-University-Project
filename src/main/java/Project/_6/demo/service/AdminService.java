@@ -10,6 +10,7 @@ import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,15 +28,18 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final AdminReplyRepository adminReplyRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
-                        UserRepository userRepository) {
+                        UserRepository userRepository,
+                        PasswordEncoder passwordEncoder) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -149,7 +153,7 @@ public class AdminService {
         // Create a default admin user
         User adminUser = new User();
         adminUser.setEmail("admin@akb.edu");
-        adminUser.setPassword("admin_" + UUID.randomUUID().toString().substring(0, 8));
+        adminUser.setPassword(passwordEncoder.encode("admin_" + UUID.randomUUID().toString().substring(0, 8)));
         adminUser.setFirstName("System");
         adminUser.setLastName("Admin");
         adminUser = userRepository.save(adminUser);

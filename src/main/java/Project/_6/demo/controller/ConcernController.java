@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
+
 @Controller
 public class ConcernController {
 
@@ -21,7 +23,10 @@ public class ConcernController {
 
     // Serve the concern submission form
     @GetMapping("/submit-concern")
-    public String showConcernForm(Model model) {
+    public String showConcernForm(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
         model.addAttribute("concernDTO", new ConcernSubmissionDTO());
         return "submit-concern";
     }
@@ -31,8 +36,12 @@ public class ConcernController {
     public String submitConcern(
             @ModelAttribute ConcernSubmissionDTO concernDTO,
             @RequestParam(value = "evidence", required = false) MultipartFile evidence,
+            HttpSession session,
             RedirectAttributes redirectAttributes) {
 
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
         try {
             Concern saved = concernService.submitConcern(concernDTO, evidence);
             redirectAttributes.addFlashAttribute("successMessage",

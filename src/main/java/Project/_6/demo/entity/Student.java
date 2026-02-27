@@ -3,6 +3,7 @@ package Project._6.demo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Entity
@@ -11,13 +12,15 @@ import java.time.LocalDate;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Student {
+public class Student implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "UserID")
     private Integer userId;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @MapsId
     @JoinColumn(name = "UserID")
     private User user;
