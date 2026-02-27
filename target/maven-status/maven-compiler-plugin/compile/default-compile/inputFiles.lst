@@ -2,8 +2,11 @@
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/config/useerconfig.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/controller/AdminController.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/controller/ConcernController.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/controller/StudentRegistrationController.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/dto/AdminReplyDTO.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/dto/ConcernSubmissionDTO.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/dto/LoginDTO.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/dto/StudentRegistrationDTO.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Admin.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/AdminReply.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Concern.java
@@ -16,3 +19,4 @@
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/UserRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/AdminService.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/ConcernService.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/StudentRegistrationService.java

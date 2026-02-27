@@ -10,6 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import jakarta.servlet.http.HttpSession;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,11 +30,15 @@ public class AdminController {
      * Admin Dashboard - shows all concerns with stats and combined filters
      */
     @GetMapping("/dashboard")
-    public String showDashboard(
+    public String showDashboard(HttpSession session,
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "timePeriod", required = false) String timePeriod,
             @RequestParam(value = "category", required = false) String category,
             Model model) {
+
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
 
         // Resolve time period to date range
         LocalDateTime from = null;
@@ -79,7 +85,10 @@ public class AdminController {
      * View a single concern with its replies
      */
     @GetMapping("/concern/{id}")
-    public String viewConcern(@PathVariable("id") Integer id, Model model) {
+    public String viewConcern(@PathVariable("id") Integer id, HttpSession session, Model model) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
         Concern concern = adminService.getConcernById(id);
         List<AdminReply> replies = adminService.getRepliesForConcern(id);
 
@@ -96,7 +105,11 @@ public class AdminController {
     @PostMapping("/concern/{id}/reply")
     public String submitReply(@PathVariable("id") Integer id,
                               @ModelAttribute AdminReplyDTO replyDTO,
+                              HttpSession session,
                               RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
         try {
             replyDTO.setConcernId(id);
             adminService.submitReply(replyDTO);
@@ -113,7 +126,11 @@ public class AdminController {
     @PostMapping("/concern/{id}/status")
     public String updateStatus(@PathVariable("id") Integer id,
                                @RequestParam("status") String status,
+                               HttpSession session,
                                RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
         try {
             adminService.updateConcernStatus(id, status);
             redirectAttributes.addFlashAttribute("successMessage", "Status updated to: " + status);
@@ -121,5 +138,12 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update status: " + e.getMessage());
         }
         return "redirect:/admin/concern/" + id;
+    }
+
+    /**
+     * Check if admin is logged in
+     */
+    private boolean isAdminLoggedIn(HttpSession session) {
+        return Boolean.TRUE.equals(session.getAttribute("adminLoggedIn"));
     }
 }

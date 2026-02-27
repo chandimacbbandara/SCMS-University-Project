@@ -3,13 +3,17 @@ package Project._6.demo.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "[User]")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,4 +46,7 @@ public class User {
 
     @Column(name = "Address_3rd_Lane", length = 255)
     private String address3rdLane;
+
+    @Column(name = "Registration_Status", length = 20)
+    private String registrationStatus;
 }

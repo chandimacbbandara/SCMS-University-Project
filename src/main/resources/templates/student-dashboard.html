@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Akademy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <style>
+        .dashboard-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .welcome-banner {
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: #fff;
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 8px 30px rgba(26, 35, 126, 0.3);
+        }
+
+        .welcome-text h2 {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .welcome-text p {
+            font-size: 15px;
+            opacity: 0.85;
+        }
+
+        .welcome-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .student-info-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .student-info-card h3 {
+            color: #1a237e;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8eaf6;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 18px;
+        }
+
+        .info-item {
+            padding: 15px;
+            background: #f5f7ff;
+            border-radius: 10px;
+            border-left: 4px solid #1a237e;
+        }
+
+        .info-item .label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .info-item .value {
+            font-size: 16px;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: #fff;
+            border-radius: 14px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-decoration: none;
+            color: inherit;
+            border-top: 4px solid #1a237e;
+        }
+
+        .action-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .action-card .action-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .action-card h4 {
+            color: #1a237e;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+
+        .action-card p {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .logout-btn {
+            padding: 8px 20px;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: #fff;
+        }
+
+        @media (max-width: 600px) {
+            .welcome-banner {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <h1>Akademy of Knowledge Bridge</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/student/dashboard" style="color: #ffc107;">Dashboard</a></li>
+                    <li><a href="/submit-concern">Report Issue</a></li>
+                    <li><a href="/logout">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+            <!-- Success Message -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <!-- Welcome Banner -->
+            <div class="welcome-banner">
+                <div class="welcome-text">
+                    <h2>Welcome, <span th:text="${student.user.firstName}">Student</span>!</h2>
+                    <p>You are logged in as <span th:text="${student.studentId}">STU001</span></p>
+                </div>
+                <div style="display:flex; align-items:center; gap:15px;">
+                    <a href="/logout" class="logout-btn">Logout</a>
+                    <div class="welcome-avatar">&#127891;</div>
+                </div>
+            </div>
+
+            <!-- Student Info Card -->
+            <div class="student-info-card">
+                <h3>Your Profile</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="label">Full Name</div>
+                        <div class="value" th:text="${student.user.firstName + ' ' + student.user.lastName}">John Doe</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Email</div>
+                        <div class="value" th:text="${student.user.email}">email@example.com</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Student ID</div>
+                        <div class="value" th:text="${student.studentId}">STU001</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="label">Account Status</div>
+                        <div class="value">
+                            <span class="status-badge">APPROVED</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <h3 style="color:#1a237e; margin-bottom:20px; font-size:20px;">Quick Actions</h3>
+            <div class="quick-actions">
+                <a href="/submit-concern" class="action-card">
+                    <div class="action-icon">&#128221;</div>
+                    <h4>Submit a Concern</h4>
+                    <p>Report an academic or campus issue</p>
+                </a>
+                <a href="/" class="action-card">
+                    <div class="action-icon">&#127968;</div>
+                    <h4>Back to Home</h4>
+                    <p>Return to the main website</p>
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
+            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

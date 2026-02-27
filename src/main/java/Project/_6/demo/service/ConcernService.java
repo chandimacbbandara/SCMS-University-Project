@@ -8,6 +8,7 @@ import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.StudentRepository;
 import Project._6.demo.repository.UserRepository;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,15 +27,18 @@ public class ConcernService {
     private final ConcernRepository concernRepository;
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     private static final String UPLOAD_DIR = "uploads/";
 
     public ConcernService(ConcernRepository concernRepository,
                           StudentRepository studentRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          PasswordEncoder passwordEncoder) {
         this.concernRepository = concernRepository;
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -70,7 +74,7 @@ public class ConcernService {
         // Create a new User first
         User user = new User();
         user.setEmail(dto.getEmail());
-        user.setPassword("temp_" + UUID.randomUUID().toString().substring(0, 8)); // temporary password
+        user.setPassword(passwordEncoder.encode("temp_" + UUID.randomUUID().toString().substring(0, 8))); // hashed temporary password
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user = userRepository.save(user);
