@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern Detail - Admin</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <style>
+        .detail-container {
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #1a237e;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: #ffc107;
+        }
+
+        /* Concern Card */
+        .concern-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .concern-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .concern-card .concern-id {
+            font-size: 14px;
+            color: #888;
+            font-weight: 600;
+        }
+
+        .concern-card h2 {
+            color: #1a237e;
+            font-size: 26px;
+            margin: 5px 0;
+        }
+
+        .concern-meta {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .concern-meta .meta-item {
+            font-size: 14px;
+        }
+
+        .concern-meta .meta-label {
+            font-weight: 700;
+            color: #1a237e;
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .concern-meta .meta-value {
+            color: #555;
+        }
+
+        .concern-message {
+            padding: 20px;
+            background: #fafafa;
+            border-left: 4px solid #1a237e;
+            border-radius: 0 8px 8px 0;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .evidence-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .evidence-link:hover {
+            background: #bbdefb;
+        }
+
+        /* Status section */
+        .status-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .status-section h3 {
+            color: #1a237e;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-form select {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafafa;
+            min-width: 180px;
+        }
+
+        .status-form select:focus {
+            outline: none;
+            border-color: #1a237e;
+        }
+
+        .status-form button {
+            padding: 10px 24px;
+            background: #1a237e;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .status-form button:hover {
+            background: #283593;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-pending { background: #fff3e0; color: #e65100; }
+        .status-inprogress { background: #e3f2fd; color: #1565c0; }
+        .status-complete { background: #e8f5e9; color: #2e7d32; }
+
+        /* Replies section */
+        .replies-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .replies-section h3 {
+            color: #1a237e;
+            font-size: 20px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e8eaf6;
+            padding-bottom: 10px;
+        }
+
+        .reply-item {
+            padding: 20px;
+            background: #f0f4ff;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .reply-item .reply-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .reply-item .reply-admin {
+            font-weight: 700;
+            color: #1a237e;
+            font-size: 14px;
+        }
+
+        .reply-item .reply-time {
+            color: #888;
+            font-size: 13px;
+        }
+
+        .reply-item .reply-message {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .no-replies {
+            text-align: center;
+            padding: 30px;
+            color: #999;
+        }
+
+        /* Reply form */
+        .reply-form-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 35px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .reply-form-section h3 {
+            color: #1a237e;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            min-height: 130px;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            resize: vertical;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: #1a237e;
+            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            background: #fff;
+        }
+
+        .reply-form .form-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .reply-form .form-row label {
+            font-weight: 600;
+            color: #1a237e;
+            font-size: 14px;
+        }
+
+        .reply-form .form-row select {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+
+        .reply-form .submit-reply-btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #1a237e, #283593);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .reply-form .submit-reply-btn:hover {
+            background: linear-gradient(135deg, #283593, #3949ab);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+        }
+
+        .mark-read-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background: #fff;
+            color: #1a237e;
+            border: 2px solid #1a237e;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .mark-read-btn:hover {
+            background: #f0f0ff;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            font-size: 15px;
+        }
+
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+        @media (max-width: 768px) {
+            .detail-container { margin: 20px 15px; }
+            .concern-card { padding: 20px; }
+            .concern-card h2 { font-size: 20px; }
+            .concern-meta { flex-direction: column; gap: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <h1>Akademy of Knowledge Bridge</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/admin/student-review">Student Review</a></li>
+                    <li><a href="/admin/dashboard" style="color: #ffc107;">Admin Dashboard</a></li>
+                    <li><a href="/logout" style="color: #ef5350;">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="detail-container">
+
+            <a href="/admin/dashboard" class="back-link">&larr; Back to Dashboard</a>
+
+            <!-- Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+            <!-- Concern Details -->
+            <div class="concern-card">
+                <div class="card-header">
+                    <div>
+                        <span class="concern-id" th:text="'CON-' + ${concern.concernId}">CON-1</span>
+                        <h2 th:text="${concern.subject}">Concern Subject</h2>
+                    </div>
+                    <span class="status-badge"
+                          th:classappend="${concern.status == 'Pending'} ? 'status-pending' : (${concern.status == 'In Progress'} ? 'status-inprogress' : (${concern.status == 'Complete'} ? 'status-complete' : 'status-complete'))"
+                          th:text="${concern.status}">Pending</span>
+                </div>
+
+                <div class="concern-meta">
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Student</span>
+                        <span class="meta-value" th:text="${concern.student.user.firstName + ' ' + concern.student.user.lastName}">Name</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Student ID</span>
+                        <span class="meta-value" th:text="${concern.student.studentId}">STU001</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Category</span>
+                        <span class="meta-value" th:text="${concern.student.category}">-</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null and concern.student.user.email != null}">
+                        <span class="meta-label">Email</span>
+                        <span class="meta-value" th:text="${concern.student.user.email}">email@test.com</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Submitted</span>
+                        <span class="meta-value" th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, HH:mm')}">01 Jan 2026</span>
+                    </div>
+                </div>
+
+                <div class="concern-message" th:text="${concern.message}">
+                    Concern message goes here...
+                </div>
+
+                <a th:if="${concern.evidencePath != null}" th:href="'/uploads/' + ${concern.evidencePath}"
+                   class="evidence-link" target="_blank">
+                    📎 View Attached Evidence
+                </a>
+            </div>
+
+            <!-- Previous Replies -->
+            <div class="replies-section">
+                <h3>Admin Replies</h3>
+
+                <div th:if="${#lists.isEmpty(replies)}" class="no-replies">
+                    <p>No replies yet. Be the first to respond to this concern.</p>
+                </div>
+
+                <div th:each="reply : ${replies}" class="reply-item">
+                    <div class="reply-header">
+                        <span class="reply-admin">
+                            <span th:if="${reply.admin != null and reply.admin.user != null}"
+                                  th:text="'Admin: ' + ${reply.admin.user.firstName} + ' ' + ${reply.admin.user.lastName}">
+                                Admin
+                            </span>
+                            <span th:if="${reply.admin != null}">
+                                (<span th:text="${reply.admin.staffId}">ADMIN001</span>)
+                            </span>
+                        </span>
+                        <span class="reply-time" th:text="${#temporals.format(reply.replyTime, 'dd MMM yyyy, HH:mm')}">01 Jan 2026</span>
+                    </div>
+                    <div class="reply-message" th:text="${reply.replyMessage}">Reply content here...</div>
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            <div class="reply-form-section">
+                <h3>Send Reply</h3>
+                <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply'}" method="post" class="reply-form"
+                      th:object="${replyDTO}">
+
+                    <textarea th:field="*{replyMessage}" placeholder="Type your reply to the student's concern..." required></textarea>
+
+                    <!-- Official replies mark the concern as Complete -->
+                    <input type="hidden" name="newStatus" value="Complete" />
+
+                    <div class="form-row">
+                        <!-- Mark as Read updates status to In Progress -->
+                        <button type="button" class="mark-read-btn" onclick="document.getElementById('markAsReadForm').submit();" 
+                                th:if="${concern.status == 'Pending'}">Mark as Read</button>
+                        <button type="submit" class="submit-reply-btn">Submit Reply</button>
+                    </div>
+                </form>
+
+                <!-- Hidden form for Mark as Read functionality -->
+                <form id="markAsReadForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}" method="post" style="display:none;">
+                    <input type="hidden" name="status" value="In Progress" />
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
+            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>

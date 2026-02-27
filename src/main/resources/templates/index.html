@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademy of Knowledge Bridge - Student Concern Management</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <h1>Akademy of Knowledge Bridge</h1>
+            </div>
+            <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
+                <ul>
+                    <li><a href="/">Home</a></li>
+                    
+                    <!-- If not logged in -->
+                    <li th:if="${student == null and admin == null}"><a href="/login">Login</a></li>
+                    <li th:if="${student == null and admin == null}"><a href="/register">Register</a></li>
+                    
+                    <!-- If student logged in -->
+                    <li th:if="${student != null}"><a href="/student/dashboard" style="color: #ffc107;">My Dashboard</a></li>
+                    
+                    <!-- If admin logged in -->
+                    <li th:if="${admin != null}"><a href="/admin/dashboard" style="color: #ffc107;">Admin Panel</a></li>
+                    
+                    <li><a href="/submit-concern" th:style="${student != null} ? 'color: #fff' : ''">Report Issue</a></li>
+
+                    <li th:if="${student != null or admin != null}"><a href="/logout" style="color: #ef5350;">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <h2>Welcome to Akademy of Knowledge Bridge</h2>
+                <p>Ensuring every student's concern is heard and addressed professionally within our academic community.</p>
+                <a href="/submit-concern" class="cta-button" style="display:inline-block;text-decoration:none;">Report a Concern</a>
+            </div>
+            <div class="hero-image">
+                <img src="/images/img1.jpeg" alt="Academic Excellence">
+            </div>
+        </section>
+
+        <section class="gallery">
+            <h3>Supporting our Scholars at Akademy of Knowledge Bridge</h3>
+            <div class="image-grid">
+                <div class="card">
+                    <div class="card-image"><img src="/images/img2.jpeg" alt="Academic support"></div>
+                    <p>Academic Excellence Concerns</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img3.jpeg" alt="Campus life"></div>
+                    <p>Student Living & Campus Life</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img4.jpeg" alt="Administration"></div>
+                    <p>Administrative Professional Services</p>
+                </div>
+                <div class="card">
+                    <div class="card-image"><img src="/images/img5.jpeg" alt="Mental Health"></div>
+                    <p>Scholar Mental Well-being</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
+            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="/JS/main.js"></script>
+</body>
+</html>
