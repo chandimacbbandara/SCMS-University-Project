@@ -3,201 +3,324 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Login - Akademy of Knowledge Bridge</title>
+    <title>Student Login - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .login-container {
-            max-width: 480px;
-            margin: 60px auto;
-            padding: 0 20px;
+        body { background: #f4f6fb; }
+
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        @keyframes pulse-ring {
+            0%   { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+        .animate-in { animation: fadeSlideUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .2s; }
+        .delay-3 { animation-delay: .3s; }
+
+        /* ===== Split Layout ===== */
+        .login-wrapper {
+            display: flex;
+            min-height: calc(100vh - 160px);
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
 
-        .login-header {
+        .login-split {
+            display: flex;
+            max-width: 920px;
+            width: 100%;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        /* ===== Left Panel (Branding) ===== */
+        .login-left {
+            flex: 0 0 380px;
+            background: linear-gradient(135deg, #e53935 0%, #c62828 50%, #b71c1c 100%);
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
             text-align: center;
+        }
+        .login-left::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        .login-left::after {
+            content: '';
+            position: absolute;
+            bottom: -100px; left: -40px;
+            width: 280px; height: 280px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .left-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 22px;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.3);
+            margin-bottom: 24px;
+            animation: float 4s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .left-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .left-subtitle {
+            font-size: 14px;
+            opacity: 0.85;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
             margin-bottom: 30px;
         }
 
-        .login-header h2 {
-            color: #1a237e;
-            font-size: 32px;
-            margin-bottom: 8px;
+        .left-features {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-align: left;
+            width: 100%;
         }
-
-        .login-header p {
-            color: #666;
-            font-size: 16px;
+        .left-features li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 0;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.9;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-
-        .login-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            border-top: 5px solid #1a237e;
-        }
-
-        .login-icon {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .login-icon .icon-circle {
-            display: inline-flex;
+        .left-features li:last-child { border-bottom: none; }
+        .left-features li i {
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #1a237e, #283593);
-            color: #fff;
-            font-size: 36px;
-        }
-
-        .form-group {
-            margin-bottom: 22px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 700;
-            color: #1a237e;
-            margin-bottom: 8px;
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            flex-shrink: 0;
         }
 
-        .form-group label .required {
-            color: #e53935;
+        /* ===== Right Panel (Form) ===== */
+        .login-right {
+            flex: 1;
+            padding: 50px 44px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
-        .form-group input[type="email"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            font-size: 15px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background: #fafafa;
+        .form-header {
+            margin-bottom: 32px;
+        }
+        .form-header h2 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #222;
+            margin: 0 0 6px;
+        }
+        .form-header p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
         }
 
-        .form-group input:focus {
-            outline: none;
-            border-color: #1a237e;
-            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
-            background: #fff;
-        }
-
-        .form-group input::placeholder {
-            color: #aaa;
-        }
-
-        .input-icon-wrapper {
-            position: relative;
-        }
-
-        .input-icon-wrapper .input-icon {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
-            color: #aaa;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1a237e, #283593);
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            background: linear-gradient(135deg, #283593, #3949ab);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Alert Messages */
+        /* Alerts */
         .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
+            padding: 14px 18px;
+            border-radius: 12px;
             margin-bottom: 20px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-
         .alert-success {
             background: #e8f5e9;
             color: #2e7d32;
             border: 1px solid #a5d6a7;
         }
-
         .alert-error {
             background: #ffebee;
             color: #c62828;
             border: 1px solid #ef9a9a;
         }
-
         .alert-warning {
             background: #fff3e0;
             color: #e65100;
             border: 1px solid #ffcc02;
         }
 
-        .register-link {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 14px;
-            color: #666;
+        /* Form groups */
+        .form-group {
+            margin-bottom: 22px;
         }
-
-        .register-link a {
-            color: #1a237e;
+        .form-group label {
+            display: block;
             font-weight: 700;
-            text-decoration: none;
+            color: #444;
+            margin-bottom: 8px;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
         }
+        .input-field {
+            position: relative;
+        }
+        .input-field i.field-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 16px;
+            transition: color 0.3s;
+            z-index: 1;
+        }
+        .input-field input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+        .input-field input:focus {
+            outline: none;
+            border-color: #e53935;
+            box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.08);
+            background: #fff;
+        }
+        .input-field input:focus ~ i.field-icon {
+            color: #e53935;
+        }
+        .input-field input::placeholder {
+            color: #bbb;
+        }
+        .input-field .toggle-pw {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            cursor: pointer;
+            font-size: 16px;
+            transition: color 0.3s;
+            z-index: 1;
+            background: none;
+            border: none;
+            padding: 4px;
+        }
+        .input-field .toggle-pw:hover { color: #e53935; }
 
-        .register-link a:hover {
-            text-decoration: underline;
+        /* Login button */
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
+        .login-btn:hover {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(229, 57, 53, 0.3);
+        }
+        .login-btn:active { transform: translateY(0); }
 
         .divider {
             display: flex;
             align-items: center;
             gap: 15px;
-            margin: 20px 0;
+            margin: 24px 0;
             color: #ccc;
-            font-size: 13px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-
-        .divider::before,
-        .divider::after {
+        .divider::before, .divider::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: #e0e0e0;
+            background: #eee;
         }
 
-        @media (max-width: 500px) {
-            .login-card {
-                padding: 25px;
+        .register-link {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+        }
+        .register-link a {
+            color: #e53935;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .register-link a:hover { color: #b71c1c; text-decoration: underline; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-split { flex-direction: column; }
+            .login-left {
+                flex: none;
+                padding: 36px 30px;
             }
+            .left-features { display: none; }
+            .login-right { padding: 36px 28px; }
+        }
+        @media (max-width: 480px) {
+            .login-wrapper { padding: 20px 12px; }
+            .login-right { padding: 28px 20px; }
         }
     </style>
 </head>
@@ -205,88 +328,121 @@
     <header>
         <div class="container header-content">
             <div class="logo-area">
-                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-                <h1>Akademy of Knowledge Bridge</h1>
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
             </div>
             <nav>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/login" style="color: #ffc107;">Login</a></li>
-                    <li><a href="/register">Register</a></li>
-                    <li><a href="/submit-concern">Report Issue</a></li>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a th:href="@{/login}" href="/login" class="nav-link" style="color: #e53935;">Login</a></li>
+                    <li><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main>
-        <div class="login-container">
-            <div class="login-header">
-                <h2>Login</h2>
-                <p>Sign in to access your portal</p>
-            </div>
+        <div class="login-wrapper">
+            <div class="login-split animate-in">
 
-            <!-- Success Message -->
-            <div th:if="${successMessage}" class="alert alert-success">
-                <span th:text="${successMessage}"></span>
-            </div>
-
-            <!-- Error Message -->
-            <div th:if="${errorMessage}" class="alert alert-error">
-                <span th:text="${errorMessage}"></span>
-            </div>
-
-            <div class="login-card">
-                <div class="login-icon">
-                    <div class="icon-circle">&#128100;</div>
+                <!-- Left Branding Panel -->
+                <div class="login-left">
+                    <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Logo" class="left-logo">
+                    <div class="left-title">Welcome Back</div>
+                    <p class="left-subtitle">Sign in to manage your academic concerns and track progress in real time.</p>
+                    <ul class="left-features">
+                        <li><i class="fas fa-paper-plane"></i> Submit &amp; track concerns</li>
+                        <li><i class="fas fa-comments"></i> Get real-time admin replies</li>
+                        <li><i class="fas fa-chart-line"></i> View your concern history</li>
+                        <li><i class="fas fa-shield-halved"></i> Secure &amp; private portal</li>
+                    </ul>
                 </div>
 
-                <form th:action="@{/login}" method="post" id="loginForm">
-                    <div class="form-group">
-                        <label>Email Address <span class="required">*</span></label>
-                        <div class="input-icon-wrapper">
-                            <input type="email" name="email" placeholder="Enter your email address" required>
-                            <span class="input-icon">&#9993;</span>
-                        </div>
+                <!-- Right Form Panel -->
+                <div class="login-right">
+                    <div class="form-header animate-in delay-1">
+                        <h2>Sign In</h2>
+                        <p>Enter your credentials to continue</p>
                     </div>
 
-                    <div class="form-group">
-                        <label>Password <span class="required">*</span></label>
-                        <div class="input-icon-wrapper">
-                            <input type="password" name="password" id="passwordField" placeholder="Enter your password" required>
-                            <span class="input-icon toggle-password" onclick="togglePassword()" style="cursor:pointer;">&#128065;</span>
-                        </div>
+                    <!-- Success Message -->
+                    <div th:if="${successMessage}" class="alert alert-success">
+                        <i class="fas fa-circle-check"></i>
+                        <span th:text="${successMessage}"></span>
                     </div>
 
-                    <button type="submit" class="login-btn">Sign In</button>
-                </form>
+                    <!-- Error Message -->
+                    <div th:if="${errorMessage}" class="alert alert-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
 
-                <div class="divider">or</div>
+                    <form th:action="@{/login}" method="post" id="loginForm">
+                        <div class="form-group animate-in delay-1">
+                            <label>Email Address</label>
+                            <div class="input-field">
+                                <i class="fas fa-envelope field-icon"></i>
+                                <input type="email" name="email" placeholder="you@example.com" required>
+                            </div>
+                        </div>
 
-                <div class="register-link">
-                    Don't have an account? <a href="/register">Register here</a>
+                        <div class="form-group animate-in delay-2">
+                            <label>Password</label>
+                            <div class="input-field">
+                                <i class="fas fa-lock field-icon"></i>
+                                <input type="password" name="password" id="passwordField" placeholder="Enter your password" required>
+                                <button type="button" class="toggle-pw" onclick="togglePassword()">
+                                    <i class="fas fa-eye" id="pwIcon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="login-btn animate-in delay-3">
+                            <i class="fas fa-right-to-bracket"></i> Sign In
+                        </button>
+                    </form>
+
+                    <div class="divider animate-in delay-3">or</div>
+
+                    <div class="register-link animate-in delay-3">
+                        Don't have an account? <a href="/register">Create one now</a>
+                    </div>
                 </div>
+
             </div>
         </div>
     </main>
 
     <footer>
         <div class="footer-content">
-            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
-            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
     <script>
         function togglePassword() {
             const field = document.getElementById('passwordField');
-            const icon = document.querySelector('.toggle-password');
+            const icon = document.getElementById('pwIcon');
             if (field.type === 'password') {
                 field.type = 'text';
-                icon.innerHTML = '&#128580;';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
                 field.type = 'password';
-                icon.innerHTML = '&#128065;';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
     </script>

@@ -15,7 +15,7 @@
         .back-link {
             display: inline-block;
             margin-bottom: 20px;
-            color: #1a237e;
+            color: #e53935;
             text-decoration: none;
             font-weight: 600;
             font-size: 15px;
@@ -23,7 +23,7 @@
         }
 
         .back-link:hover {
-            color: #ffc107;
+            color: #c62828;
         }
 
         /* Concern Card */
@@ -51,7 +51,7 @@
         }
 
         .concern-card h2 {
-            color: #1a237e;
+            color: #e53935;
             font-size: 26px;
             margin: 5px 0;
         }
@@ -72,7 +72,7 @@
 
         .concern-meta .meta-label {
             font-weight: 700;
-            color: #1a237e;
+            color: #e53935;
             display: block;
             margin-bottom: 3px;
         }
@@ -84,7 +84,7 @@
         .concern-message {
             padding: 20px;
             background: #fafafa;
-            border-left: 4px solid #1a237e;
+            border-left: 4px solid #e53935;
             border-radius: 0 8px 8px 0;
             font-size: 15px;
             line-height: 1.7;
@@ -117,7 +117,7 @@
         }
 
         .status-section h3 {
-            color: #1a237e;
+            color: #e53935;
             margin-bottom: 15px;
             font-size: 18px;
         }
@@ -140,12 +140,12 @@
 
         .status-form select:focus {
             outline: none;
-            border-color: #1a237e;
+            border-color: #e53935;
         }
 
         .status-form button {
             padding: 10px 24px;
-            background: #1a237e;
+            background: #e53935;
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -155,7 +155,7 @@
         }
 
         .status-form button:hover {
-            background: #283593;
+            background: #c62828;
         }
 
         .status-badge {
@@ -181,16 +181,16 @@
         }
 
         .replies-section h3 {
-            color: #1a237e;
+            color: #e53935;
             font-size: 20px;
             margin-bottom: 20px;
-            border-bottom: 2px solid #e8eaf6;
+            border-bottom: 2px solid #fce4ec;
             padding-bottom: 10px;
         }
 
         .reply-item {
             padding: 20px;
-            background: #f0f4ff;
+            background: #fff5f5;
             border-radius: 10px;
             margin-bottom: 15px;
             border-left: 4px solid #4caf50;
@@ -205,7 +205,7 @@
 
         .reply-item .reply-admin {
             font-weight: 700;
-            color: #1a237e;
+            color: #e53935;
             font-size: 14px;
         }
 
@@ -236,7 +236,7 @@
         }
 
         .reply-form-section h3 {
-            color: #1a237e;
+            color: #e53935;
             font-size: 20px;
             margin-bottom: 20px;
         }
@@ -256,8 +256,8 @@
 
         .reply-form textarea:focus {
             outline: none;
-            border-color: #1a237e;
-            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            border-color: #e53935;
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
             background: #fff;
         }
 
@@ -270,7 +270,7 @@
 
         .reply-form .form-row label {
             font-weight: 600;
-            color: #1a237e;
+            color: #e53935;
             font-size: 14px;
         }
 
@@ -285,7 +285,7 @@
         .reply-form .submit-reply-btn {
             display: inline-block;
             padding: 12px 30px;
-            background: linear-gradient(135deg, #1a237e, #283593);
+            background: linear-gradient(135deg, #e53935, #c62828);
             color: #fff;
             border: none;
             border-radius: 8px;
@@ -299,17 +299,17 @@
         }
 
         .reply-form .submit-reply-btn:hover {
-            background: linear-gradient(135deg, #283593, #3949ab);
+            background: linear-gradient(135deg, #c62828, #b71c1c);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+            box-shadow: 0 6px 20px rgba(229, 57, 53, 0.3);
         }
 
         .mark-read-btn {
             display: inline-block;
             padding: 10px 20px;
             background: #fff;
-            color: #1a237e;
-            border: 2px solid #1a237e;
+            color: #e53935;
+            border: 2px solid #e53935;
             border-radius: 8px;
             font-size: 14px;
             font-weight: 600;
@@ -319,7 +319,7 @@
         }
 
         .mark-read-btn:hover {
-            background: #f0f0ff;
+            background: #fff5f5;
         }
 
         /* Alert */
@@ -346,15 +346,18 @@
     <header>
         <div class="container header-content">
             <div class="logo-area">
-                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-                <h1>Akademy of Knowledge Bridge</h1>
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
             </div>
             <nav>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/admin/student-review">Student Review</a></li>
-                    <li><a href="/admin/dashboard" style="color: #ffc107;">Admin Dashboard</a></li>
-                    <li><a href="/logout" style="color: #ef5350;">Logout</a></li>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/admin/student-review" class="nav-link">Student Review</a></li>
+                    <li><a href="/admin/dashboard" class="nav-link" style="color: #e53935;">Admin Dashboard</a></li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
                 </ul>
             </nav>
         </div>
@@ -469,8 +472,16 @@
 
     <footer>
         <div class="footer-content">
-            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
-            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 </body>
