@@ -7,4 +7,5 @@ Project/_6/demo/repository/UserRepository.class
 Project/_6/demo/service/ConcernService.class
 Project/_6/demo/repository/ConcernRepository.class
 Project/_6/demo/entity/User.class
+Project/_6/demo/repository/NotificationRepository.class
 Project/_6/demo/entity/Student.class

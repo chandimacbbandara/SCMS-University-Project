@@ -29,17 +29,20 @@ public class AdminService {
     private final AdminReplyRepository adminReplyRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
                         UserRepository userRepository,
-                        PasswordEncoder passwordEncoder) {
+                        PasswordEncoder passwordEncoder,
+                        NotificationService notificationService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
     }
 
     /**
@@ -128,7 +131,14 @@ public class AdminService {
         }
 
         concernRepository.save(concern);
-        return adminReplyRepository.save(reply);
+        AdminReply savedReply = adminReplyRepository.save(reply);
+
+        // Trigger notification: Step 3 - Concern Complete (when reply is submitted)
+        if ("Complete".equals(concern.getStatus())) {
+            notificationService.notifyConcernComplete(concern);
+        }
+
+        return savedReply;
     }
 
     /**
@@ -138,7 +148,14 @@ public class AdminService {
     public Concern updateConcernStatus(Integer concernId, String status) {
         Concern concern = getConcernById(concernId);
         concern.setStatus(status);
-        return concernRepository.save(concern);
+        Concern saved = concernRepository.save(concern);
+
+        // Trigger notification: Step 2 - Concern In Progress (Mark as Read)
+        if ("In Progress".equals(status)) {
+            notificationService.notifyConcernInProgress(saved);
+        }
+
+        return saved;
     }
 
     /**

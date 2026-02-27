@@ -2,7 +2,11 @@ package Project._6.demo.controller;
 
 import Project._6.demo.dto.LoginDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
+import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.Student;
+import Project._6.demo.service.ConcernService;
+import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentRegistrationService;
 
 import org.springframework.http.HttpHeaders;
@@ -23,9 +27,15 @@ import java.util.List;
 public class StudentRegistrationController {
 
     private final StudentRegistrationService registrationService;
+    private final NotificationService notificationService;
+    private final ConcernService concernService;
 
-    public StudentRegistrationController(StudentRegistrationService registrationService) {
+    public StudentRegistrationController(StudentRegistrationService registrationService,
+                                         NotificationService notificationService,
+                                         ConcernService concernService) {
         this.registrationService = registrationService;
+        this.notificationService = notificationService;
+        this.concernService = concernService;
     }
 
     /**
@@ -117,6 +127,17 @@ public class StudentRegistrationController {
 
         model.addAttribute("student", student);
         model.addAttribute("studentName", student.getUser().getFirstName() + " " + student.getUser().getLastName());
+
+        // Add notifications for the student
+        List<Notification> notifications = notificationService.getNotificationsForStudent(userId);
+        long unreadCount = notificationService.getUnreadCount(userId);
+        model.addAttribute("notifications", notifications);
+        model.addAttribute("unreadCount", unreadCount);
+
+        // Add student's concerns for tracking
+        List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
+        model.addAttribute("concerns", concerns);
+
         return "student-dashboard";
     }
 

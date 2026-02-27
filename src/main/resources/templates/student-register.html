@@ -3,133 +3,337 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Registration - Akademy of Knowledge Bridge</title>
+    <title>Student Registration - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .register-container {
-            max-width: 600px;
-            margin: 40px auto;
-            padding: 0 20px;
+        body { background: #f4f6fb; }
+
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        .animate-in { animation: fadeSlideUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .2s; }
+        .delay-3 { animation-delay: .3s; }
+        .delay-4 { animation-delay: .4s; }
+
+        /* ===== Split Layout ===== */
+        .register-wrapper {
+            display: flex;
+            min-height: calc(100vh - 160px);
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
 
-        .register-header {
+        .register-split {
+            display: flex;
+            max-width: 1020px;
+            width: 100%;
+            background: #fff;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
+        }
+
+        /* ===== Left Panel ===== */
+        .register-left {
+            flex: 0 0 340px;
+            background: linear-gradient(135deg, #e53935 0%, #c62828 50%, #b71c1c 100%);
+            padding: 50px 36px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            color: #fff;
             text-align: center;
+        }
+        .register-left::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 50%;
+        }
+        .register-left::after {
+            content: '';
+            position: absolute;
+            bottom: -100px; left: -40px;
+            width: 280px; height: 280px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+
+        .left-logo {
+            width: 80px; height: 80px;
+            border-radius: 20px;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.3);
+            margin-bottom: 22px;
+            animation: float 4s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+        .left-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+        .left-subtitle {
+            font-size: 13px;
+            opacity: 0.85;
+            line-height: 1.5;
+            position: relative;
+            z-index: 1;
             margin-bottom: 30px;
         }
 
-        .register-header h2 {
-            color: #1a237e;
-            font-size: 32px;
-            margin-bottom: 8px;
+        /* Steps indicator */
+        .reg-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+            z-index: 1;
+            text-align: left;
+            width: 100%;
+        }
+        .reg-steps li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            font-size: 13px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        .step-num {
+            width: 30px; height: 30px;
+            background: rgba(255,255,255,0.18);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 13px;
+            flex-shrink: 0;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .step-connector {
+            width: 2px;
+            height: 16px;
+            background: rgba(255,255,255,0.15);
+            margin-left: 14px;
         }
 
-        .register-header p {
-            color: #666;
-            font-size: 16px;
+        /* ===== Right Panel ===== */
+        .register-right {
+            flex: 1;
+            padding: 44px 40px;
+            overflow-y: auto;
+            max-height: 90vh;
         }
 
-        .register-card {
-            background: #fff;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-            border-top: 5px solid #1a237e;
+        .form-header {
+            margin-bottom: 28px;
+        }
+        .form-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #222;
+            margin: 0 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-header h2 i { color: #e53935; font-size: 22px; }
+        .form-header p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
         }
 
+        /* Info note */
+        .info-note {
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 24px;
+            font-size: 13px;
+            color: #f57f17;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+        .info-note i { font-size: 18px; }
+
+        /* Alerts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .alert-error { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+        /* Section titles */
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e53935;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #fdeaea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-section-title i { font-size: 14px; }
+
+        /* Form groups */
         .form-group {
-            margin-bottom: 22px;
+            margin-bottom: 20px;
         }
-
         .form-group label {
             display: block;
             font-weight: 700;
-            color: #1a237e;
-            margin-bottom: 8px;
-            font-size: 14px;
+            color: #444;
+            margin-bottom: 7px;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
         }
+        .form-group label .required { color: #e53935; }
 
-        .form-group label .required {
-            color: #e53935;
+        .input-field {
+            position: relative;
         }
-
-        .form-group input[type="text"],
-        .form-group input[type="email"],
-        .form-group input[type="password"] {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+        .input-field i.field-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
             font-size: 15px;
-            font-family: 'Segoe UI', Arial, sans-serif;
-            transition: border-color 0.3s, box-shadow 0.3s;
-            background: #fafafa;
+            transition: color 0.3s;
+            z-index: 1;
         }
-
-        .form-group input:focus {
+        .input-field input {
+            width: 100%;
+            padding: 13px 16px 13px 44px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: all 0.3s;
+            background: #fafbfc;
+        }
+        .input-field input:focus {
             outline: none;
-            border-color: #1a237e;
-            box-shadow: 0 0 0 3px rgba(26, 35, 126, 0.1);
+            border-color: #e53935;
+            box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.08);
             background: #fff;
         }
-
-        .form-group input::placeholder {
-            color: #aaa;
-        }
+        .input-field input:focus ~ i.field-icon { color: #e53935; }
+        .input-field input::placeholder { color: #bbb; }
 
         .form-row {
             display: flex;
-            gap: 20px;
+            gap: 16px;
+        }
+        .form-row .form-group { flex: 1; }
+
+        /* Password strength indicator */
+        .pw-match-error {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #e53935;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 5px;
         }
 
-        .form-row .form-group {
-            flex: 1;
-        }
-
-        /* File Upload Area */
+        /* File Upload */
         .file-upload-area {
-            border: 2px dashed #c5cae9;
-            border-radius: 12px;
-            padding: 30px;
+            border: 2px dashed #ddd;
+            border-radius: 16px;
+            padding: 32px 24px;
             text-align: center;
-            background: #f5f7ff;
+            background: #fafbfc;
             cursor: pointer;
             transition: all 0.3s;
             position: relative;
+            overflow: hidden;
         }
-
         .file-upload-area:hover {
-            border-color: #1a237e;
-            background: #eef0ff;
+            border-color: #e53935;
+            background: #fff5f5;
         }
-
         .file-upload-area.has-file {
             border-color: #4caf50;
             background: #f1f8e9;
         }
+        .file-upload-area.dragover {
+            border-color: #e53935;
+            background: #fdeaea;
+            transform: scale(1.01);
+        }
 
-        .file-upload-icon {
-            font-size: 48px;
-            color: #7986cb;
-            margin-bottom: 10px;
+        .upload-icon-wrapper {
+            width: 60px; height: 60px;
+            border-radius: 16px;
+            background: #fdeaea;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+            transition: all 0.3s;
+        }
+        .upload-icon-wrapper i {
+            font-size: 24px;
+            color: #e53935;
+        }
+        .file-upload-area.has-file .upload-icon-wrapper {
+            background: #e8f5e9;
+        }
+        .file-upload-area.has-file .upload-icon-wrapper i {
+            color: #4caf50;
         }
 
         .file-upload-text {
             color: #666;
             font-size: 14px;
+            line-height: 1.5;
         }
-
-        .file-upload-text strong {
-            color: #1a237e;
-        }
+        .file-upload-text strong { color: #e53935; }
+        .file-upload-text small { color: #aaa; font-size: 12px; }
 
         .file-upload-area input[type="file"] {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             opacity: 0;
             cursor: pointer;
         }
@@ -139,110 +343,82 @@
             font-size: 13px;
             color: #4caf50;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .photo-preview {
-            margin-top: 15px;
-            max-width: 200px;
-            max-height: 200px;
-            border-radius: 8px;
+            margin-top: 16px;
+            max-width: 180px;
+            max-height: 180px;
+            border-radius: 12px;
             display: none;
             margin-left: auto;
             margin-right: auto;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
         }
 
-        /* Submit Button */
+        /* Submit */
         .submit-btn {
             width: 100%;
-            padding: 14px;
-            background: linear-gradient(135deg, #1a237e, #283593);
+            padding: 15px;
+            background: linear-gradient(135deg, #e53935, #c62828);
             color: #fff;
             border: none;
-            border-radius: 10px;
-            font-size: 16px;
+            border-radius: 12px;
+            font-size: 15px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
-
         .submit-btn:hover {
-            background: linear-gradient(135deg, #283593, #3949ab);
+            background: linear-gradient(135deg, #c62828, #b71c1c);
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(26, 35, 126, 0.3);
+            box-shadow: 0 8px 24px rgba(229, 57, 53, 0.3);
         }
-
-        .submit-btn:active {
-            transform: translateY(0);
-        }
-
-        /* Alert Messages */
-        .alert {
-            padding: 15px 20px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .alert-success {
-            background: #e8f5e9;
-            color: #2e7d32;
-            border: 1px solid #a5d6a7;
-        }
-
-        .alert-error {
-            background: #ffebee;
-            color: #c62828;
-            border: 1px solid #ef9a9a;
-        }
+        .submit-btn:active { transform: translateY(0); }
 
         .login-link {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 22px;
             font-size: 14px;
-            color: #666;
+            color: #888;
         }
-
         .login-link a {
-            color: #1a237e;
+            color: #e53935;
             font-weight: 700;
             text-decoration: none;
         }
+        .login-link a:hover { color: #b71c1c; text-decoration: underline; }
 
-        .login-link a:hover {
-            text-decoration: underline;
-        }
-
-        .info-note {
-            background: #fff3e0;
-            border: 1px solid #ffcc02;
-            border-radius: 10px;
-            padding: 14px 18px;
-            margin-bottom: 25px;
-            font-size: 13px;
-            color: #e65100;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .info-note .note-icon {
-            font-size: 20px;
-        }
-
-        @media (max-width: 600px) {
-            .form-row {
-                flex-direction: column;
-                gap: 0;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .register-split { flex-direction: column; }
+            .register-left {
+                flex: none;
+                padding: 32px 28px;
             }
-
-            .register-card {
-                padding: 25px;
+            .reg-steps { display: none; }
+            .step-connector { display: none; }
+            .register-right {
+                padding: 32px 24px;
+                max-height: none;
             }
+        }
+        @media (max-width: 480px) {
+            .register-wrapper { padding: 20px 12px; }
+            .register-right { padding: 24px 18px; }
+            .form-row { flex-direction: column; gap: 0; }
         }
     </style>
 </head>
@@ -250,106 +426,190 @@
     <header>
         <div class="container header-content">
             <div class="logo-area">
-                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-                <h1>Akademy of Knowledge Bridge</h1>
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
             </div>
             <nav>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/login">Login</a></li>
-                    <li><a href="/register">Register</a></li>
-                    <li><a href="/submit-concern">Report Issue</a></li>
-                    <li><a href="/admin/dashboard">Admin</a></li>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
+                    <li><a th:href="@{/register}" href="/register" class="nav-link" style="color: #e53935;">Sign Up</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
     <main>
-        <div class="register-container">
-            <div class="register-header">
-                <h2>Student Registration</h2>
-                <p>Create your account to submit and track academic concerns</p>
-            </div>
+        <div class="register-wrapper">
+            <div class="register-split animate-in">
 
-            <!-- Success Message -->
-            <div th:if="${successMessage}" class="alert alert-success">
-                <span th:text="${successMessage}"></span>
-            </div>
+                <!-- Left Panel -->
+                <div class="register-left">
+                    <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Logo" class="left-logo">
+                    <div class="left-title">Join Us Today</div>
+                    <p class="left-subtitle">Create your student account and start managing your academic concerns.</p>
 
-            <!-- Error Message -->
-            <div th:if="${errorMessage}" class="alert alert-error">
-                <span th:text="${errorMessage}"></span>
-            </div>
-
-            <div class="register-card">
-                <div class="info-note">
-                    <span class="note-icon">&#9432;</span>
-                    <span>Your registration will be reviewed by an administrator. You will be notified once approved.</span>
+                    <ul class="reg-steps">
+                        <li>
+                            <span class="step-num">1</span>
+                            <span>Fill in your personal details</span>
+                        </li>
+                        <div class="step-connector"></div>
+                        <li>
+                            <span class="step-num">2</span>
+                            <span>Set your password</span>
+                        </li>
+                        <div class="step-connector"></div>
+                        <li>
+                            <span class="step-num">3</span>
+                            <span>Upload student ID photo</span>
+                        </li>
+                        <div class="step-connector"></div>
+                        <li>
+                            <span class="step-num">4</span>
+                            <span>Wait for admin approval</span>
+                        </li>
+                    </ul>
                 </div>
 
-                <form th:action="@{/register}" method="post" enctype="multipart/form-data" id="registerForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>First Name <span class="required">*</span></label>
-                            <input type="text" name="firstName" placeholder="Enter first name" required>
+                <!-- Right Panel -->
+                <div class="register-right">
+                    <div class="form-header animate-in delay-1">
+                        <h2><i class="fas fa-user-plus"></i> Create Account</h2>
+                        <p>Complete the form below to register as a student</p>
+                    </div>
+
+                    <!-- Success Message -->
+                    <div th:if="${successMessage}" class="alert alert-success">
+                        <i class="fas fa-circle-check"></i>
+                        <span th:text="${successMessage}"></span>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div th:if="${errorMessage}" class="alert alert-error">
+                        <i class="fas fa-circle-exclamation"></i>
+                        <span th:text="${errorMessage}"></span>
+                    </div>
+
+                    <div class="info-note animate-in delay-1">
+                        <i class="fas fa-info-circle"></i>
+                        <span>Your registration will be reviewed by an administrator. You'll be notified once approved.</span>
+                    </div>
+
+                    <form th:action="@{/register}" method="post" enctype="multipart/form-data" id="registerForm">
+
+                        <!-- Personal Info Section -->
+                        <div class="form-section-title animate-in delay-1">
+                            <i class="fas fa-user"></i> Personal Information
                         </div>
-                        <div class="form-group">
-                            <label>Last Name <span class="required">*</span></label>
-                            <input type="text" name="lastName" placeholder="Enter last name" required>
+
+                        <div class="form-row animate-in delay-1">
+                            <div class="form-group">
+                                <label>First Name <span class="required">*</span></label>
+                                <div class="input-field">
+                                    <i class="fas fa-user field-icon"></i>
+                                    <input type="text" name="firstName" placeholder="First name" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Last Name <span class="required">*</span></label>
+                                <div class="input-field">
+                                    <i class="fas fa-user field-icon"></i>
+                                    <input type="text" name="lastName" placeholder="Last name" required>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Email Address <span class="required">*</span></label>
-                        <input type="email" name="email" placeholder="your.email@example.com" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Password <span class="required">*</span></label>
-                        <input type="password" name="password" id="password" placeholder="Create a strong password" required
-                               minlength="6">
-                    </div>
-
-                    <div class="form-group">
-                        <label>Confirm Password <span class="required">*</span></label>
-                        <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirm your password" required>
-                        <div id="passwordError" class="file-name" style="color: #e53935; display: none; margin-top: 5px;">
-                            Passwords do not match!
+                        <div class="form-group animate-in delay-2">
+                            <label>Email Address <span class="required">*</span></label>
+                            <div class="input-field">
+                                <i class="fas fa-envelope field-icon"></i>
+                                <input type="email" name="email" placeholder="you@example.com" required>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="form-group">
-                        <label>Student ID <span class="required">*</span></label>
-                        <input type="text" name="studentId" placeholder="e.g. STU2024001" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Student ID Card Photo <span class="required">*</span></label>
-                        <div class="file-upload-area" id="uploadArea">
-                            <div class="file-upload-icon">&#128247;</div>
-                            <p class="file-upload-text">
-                                <strong>Click to upload</strong> or drag and drop<br>
-                                your Student ID card photo<br>
-                                <small>JPG, PNG or GIF (Max 10MB)</small>
-                            </p>
-                            <input type="file" name="studentIdPhoto" id="studentIdPhoto"
-                                   accept="image/*" required>
-                            <div class="file-name" id="fileName"></div>
+                        <div class="form-group animate-in delay-2">
+                            <label>Student ID <span class="required">*</span></label>
+                            <div class="input-field">
+                                <i class="fas fa-id-card field-icon"></i>
+                                <input type="text" name="studentId" placeholder="e.g. STU2024001" required>
+                            </div>
                         </div>
-                        <img class="photo-preview" id="photoPreview" alt="ID Preview">
-                    </div>
 
-                    <button type="submit" class="submit-btn">Register Account</button>
-                </form>
+                        <!-- Security Section -->
+                        <div class="form-section-title animate-in delay-2">
+                            <i class="fas fa-lock"></i> Security
+                        </div>
+
+                        <div class="form-group animate-in delay-3">
+                            <label>Password <span class="required">*</span></label>
+                            <div class="input-field">
+                                <i class="fas fa-lock field-icon"></i>
+                                <input type="password" name="password" id="password" placeholder="Min 6 characters" required minlength="6">
+                            </div>
+                        </div>
+
+                        <div class="form-group animate-in delay-3">
+                            <label>Confirm Password <span class="required">*</span></label>
+                            <div class="input-field">
+                                <i class="fas fa-shield-halved field-icon"></i>
+                                <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Re-enter your password" required>
+                            </div>
+                            <div class="pw-match-error" id="passwordError">
+                                <i class="fas fa-triangle-exclamation"></i> Passwords do not match!
+                            </div>
+                        </div>
+
+                        <!-- ID Upload Section -->
+                        <div class="form-section-title animate-in delay-3">
+                            <i class="fas fa-camera"></i> Student ID Verification
+                        </div>
+
+                        <div class="form-group animate-in delay-4">
+                            <label>Student ID Card Photo <span class="required">*</span></label>
+                            <div class="file-upload-area" id="uploadArea">
+                                <div class="upload-icon-wrapper">
+                                    <i class="fas fa-cloud-arrow-up" id="uploadIcon"></i>
+                                </div>
+                                <p class="file-upload-text">
+                                    <strong>Click to upload</strong> or drag &amp; drop<br>
+                                    <small>JPG, PNG or GIF (Max 10MB)</small>
+                                </p>
+                                <input type="file" name="studentIdPhoto" id="studentIdPhoto" accept="image/*" required>
+                                <div class="file-name" id="fileName"></div>
+                            </div>
+                            <img class="photo-preview" id="photoPreview" alt="ID Preview">
+                        </div>
+
+                        <button type="submit" class="submit-btn animate-in delay-4">
+                            <i class="fas fa-check-circle"></i> Create Account
+                        </button>
+                    </form>
+
+                    <div class="login-link animate-in delay-4">
+                        Already have an account? <a href="/login">Sign in here</a>
+                    </div>
+                </div>
+
             </div>
         </div>
     </main>
 
     <footer>
         <div class="footer-content">
-            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
-            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
@@ -359,14 +619,16 @@
         const uploadArea = document.getElementById('uploadArea');
         const fileName = document.getElementById('fileName');
         const photoPreview = document.getElementById('photoPreview');
+        const uploadIcon = document.getElementById('uploadIcon');
 
         fileInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const file = this.files[0];
-                fileName.textContent = '✓ ' + file.name;
+                fileName.innerHTML = '<i class="fas fa-check-circle"></i> ' + file.name;
                 uploadArea.classList.add('has-file');
+                uploadIcon.classList.remove('fa-cloud-arrow-up');
+                uploadIcon.classList.add('fa-circle-check');
 
-                // Show image preview
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     photoPreview.src = e.target.result;
@@ -376,35 +638,33 @@
             }
         });
 
-        // Drag and drop support
+        // Drag and drop
         uploadArea.addEventListener('dragover', function(e) {
             e.preventDefault();
-            this.style.borderColor = '#1a237e';
-            this.style.background = '#eef0ff';
+            this.classList.add('dragover');
         });
-
         uploadArea.addEventListener('dragleave', function(e) {
             e.preventDefault();
-            if (!uploadArea.classList.contains('has-file')) {
-                this.style.borderColor = '#c5cae9';
-                this.style.background = '#f5f7ff';
-            }
+            this.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', function(e) {
+            this.classList.remove('dragover');
         });
 
-        // Password matching validation
+        // Password matching
         const form = document.getElementById('registerForm');
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirmPassword');
         const passwordError = document.getElementById('passwordError');
 
         function validatePassword() {
-            if (password.value !== confirmPassword.value) {
-                passwordError.style.display = 'block';
-                confirmPassword.style.border = '2px solid #e53935';
+            if (confirmPassword.value && password.value !== confirmPassword.value) {
+                passwordError.style.display = 'flex';
+                confirmPassword.style.borderColor = '#e53935';
                 return false;
             } else {
                 passwordError.style.display = 'none';
-                confirmPassword.style.border = '2px solid #e0e0e0';
+                confirmPassword.style.borderColor = '#eee';
                 return true;
             }
         }

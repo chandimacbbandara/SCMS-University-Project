@@ -3,33 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Akademy of Knowledge Bridge - Student Concern Management</title>
+    <title>Academy of Knowledge Bridge - Student Concern Management</title>
     <link rel="stylesheet" href="/CSS/main.css">
 </head>
 <body>
     <header>
         <div class="container header-content">
             <div class="logo-area">
-                <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-                <h1>Akademy of Knowledge Bridge</h1>
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
             </div>
             <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    
-                    <!-- If not logged in -->
-                    <li th:if="${student == null and admin == null}"><a href="/login">Login</a></li>
-                    <li th:if="${student == null and admin == null}"><a href="/register">Register</a></li>
-                    
-                    <!-- If student logged in -->
-                    <li th:if="${student != null}"><a href="/student/dashboard" style="color: #ffc107;">My Dashboard</a></li>
-                    
-                    <!-- If admin logged in -->
-                    <li th:if="${admin != null}"><a href="/admin/dashboard" style="color: #ffc107;">Admin Panel</a></li>
-                    
-                    <li><a href="/submit-concern" th:style="${student != null} ? 'color: #fff' : ''">Report Issue</a></li>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="#about" class="nav-link">About</a></li>
 
-                    <li th:if="${student != null or admin != null}"><a href="/logout" style="color: #ef5350;">Logout</a></li>
+                    <li th:if="${student == null and admin == null}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
+                    <li th:if="${student == null and admin == null}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
                 </ul>
             </nav>
         </div>
@@ -37,34 +30,63 @@
 
     <main>
         <section class="hero">
-            <div class="hero-content">
-                <h2>Welcome to Akademy of Knowledge Bridge</h2>
-                <p>Ensuring every student's concern is heard and addressed professionally within our academic community.</p>
-                <a href="/submit-concern" class="cta-button" style="display:inline-block;text-decoration:none;">Report a Concern</a>
+            <div class="hero-bg-image">
+                <img th:src="@{/images/img4.jpeg}" src="/images/img1.jpeg" alt="Background" class="hero-bg-img">
             </div>
-            <div class="hero-image">
-                <img src="/images/img1.jpeg" alt="Academic Excellence">
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <p class="hero-subtitle">ACADEMY OF KNOWLEDGE BRIDGE</p>
+                <div class="hero-logo-container">
+                    <div class="hero-logo-glow"></div>
+                    <img th:src="@{/images/img2.jpeg}" src="/images/img2.jpeg" alt="Academy Logo" class="hero-main-logo">
+                    <div class="hero-logo-ring"></div>
+                </div>
+                <p class="hero-description">Empowering students with the knowledge and support they need to excel in their academic journey.</p>
+                <div class="hero-buttons">
+                    <a th:href="@{/submit-concern}" href="/submit-concern" class="btn-get-started">GET STARTED</a>
+                    <a href="#resources" class="btn-learn-more">LEARN MORE</a>
+                </div>
             </div>
         </section>
 
-        <section class="gallery">
-            <h3>Supporting our Scholars at Akademy of Knowledge Bridge</h3>
-            <div class="image-grid">
-                <div class="card">
-                    <div class="card-image"><img src="/images/img2.jpeg" alt="Academic support"></div>
-                    <p>Academic Excellence Concerns</p>
+        <section class="resources" id="resources">
+            <div class="section-divider"></div>
+            <p class="section-subtitle">RESOURCES</p>
+            <h3 class="section-title">Student Support &amp; Guidelines</h3>
+            <div class="section-underline"></div>
+
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="16" y1="13" x2="8" y2="13"></line>
+                            <line x1="16" y1="17" x2="8" y2="17"></line>
+                        </svg>
+                    </div>
+                    <h4>How to Submit a Concern</h4>
+                    <p>Follow our streamlined process to raise academic or administrative concerns. We ensure every voice is heard.</p>
                 </div>
-                <div class="card">
-                    <div class="card-image"><img src="/images/img3.jpeg" alt="Campus life"></div>
-                    <p>Student Living & Campus Life</p>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <h4>Our Response Timeline</h4>
+                    <p>All submitted concerns are acknowledged within 24 hours and resolved within 5 working days.</p>
                 </div>
-                <div class="card">
-                    <div class="card-image"><img src="/images/img4.jpeg" alt="Administration"></div>
-                    <p>Administrative Professional Services</p>
-                </div>
-                <div class="card">
-                    <div class="card-image"><img src="/images/img5.jpeg" alt="Mental Health"></div>
-                    <p>Scholar Mental Well-being</p>
+                <div class="resource-card">
+                    <div class="resource-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                            <polyline points="9 12 11 14 15 10"></polyline>
+                        </svg>
+                    </div>
+                    <h4>Privacy &amp; Security</h4>
+                    <p>Your data and identity are protected under our strict confidentiality and data protection policies.</p>
                 </div>
             </div>
         </section>
@@ -72,8 +94,16 @@
 
     <footer>
         <div class="footer-content">
-            <img src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo sm">
-            <p>&copy; 2026 Akademy of Knowledge Bridge. All rights reserved.</p>
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
         </div>
     </footer>
 
