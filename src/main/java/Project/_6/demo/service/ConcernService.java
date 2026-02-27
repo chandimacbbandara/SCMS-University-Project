@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,17 +29,20 @@ public class ConcernService {
     private final StudentRepository studentRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final NotificationService notificationService;
 
     private static final String UPLOAD_DIR = "uploads/";
 
     public ConcernService(ConcernRepository concernRepository,
                           StudentRepository studentRepository,
                           UserRepository userRepository,
-                          PasswordEncoder passwordEncoder) {
+                          PasswordEncoder passwordEncoder,
+                          NotificationService notificationService) {
         this.concernRepository = concernRepository;
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -61,7 +65,21 @@ public class ConcernService {
         concern.setStatus("Pending");
         concern.setStudent(student);
 
-        return concernRepository.save(concern);
+        Concern saved = concernRepository.save(concern);
+
+        // Trigger notification: Step 1 - Concern Submitted
+        notificationService.notifyConcernSubmitted(saved);
+
+        return saved;
+    }
+
+    /**
+     * Get all concerns submitted by a specific student.
+     */
+    public List<Concern> getConcernsByStudentUserId(Integer userId) {
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return concernRepository.findByStudent_StudentId(student.getStudentId());
     }
 
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {
