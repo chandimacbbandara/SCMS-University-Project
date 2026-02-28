@@ -1,9 +1,11 @@
 package Project._6.demo.service;
 
 import Project._6.demo.dto.ConcernSubmissionDTO;
+import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Student;
 import Project._6.demo.entity.User;
+import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.StudentRepository;
 import Project._6.demo.repository.UserRepository;
@@ -18,7 +20,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,6 +34,7 @@ public class ConcernService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
+    private final AdminReplyRepository adminReplyRepository;
 
     private static final String UPLOAD_DIR = "uploads/";
 
@@ -37,12 +42,14 @@ public class ConcernService {
                           StudentRepository studentRepository,
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
-                          NotificationService notificationService) {
+                          NotificationService notificationService,
+                          AdminReplyRepository adminReplyRepository) {
         this.concernRepository = concernRepository;
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationService = notificationService;
+        this.adminReplyRepository = adminReplyRepository;
     }
 
     @Transactional
@@ -63,6 +70,7 @@ public class ConcernService {
         concern.setMessage(dto.getMessage());
         concern.setEvidencePath(evidencePath);
         concern.setStatus("Pending");
+        concern.setCategory(dto.getCategory());
         concern.setStudent(student);
 
         Concern saved = concernRepository.save(concern);
@@ -74,12 +82,32 @@ public class ConcernService {
     }
 
     /**
+     * Get a Student entity by userId.
+     */
+    public Student getStudentByUserId(Integer userId) {
+        return studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+    }
+
+    /**
      * Get all concerns submitted by a specific student.
      */
     public List<Concern> getConcernsByStudentUserId(Integer userId) {
         Student student = studentRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
         return concernRepository.findByStudent_StudentId(student.getStudentId());
+    }
+
+    /**
+     * Build a map of concernId -> List<AdminReply> for a list of concerns.
+     */
+    public Map<Integer, List<AdminReply>> getRepliesMap(List<Concern> concerns) {
+        Map<Integer, List<AdminReply>> map = new HashMap<>();
+        for (Concern c : concerns) {
+            map.put(c.getConcernId(),
+                    adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(c.getConcernId()));
+        }
+        return map;
     }
 
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {

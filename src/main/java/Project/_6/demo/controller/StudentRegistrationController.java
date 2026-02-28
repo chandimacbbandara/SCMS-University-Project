@@ -195,6 +195,10 @@ public class StudentRegistrationController {
         List<Student> students;
         if ("ALL".equalsIgnoreCase(filter)) {
             students = registrationService.getAllStudents();
+        } else if ("APPROVED".equalsIgnoreCase(filter)) {
+            students = registrationService.getStudentsByStatus("APPROVED");
+        } else if ("REJECTED".equalsIgnoreCase(filter)) {
+            students = registrationService.getStudentsByStatus("REJECTED");
         } else {
             students = registrationService.getPendingStudents();
         }

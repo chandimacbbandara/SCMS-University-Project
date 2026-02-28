@@ -23,6 +23,9 @@
 
                     <li th:if="${student == null and admin == null}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
                     <li th:if="${student == null and admin == null}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+                    
+                    <li th:if="${student != null}"><a th:href="@{/student/dashboard}" class="btn-red">Back to Dashboard</a></li>
+                    <li th:if="${admin != null}"><a th:href="@{/admin/dashboard}" class="btn-red">Back to Admin Dashboard</a></li>
                 </ul>
             </nav>
         </div>

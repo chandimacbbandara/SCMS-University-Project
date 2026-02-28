@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern History - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; }
+
+        /* ===== Animations ===== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes slideInLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(20px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .animate-in  { animation: fadeSlideUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .08s; }
+        .delay-2 { animation-delay: .16s; }
+        .delay-3 { animation-delay: .24s; }
+
+        /* ===== Page Layout ===== */
+        .history-container {
+            max-width: 900px;
+            margin: 32px auto;
+            padding: 0 20px;
+        }
+
+        /* ===== Page Header ===== */
+        .page-hero {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 55%, #b71c1c 100%);
+            border-radius: 22px;
+            padding: 36px 38px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 14px 40px rgba(229,57,53,0.28);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -70px; right: -70px;
+            width: 220px; height: 220px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 50%;
+        }
+        .page-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -90px; left: 20%;
+            width: 280px; height: 280px;
+            background: rgba(255,255,255,0.04);
+            border-radius: 50%;
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .hero-eyebrow {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 2.5px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 6px;
+        }
+        .hero-title {
+            font-size: 30px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.8);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .hero-icon-wrap {
+            position: relative; z-index: 1;
+            width: 80px; height: 80px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 34px; color: #fff;
+            backdrop-filter: blur(8px);
+        }
+
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+        .stat-pill {
+            background: #fff;
+            border-radius: 14px;
+            padding: 16px 18px;
+            display: flex; align-items: center; gap: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.05);
+            border-left: 4px solid transparent;
+            transition: all 0.3s;
+        }
+        .stat-pill:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .stat-pill.total   { border-left-color: #7c3aed; }
+        .stat-pill.pending { border-left-color: #f97316; }
+        .stat-pill.progress{ border-left-color: #2563eb; }
+        .stat-pill.complete{ border-left-color: #16a34a; }
+        .stat-pill-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 16px; flex-shrink: 0;
+        }
+        .stat-pill.total   .stat-pill-icon { background: #ede9fe; color: #7c3aed; }
+        .stat-pill.pending .stat-pill-icon { background: #fff7ed; color: #f97316; }
+        .stat-pill.progress .stat-pill-icon { background: #eff6ff; color: #2563eb; }
+        .stat-pill.complete .stat-pill-icon { background: #f0fdf4; color: #16a34a; }
+        .stat-pill-info .stat-pill-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #aaa; }
+        .stat-pill-info .stat-pill-val { font-size: 22px; font-weight: 900; color: #222; }
+
+        /* ===== Filter Bar ===== */
+        .filter-bar {
+            background: #fff;
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 22px;
+            display: flex; gap: 8px; flex-wrap: wrap;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+        }
+        .filter-btn {
+            padding: 7px 18px; border-radius: 20px;
+            font-size: 12px; font-weight: 700;
+            border: 2px solid #eee;
+            background: #fafafa;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.3px;
+        }
+        .filter-btn:hover, .filter-btn.active {
+            border-color: #e53935; background: #fff5f5; color: #e53935;
+        }
+        .filter-btn[data-filter="all"].active { border-color: #7c3aed; background: #ede9fe; color: #7c3aed; }
+        .filter-btn[data-filter="Pending"].active { border-color: #f97316; background: #fff7ed; color: #f97316; }
+        .filter-btn[data-filter="In Progress"].active { border-color: #2563eb; background: #eff6ff; color: #2563eb; }
+        .filter-btn[data-filter="Complete"].active { border-color: #16a34a; background: #f0fdf4; color: #16a34a; }
+
+        /* ===== Empty State ===== */
+        .empty-state {
+            background: #fff; border-radius: 20px;
+            padding: 70px 40px; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+        .empty-icon {
+            width: 90px; height: 90px; border-radius: 50%;
+            background: linear-gradient(135deg, #fdeaea, #fff5f5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: #e53935;
+            margin: 0 auto 20px;
+            animation: pulse 3s infinite;
+        }
+        .empty-state h3 { font-size: 20px; font-weight: 800; color: #333; margin-bottom: 8px; }
+        .empty-state p { color: #999; font-size: 14px; margin-bottom: 22px; }
+        .btn-submit-new {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: #fff; text-decoration: none;
+            padding: 12px 28px; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            box-shadow: 0 6px 20px rgba(229,57,53,0.3);
+            transition: all 0.3s;
+        }
+        .btn-submit-new:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(229,57,53,0.4); }
+
+        /* ===== Concern Card ===== */
+        .concern-card {
+            background: #fff;
+            border-radius: 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            overflow: hidden;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .concern-card:hover {
+            border-color: #fde8e8;
+            box-shadow: 0 8px 32px rgba(229,57,53,0.1);
+            transform: translateY(-2px);
+        }
+
+        /* Card Top Banner by status */
+        .concern-card-banner {
+            height: 5px;
+        }
+        .concern-card.status-Pending .concern-card-banner { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .concern-card.status-In-Progress .concern-card-banner { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+        .concern-card.status-Complete .concern-card-banner { background: linear-gradient(90deg, #16a34a, #4ade80); }
+
+        .concern-card-body { padding: 24px 28px; }
+
+        .concern-card-header {
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 12px;
+            margin-bottom: 14px;
+        }
+        .concern-ref-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+        .concern-ref {
+            font-size: 11px; font-weight: 800;
+            color: #aaa; letter-spacing: 0.8px; text-transform: uppercase;
+        }
+        .concern-priority {
+            font-size: 10px; font-weight: 700;
+            padding: 2px 10px; border-radius: 20px;
+            letter-spacing: 0.5px; text-transform: uppercase;
+        }
+        .priority-high { background: #fef2f2; color: #dc2626; }
+        .priority-medium { background: #fff7ed; color: #ea580c; }
+        .priority-low { background: #f0fdf4; color: #16a34a; }
+
+        .concern-subject {
+            font-size: 18px; font-weight: 800; color: #1a1a1a;
+        }
+        .concern-meta {
+            display: flex; flex-wrap: wrap; gap: 14px;
+            font-size: 12px; color: #999; margin-top: 4px;
+        }
+        .concern-meta span { display: flex; align-items: center; gap: 5px; }
+
+        .status-badge {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 6px 16px; border-radius: 20px;
+            font-size: 11px; font-weight: 800;
+            letter-spacing: 0.5px; text-transform: uppercase;
+            flex-shrink: 0;
+        }
+        .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+        .status-Pending   { background: #fff7ed; color: #f97316; }
+        .status-In-Progress { background: #eff6ff; color: #2563eb; }
+        .status-Complete  { background: #f0fdf4; color: #16a34a; }
+        .status-Pending   .dot { animation: pulse 1.5s infinite; }
+        .status-In-Progress .dot { animation: pulse 1.5s infinite; }
+
+        /* Progress Mini Tracker */
+        .mini-tracker {
+            display: flex; align-items: center; gap: 0;
+            margin: 16px 0; padding: 14px 18px;
+            background: #f9fafb; border-radius: 12px;
+            border: 1px solid #f0f0f0;
+        }
+        .mini-step { display: flex; flex-direction: column; align-items: center; flex: 1; }
+        .mini-step-dot {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px; border: 2px solid #e0e0e0;
+            background: #fff; color: #ccc;
+            transition: all 0.4s;
+            margin-bottom: 6px;
+        }
+        .mini-step.done .mini-step-dot  { background: #16a34a; border-color: #16a34a; color: #fff; box-shadow: 0 3px 10px rgba(22,163,74,0.25); }
+        .mini-step.active .mini-step-dot { background: #2563eb; border-color: #2563eb; color: #fff; box-shadow: 0 3px 10px rgba(37,99,235,0.25); animation: pulse 2s infinite; }
+        .mini-step-label { font-size: 10px; font-weight: 700; color: #bbb; text-align: center; }
+        .mini-step.done .mini-step-label  { color: #16a34a; }
+        .mini-step.active .mini-step-label { color: #2563eb; }
+        .mini-connector { flex: 1; height: 3px; background: #e0e0e0; border-radius: 2px; margin-bottom: 24px; transition: background 0.4s; }
+        .mini-connector.filled { background: #16a34a; }
+
+        /* Concern Message */
+        .concern-message-block {
+            background: #fafbfc; border-radius: 12px;
+            padding: 16px 20px; margin-bottom: 14px;
+            border-left: 4px solid #e53935;
+        }
+        .message-label {
+            font-size: 10px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: #e53935; margin-bottom: 6px;
+        }
+        .message-text { font-size: 13px; color: #555; line-height: 1.7; }
+
+        /* Evidence file pill */
+        .evidence-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #eff6ff; color: #2563eb;
+            padding: 5px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 700;
+            text-decoration: none;
+            border: 1px solid #bfdbfe;
+            transition: all 0.2s;
+        }
+        .evidence-pill:hover { background: #dbeafe; }
+
+        /* ===== Admin Replies ===== */
+        .replies-section { margin-top: 4px; }
+        .replies-header {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 800;
+            color: #555; text-transform: uppercase; letter-spacing: 0.8px;
+            margin-bottom: 10px;
+            cursor: pointer; user-select: none;
+        }
+        .replies-header i.toggle-icon { margin-left: auto; color: #aaa; transition: transform 0.3s; font-size: 12px; }
+        .replies-header.open .toggle-icon { transform: rotate(180deg); }
+
+        .replies-list { display: flex; flex-direction: column; gap: 10px; }
+
+        .reply-bubble {
+            background: linear-gradient(135deg, #f8faff, #eff6ff);
+            border-radius: 16px; padding: 16px 20px;
+            border: 1.5px solid #dbeafe;
+            display: flex; gap: 14px;
+            animation: slideInRight 0.4s ease both;
+        }
+        .reply-avatar {
+            width: 38px; height: 38px; border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px; font-weight: 800; color: #fff;
+            flex-shrink: 0;
+        }
+        .reply-body { flex: 1; }
+        .reply-meta-row {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px; flex-wrap: wrap; gap: 4px;
+        }
+        .reply-sender { font-size: 12px; font-weight: 800; color: #1e40af; }
+        .reply-time   { font-size: 11px; color: #999; display: flex; align-items: center; gap: 4px; }
+        .reply-message { font-size: 13px; color: #333; line-height: 1.65; }
+
+        .no-reply-pill {
+            display: flex; align-items: center; gap: 8px;
+            background: #f9fafb; border: 1.5px dashed #e0e0e0;
+            border-radius: 12px; padding: 12px 18px;
+            font-size: 12px; color: #aaa; font-style: italic;
+        }
+
+        /* ===== Collapse/Expand ===== */
+        .replies-collapsible { display: none; }
+        .replies-collapsible.open { display: flex; flex-direction: column; gap: 10px; }
+
+        /* ===== Bottom Actions ===== */
+        .card-actions {
+            display: flex; justify-content: flex-end; gap: 10px;
+            padding: 14px 28px 18px;
+            border-top: 1px solid #f5f5f5;
+            background: #fafbfc;
+        }
+        .action-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 18px; border-radius: 10px;
+            font-size: 12px; font-weight: 700;
+            border: 2px solid transparent;
+            cursor: pointer; transition: all 0.2s; text-decoration: none;
+        }
+        .action-btn.view { background: #eff6ff; color: #2563eb; border-color: #bfdbfe; }
+        .action-btn.view:hover { background: #dbeafe; }
+
+        .alert-toast {
+            padding: 14px 20px; border-radius: 14px;
+            margin-bottom: 18px; font-weight: 600; font-size: 13px;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .alert-toast.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+        .alert-toast.error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        /* ===== Feedback Section ===== */
+        .feedback-section {
+            margin-top: 16px;
+            border-top: 2px dashed #f0fdf4;
+            padding-top: 16px;
+        }
+        .feedback-prompt {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1.5px solid #bbf7d0;
+            border-radius: 16px;
+            padding: 20px 22px;
+        }
+        .feedback-prompt-header {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 14px;
+        }
+        .feedback-prompt-icon {
+            width: 40px; height: 40px; border-radius: 12px;
+            background: #16a34a; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; flex-shrink: 0;
+        }
+        .feedback-prompt-title { font-size: 14px; font-weight: 800; color: #15803d; }
+        .feedback-prompt-sub   { font-size: 12px; color: #4ade80; margin-top: 1px; }
+
+        /* Star Rating */
+        .star-rating-row {
+            display: flex; align-items: center; gap: 6px;
+            margin-bottom: 14px;
+        }
+        .star-rating-label { font-size: 11px; font-weight: 700; color: #15803d; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 4px; }
+        .star-rating { display: flex; gap: 4px; direction: rtl; }
+        .star-rating input { display: none; }
+        .star-rating label {
+            font-size: 26px; color: #d1d5db; cursor: pointer;
+            transition: color 0.15s, transform 0.15s;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label,
+        .star-rating input:checked ~ label {
+            color: #facc15;
+        }
+        .star-rating label:hover { transform: scale(1.25); }
+
+        .feedback-textarea {
+            width: 100%; border: 1.5px solid #bbf7d0; border-radius: 10px;
+            padding: 11px 14px; font-size: 13px; color: #333;
+            background: #fff; resize: vertical; min-height: 72px;
+            outline: none; transition: border 0.2s;
+            font-family: inherit;
+        }
+        .feedback-textarea:focus { border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.1); }
+        .feedback-textarea::placeholder { color: #aaa; }
+
+        .feedback-submit-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff; border: none; padding: 10px 24px;
+            border-radius: 10px; font-size: 13px; font-weight: 700;
+            cursor: pointer; transition: all 0.25s; margin-top: 12px;
+            box-shadow: 0 4px 14px rgba(22,163,74,0.3);
+        }
+        .feedback-submit-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(22,163,74,0.4); }
+
+        /* Submitted feedback display */
+        .feedback-submitted {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1.5px solid #bbf7d0;
+            border-radius: 16px; padding: 18px 22px;
+            display: flex; gap: 14px; align-items: flex-start;
+        }
+        .feedback-submitted-icon {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: #16a34a; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 17px; flex-shrink: 0;
+        }
+        .feedback-submitted-body { flex: 1; }
+        .feedback-submitted-top {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px; flex-wrap: wrap; gap: 6px;
+        }
+        .feedback-submitted-label { font-size: 12px; font-weight: 800; color: #15803d; text-transform: uppercase; letter-spacing: 0.5px; }
+        .feedback-stars-display { display: flex; gap: 2px; }
+        .feedback-stars-display i { font-size: 15px; }
+        .feedback-stars-display i.filled { color: #facc15; }
+        .feedback-stars-display i.empty  { color: #d1d5db; }
+        .feedback-submitted-comment { font-size: 13px; color: #166534; line-height: 1.6; }
+        .feedback-submitted-time { font-size: 11px; color: #4ade80; margin-top: 5px; display: flex; align-items:center; gap:4px; }
+
+        /* ===== Back Button ===== */
+        .top-actions {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            text-decoration: none;
+            font-size: 13px; font-weight: 700; color: #666;
+            background: #fff; border: 2px solid #eee;
+            padding: 9px 18px; border-radius: 12px;
+            transition: all 0.25s;
+        }
+        .back-btn:hover { border-color: #e53935; color: #e53935; background: #fff5f5; }
+        .new-concern-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: #fff; text-decoration: none;
+            padding: 10px 22px; border-radius: 12px;
+            font-size: 13px; font-weight: 700;
+            box-shadow: 0 6px 20px rgba(229,57,53,0.25);
+            transition: all 0.3s;
+        }
+        .new-concern-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(229,57,53,0.35); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: repeat(2, 1fr); }
+            .page-hero { flex-direction: column; gap: 16px; align-items: flex-start; }
+            .hero-icon-wrap { display: none; }
+        }
+        @media (max-width: 480px) {
+            .history-container { padding: 0 12px; }
+            .stats-bar { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/submit-concern" class="nav-link" style="color:#e53935; font-weight:700;">Report Issue</a></li>
+                <li><a href="/student/concern-history" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">My History</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="history-container">
+
+        <!-- Top Actions -->
+        <div class="top-actions animate-in">
+            <a href="/student/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <a href="/submit-concern" class="new-concern-btn"><i class="fas fa-plus"></i> New Concern</a>
+        </div>
+
+        <!-- Flash Messages -->
+        <div th:if="${feedbackSuccess}" class="alert-toast success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${feedbackSuccess}"></span>
+        </div>
+        <div th:if="${feedbackError}" class="alert-toast error">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${feedbackError}"></span>
+        </div>
+
+        <!-- Page Hero -->
+        <div class="page-hero animate-in delay-1">
+            <div class="hero-left">
+                <p class="hero-eyebrow">Student Portal</p>
+                <h1 class="hero-title">My Concern History</h1>
+                <p class="hero-sub">
+                    <i class="fas fa-circle-info"></i>
+                    Track all submitted concerns and view admin replies
+                </p>
+            </div>
+            <div class="hero-icon-wrap">
+                <i class="fas fa-clock-rotate-left"></i>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar animate-in delay-2" th:if="${!#lists.isEmpty(concerns)}">
+            <div class="stat-pill total">
+                <div class="stat-pill-icon"><i class="fas fa-layer-group"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Total</div>
+                    <div class="stat-pill-val" th:text="${#lists.size(concerns)}">0</div>
+                </div>
+            </div>
+            <div class="stat-pill pending">
+                <div class="stat-pill-icon"><i class="fas fa-hourglass-half"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Pending</div>
+                    <div class="stat-pill-val"
+                         th:text="${#lists.size(concerns.?[status == 'Pending'])}">0</div>
+                </div>
+            </div>
+            <div class="stat-pill progress">
+                <div class="stat-pill-icon"><i class="fas fa-spinner"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">In Progress</div>
+                    <div class="stat-pill-val"
+                         th:text="${#lists.size(concerns.?[status == 'In Progress'])}">0</div>
+                </div>
+            </div>
+            <div class="stat-pill complete">
+                <div class="stat-pill-icon"><i class="fas fa-circle-check"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Resolved</div>
+                    <div class="stat-pill-val"
+                         th:text="${#lists.size(concerns.?[status == 'Complete'])}">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar animate-in delay-2" th:if="${!#lists.isEmpty(concerns)}">
+            <button class="filter-btn active" data-filter="all">
+                <i class="fas fa-border-all"></i> All Concerns
+            </button>
+            <button class="filter-btn" data-filter="Pending">
+                <i class="fas fa-hourglass-half"></i> Pending
+            </button>
+            <button class="filter-btn" data-filter="In Progress">
+                <i class="fas fa-spinner"></i> In Progress
+            </button>
+            <button class="filter-btn" data-filter="Complete">
+                <i class="fas fa-circle-check"></i> Resolved
+            </button>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(concerns)}" class="empty-state animate-in delay-2">
+            <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+            <h3>No Concerns Yet</h3>
+            <p>You haven't submitted any concerns yet. Use the button below to raise your first concern.</p>
+            <a href="/submit-concern" class="btn-submit-new">
+                <i class="fas fa-plus"></i> Submit Your First Concern
+            </a>
+        </div>
+
+        <!-- Concern Cards -->
+        <div id="concernsList">
+            <div th:each="concern, iterStat : ${concerns}"
+                 class="concern-card animate-in"
+                 th:classappend="'status-' + ${#strings.replace(concern.status, ' ', '-')}"
+                 th:attr="data-status=${concern.status}"
+                 th:style="'animation-delay: ' + ${0.08 * (iterStat.index + 3)} + 's'">
+
+                <!-- Status color banner -->
+                <div class="concern-card-banner"></div>
+
+                <div class="concern-card-body">
+                    <!-- Header -->
+                    <div class="concern-card-header">
+                        <div>
+                            <div class="concern-ref-row">
+                                <span class="concern-ref" th:text="'CON-' + ${concern.concernId}">CON-1</span>
+                                <span class="concern-priority"
+                                      th:if="${concern.aiPriorityLevel != null}"
+                                      th:classappend="'priority-' + ${#strings.toLowerCase(concern.aiPriorityLevel)}"
+                                      th:text="${concern.aiPriorityLevel}">High</span>
+                            </div>
+                            <div class="concern-subject" th:text="${concern.subject}">Subject</div>
+                            <div class="concern-meta">
+                                <span><i class="fas fa-calendar-alt"></i>
+                                    <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy')}">01 Jan 2026</span>
+                                </span>
+                                <span><i class="fas fa-clock"></i>
+                                    <span th:text="${#temporals.format(concern.createdTime, 'hh:mm a')}">09:00 AM</span>
+                                </span>
+                            </div>
+                        </div>
+                        <span class="status-badge"
+                              th:classappend="'status-' + ${#strings.replace(concern.status, ' ', '-')}">
+                            <span class="dot"></span>
+                            <span th:text="${concern.status}">Status</span>
+                        </span>
+                    </div>
+
+                    <!-- Mini Progress Tracker -->
+                    <div class="mini-tracker">
+                        <!-- Step 1: Submitted (always done) -->
+                        <div class="mini-step done">
+                            <div class="mini-step-dot"><i class="fas fa-paper-plane"></i></div>
+                            <div class="mini-step-label">Submitted</div>
+                        </div>
+                        <div class="mini-connector"
+                             th:classappend="${concern.status == 'In Progress' or concern.status == 'Complete'} ? 'filled' : ''"></div>
+
+                        <!-- Step 2: Under Review -->
+                        <div class="mini-step"
+                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Complete'} ? 'done' : '')">
+                            <div class="mini-step-dot"><i class="fas fa-eye"></i></div>
+                            <div class="mini-step-label">In Review</div>
+                        </div>
+                        <div class="mini-connector"
+                             th:classappend="${concern.status == 'Complete'} ? 'filled' : ''"></div>
+
+                        <!-- Step 3: Resolved -->
+                        <div class="mini-step"
+                             th:classappend="${concern.status == 'Complete'} ? 'done' : ''">
+                            <div class="mini-step-dot"><i class="fas fa-circle-check"></i></div>
+                            <div class="mini-step-label">Resolved</div>
+                        </div>
+                    </div>
+
+                    <!-- Concern Message -->
+                    <div class="concern-message-block">
+                        <div class="message-label"><i class="fas fa-message"></i> Your Concern</div>
+                        <div class="message-text" th:text="${concern.message}">Message</div>
+                    </div>
+
+                    <!-- Evidence -->
+                    <div th:if="${concern.evidencePath != null}" style="margin-bottom:14px;">
+                        <a th:href="@{'/uploads/' + ${concern.evidencePath}}" target="_blank" class="evidence-pill">
+                            <i class="fas fa-paperclip"></i> View Attached Evidence
+                        </a>
+                    </div>
+
+                    <!-- Admin Replies Section -->
+                    <div class="replies-section">
+                        <div class="replies-header"
+                             th:attr="onclick='toggleReplies(this)'"
+                             th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
+                            <i class="fas fa-reply" style="color:#2563eb;"></i>
+                            <span>Admin Replies</span>
+                            <span style="background:#eff6ff; color:#2563eb; border-radius:20px; padding:2px 10px; font-size:11px; font-weight:800;"
+                                  th:text="${#lists.size(repliesMap[concern.concernId])}">0</span>
+                            <i class="fas fa-chevron-down toggle-icon"></i>
+                        </div>
+
+                        <div class="replies-collapsible"
+                             th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
+
+                            <!-- No replies yet -->
+                            <div th:if="${#lists.isEmpty(repliesMap[concern.concernId])}" class="no-reply-pill">
+                                <i class="fas fa-hourglass-half" style="color:#aaa;"></i>
+                                Awaiting admin response — we'll notify you when a reply is received.
+                            </div>
+
+                            <!-- Render each reply -->
+                            <div th:each="reply : ${repliesMap[concern.concernId]}" class="reply-bubble">
+                                <div class="reply-avatar">A</div>
+                                <div class="reply-body">
+                                    <div class="reply-meta-row">
+                                        <span class="reply-sender"><i class="fas fa-shield-halved"></i> Admin</span>
+                                        <span class="reply-time">
+                                            <i class="fas fa-clock"></i>
+                                            <span th:text="${#temporals.format(reply.replyTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
+                                        </span>
+                                    </div>
+                                    <div class="reply-message" th:text="${reply.replyMessage}">Reply message</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Feedback Section (shown when concern is Complete) -->
+                    <div class="feedback-section" th:if="${concern.status == 'Complete'}">
+
+                        <!-- Feedback form (only if not yet submitted) -->
+                        <div th:if="${feedbackMap[concern.concernId] == null}" class="feedback-prompt">
+                            <div class="feedback-prompt-header">
+                                <div class="feedback-prompt-icon"><i class="fas fa-star"></i></div>
+                                <div>
+                                    <div class="feedback-prompt-title">Rate the Admin Response</div>
+                                    <div class="feedback-prompt-sub">Your feedback helps us improve our support quality</div>
+                                </div>
+                            </div>
+                            <form th:action="@{/student/feedback}" method="post">
+                                <input type="hidden" name="concernId" th:value="${concern.concernId}">
+
+                                <!-- Star Rating -->
+                                <div class="star-rating-row">
+                                    <span class="star-rating-label">Rating:</span>
+                                    <div class="star-rating" th:attr="id='stars-' + ${concern.concernId}">
+                                        <input type="radio" th:id="'s5-' + ${concern.concernId}" name="rating" value="5" required>
+                                        <label th:for="'s5-' + ${concern.concernId}" title="Excellent"><i class="fas fa-star"></i></label>
+                                        <input type="radio" th:id="'s4-' + ${concern.concernId}" name="rating" value="4">
+                                        <label th:for="'s4-' + ${concern.concernId}" title="Good"><i class="fas fa-star"></i></label>
+                                        <input type="radio" th:id="'s3-' + ${concern.concernId}" name="rating" value="3">
+                                        <label th:for="'s3-' + ${concern.concernId}" title="Average"><i class="fas fa-star"></i></label>
+                                        <input type="radio" th:id="'s2-' + ${concern.concernId}" name="rating" value="2">
+                                        <label th:for="'s2-' + ${concern.concernId}" title="Poor"><i class="fas fa-star"></i></label>
+                                        <input type="radio" th:id="'s1-' + ${concern.concernId}" name="rating" value="1">
+                                        <label th:for="'s1-' + ${concern.concernId}" title="Very Poor"><i class="fas fa-star"></i></label>
+                                    </div>
+                                </div>
+
+                                <!-- Comment -->
+                                <textarea name="comments"
+                                          class="feedback-textarea"
+                                          placeholder="Share your thoughts about the admin's response (optional)..."
+                                          rows="3"></textarea>
+
+                                <button type="submit" class="feedback-submit-btn">
+                                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                                </button>
+                            </form>
+                        </div>
+
+                        <!-- Feedback already submitted — display it -->
+                        <div th:if="${feedbackMap[concern.concernId] != null}" class="feedback-submitted">
+                            <div class="feedback-submitted-icon"><i class="fas fa-circle-check"></i></div>
+                            <div class="feedback-submitted-body">
+                                <div class="feedback-submitted-top">
+                                    <span class="feedback-submitted-label"><i class="fas fa-star"></i> Your Feedback</span>
+                                    <div class="feedback-stars-display">
+                                        <th:block th:with="r=${feedbackMap[concern.concernId].rating}">
+                                            <i th:each="n : ${#numbers.sequence(1,5)}"
+                                               th:class="${n <= r} ? 'fas fa-star filled' : 'fas fa-star empty'"></i>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <div class="feedback-submitted-comment"
+                                     th:if="${feedbackMap[concern.concernId].comments != null and !feedbackMap[concern.concernId].comments.isEmpty()}"
+                                     th:text="${feedbackMap[concern.concernId].comments}"></div>
+                                <div class="feedback-submitted-comment"
+                                     th:if="${feedbackMap[concern.concernId].comments == null or feedbackMap[concern.concernId].comments.isEmpty()}"
+                                     style="color:#9ca3af; font-style:italic;">No written comment provided.</div>
+                                <div class="feedback-submitted-time">
+                                    <i class="fas fa-clock"></i>
+                                    <span th:text="'Submitted on ' + ${#temporals.format(feedbackMap[concern.concernId].submissionTime, 'dd MMM yyyy, hh:mm a')}"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- No results after filtering -->
+        <div id="noFilterResults" style="display:none;" class="empty-state">
+            <div class="empty-icon"><i class="fas fa-filter"></i></div>
+            <h3>No Concerns Found</h3>
+            <p>No concerns match the selected filter. Try a different category.</p>
+        </div>
+
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ===== Filter functionality =====
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const cards = document.querySelectorAll('.concern-card');
+    const noResults = document.getElementById('noFilterResults');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const filter = btn.dataset.filter;
+            let visible = 0;
+            cards.forEach(card => {
+                const status = card.dataset.status;
+                if (filter === 'all' || status === filter) {
+                    card.style.display = '';
+                    visible++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            noResults.style.display = visible === 0 ? 'block' : 'none';
+        });
+    });
+
+    // ===== Toggle replies =====
+    function toggleReplies(header) {
+        header.classList.toggle('open');
+        const collapsible = header.nextElementSibling;
+        collapsible.classList.toggle('open');
+    }
+</script>
+</body>
+</html>

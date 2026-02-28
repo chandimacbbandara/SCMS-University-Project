@@ -712,59 +712,76 @@
             flex: 1;
         }
         .tracker-step-dot {
-            width: 40px; height: 40px;
+            width: 44px; height: 44px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            margin-bottom: 10px;
+            font-size: 18px;
+            margin-bottom: 12px;
             border: 3px solid #e0e0e0;
             background: #fff;
             color: #bbb;
             transition: all 0.4s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
         .tracker-step.active .tracker-step-dot {
             border-color: #e53935;
-            background: #fff5f5;
-            color: #e53935;
+            background: #e53935;
+            color: #fff;
+            box-shadow: 0 0 0 5px rgba(229,57,53,0.15);
             animation: pulse 2s infinite;
         }
         .tracker-step.done .tracker-step-dot {
             border-color: #43a047;
-            background: #e8f5e9;
-            color: #43a047;
+            background: #43a047;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(67,160,71,0.2);
         }
         .tracker-step-label {
-            font-size: 11px;
-            font-weight: 700;
-            color: #bbb;
+            font-size: 12px;
+            font-weight: 800;
+            color: #888;
             text-align: center;
-            max-width: 90px;
+            max-width: 100px;
             line-height: 1.3;
+            letter-spacing: 0.3px;
         }
         .tracker-step.active .tracker-step-label { color: #e53935; }
         .tracker-step.done .tracker-step-label { color: #43a047; }
 
         .tracker-step-time {
-            font-size: 10px;
-            color: #bbb;
-            margin-top: 3px;
+            font-size: 11px;
+            color: #aaa;
+            margin-top: 5px;
             text-align: center;
+            font-weight: 500;
         }
         .tracker-step.done .tracker-step-time,
-        .tracker-step.active .tracker-step-time { color: #999; }
+        .tracker-step.active .tracker-step-time { color: #777; }
 
         /* Progress line fill */
         .step-tracker .progress-line {
             position: absolute;
-            top: 28px;
+            top: 29px;
             left: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, #43a047, #43a047);
+            right: 40px;
+            height: 4px;
+            background: #e0e0e0;
             z-index: 0;
-            transition: width 0.6s cubic-bezier(.22,1,.36,1);
-            border-radius: 2px;
+            border-radius: 4px;
+        }
+        .step-tracker .progress-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: #43a047;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(67,160,71,0.3);
+            transition: width 0.8s cubic-bezier(.22,1,.36,1);
+            width: var(--progress-width, 0%);
         }
 
         .track-date {
@@ -801,6 +818,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link" style="color: #e53935;">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                     <li>
                         <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
                             <i class="fas fa-bell"></i>
@@ -931,8 +949,15 @@
                                 <p>Report an academic or campus issue</p>
                             </div>
                         </a>
+                        <a href="/student/concern-history" class="action-item">
+                            <div class="action-item-icon home"><i class="fas fa-clock-rotate-left"></i></div>
+                            <div class="action-item-text">
+                                <h4>View Concern History</h4>
+                                <p>See all submitted concerns &amp; replies</p>
+                            </div>
+                        </a>
                         <a href="/" class="action-item">
-                            <div class="action-item-icon home"><i class="fas fa-house"></i></div>
+                            <div class="action-item-icon home" style="background:#e8f5e9;color:#43a047;"><i class="fas fa-house"></i></div>
                             <div class="action-item-text">
                                 <h4>Back to Home</h4>
                                 <p>Return to the main website</p>
@@ -975,7 +1000,7 @@
                     <div class="step-tracker">
                         <!-- Progress line fill -->
                         <div class="progress-line"
-                             th:style="${concern.status == 'Pending'} ? 'width: 0%' : (${concern.status == 'In Progress'} ? 'width: 50%' : 'width: 100%')"></div>
+                             th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : '100%'))"></div>
 
                         <!-- Step 1: Submitted -->
                         <div class="tracker-step done">

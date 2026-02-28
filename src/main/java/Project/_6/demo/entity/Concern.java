@@ -27,6 +27,9 @@ public class Concern {
     @Column(name = "Evidence", length = 500)
     private String evidencePath;
 
+    @Column(name = "Category", length = 100)
+    private String category;
+
     @Column(name = "AI_Priority_Level", length = 20)
     private String aiPriorityLevel;
 

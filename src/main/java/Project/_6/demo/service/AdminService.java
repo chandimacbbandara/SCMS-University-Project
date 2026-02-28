@@ -78,9 +78,22 @@ public class AdminService {
             concerns = concernRepository.findAllByOrderByCreatedTimeDesc();
         }
 
+        // --- FIXED: Migration of data if category is missing ---
+        boolean needsSave = false;
+        for (Concern c : concerns) {
+            if ((c.getCategory() == null || c.getCategory().isEmpty()) && c.getStudent() != null) {
+                c.setCategory(c.getStudent().getCategory());
+                needsSave = true;
+            }
+        }
+        if (needsSave) {
+            concernRepository.saveAll(concerns);
+        }
+        // --------------------------------------------------------
+
         if (hasCategory) {
             concerns = concerns.stream()
-                    .filter(c -> c.getStudent() != null && category.equals(c.getStudent().getCategory()))
+                    .filter(c -> category.equals(c.getCategory()))
                     .collect(Collectors.toList());
         }
 
