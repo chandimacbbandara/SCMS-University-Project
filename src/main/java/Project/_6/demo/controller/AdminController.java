@@ -81,6 +81,24 @@ public class AdminController {
         return "admin-dashboard";
     }
 
+    @GetMapping("/edu-dashboard")
+    public String showEduDashboard(HttpSession session, Model model) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        // Filter: only education category
+        List<Concern> eduConcerns = adminService.getFilteredConcerns("All", "Education (Creative and IT)", null, null);
+
+        model.addAttribute("concerns", eduConcerns);
+        model.addAttribute("totalConcerns", eduConcerns.size());
+        model.addAttribute("pendingCount", eduConcerns.stream().filter(c -> "Pending".equals(c.getStatus())).count());
+        model.addAttribute("inProgressCount", eduConcerns.stream().filter(c -> "In Progress".equals(c.getStatus())).count());
+        model.addAttribute("completeCount", eduConcerns.stream().filter(c -> "Complete".equals(c.getStatus())).count());
+
+        return "admin-edu-dashboard";
+    }
+
     /**
      * View a single concern with its replies
      */

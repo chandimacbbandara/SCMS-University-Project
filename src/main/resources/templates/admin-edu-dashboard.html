@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Academy of Knowledge Bridge</title>
+    <title>Education Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #e53935;
-            --primary-dark: #c62828;
-            --primary-light: #ff6f60;
-            --primary-bg: rgba(229, 57, 53, 0.08);
+            --primary: #1a237e;
+            --primary-dark: #0d1559;
+            --primary-light: #3949ab;
+            --primary-bg: rgba(26, 35, 126, 0.08);
+            --accent-indigo: #5c6bc0;
             --accent-orange: #ff9800;
             --accent-blue: #2196f3;
             --accent-green: #4caf50;
-            --accent-teal: #009688;
+            --accent-purple: #7c4dff;
             --bg-body: #f0f2f5;
             --bg-white: #ffffff;
             --card-shadow: 0 2px 12px rgba(0,0,0,0.06);
@@ -52,17 +53,21 @@
             to   { opacity: 1; transform: translateX(0); }
         }
         @keyframes pulseRing {
-            0%   { box-shadow: 0 0 0 0 rgba(229,57,53,0.25); }
-            70%  { box-shadow: 0 0 0 8px rgba(229,57,53,0); }
-            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
-        }
-        @keyframes shimmer {
-            0%   { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
+            0%   { box-shadow: 0 0 0 0 rgba(26,35,126,0.25); }
+            70%  { box-shadow: 0 0 0 8px rgba(26,35,126,0); }
+            100% { box-shadow: 0 0 0 0 rgba(26,35,126,0); }
         }
         @keyframes floatSoft {
             0%, 100% { transform: translateY(0); }
             50%      { transform: translateY(-6px); }
+        }
+        @keyframes orbitSlow {
+            from { transform: rotate(0deg) translateX(120px) rotate(0deg); }
+            to   { transform: rotate(360deg) translateX(120px) rotate(-360deg); }
+        }
+        @keyframes bookFlip {
+            0%, 100% { transform: rotateY(0deg); }
+            50%      { transform: rotateY(15deg); }
         }
 
         .anim-up   { animation: fadeInUp 0.7s cubic-bezier(.22,1,.36,1) both; }
@@ -105,20 +110,20 @@
         .nav-links a:hover { color: var(--primary); background: var(--primary-bg); }
         .nav-links a.active { color: var(--primary); background: var(--primary-bg); font-weight: 700; }
         .nav-logout {
-            background: var(--primary) !important; color: #fff !important;
+            background: #e53935 !important; color: #fff !important;
             font-weight: 700 !important; border-radius: var(--radius-sm) !important;
             box-shadow: 0 3px 12px rgba(229,57,53,0.25);
             transition: all 0.3s ease !important;
         }
         .nav-logout:hover {
-            background: var(--primary-dark) !important;
+            background: #c62828 !important;
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(229,57,53,0.35) !important;
         }
 
         /* ===== Hero Banner ===== */
         .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 50%, #8b1a1a 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 40%, #283593 70%, var(--primary-dark) 100%);
             position: relative; overflow: hidden;
             padding: 48px 0 90px;
         }
@@ -138,8 +143,23 @@
         }
         .hero-pattern {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3Cpath d='M0 0h20v20H0z'/%3E%3C/g%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='0.04' stroke-width='1'%3E%3Cpath d='M30 5v50M5 30h50M15 15l30 30M45 15L15 45'/%3E%3C/g%3E%3C/svg%3E");
             pointer-events: none;
+        }
+        /* Orbiting decoration */
+        .hero-orbit {
+            position: absolute; top: 50%; left: 75%;
+            width: 10px; height: 10px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            animation: orbitSlow 20s linear infinite;
+            pointer-events: none;
+        }
+        .hero-orbit:nth-child(2) {
+            left: 80%; top: 40%;
+            width: 6px; height: 6px;
+            background: rgba(255,255,255,0.12);
+            animation-duration: 28s; animation-direction: reverse;
         }
 
         .container { max-width: 1440px; margin: 0 auto; padding: 0 36px; position: relative; z-index: 1; }
@@ -154,11 +174,12 @@
             text-transform: uppercase; letter-spacing: 1.5px;
             margin-bottom: 18px;
         }
-        .hero-badge .dot { width: 7px; height: 7px; background: #fff; border-radius: 50%; animation: pulseRing 2s infinite; }
+        .hero-badge .dot { width: 7px; height: 7px; background: #7c4dff; border-radius: 50%; animation: pulseRing 2s infinite; box-shadow: 0 0 0 0 rgba(124,77,255,0.4); }
         .hero h1 {
             font-size: 36px; font-weight: 900; color: #fff;
             margin: 0 0 12px; letter-spacing: -1px; line-height: 1.15;
         }
+        .hero h1 .book-icon { display: inline-block; animation: bookFlip 3s ease-in-out infinite; margin-right: 10px; }
         .hero-sub { color: rgba(255,255,255,0.75); font-size: 15px; line-height: 1.6; max-width: 520px; margin-bottom: 28px; }
         .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
         .hero-btn {
@@ -215,12 +236,12 @@
             box-shadow: var(--card-shadow-hover);
             border-color: transparent;
         }
-        .stat-card.sc-total::before { background: linear-gradient(180deg, var(--primary), var(--primary-light)); }
+        .stat-card.sc-total::before { background: linear-gradient(180deg, var(--primary), var(--accent-indigo)); }
         .stat-card.sc-pending::before { background: linear-gradient(180deg, var(--accent-orange), #ffc107); }
         .stat-card.sc-progress::before { background: linear-gradient(180deg, var(--accent-blue), #42a5f5); }
         .stat-card.sc-resolved::before { background: linear-gradient(180deg, var(--accent-green), #66bb6a); }
 
-        .stat-card:hover.sc-total { border-color: rgba(229,57,53,0.2); }
+        .stat-card:hover.sc-total { border-color: rgba(26,35,126,0.2); }
         .stat-card:hover.sc-pending { border-color: rgba(255,152,0,0.2); }
         .stat-card:hover.sc-progress { border-color: rgba(33,150,243,0.2); }
         .stat-card:hover.sc-resolved { border-color: rgba(76,175,80,0.2); }
@@ -230,7 +251,7 @@
             display: flex; align-items: center; justify-content: center;
             font-size: 20px; flex-shrink: 0;
         }
-        .sc-total .stat-icon-wrap   { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .sc-total .stat-icon-wrap   { background: rgba(26,35,126,0.1); color: var(--primary); }
         .sc-pending .stat-icon-wrap  { background: rgba(255,152,0,0.1); color: var(--accent-orange); }
         .sc-progress .stat-icon-wrap { background: rgba(33,150,243,0.1); color: var(--accent-blue); }
         .sc-resolved .stat-icon-wrap { background: rgba(76,175,80,0.1); color: var(--accent-green); }
@@ -250,86 +271,6 @@
             text-transform: uppercase; letter-spacing: 0.8px;
         }
 
-        /* ===== Filter Panel ===== */
-        .filter-card {
-            background: var(--bg-white);
-            border-radius: var(--radius-md);
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border);
-            margin-bottom: 24px;
-            overflow: hidden;
-        }
-        .filter-header {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 18px 28px;
-            cursor: pointer;
-            transition: background 0.2s;
-            user-select: none;
-        }
-        .filter-header:hover { background: #fafafa; }
-        .filter-header h3 {
-            font-size: 15px; font-weight: 700; margin: 0;
-            display: flex; align-items: center; gap: 10px; color: var(--text-dark);
-        }
-        .filter-header h3 i { color: var(--primary); font-size: 16px; }
-        .filter-toggle-btn {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 12.5px; font-weight: 600; color: var(--text-light);
-            background: none; border: none; cursor: pointer;
-        }
-        .filter-toggle-btn i { transition: transform 0.3s; font-size: 11px; }
-        .filter-toggle-btn.collapsed i { transform: rotate(180deg); }
-
-        .filter-body { padding: 0 28px 24px; }
-        .filter-body.hidden { display: none; }
-        .filter-form {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr) auto auto;
-            gap: 16px; align-items: flex-end;
-        }
-        .filter-group label {
-            display: block; font-size: 11px; font-weight: 700;
-            color: var(--text-light); text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 7px;
-        }
-        .filter-group select {
-            width: 100%; padding: 11px 14px;
-            background: #f8f8fa; border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif; font-size: 13.5px;
-            font-weight: 500; color: var(--text-dark);
-            outline: none; cursor: pointer;
-            transition: all 0.25s;
-            appearance: none; -webkit-appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.5'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-        }
-        .filter-group select:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(229,57,53,0.1); }
-
-        .btn-apply {
-            display: inline-flex; align-items: center; gap: 7px;
-            background: var(--primary); color: #fff;
-            border: none; padding: 11px 24px;
-            border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 700;
-            cursor: pointer; transition: all 0.3s;
-            box-shadow: 0 3px 12px rgba(229,57,53,0.2);
-            white-space: nowrap;
-        }
-        .btn-apply:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 5px 18px rgba(229,57,53,0.3); }
-
-        .btn-clear {
-            background: none; border: 1.5px solid var(--border);
-            color: var(--text-light); padding: 11px 18px;
-            border-radius: var(--radius-sm);
-            font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-            cursor: pointer; transition: all 0.3s;
-            text-decoration: none; display: inline-flex; align-items: center;
-            white-space: nowrap;
-        }
-        .btn-clear:hover { border-color: var(--primary); color: var(--primary); }
-
         /* ===== Concern Table Section ===== */
         .table-card {
             background: var(--bg-white);
@@ -340,7 +281,7 @@
             overflow: hidden;
         }
         .table-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
             padding: 22px 28px;
             display: flex; justify-content: space-between; align-items: center;
             flex-wrap: wrap; gap: 12px;
@@ -422,27 +363,17 @@
             display: flex; align-items: center; justify-content: center;
             font-weight: 800; font-size: 14px; color: #fff; flex-shrink: 0;
         }
-        .student-avatar.av-1 { background: linear-gradient(135deg, var(--primary), #ff6b6b); }
+        .student-avatar.av-1 { background: linear-gradient(135deg, var(--primary), var(--accent-indigo)); }
         .student-avatar.av-2 { background: linear-gradient(135deg, var(--accent-blue), #64b5f6); }
-        .student-avatar.av-3 { background: linear-gradient(135deg, var(--accent-green), #81c784); }
+        .student-avatar.av-3 { background: linear-gradient(135deg, var(--accent-purple), #b388ff); }
         .student-avatar.av-4 { background: linear-gradient(135deg, var(--accent-orange), #ffb74d); }
-        .student-avatar.av-5 { background: linear-gradient(135deg, var(--accent-teal), #4db6ac); }
+        .student-avatar.av-5 { background: linear-gradient(135deg, #00897b, #4db6ac); }
         .student-name { font-weight: 700; font-size: 14px; color: var(--text-dark); }
         .student-id-text { font-size: 11.5px; color: var(--text-light); margin-top: 2px; }
 
         /* Subject */
         .subject-text { font-weight: 700; font-size: 14px; color: var(--text-dark); margin-bottom: 2px; }
         .desc-text { font-size: 12px; color: var(--text-light); }
-
-        /* Category */
-        .cat-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            padding: 5px 12px; border-radius: 7px;
-            font-size: 11.5px; font-weight: 700;
-            background: #f0f2f5; color: var(--text-mid);
-            border: 1px solid #e8e8e8;
-            white-space: nowrap;
-        }
 
         /* Status */
         .status-pill {
@@ -453,7 +384,7 @@
         }
         .status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
         .st-pending  { background: rgba(255,152,0,0.1); color: #e65100; border: 1px solid rgba(255,152,0,0.25); }
-        .st-pending .status-dot { background: var(--accent-orange); animation: pulseRing 2s infinite; }
+        .st-pending .status-dot { background: var(--accent-orange); animation: pulseRing 2s infinite; box-shadow: 0 0 0 0 rgba(255,152,0,0.3); }
         .st-progress { background: rgba(33,150,243,0.1); color: #1565c0; border: 1px solid rgba(33,150,243,0.25); }
         .st-progress .status-dot { background: var(--accent-blue); }
         .st-complete { background: rgba(76,175,80,0.1); color: #2e7d32; border: 1px solid rgba(76,175,80,0.25); }
@@ -475,7 +406,7 @@
         }
         .view-btn:hover {
             background: var(--primary); color: #fff;
-            box-shadow: 0 3px 12px rgba(229,57,53,0.25);
+            box-shadow: 0 3px 12px rgba(26,35,126,0.25);
             transform: translateY(-1px);
         }
 
@@ -490,13 +421,14 @@
             font-size: 32px; color: #ddd;
         }
         .empty-state p { color: var(--text-light); font-size: 14.5px; font-weight: 500; }
+        .empty-state .empty-sub { font-size: 12.5px; color: #bbb; margin-top: 6px; }
 
         /* ===== Footer ===== */
         .site-footer {
             text-align: center; padding: 30px 20px 40px;
             color: var(--text-light); font-size: 12.5px;
         }
-        .site-footer .heart { color: var(--primary); }
+        .site-footer .heart { color: #e53935; }
 
         /* ===== Table scroll ===== */
         .table-scroll { overflow-x: auto; }
@@ -504,7 +436,6 @@
         /* ===== Responsive ===== */
         @media (max-width: 1100px) {
             .stats-row { grid-template-columns: repeat(2, 1fr); }
-            .filter-form { grid-template-columns: repeat(2, 1fr) auto auto; }
         }
         @media (max-width: 768px) {
             .stats-row { grid-template-columns: 1fr 1fr; gap: 12px; }
@@ -512,7 +443,6 @@
             .hero-right { text-align: left; }
             .hero h1 { font-size: 28px; }
             .container { padding: 0 16px; }
-            .filter-form { grid-template-columns: 1fr; }
             .navbar-inner { padding: 0 16px; }
             .nav-links a { padding: 8px 12px; font-size: 12px; }
         }
@@ -533,7 +463,8 @@
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/admin/student-review">Student Review</a></li>
-                <li><a href="/admin/dashboard" class="active">Admin Dashboard</a></li>
+                <li><a href="/admin/dashboard">General Dashboard</a></li>
+                <li><a href="/admin/edu-dashboard" class="active">Edu Dashboard</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
         </div>
@@ -542,15 +473,17 @@
     <!-- Hero Banner -->
     <section class="hero">
         <div class="hero-pattern"></div>
+        <div class="hero-orbit"></div>
+        <div class="hero-orbit"></div>
         <div class="container">
             <div class="hero-content anim-up">
                 <div class="hero-left">
-                    <div class="hero-badge"><span class="dot"></span> Admin Panel</div>
-                    <h1><i class="fas fa-shield-halved" style="margin-right:8px;opacity:0.8;"></i> Admin Dashboard</h1>
-                    <p class="hero-sub">Monitor, manage &amp; respond to student concerns in real time. Your centralized control panel for academic excellence.</p>
+                    <div class="hero-badge"><span class="dot"></span> Education Panel</div>
+                    <h1><span class="book-icon"><i class="fas fa-graduation-cap"></i></span> Education Dashboard</h1>
+                    <p class="hero-sub">Manage and review Creative &amp; IT academic concerns. Track faculty-related issues and ensure timely resolutions for students.</p>
                     <div class="hero-btns">
-                        <a th:href="@{/admin/edu-dashboard}" class="hero-btn hero-btn-primary">
-                            <i class="fas fa-graduation-cap"></i> View Education Dashboard
+                        <a href="/admin/dashboard" class="hero-btn hero-btn-primary">
+                            <i class="fas fa-th-large"></i> General Dashboard
                         </a>
                         <a href="/admin/student-review" class="hero-btn hero-btn-outline">
                             <i class="fas fa-users"></i> Student Accounts
@@ -572,10 +505,10 @@
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card sc-total anim-scale d1">
-                <div class="stat-icon-wrap"><i class="fas fa-layer-group"></i></div>
+                <div class="stat-icon-wrap"><i class="fas fa-book-open"></i></div>
                 <div class="stat-info">
                     <div class="stat-number" data-count th:text="${totalConcerns}">0</div>
-                    <div class="stat-label">Total Concerns</div>
+                    <div class="stat-label">Total EDU Concerns</div>
                 </div>
             </div>
             <div class="stat-card sc-pending anim-scale d2">
@@ -589,7 +522,7 @@
                 <div class="stat-icon-wrap"><i class="fas fa-spinner"></i></div>
                 <div class="stat-info">
                     <div class="stat-number" data-count th:text="${inProgressCount}">0</div>
-                    <div class="stat-label">In Progress</div>
+                    <div class="stat-label">Reviewing</div>
                 </div>
             </div>
             <div class="stat-card sc-resolved anim-scale d4">
@@ -601,69 +534,23 @@
             </div>
         </div>
 
-        <!-- Filter Card -->
-        <div class="filter-card anim-up d4">
-            <div class="filter-header" onclick="toggleFilter()">
-                <h3><i class="fas fa-sliders-h"></i> Filter Concerns</h3>
-                <button type="button" class="filter-toggle-btn" id="filterToggleBtn">
-                    <i class="fas fa-chevron-up"></i> Toggle
-                </button>
-            </div>
-            <div class="filter-body" id="filterBody">
-                <form th:action="@{/admin/dashboard}" method="get" class="filter-form">
-                    <div class="filter-group">
-                        <label>STATUS</label>
-                        <select name="status">
-                            <option value="All" th:selected="${selectedStatus == 'All'}">All Status</option>
-                            <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Pending</option>
-                            <option value="In Progress" th:selected="${selectedStatus == 'In Progress'}">In Progress</option>
-                            <option value="Complete" th:selected="${selectedStatus == 'Complete'}">Complete</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>CATEGORY</label>
-                        <select name="category">
-                            <option value="All" th:selected="${selectedCategory == 'All'}">All Categories</option>
-                            <option value="Institute Problem" th:selected="${selectedCategory == 'Institute Problem'}">Institute Problem</option>
-                            <option value="Registration" th:selected="${selectedCategory == 'Registration'}">Registration</option>
-                            <option value="Administrative" th:selected="${selectedCategory == 'Administrative'}">Administrative</option>
-                            <option value="Financial" th:selected="${selectedCategory == 'Financial'}">Financial</option>
-                            <option value="Other" th:selected="${selectedCategory == 'Other'}">Other</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>TIME PERIOD</label>
-                        <select name="timePeriod">
-                            <option value="All" th:selected="${selectedTimePeriod == 'All'}">All Time</option>
-                            <option value="Today" th:selected="${selectedTimePeriod == 'Today'}">Today</option>
-                            <option value="Last7Days" th:selected="${selectedTimePeriod == 'Last7Days'}">Last 7 Days</option>
-                            <option value="Last30Days" th:selected="${selectedTimePeriod == 'Last30Days'}">Last 30 Days</option>
-                            <option value="Older" th:selected="${selectedTimePeriod == 'Older'}">Older</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-apply"><i class="fas fa-filter"></i> APPLY</button>
-                    <a href="/admin/dashboard" class="btn-clear">Clear</a>
-                </form>
-            </div>
-        </div>
-
         <!-- Concerns Table -->
         <div class="table-card anim-up d5">
             <div class="table-header">
                 <div class="table-header-left">
-                    <div class="table-header-icon"><i class="fas fa-stream"></i></div>
+                    <div class="table-header-icon"><i class="fas fa-chalkboard-teacher"></i></div>
                     <div>
-                        <h3>General Student Concerns</h3>
-                        <div class="sub">Institute, Registration, Administrative, Financial &amp; Other</div>
+                        <h3>Education (Creative &amp; IT) Submissions</h3>
+                        <div class="sub">Academic, Faculty &amp; Course-related Concerns</div>
                     </div>
                 </div>
                 <div class="concern-count-badge">
-                    <span th:text="${#lists.size(concerns.?[category != 'Education (Creative and IT)'])}">0</span>
-                    <span class="concern-count-label">Concerns</span>
+                    <span th:text="${totalConcerns}">0</span>
+                    <span class="concern-count-label">Records</span>
                 </div>
             </div>
 
-            <div class="table-body" th:if="${!#lists.isEmpty(concerns.?[category != 'Education (Creative and IT)'])}">
+            <div class="table-body" th:if="${!#lists.isEmpty(concerns)}">
                 <div class="table-scroll">
                     <table class="concern-table">
                         <thead>
@@ -671,14 +558,13 @@
                                 <th>ID</th>
                                 <th>Student</th>
                                 <th>Subject</th>
-                                <th>Category</th>
                                 <th>Status</th>
                                 <th>Submitted</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="concern, iterStat : ${concerns}" th:if="${concern.category != 'Education (Creative and IT)'}">
+                            <tr th:each="concern, iterStat : ${concerns}">
                                 <td>
                                     <span class="id-pill" th:text="'CON-' + ${concern.concernId}">CON-1</span>
                                 </td>
@@ -686,19 +572,16 @@
                                     <div class="student-cell">
                                         <div class="student-avatar"
                                              th:classappend="'av-' + ${(iterStat.index % 5) + 1}"
-                                             th:text="${concern.student != null and concern.student.user != null} ? ${#strings.substring(concern.student.user.firstName, 0, 1)} : '?'">K</div>
+                                             th:text="${concern.student != null and concern.student.user != null} ? ${#strings.substring(concern.student.user.firstName, 0, 1)} : '?'">S</div>
                                         <div>
                                             <div class="student-name" th:text="${concern.student != null and concern.student.user != null} ? ${concern.student.user.firstName + ' ' + concern.student.user.lastName} : 'Unknown'">Student</div>
-                                            <div class="student-id-text" th:text="${concern.student != null} ? ${concern.student.studentId} : 'N/A'">ID</div>
+                                            <div class="student-id-text" th:text="${concern.student != null} ? ${concern.student.studentId} : 'N/A'">STU001</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="subject-text" th:text="${concern.subject}">Subject</div>
-                                    <div class="desc-text" th:text="${#strings.abbreviate(concern.message, 45)}">Desc...</div>
-                                </td>
-                                <td>
-                                    <span class="cat-badge" th:text="${concern.category}">Category</span>
+                                    <div class="desc-text" th:text="${#strings.abbreviate(concern.message, 45)}">Description...</div>
                                 </td>
                                 <td>
                                     <span class="status-pill"
@@ -722,9 +605,10 @@
                 </div>
             </div>
 
-            <div th:if="${#lists.isEmpty(concerns.?[category != 'Education (Creative and IT)'])}" class="empty-state">
-                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                <p>No concerns found. Everything looks great!</p>
+            <div th:if="${#lists.isEmpty(concerns)}" class="empty-state">
+                <div class="empty-icon"><i class="fas fa-graduation-cap"></i></div>
+                <p>No education concerns found at this moment.</p>
+                <p class="empty-sub">All academic issues have been resolved or none have been submitted yet.</p>
             </div>
         </div>
     </main>
@@ -744,14 +628,6 @@
         }
         setInterval(updateClock, 1000);
         updateClock();
-
-        /* Filter toggle */
-        function toggleFilter() {
-            const body = document.getElementById('filterBody');
-            const btn  = document.getElementById('filterToggleBtn');
-            body.classList.toggle('hidden');
-            btn.classList.toggle('collapsed');
-        }
 
         /* Animated counters */
         function animateCounters() {

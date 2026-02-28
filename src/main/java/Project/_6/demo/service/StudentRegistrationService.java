@@ -83,6 +83,13 @@ public class StudentRegistrationService {
     }
 
     /**
+     * Get students by a specific registration status
+     */
+    public List<Student> getStudentsByStatus(String status) {
+        return studentRepository.findByUser_RegistrationStatus(status);
+    }
+
+    /**
      * Get all students (for admin overview)
      */
     public List<Student> getAllStudents() {

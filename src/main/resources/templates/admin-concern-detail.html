@@ -395,7 +395,7 @@
                     </div>
                     <div class="meta-item" th:if="${concern.student != null}">
                         <span class="meta-label">Category</span>
-                        <span class="meta-value" th:text="${concern.student.category}">-</span>
+                        <span class="meta-value" th:text="${concern.category != null ? concern.category : '-'}">-</span>
                     </div>
                     <div class="meta-item" th:if="${concern.student != null and concern.student.user.email != null}">
                         <span class="meta-label">Email</span>
