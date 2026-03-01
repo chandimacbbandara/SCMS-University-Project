@@ -63,13 +63,25 @@ public class StudentRegistrationController {
     private static final String ADMIN_EMAIL = "admin@gmail.com";
     private static final String ADMIN_PASSWORD = "123456";
 
+    // Predefined owner credentials
+    private static final String OWNER_EMAIL = "owner@gmail.com";
+    private static final String OWNER_PASSWORD = "123456";
+
     /**
-     * Handle login form submission - checks admin first, then student
+     * Handle login form submission - checks owner first, then admin, then student
      */
     @PostMapping("/login")
     public String loginUser(@ModelAttribute LoginDTO loginDTO,
                             HttpSession session,
                             RedirectAttributes redirectAttributes) {
+        // Check if owner credentials
+        if (OWNER_EMAIL.equals(loginDTO.getEmail()) && OWNER_PASSWORD.equals(loginDTO.getPassword())) {
+            session.setAttribute("ownerLoggedIn", true);
+            session.setAttribute("ownerEmail", loginDTO.getEmail());
+            redirectAttributes.addFlashAttribute("successMessage", "Welcome, Owner!");
+            return "redirect:/owner/dashboard";
+        }
+
         // Check if admin credentials
         if (ADMIN_EMAIL.equals(loginDTO.getEmail()) && ADMIN_PASSWORD.equals(loginDTO.getPassword())) {
             session.setAttribute("adminLoggedIn", true);
