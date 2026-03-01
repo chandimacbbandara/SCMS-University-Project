@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer> {
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
+    List<AdminReply> findByConcern_Category(String category);
 }

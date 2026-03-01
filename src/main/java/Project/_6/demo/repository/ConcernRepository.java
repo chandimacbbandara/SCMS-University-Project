@@ -14,6 +14,9 @@ public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     List<Concern> findByStatusOrderByCreatedTimeDesc(String status);
     long countByStatus(String status);
 
+    // Category count
+    long countByCategory(String category);
+
     // Time range queries
     List<Concern> findByCreatedTimeBetweenOrderByCreatedTimeDesc(LocalDateTime from, LocalDateTime to);
     List<Concern> findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(String status, LocalDateTime from, LocalDateTime to);
