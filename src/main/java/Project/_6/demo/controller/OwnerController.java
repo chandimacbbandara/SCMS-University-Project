@@ -2,16 +2,18 @@ package Project._6.demo.controller;
 
 import Project._6.demo.dto.AnalyticsReportDTO;
 import Project._6.demo.entity.Admin;
-import Project._6.demo.entity.AnalyticsReport;
-import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.AdminReply;
+import Project._6.demo.entity.AnalyticsReport;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.Feedback;
+import Project._6.demo.entity.Notification;
 import Project._6.demo.repository.AnalyticsReportRepository;
 import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.FeedbackRepository;
 import Project._6.demo.service.AnalyticsReportService;
+import Project._6.demo.service.NotificationService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -35,19 +37,22 @@ public class OwnerController {
     private final AdminRepository adminRepository;
     private final FeedbackRepository feedbackRepository;
     private final AdminReplyRepository adminReplyRepository;
+    private final NotificationService notificationService;
 
     public OwnerController(AnalyticsReportService analyticsReportService,
                            AnalyticsReportRepository analyticsReportRepository,
                            ConcernRepository concernRepository,
                            AdminRepository adminRepository,
                            FeedbackRepository feedbackRepository,
-                           AdminReplyRepository adminReplyRepository) {
+                           AdminReplyRepository adminReplyRepository,
+                           NotificationService notificationService) {
         this.analyticsReportService = analyticsReportService;
         this.analyticsReportRepository = analyticsReportRepository;
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.feedbackRepository = feedbackRepository;
         this.adminReplyRepository = adminReplyRepository;
+        this.notificationService = notificationService;
     }
 
     @GetMapping("/dashboard")
@@ -319,6 +324,40 @@ public class OwnerController {
                         BigDecimal.valueOf(avg).setScale(2, RoundingMode.HALF_UP));
             }
         }
+    }
+
+    // ========================
+    // Broadcast Notifications
+    // ========================
+
+    @GetMapping("/notifications")
+    public String showNotificationsPage(HttpSession session, Model model) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+        model.addAttribute("notifications", broadcastNotifications);
+        return "owner-notifications";
+    }
+
+    @PostMapping("/notifications/send")
+    public String sendBroadcastNotification(@RequestParam("title") String title,
+                                            @RequestParam("message") String message,
+                                            @RequestParam("targetAudience") String targetAudience,
+                                            HttpSession session,
+                                            RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            notificationService.createBroadcastNotification(title, message, targetAudience, null);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Notification sent successfully to " + targetAudience + "!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Failed to send notification: " + e.getMessage());
+        }
+        return "redirect:/owner/notifications";
     }
 
     private boolean isOwnerLoggedIn(HttpSession session) {

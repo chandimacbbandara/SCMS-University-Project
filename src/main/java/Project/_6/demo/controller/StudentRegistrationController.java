@@ -140,10 +140,14 @@ public class StudentRegistrationController {
         model.addAttribute("student", student);
         model.addAttribute("studentName", student.getUser().getFirstName() + " " + student.getUser().getLastName());
 
-        // Add notifications for the student
-        List<Notification> notifications = notificationService.getNotificationsForStudent(userId);
-        long unreadCount = notificationService.getUnreadCount(userId);
-        model.addAttribute("notifications", notifications);
+        // Add notifications for the student (personal + broadcast)
+        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+        allNotifications.addAll(broadcastNotifications);
+        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        long unreadCount = notificationService.getUnreadCount(userId) + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+        model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
 
         // Add student's concerns for tracking

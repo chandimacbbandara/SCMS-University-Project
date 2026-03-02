@@ -807,6 +807,7 @@
         .notif-icon-wrap.submitted { background: rgba(21,101,192,0.08); color: #1565c0; }
         .notif-icon-wrap.in-progress { background: rgba(239,108,0,0.1); color: #ef6c00; }
         .notif-icon-wrap.complete { background: rgba(46,125,50,0.08); color: #2e7d32; }
+        .notif-icon-wrap.broadcast { background: rgba(249,115,22,0.1); color: #ea580c; }
 
         .notif-content { flex: 1; min-width: 0; }
         .notif-content .notif-title {
@@ -1376,8 +1377,8 @@
                  th:attr="data-id=${notif.notificationId}"
                  onclick="markNotifRead(this)">
                 <div class="notif-icon-wrap"
-                     th:classappend="${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete')">
-                    <i th:classappend="${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check')"></i>
+                     th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
+                    <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : (${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check'))"></i>
                 </div>
                 <div class="notif-content">
                     <div class="notif-title" th:text="${notif.title}">Notification Title</div>
