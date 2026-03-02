@@ -25,13 +25,19 @@ public class Notification {
     private String message;
 
     @Column(name = "Type", length = 50)
-    private String type; // SUBMITTED, IN_PROGRESS, COMPLETE
+    private String type; // SUBMITTED, IN_PROGRESS, COMPLETE, BROADCAST
+
+    @Column(name = "TargetAudience", length = 100)
+    private String targetAudience; // ALL_STUDENTS, specific category, etc.
 
     @Column(name = "IsRead")
     private Boolean isRead = false;
 
     @Column(name = "SentTime")
     private LocalDateTime sentTime;
+
+    @Column(name = "AdminID_FK")
+    private Integer adminIdFk;
 
     @ManyToOne
     @JoinColumn(name = "StudentID_FK")

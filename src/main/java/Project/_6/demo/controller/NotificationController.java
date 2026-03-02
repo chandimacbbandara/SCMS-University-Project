@@ -25,6 +25,7 @@ public class NotificationController {
 
     /**
      * Get all notifications for the logged-in student (JSON API).
+     * Includes both personal and broadcast notifications.
      */
     @GetMapping
     public ResponseEntity<?> getNotifications(HttpSession session) {
@@ -33,12 +34,19 @@ public class NotificationController {
             return ResponseEntity.status(401).body("Not logged in");
         }
 
-        List<Notification> notifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+
+        // Merge personal + broadcast, sort by sentTime desc
+        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+        allNotifications.addAll(broadcastNotifications);
+        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+
         long unreadCount = notificationService.getUnreadCount(userId);
 
         Map<String, Object> response = new HashMap<>();
         response.put("unreadCount", unreadCount);
-        response.put("notifications", notifications.stream().map(n -> {
+        response.put("notifications", allNotifications.stream().map(n -> {
             Map<String, Object> map = new HashMap<>();
             map.put("id", n.getNotificationId());
             map.put("title", n.getTitle());

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Notifications - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --primary-deeper: #b71c1c;
+            --primary-light: #ff6f60;
+            --primary-bg: rgba(229, 57, 53, 0.08);
+            --accent-green: #16a34a;
+            --accent-blue: #2563eb;
+            --accent-orange: #f97316;
+            --accent-purple: #7c3aed;
+            --accent-teal: #0d9488;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: #f0f0f0; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes pulseRing {
+            0%   { box-shadow: 0 0 0 0 rgba(229,57,53,0.35); }
+            70%  { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
+            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes bounceIn {
+            0%   { transform: scale(0.3); opacity: 0; }
+            50%  { transform: scale(1.05); }
+            70%  { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in  { animation: fadeSlideUp 0.7s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .18s; }
+        .delay-3 { animation-delay: .26s; }
+        .delay-4 { animation-delay: .34s; }
+
+        .owner-container {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Page Hero ===== */
+        .page-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 40%, #020617 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            border-radius: var(--radius-lg);
+            padding: 40px 42px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 50px rgba(15,23,42,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-hero .hero-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3Cpath d='M0 0h20v20H0z'/%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(229,57,53,0.15) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(229,57,53,0.2);
+            backdrop-filter: blur(8px);
+            padding: 5px 16px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ff6f60;
+            margin-bottom: 14px;
+        }
+        .hero-eyebrow .eyebrow-dot {
+            width: 6px; height: 6px;
+            background: #ff6f60;
+            border-radius: 50%;
+            animation: pulseRing 2s infinite;
+        }
+        .hero-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .hero-right {
+            position: relative; z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .hero-icon-wrap {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            background: rgba(229,57,53,0.15);
+            border: 3px solid rgba(229,57,53,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: #ff6f60;
+            animation: float 4s ease-in-out infinite;
+        }
+        .hero-icon-wrap::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255,255,255,0.1);
+            animation: spin 15s linear infinite;
+        }
+
+        /* ===== Back Button ===== */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: rgba(255,255,255,0.7);
+            padding: 8px 18px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn-back:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-pill {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-pill::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 4px 0 0 4px;
+        }
+        .stat-pill:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .stat-pill.total::before   { background: linear-gradient(180deg, var(--accent-purple), #a78bfa); }
+        .stat-pill.sent::before    { background: linear-gradient(180deg, var(--accent-green), #4ade80); }
+        .stat-pill.audience::before { background: linear-gradient(180deg, var(--accent-blue), #60a5fa); }
+        .stat-pill-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .stat-pill.total    .stat-pill-icon { background: #ede9fe; color: var(--accent-purple); }
+        .stat-pill.sent     .stat-pill-icon { background: #f0fdf4; color: var(--accent-green); }
+        .stat-pill.audience .stat-pill-icon { background: #eff6ff; color: var(--accent-blue); }
+        .stat-pill-info .stat-pill-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-light);
+        }
+        .stat-pill-info .stat-pill-val {
+            font-size: 24px; font-weight: 900; color: var(--text-dark);
+            animation: countUp 0.6s ease both;
+        }
+
+        /* ===== Alert Toasts ===== */
+        .alert-toast {
+            padding: 16px 22px; border-radius: var(--radius-sm);
+            margin-bottom: 18px; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 12px;
+            animation: bounceIn 0.5s cubic-bezier(.22,1,.36,1) both;
+        }
+        .alert-toast.success {
+            background: linear-gradient(135deg, rgba(240,253,244,0.95), rgba(220,252,231,0.95));
+            color: #15803d; border: 1px solid #bbf7d0;
+        }
+        .alert-toast.error {
+            background: linear-gradient(135deg, rgba(254,242,242,0.95), rgba(254,226,226,0.95));
+            color: #dc2626; border: 1px solid #fecaca;
+        }
+
+        /* ===== Two Column Layout ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ===== Create Card ===== */
+        .create-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .create-card-header {
+            background: linear-gradient(135deg, var(--accent-orange) 0%, #ea580c 100%);
+            padding: 22px 28px;
+            display: flex; align-items: center; gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .create-card-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+        .create-card-header-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff;
+        }
+        .create-card-header-text h2 {
+            font-size: 16px; font-weight: 800; color: #fff;
+        }
+        .create-card-header-text p {
+            font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;
+        }
+        .create-card-body {
+            padding: 28px;
+        }
+
+        /* ===== Form Styles ===== */
+        .form-group { margin-bottom: 18px; }
+        .form-label {
+            display: block;
+            font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-mid);
+            margin-bottom: 7px;
+        }
+        .form-label i { margin-right: 5px; color: var(--accent-orange); }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: #fafafa;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--accent-orange);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(249,115,22,0.08);
+        }
+        .form-control::placeholder { color: #bbb; }
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 120px;
+            line-height: 1.7;
+        }
+        .form-hint {
+            font-size: 10px; color: #aaa; margin-top: 4px;
+            display: flex; align-items: center; gap: 4px;
+        }
+        .char-count {
+            font-size: 10px;
+            color: #aaa;
+            text-align: right;
+            margin-top: 4px;
+            transition: color 0.3s;
+        }
+        .char-count.warn { color: var(--accent-orange); }
+        .char-count.over { color: #dc2626; font-weight: 700; }
+
+        .btn-send {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, var(--accent-orange), #ea580c);
+            color: #fff; border: none;
+            padding: 14px 32px; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            box-shadow: 0 6px 24px rgba(249,115,22,0.3);
+            width: 100%;
+            justify-content: center;
+            margin-top: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-send::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-send:hover::before { left: 100%; }
+        .btn-send:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px rgba(249,115,22,0.4);
+        }
+
+        /* ===== Notification History Card ===== */
+        .history-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .history-card-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 22px 28px;
+            display: flex; align-items: center; gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .history-card-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 4s infinite;
+        }
+        .history-card-header-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #94a3b8;
+        }
+        .history-card-header-text h2 {
+            font-size: 16px; font-weight: 800; color: #fff;
+        }
+        .history-card-header-text p {
+            font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;
+        }
+        .history-card-body {
+            padding: 20px 24px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* ===== Notification Item ===== */
+        .notif-item {
+            background: #fafbfc;
+            border: 1px solid #f0f0f0;
+            border-radius: var(--radius-sm);
+            padding: 18px 22px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .notif-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--accent-orange), #facc15);
+            border-radius: 4px 0 0 4px;
+        }
+        .notif-item:hover {
+            border-color: #ddd;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transform: translateX(4px);
+        }
+        .notif-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 8px;
+        }
+        .notif-title {
+            font-size: 14px; font-weight: 800; color: var(--text-dark);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .notif-title i { color: var(--accent-orange); font-size: 14px; }
+        .notif-audience-badge {
+            font-size: 10px; font-weight: 700;
+            color: var(--accent-blue);
+            background: #eff6ff;
+            padding: 3px 10px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+        .notif-message {
+            font-size: 13px; color: var(--text-mid);
+            line-height: 1.7;
+            margin-bottom: 10px;
+            padding: 10px 14px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-orange);
+        }
+        .notif-meta {
+            display: flex; align-items: center; gap: 16px;
+            font-size: 11px; color: #999;
+        }
+        .notif-meta span { display: flex; align-items: center; gap: 5px; }
+
+        /* ===== Empty State ===== */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .empty-state-icon {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: #fff7ed;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: var(--accent-orange);
+            margin: 0 auto 16px;
+        }
+        .empty-state h4 {
+            font-size: 15px; font-weight: 800; color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .empty-state p {
+            font-size: 12px; color: var(--text-light); line-height: 1.6;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            .page-hero { flex-direction: column; gap: 18px; align-items: flex-start; padding: 28px 24px; }
+            .hero-right { display: none; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                <li><a href="/owner/notifications" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Notifications</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="owner-container">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert-toast success animate-in">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert-toast error animate-in">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Page Hero -->
+        <div class="page-hero animate-in">
+            <div class="hero-pattern"></div>
+            <div class="hero-left">
+                <a href="/owner/dashboard" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                <p class="hero-eyebrow"><span class="eyebrow-dot"></span> Broadcast Center</p>
+                <h1 class="hero-title">Student Notifications</h1>
+                <p class="hero-sub">
+                    <i class="fas fa-bullhorn"></i>
+                    Send important announcements to all students
+                </p>
+            </div>
+            <div class="hero-right">
+                <div class="hero-icon-wrap">
+                    <i class="fas fa-bell"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar animate-in delay-1">
+            <div class="stat-pill total">
+                <div class="stat-pill-icon"><i class="fas fa-bell"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Total Sent</div>
+                    <div class="stat-pill-val" th:text="${notifications != null ? #lists.size(notifications) : 0}">0</div>
+                </div>
+            </div>
+            <div class="stat-pill sent">
+                <div class="stat-pill-icon"><i class="fas fa-paper-plane"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">This Month</div>
+                    <div class="stat-pill-val" id="thisMonthCount">0</div>
+                </div>
+            </div>
+            <div class="stat-pill audience">
+                <div class="stat-pill-icon"><i class="fas fa-users"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Audience</div>
+                    <div class="stat-pill-val" style="font-size:16px;">All Students</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Send Notification Form -->
+            <div class="create-card animate-in delay-2">
+                <div class="create-card-header">
+                    <div class="create-card-header-icon"><i class="fas fa-bullhorn"></i></div>
+                    <div class="create-card-header-text">
+                        <h2>Send New Notification</h2>
+                        <p>Compose and broadcast a message to students</p>
+                    </div>
+                </div>
+                <div class="create-card-body">
+                    <form th:action="@{/owner/notifications/send}" method="post" id="notificationForm">
+
+                        <!-- Title -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-heading"></i> Notification Title</label>
+                            <input type="text" name="title" class="form-control" placeholder="Enter notification title..." required maxlength="255">
+                            <div class="form-hint"><i class="fas fa-info-circle"></i> Keep it short and descriptive (max 255 characters)</div>
+                        </div>
+
+                        <!-- Message -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-message"></i> Message</label>
+                            <textarea name="message" class="form-control" id="messageInput" placeholder="Type your notification message here..." required maxlength="2000"></textarea>
+                            <div class="char-count" id="charCount">0 / 2000 characters</div>
+                        </div>
+
+                        <!-- Target Audience (fixed to All Students) -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-users"></i> Target Audience</label>
+                            <input type="hidden" name="targetAudience" value="ALL_STUDENTS">
+                            <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px;">
+                                <i class="fas fa-users" style="color:#16a34a; font-size:18px;"></i>
+                                <div>
+                                    <div style="font-size:14px; font-weight:800; color:#15803d;">All Students</div>
+                                    <div style="font-size:11px; color:#4ade80;">This notification will be sent to every registered student</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-send" id="sendBtn">
+                            <i class="fas fa-paper-plane"></i> Send Notification
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT: Sent Notifications History -->
+            <div class="history-card animate-in delay-3">
+                <div class="history-card-header">
+                    <div class="history-card-header-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                    <div class="history-card-header-text">
+                        <h2>Sent Notifications</h2>
+                        <p>Previously sent broadcast notifications</p>
+                    </div>
+                </div>
+                <div class="history-card-body">
+
+                    <!-- Empty State -->
+                    <div th:if="${notifications == null or #lists.isEmpty(notifications)}" class="empty-state">
+                        <div class="empty-state-icon"><i class="fas fa-bell-slash"></i></div>
+                        <h4>No Notifications Sent Yet</h4>
+                        <p>Use the form on the left to send your first notification to students.</p>
+                    </div>
+
+                    <!-- Notification Items -->
+                    <div th:each="notif, iterStat : ${notifications}" class="notif-item"
+                         th:style="'animation: fadeSlideUp 0.5s ease both; animation-delay: ' + ${0.06 * iterStat.index} + 's'">
+                        <div class="notif-item-header">
+                            <span class="notif-title">
+                                <i class="fas fa-bullhorn"></i>
+                                <span th:text="${notif.title}">Notification Title</span>
+                            </span>
+                            <span class="notif-audience-badge" th:text="${notif.targetAudience}">ALL_STUDENTS</span>
+                        </div>
+                        <div class="notif-message" th:text="${notif.message}">
+                            Notification message content goes here...
+                        </div>
+                        <div class="notif-meta">
+                            <span>
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${notif.sentTime != null ? #temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01 Jan 2026, 10:00 AM</span>
+                            </span>
+                            <span>
+                                <i class="fas fa-users"></i>
+                                <span th:text="${notif.targetAudience}">All Students</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.dashboard-grid -->
+
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ===== Auto-dismiss alert toasts =====
+    document.querySelectorAll('.alert-toast').forEach(toast => {
+        setTimeout(() => {
+            toast.style.transition = 'all 0.5s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    });
+
+    // ===== Character counter for message =====
+    const messageInput = document.getElementById('messageInput');
+    const charCount = document.getElementById('charCount');
+    if (messageInput && charCount) {
+        messageInput.addEventListener('input', function() {
+            const len = this.value.length;
+            charCount.textContent = len + ' / 2000 characters';
+            charCount.className = 'char-count';
+            if (len > 1800) charCount.classList.add('warn');
+            if (len >= 2000) charCount.classList.add('over');
+        });
+    }
+
+    // ===== Count this month's notifications =====
+    (function() {
+        const items = document.querySelectorAll('.notif-item');
+        let thisMonth = 0;
+        const now = new Date();
+        items.forEach(item => {
+            const timeEl = item.querySelector('.notif-meta span:first-child span:last-child');
+            if (timeEl) {
+                const d = new Date(timeEl.textContent);
+                if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+                    thisMonth++;
+                }
+            }
+        });
+        const monthEl = document.getElementById('thisMonthCount');
+        if (monthEl) monthEl.textContent = thisMonth;
+    })();
+
+    // ===== Form submit feedback =====
+    document.getElementById('notificationForm').addEventListener('submit', function() {
+        const btn = document.getElementById('sendBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+        btn.style.opacity = '0.7';
+        btn.style.pointerEvents = 'none';
+    });
+</script>
+</body>
+</html>

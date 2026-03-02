@@ -116,4 +116,27 @@ public class NotificationService {
     public List<Notification> getTrackingForConcern(Integer concernId) {
         return notificationRepository.findByConcern_ConcernIdOrderBySentTimeDesc(concernId);
     }
+
+    /**
+     * Create a broadcast notification sent by the owner to ALL students.
+     */
+    @Transactional
+    public Notification createBroadcastNotification(String title, String message, String targetAudience, Integer adminIdFk) {
+        Notification notification = new Notification();
+        notification.setTitle(title);
+        notification.setMessage(message);
+        notification.setType("BROADCAST");
+        notification.setTargetAudience(targetAudience != null ? targetAudience : "ALL_STUDENTS");
+        notification.setAdminIdFk(adminIdFk);
+        notification.setStudent(null);
+        notification.setConcern(null);
+        return notificationRepository.save(notification);
+    }
+
+    /**
+     * Get all broadcast notifications (for owner to see sent history).
+     */
+    public List<Notification> getAllBroadcastNotifications() {
+        return notificationRepository.findByTypeOrderBySentTimeDesc("BROADCAST");
+    }
 }
