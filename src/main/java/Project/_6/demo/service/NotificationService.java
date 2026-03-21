@@ -118,6 +118,14 @@ public class NotificationService {
     }
 
     /**
+     * Delete all notifications tied to a specific concern.
+     */
+    @Transactional
+    public void deleteByConcernId(Integer concernId) {
+        notificationRepository.deleteByConcern_ConcernId(concernId);
+    }
+
+    /**
      * Create a broadcast notification sent by the owner to ALL students.
      */
     @Transactional

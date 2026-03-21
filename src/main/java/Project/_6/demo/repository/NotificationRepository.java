@@ -17,6 +17,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
 
     List<Notification> findByConcern_ConcernIdOrderBySentTimeDesc(Integer concernId);
 
+    void deleteByConcern_ConcernId(Integer concernId);
+
     // Broadcast notifications (no specific student, sent to all)
     List<Notification> findByTargetAudienceAndStudentIsNullOrderBySentTimeDesc(String targetAudience);
 

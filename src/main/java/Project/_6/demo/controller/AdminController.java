@@ -8,6 +8,7 @@ import Project._6.demo.service.AdminService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import jakarta.servlet.http.HttpSession;
@@ -68,11 +69,23 @@ public class AdminController {
         }
 
         List<Concern> concerns = adminService.getFilteredConcerns(status, category, from, to);
+        List<Concern> allConcerns = adminService.getAllConcerns();
+
+        long instituteCount = allConcerns.stream().filter(c -> "Institute Problem".equals(c.getCategory())).count();
+        long registrationCount = allConcerns.stream().filter(c -> "Registration".equals(c.getCategory())).count();
+        long administrativeCount = allConcerns.stream().filter(c -> "Administrative".equals(c.getCategory())).count();
+        long financialCount = allConcerns.stream().filter(c -> "Financial".equals(c.getCategory())).count();
+        long otherCount = allConcerns.stream().filter(c -> "Other".equals(c.getCategory())).count();
 
         model.addAttribute("concerns", concerns);
         model.addAttribute("selectedStatus", status != null ? status : "All");
         model.addAttribute("selectedTimePeriod", timePeriod != null ? timePeriod : "All");
         model.addAttribute("selectedCategory", category != null ? category : "All");
+        model.addAttribute("instituteCount", instituteCount);
+        model.addAttribute("registrationCount", registrationCount);
+        model.addAttribute("administrativeCount", administrativeCount);
+        model.addAttribute("financialCount", financialCount);
+        model.addAttribute("otherCount", otherCount);
         model.addAttribute("totalConcerns", adminService.getTotalConcerns());
         model.addAttribute("pendingCount", adminService.getPendingCount());
         model.addAttribute("inProgressCount", adminService.getInProgressCount());
@@ -123,6 +136,7 @@ public class AdminController {
     @PostMapping("/concern/{id}/reply")
     public String submitReply(@PathVariable("id") Integer id,
                               @ModelAttribute AdminReplyDTO replyDTO,
+                              @RequestParam(value = "resolutionFile", required = false) MultipartFile resolutionFile,
                               HttpSession session,
                               RedirectAttributes redirectAttributes) {
         if (!isAdminLoggedIn(session)) {
@@ -130,12 +144,76 @@ public class AdminController {
         }
         try {
             replyDTO.setConcernId(id);
-            adminService.submitReply(replyDTO);
+            adminService.submitReply(replyDTO, resolutionFile);
             redirectAttributes.addFlashAttribute("successMessage", "Reply submitted successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to submit reply: " + e.getMessage());
         }
         return "redirect:/admin/concern/" + id;
+    }
+
+    /**
+     * Delete a reply from a concern
+     */
+    @PostMapping("/concern/{concernId}/reply/{replyId}/delete")
+    public String deleteReply(@PathVariable("concernId") Integer concernId,
+                              @PathVariable("replyId") Integer replyId,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            adminService.deleteReply(concernId, replyId);
+            redirectAttributes.addFlashAttribute("successMessage", "Reply deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete reply: " + e.getMessage());
+        }
+        return "redirect:/admin/concern/" + concernId;
+    }
+
+    /**
+     * Update the latest reply from a concern
+     */
+    @PostMapping("/concern/{concernId}/reply/{replyId}/update")
+    public String updateReply(@PathVariable("concernId") Integer concernId,
+                              @PathVariable("replyId") Integer replyId,
+                              @RequestParam("replyMessage") String replyMessage,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            adminService.updateLatestReply(concernId, replyId, replyMessage);
+            redirectAttributes.addFlashAttribute("successMessage", "Reply updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update reply: " + e.getMessage());
+        }
+        return "redirect:/admin/concern/" + concernId;
+    }
+
+    /**
+     * Delete a concern from dashboard list
+     */
+    @PostMapping("/concern/{id}/delete")
+    public String deleteConcern(@PathVariable("id") Integer concernId,
+                                @RequestParam(value = "redirectTo", defaultValue = "dashboard") String redirectTo,
+                                HttpSession session,
+                                RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            adminService.deleteConcern(concernId);
+            redirectAttributes.addFlashAttribute("successMessage", "Concern deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete concern: " + e.getMessage());
+        }
+        if ("edu-dashboard".equals(redirectTo)) {
+            return "redirect:/admin/edu-dashboard";
+        }
+        return "redirect:/admin/dashboard";
     }
 
     /**
@@ -154,6 +232,26 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("successMessage", "Status updated to: " + status);
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update status: " + e.getMessage());
+        }
+        return "redirect:/admin/concern/" + id;
+    }
+
+    /**
+     * Reassign concern category/department
+     */
+    @PostMapping("/concern/{id}/category")
+    public String updateCategory(@PathVariable("id") Integer id,
+                                 @RequestParam("category") String category,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            adminService.updateConcernCategory(id, category);
+            redirectAttributes.addFlashAttribute("successMessage", "Concern department updated to: " + category);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update department: " + e.getMessage());
         }
         return "redirect:/admin/concern/" + id;
     }
