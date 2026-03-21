@@ -2,6 +2,7 @@ package Project._6.demo.controller;
 
 import Project._6.demo.dto.LoginDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
+import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.Student;
@@ -22,6 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class StudentRegistrationController {
@@ -152,7 +154,9 @@ public class StudentRegistrationController {
 
         // Add student's concerns for tracking
         List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
+        Map<Integer, List<AdminReply>> repliesMap = concernService.getRepliesMap(concerns);
         model.addAttribute("concerns", concerns);
+        model.addAttribute("repliesMap", repliesMap);
 
         return "student-dashboard";
     }

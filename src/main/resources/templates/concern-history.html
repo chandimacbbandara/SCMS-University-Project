@@ -757,6 +757,27 @@
         .reply-time   { font-size: 11px; color: #999; display: flex; align-items: center; gap: 4px; }
         .reply-message { font-size: 13px; color: #333; line-height: 1.7; }
 
+        .reply-attachment-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #dbeafe;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            padding: 6px 12px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .reply-attachment-link:hover {
+            background: #bfdbfe;
+            transform: translateY(-1px);
+        }
+
         .no-reply-pill {
             display: flex; align-items: center; gap: 10px;
             background: linear-gradient(135deg, #f9fafb, #f5f6f8);
@@ -1260,6 +1281,13 @@
                                         </span>
                                     </div>
                                     <div class="reply-message" th:text="${reply.replyMessage}">Reply message</div>
+                                    <a th:if="${reply.resolutionScreenshotPath != null}"
+                                       th:href="@{'/uploads/' + ${reply.resolutionScreenshotPath}}"
+                                       target="_blank"
+                                       class="reply-attachment-link">
+                                        <i class="fas fa-paperclip"></i>
+                                        View Admin Attachment
+                                    </a>
                                 </div>
                             </div>
                         </div>

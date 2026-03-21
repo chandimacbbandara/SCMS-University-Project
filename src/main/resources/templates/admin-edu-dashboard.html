@@ -410,6 +410,35 @@
             transform: translateY(-1px);
         }
 
+        .row-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .delete-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #c62828;
+            background: #ffebee;
+            border: 1px solid #ef9a9a;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .delete-btn:hover {
+            background: #f44336;
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(198,40,40,0.25);
+            transform: translateY(-1px);
+        }
+
         /* Empty state */
         .empty-state {
             text-align: center; padding: 70px 20px;
@@ -429,6 +458,28 @@
             color: var(--text-light); font-size: 12.5px;
         }
         .site-footer .heart { color: #e53935; }
+
+        .alert-toast {
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 18px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            animation: fadeInUp 0.35s ease both;
+        }
+        .alert-toast.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .alert-toast.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
 
         /* ===== Table scroll ===== */
         .table-scroll { overflow-x: auto; }
@@ -502,6 +553,15 @@
     </section>
 
     <main class="container">
+        <div th:if="${successMessage}" class="alert-toast success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}">Success</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert-toast error">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}">Error</span>
+        </div>
+
         <!-- Stats Row -->
         <div class="stats-row">
             <div class="stat-card sc-total anim-scale d1">
@@ -595,9 +655,19 @@
                                     <div class="time-text" th:text="${#temporals.format(concern.createdTime, 'HH:mm')}">Time</div>
                                 </td>
                                 <td>
-                                    <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">
-                                        <i class="fas fa-arrow-right"></i> VIEW
-                                    </a>
+                                    <div class="row-actions">
+                                        <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">
+                                            <i class="fas fa-arrow-right"></i> VIEW
+                                        </a>
+                                        <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
+                                              method="post"
+                                              onsubmit="return confirm('Delete this concern and related replies/feedback?');">
+                                            <input type="hidden" name="redirectTo" value="edu-dashboard" />
+                                            <button type="submit" class="delete-btn">
+                                                <i class="fas fa-trash"></i> DELETE
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

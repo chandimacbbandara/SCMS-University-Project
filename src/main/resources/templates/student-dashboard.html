@@ -1080,6 +1080,27 @@
         }
         .track-date i { color: var(--primary); }
 
+        .admin-attachment-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .admin-attachment-pill:hover {
+            background: #bbdefb;
+            transform: translateY(-1px);
+        }
+
         @media (max-width: 768px) {
             .notif-panel { width: 100%; right: -100%; border-radius: 0; }
             .step-tracker { flex-direction: column; gap: 0; }
@@ -1324,6 +1345,15 @@
                         <i class="fas fa-clock"></i>
                         <span>Submitted: </span>
                         <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
+                    </div>
+
+                    <div th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}">
+                        <a th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
+                           target="_blank"
+                           class="admin-attachment-pill">
+                            <i class="fas fa-paperclip"></i>
+                            View Admin Attachment
+                        </a>
                     </div>
                 </div>
             </div>

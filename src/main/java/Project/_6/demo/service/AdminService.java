@@ -8,14 +8,22 @@ import Project._6.demo.entity.User;
 import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.ConcernRepository;
+import Project._6.demo.repository.FeedbackRepository;
 import Project._6.demo.repository.UserRepository;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,9 +32,12 @@ import java.util.stream.Collectors;
 @Service
 public class AdminService {
 
+    private static final String UPLOAD_DIR = "uploads/";
+
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
     private final AdminReplyRepository adminReplyRepository;
+    private final FeedbackRepository feedbackRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
@@ -34,12 +45,14 @@ public class AdminService {
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
+                        FeedbackRepository feedbackRepository,
                         UserRepository userRepository,
                         PasswordEncoder passwordEncoder,
                         NotificationService notificationService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
+        this.feedbackRepository = feedbackRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationService = notificationService;
@@ -116,10 +129,67 @@ public class AdminService {
     }
 
     /**
+     * Delete a reply for a specific concern.
+     */
+    @Transactional
+    public void deleteReply(Integer concernId, Integer replyId) {
+        AdminReply reply = adminReplyRepository.findById(replyId)
+                .orElseThrow(() -> new RuntimeException("Reply not found with ID: " + replyId));
+
+        if (reply.getConcern() == null || !concernId.equals(reply.getConcern().getConcernId())) {
+            throw new RuntimeException("Reply does not belong to concern ID: " + concernId);
+        }
+
+        adminReplyRepository.delete(reply);
+    }
+
+    /**
+     * Delete a concern and related data (admin replies and feedback).
+     */
+    @Transactional
+    public void deleteConcern(Integer concernId) {
+        Concern concern = getConcernById(concernId);
+
+        // Explicitly remove dependent records first to satisfy FK constraints.
+        feedbackRepository.findByConcern_ConcernId(concernId)
+                .ifPresent(feedbackRepository::delete);
+
+        List<AdminReply> replies = adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId);
+        if (!replies.isEmpty()) {
+            adminReplyRepository.deleteAll(replies);
+        }
+
+        notificationService.deleteByConcernId(concernId);
+
+        concernRepository.deleteById(concern.getConcernId());
+        concernRepository.flush();
+    }
+
+    /**
+     * Update only the latest reply for a specific concern.
+     */
+    @Transactional
+    public void updateLatestReply(Integer concernId, Integer replyId, String replyMessage) {
+        if (replyMessage == null || replyMessage.trim().isEmpty()) {
+            throw new RuntimeException("Reply message cannot be empty.");
+        }
+
+        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+                .orElseThrow(() -> new RuntimeException("No replies found for concern ID: " + concernId));
+
+        if (!replyId.equals(latestReply.getReplyId())) {
+            throw new RuntimeException("Only the latest reply can be updated.");
+        }
+
+        latestReply.setReplyMessage(replyMessage.trim());
+        adminReplyRepository.save(latestReply);
+    }
+
+    /**
      * Submit a reply to a concern and update its status
      */
     @Transactional
-    public AdminReply submitReply(AdminReplyDTO dto) {
+    public AdminReply submitReply(AdminReplyDTO dto, MultipartFile resolutionFile) {
         Concern concern = getConcernById(dto.getConcernId());
 
         // Get or create a default admin for now
@@ -130,6 +200,14 @@ public class AdminService {
         reply.setReplyMessage(dto.getReplyMessage());
         reply.setConcern(concern);
         reply.setAdmin(admin);
+
+        if (resolutionFile != null && !resolutionFile.isEmpty()) {
+            try {
+                reply.setResolutionScreenshotPath(saveReplyAttachment(resolutionFile));
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to upload reply attachment.");
+            }
+        }
 
         // Update concern status
         if (dto.getNewStatus() != null && !dto.getNewStatus().isEmpty()) {
@@ -154,6 +232,25 @@ public class AdminService {
         return savedReply;
     }
 
+    private String saveReplyAttachment(MultipartFile file) throws IOException {
+        Path uploadPath = Paths.get(UPLOAD_DIR);
+        if (!Files.exists(uploadPath)) {
+            Files.createDirectories(uploadPath);
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String extension = "";
+        if (originalFilename != null && originalFilename.contains(".")) {
+            extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+        }
+        String storedFilename = UUID.randomUUID().toString() + extension;
+
+        Path filePath = uploadPath.resolve(storedFilename);
+        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        return storedFilename;
+    }
+
     /**
      * Update concern status
      */
@@ -169,6 +266,34 @@ public class AdminService {
         }
 
         return saved;
+    }
+
+    /**
+     * Update concern category/department.
+     */
+    @Transactional
+    public Concern updateConcernCategory(Integer concernId, String category) {
+        List<String> allowedCategories = Arrays.asList(
+                "Institute Problem",
+                "Registration",
+                "Administrative",
+                "Financial",
+                "Other",
+                "Education (Creative and IT)"
+        );
+
+        if (category == null || category.trim().isEmpty()) {
+            throw new RuntimeException("Category is required.");
+        }
+
+        String normalizedCategory = category.trim();
+        if (!allowedCategories.contains(normalizedCategory)) {
+            throw new RuntimeException("Invalid category selected.");
+        }
+
+        Concern concern = getConcernById(concernId);
+        concern.setCategory(normalizedCategory);
+        return concernRepository.save(concern);
     }
 
     /**
