@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Profile - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --bg-main: #f0f2f5;
+            --bg-card: #fff;
+            --border: #e8e8e8;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --radius: 16px;
+        }
+
+        body {
+            background: var(--bg-main);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+        }
+
+        .profile-page {
+            max-width: 1100px;
+            margin: 28px auto;
+            padding: 0 20px 24px;
+        }
+
+        .profile-hero {
+            border-radius: 22px;
+            background: linear-gradient(130deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            padding: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 14px 36px rgba(229, 57, 53, 0.25);
+            margin-bottom: 20px;
+        }
+
+        .profile-hero h1 {
+            margin: 0;
+            font-size: 30px;
+            line-height: 1.1;
+            font-weight: 800;
+        }
+
+        .profile-hero p {
+            margin: 8px 0 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .hero-pill {
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 8px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .alerts {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .alert-box {
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-success {
+            background: #e8f5e9;
+            border: 1px solid #c8e6c9;
+            color: var(--success);
+        }
+
+        .alert-error {
+            background: #ffebee;
+            border: 1px solid #ffcdd2;
+            color: var(--danger);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 18px;
+        }
+
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-head {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--border);
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .profile-overview {
+            padding: 20px 18px;
+        }
+
+        .photo-wrap {
+            width: 126px;
+            height: 126px;
+            border-radius: 50%;
+            margin: 0 auto 14px;
+            overflow: hidden;
+            border: 4px solid rgba(229, 57, 53, 0.16);
+            background: #fff4f3;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .photo-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-fallback {
+            font-size: 44px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+
+        .full-name {
+            text-align: center;
+            margin: 0;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .role-line {
+            text-align: center;
+            margin: 6px 0 12px;
+            color: var(--text-mid);
+            font-size: 13px;
+        }
+
+        .readonly-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .readonly-list li {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 11px;
+        }
+
+        .readonly-list .label {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        .readonly-list .value {
+            font-size: 14px;
+            font-weight: 600;
+            overflow-wrap: anywhere;
+        }
+
+        .note-box {
+            margin-top: 12px;
+            background: #fff7e6;
+            border: 1px solid #ffecb3;
+            border-radius: 12px;
+            padding: 10px;
+            font-size: 12px;
+            color: #7a5a00;
+            line-height: 1.45;
+        }
+
+        .forms-area {
+            display: grid;
+            gap: 18px;
+        }
+
+        .form-card {
+            padding: 16px 18px 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .profile-view-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .view-item {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 11px;
+            background: #fff;
+        }
+
+        .view-item.full {
+            grid-column: 1 / -1;
+        }
+
+        .view-item .label {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.35px;
+        }
+
+        .view-item .value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            min-height: 22px;
+            overflow-wrap: anywhere;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 13px;
+        }
+
+        .form-field {
+            display: grid;
+            gap: 7px;
+        }
+
+        .form-field.full {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #444;
+        }
+
+        input, select {
+            border: 1px solid #d7d7d7;
+            border-radius: 11px;
+            padding: 11px 12px;
+            font-size: 14px;
+            font-family: inherit;
+            background: #fff;
+            color: #222;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.12);
+        }
+
+        .readonly-input {
+            background: #f4f4f4;
+            color: #666;
+        }
+
+        .btn-row {
+            margin-top: 14px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-primary:hover { background: var(--primary-dark); }
+
+        .btn-subtle {
+            background: #eceff1;
+            color: #2f3b47;
+        }
+
+        .password-rule {
+            margin-top: 2px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .error-text {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 2px;
+            min-height: 14px;
+        }
+
+        .input-error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.12);
+        }
+
+        .form-validation-summary {
+            margin-top: 10px;
+            border: 1px solid #ffcdd2;
+            background: #ffebee;
+            color: var(--danger);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 10px 12px;
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-view-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .profile-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                <li><a href="/student/profile" class="nav-link" style="color:#e53935;">Profile</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="profile-page">
+    <section class="profile-hero">
+        <div>
+            <h1>Student Profile</h1>
+            <p>Review and update your personal details securely.</p>
+        </div>
+        <div class="hero-pill">
+            <i class="fas fa-shield-halved"></i>
+            Protected Fields Locked
+        </div>
+    </section>
+
+    <section class="alerts">
+        <div th:if="${successMessage}" class="alert-box alert-success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}">Profile updated successfully.</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert-box alert-error">
+            <i class="fas fa-circle-xmark"></i>
+            <span th:text="${errorMessage}">Unable to update profile.</span>
+        </div>
+        <div th:if="${passwordSuccessMessage}" class="alert-box alert-success">
+            <i class="fas fa-lock"></i>
+            <span th:text="${passwordSuccessMessage}">Password changed successfully.</span>
+        </div>
+        <div th:if="${passwordErrorMessage}" class="alert-box alert-error">
+            <i class="fas fa-triangle-exclamation"></i>
+            <span th:text="${passwordErrorMessage}">Password change failed.</span>
+        </div>
+    </section>
+
+    <section class="grid">
+        <aside class="card">
+            <div class="card-head"><i class="fas fa-id-card"></i> Read-Only Details</div>
+            <div class="profile-overview">
+                <div class="photo-wrap" th:if="${student.studentPhoto != null and student.studentPhoto.length > 0}">
+                    <img th:src="@{/student/profile/photo}" alt="Student Photo">
+                </div>
+                <div class="photo-wrap" th:if="${student.studentPhoto == null or student.studentPhoto.length == 0}">
+                    <div class="photo-fallback" th:text="${student.user.firstName.substring(0,1)}">S</div>
+                </div>
+
+                <h3 class="full-name" th:text="${student.user.firstName + ' ' + student.user.lastName}">Student Name</h3>
+                <p class="role-line">Approved Student Account</p>
+
+                <ul class="readonly-list">
+                    <li>
+                        <div class="label">Email</div>
+                        <div class="value" th:text="${student.user.email}">student@email.com</div>
+                    </li>
+                    <li>
+                        <div class="label">First Name</div>
+                        <div class="value" th:text="${student.user.firstName}">First</div>
+                    </li>
+                    <li>
+                        <div class="label">Last Name</div>
+                        <div class="value" th:text="${student.user.lastName}">Last</div>
+                    </li>
+                    <li>
+                        <div class="label">Student ID</div>
+                        <div class="value" th:text="${student.studentId}">STU001</div>
+                    </li>
+                </ul>
+
+                <div class="note-box">
+                    Email, first name, last name, student ID, and student photo are locked and cannot be edited by students.
+                </div>
+            </div>
+        </aside>
+
+        <div class="forms-area">
+            <article class="card form-card">
+                <div class="card-head"><i class="fas fa-pen-to-square"></i> Edit Profile Information</div>
+                <div id="profileViewSection">
+                    <div class="profile-view-grid">
+                        <div class="view-item">
+                            <div class="label">Gender</div>
+                            <div class="value" th:text="${student.user.gender != null and student.user.gender != '' ? student.user.gender : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item">
+                            <div class="label">Phone Number</div>
+                            <div class="value" th:text="${student.user.phoneNumber != null and student.user.phoneNumber != '' ? student.user.phoneNumber : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item">
+                            <div class="label">Date of Birth</div>
+                            <div class="value" th:text="${student.dob != null ? #temporals.format(student.dob, 'yyyy-MM-dd') : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item">
+                            <div class="label">Category</div>
+                            <div class="value" th:text="${student.category != null and student.category != '' ? student.category : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item full">
+                            <div class="label">Address 1st Lane</div>
+                            <div class="value" th:text="${student.user.address1stLane != null and student.user.address1stLane != '' ? student.user.address1stLane : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item full">
+                            <div class="label">Address 2nd Lane</div>
+                            <div class="value" th:text="${student.user.address2ndLane != null and student.user.address2ndLane != '' ? student.user.address2ndLane : 'Not set'}">Not set</div>
+                        </div>
+                        <div class="view-item full">
+                            <div class="label">Address 3rd Lane</div>
+                            <div class="value" th:text="${student.user.address3rdLane != null and student.user.address3rdLane != '' ? student.user.address3rdLane : 'Not set'}">Not set</div>
+                        </div>
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-primary" type="button" id="editDetailsBtn">
+                            <i class="fas fa-pen"></i>
+                            Edit Details
+                        </button>
+                        <a class="btn btn-subtle" href="/student/dashboard">
+                            <i class="fas fa-arrow-left"></i>
+                            Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+
+                <form th:action="@{/student/profile/update}" method="post" th:object="${profileDTO}" id="profileEditForm" class="hidden">
+                    <div class="form-grid">
+                        <div class="form-field">
+                            <label>Email (Locked)</label>
+                            <input type="text" class="readonly-input" th:value="${student.user.email}" readonly>
+                        </div>
+                        <div class="form-field">
+                            <label>Student ID (Locked)</label>
+                            <input type="text" class="readonly-input" th:value="${student.studentId}" readonly>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="gender">Gender</label>
+                            <select id="gender" th:field="*{gender}" required>
+                                <option value="">Select gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <small class="error-text" id="genderError"></small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="phoneNumber">Phone Number</label>
+                            <input id="phoneNumber" type="text" th:field="*{phoneNumber}" maxlength="16" placeholder="e.g. +94xxxxxxxxx" required>
+                            <small class="error-text" id="phoneError"></small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="dob">Date of Birth</label>
+                            <input id="dob" type="date" name="dob" th:value="${profileDTO.dob != null ? #temporals.format(profileDTO.dob, 'yyyy-MM-dd') : ''}" required>
+                            <small class="error-text" id="dobError"></small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="category">Category</label>
+                            <select id="category" th:field="*{category}" required>
+                                <option value="">Select category</option>
+                                <option value="Online">Online</option>
+                                <option value="Physical">Physical</option>
+                            </select>
+                            <small class="error-text" id="categoryError"></small>
+                        </div>
+
+                        <div class="form-field full">
+                            <label for="address1stLane">Address 1st Lane</label>
+                            <input id="address1stLane" type="text" th:field="*{address1stLane}" maxlength="255">
+                            <small class="error-text" id="address1Error"></small>
+                        </div>
+
+                        <div class="form-field full">
+                            <label for="address2ndLane">Address 2nd Lane</label>
+                            <input id="address2ndLane" type="text" th:field="*{address2ndLane}" maxlength="255">
+                            <small class="error-text" id="address2Error"></small>
+                        </div>
+
+                        <div class="form-field full">
+                            <label for="address3rdLane">Address 3rd Lane</label>
+                            <input id="address3rdLane" type="text" th:field="*{address3rdLane}" maxlength="255">
+                            <small class="error-text" id="address3Error"></small>
+                        </div>
+                    </div>
+
+                    <div class="form-validation-summary hidden" id="profileValidationSummary">
+                        Please correct the highlighted fields before saving.
+                    </div>
+
+                    <div class="btn-row">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-floppy-disk"></i>
+                            Save Profile
+                        </button>
+                        <button class="btn btn-subtle" type="button" id="cancelEditBtn">
+                            <i class="fas fa-xmark"></i>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </article>
+
+            <article class="card form-card">
+                <div class="card-head"><i class="fas fa-key"></i> Change Password</div>
+                <form th:action="@{/student/profile/change-password}" method="post" th:object="${changePasswordDTO}" id="changePasswordForm">
+                    <div class="form-grid">
+                        <div class="form-field full">
+                            <label for="currentPassword">Current Password</label>
+                            <input id="currentPassword" type="password" th:field="*{currentPassword}" required>
+                            <small class="error-text" id="currentPasswordError"></small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="newPassword">New Password</label>
+                            <input id="newPassword" type="password" th:field="*{newPassword}" required>
+                            <small class="error-text" id="newPasswordError"></small>
+                        </div>
+
+                        <div class="form-field">
+                            <label for="confirmNewPassword">Confirm New Password</label>
+                            <input id="confirmNewPassword" type="password" th:field="*{confirmNewPassword}" required>
+                            <small class="error-text" id="confirmNewPasswordError"></small>
+                        </div>
+                    </div>
+                    <p class="password-rule" th:text="${passwordRule}">Use at least 12 characters with uppercase, lowercase, number, and special character.</p>
+                    <div class="form-validation-summary hidden" id="passwordValidationSummary">
+                        Please correct the highlighted password fields before updating.
+                    </div>
+                    <div class="btn-row">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-lock"></i>
+                            Update Password
+                        </button>
+                    </div>
+                </form>
+            </article>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    const profileViewSection = document.getElementById('profileViewSection');
+    const profileEditForm = document.getElementById('profileEditForm');
+    const editDetailsBtn = document.getElementById('editDetailsBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const profileValidationSummary = document.getElementById('profileValidationSummary');
+
+    function openEditMode() {
+        profileViewSection.classList.add('hidden');
+        profileEditForm.classList.remove('hidden');
+    }
+
+    function closeEditMode() {
+        profileEditForm.classList.add('hidden');
+        profileViewSection.classList.remove('hidden');
+    }
+
+    if (editDetailsBtn) {
+        editDetailsBtn.addEventListener('click', openEditMode);
+    }
+
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener('click', closeEditMode);
+    }
+
+    function setFieldError(inputEl, errorEl, message) {
+        if (message) {
+            inputEl.classList.add('input-error');
+            errorEl.textContent = message;
+            return true;
+        }
+        inputEl.classList.remove('input-error');
+        errorEl.textContent = '';
+        return false;
+    }
+
+    function validateAddressValue(value) {
+        if (!value) {
+            return '';
+        }
+        const regex = /^[A-Za-z0-9\s,./#-]{3,255}$/;
+        if (!regex.test(value)) {
+            return 'Use 3-255 valid characters (letters, numbers, spaces, comma, dot, slash, #, -).';
+        }
+        return '';
+    }
+
+    profileEditForm.addEventListener('submit', function (event) {
+        const gender = document.getElementById('gender');
+        const phone = document.getElementById('phoneNumber');
+        const dob = document.getElementById('dob');
+        const category = document.getElementById('category');
+        const address1 = document.getElementById('address1stLane');
+        const address2 = document.getElementById('address2ndLane');
+        const address3 = document.getElementById('address3rdLane');
+
+        const genderError = document.getElementById('genderError');
+        const phoneError = document.getElementById('phoneError');
+        const dobError = document.getElementById('dobError');
+        const categoryError = document.getElementById('categoryError');
+        const address1Error = document.getElementById('address1Error');
+        const address2Error = document.getElementById('address2Error');
+        const address3Error = document.getElementById('address3Error');
+
+        let hasErrors = false;
+        const phoneRegex = /^\+?[0-9]{10,15}$/;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        hasErrors = setFieldError(gender, genderError, gender.value ? '' : 'Please select a gender.') || hasErrors;
+        hasErrors = setFieldError(phone, phoneError, phoneRegex.test(phone.value.trim()) ? '' : 'Phone number must be 10-15 digits and may start with +.') || hasErrors;
+
+        let dobMessage = '';
+        if (!dob.value) {
+            dobMessage = 'Please select date of birth.';
+        } else {
+            const dobDate = new Date(dob.value);
+            if (dobDate > today) {
+                dobMessage = 'Date of birth cannot be in the future.';
+            }
+        }
+        hasErrors = setFieldError(dob, dobError, dobMessage) || hasErrors;
+
+        hasErrors = setFieldError(category, categoryError, category.value ? '' : 'Please select category.') || hasErrors;
+        hasErrors = setFieldError(address1, address1Error, validateAddressValue(address1.value.trim())) || hasErrors;
+        hasErrors = setFieldError(address2, address2Error, validateAddressValue(address2.value.trim())) || hasErrors;
+        hasErrors = setFieldError(address3, address3Error, validateAddressValue(address3.value.trim())) || hasErrors;
+
+        if (hasErrors) {
+            event.preventDefault();
+            profileValidationSummary.classList.remove('hidden');
+        } else {
+            profileValidationSummary.classList.add('hidden');
+        }
+    });
+
+    // Client-side validation for change password form.
+    document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
+        const currentPassword = document.getElementById('currentPassword');
+        const newPassword = document.getElementById('newPassword').value;
+        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+        const newPasswordInput = document.getElementById('newPassword');
+        const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+        const currentPasswordError = document.getElementById('currentPasswordError');
+        const newPasswordError = document.getElementById('newPasswordError');
+        const confirmNewPasswordError = document.getElementById('confirmNewPasswordError');
+        const passwordValidationSummary = document.getElementById('passwordValidationSummary');
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{12,}$/;
+        let hasErrors = false;
+
+        hasErrors = setFieldError(
+            currentPassword,
+            currentPasswordError,
+            currentPassword.value.trim() ? '' : 'Please enter your current password.'
+        ) || hasErrors;
+
+        let newPasswordMessage = '';
+        if (!newPassword.trim()) {
+            newPasswordMessage = 'Please enter a new password.';
+        } else if (!strongPasswordRegex.test(newPassword)) {
+            newPasswordMessage = 'Must be 12+ chars with uppercase, lowercase, number, and special character.';
+        } else if (newPassword === currentPassword.value) {
+            newPasswordMessage = 'New password must be different from current password.';
+        }
+        hasErrors = setFieldError(newPasswordInput, newPasswordError, newPasswordMessage) || hasErrors;
+
+        let confirmMessage = '';
+        if (!confirmNewPassword.trim()) {
+            confirmMessage = 'Please confirm your new password.';
+        } else if (newPassword !== confirmNewPassword) {
+            confirmMessage = 'New password and confirm password do not match.';
+        }
+        hasErrors = setFieldError(confirmNewPasswordInput, confirmNewPasswordError, confirmMessage) || hasErrors;
+
+        if (hasErrors) {
+            event.preventDefault();
+            passwordValidationSummary.classList.remove('hidden');
+        } else {
+            passwordValidationSummary.classList.add('hidden');
+        }
+    });
+</script>
+</body>
+</html>

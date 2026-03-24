@@ -1,6 +1,8 @@
 package Project._6.demo.service;
 
 import Project._6.demo.dto.LoginDTO;
+import Project._6.demo.dto.ChangePasswordDTO;
+import Project._6.demo.dto.StudentProfileUpdateDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
 import Project._6.demo.entity.Student;
 import Project._6.demo.entity.User;
@@ -13,11 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class StudentRegistrationService {
+
+    private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile(
+            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$"
+    );
+        private static final Pattern PHONE_PATTERN = Pattern.compile("^\\+?[0-9]{10,15}$");
+        private static final Pattern ADDRESS_PATTERN = Pattern.compile("^[A-Za-z0-9\\s,./#-]{3,255}$");
 
     private final UserRepository userRepository;
     private final StudentRepository studentRepository;
@@ -195,5 +205,113 @@ public class StudentRegistrationService {
         }
 
         return studentOpt.get();
+    }
+
+    /**
+     * Update editable student profile information.
+     */
+    @Transactional
+    public Student updateStudentProfile(Integer userId, StudentProfileUpdateDTO dto) {
+        Student student = getStudentByUserId(userId);
+        User user = student.getUser();
+
+        String gender = normalize(dto.getGender());
+        if (gender != null && !"Male".equalsIgnoreCase(gender) && !"Female".equalsIgnoreCase(gender) && !"Other".equalsIgnoreCase(gender)) {
+            throw new RuntimeException("Gender must be Male, Female, or Other.");
+        }
+
+        String phoneNumber = normalize(dto.getPhoneNumber());
+        if (phoneNumber != null && !PHONE_PATTERN.matcher(phoneNumber).matches()) {
+            throw new RuntimeException("Phone number must contain 10 to 15 digits and may start with +.");
+        }
+
+        LocalDate dob = dto.getDob();
+        if (dob != null) {
+            LocalDate today = LocalDate.now();
+            if (dob.isAfter(today)) {
+                throw new RuntimeException("Date of birth cannot be in the future.");
+            }
+            if (dob.isBefore(today.minusYears(100))) {
+                throw new RuntimeException("Date of birth is not valid.");
+            }
+        }
+
+        String category = normalize(dto.getCategory());
+        if (category == null) {
+            throw new RuntimeException("Category is required.");
+        }
+        if (!"Online".equalsIgnoreCase(category) && !"Physical".equalsIgnoreCase(category)) {
+            throw new RuntimeException("Category must be either Online or Physical.");
+        }
+        category = "Online".equalsIgnoreCase(category) ? "Online" : "Physical";
+
+        String address1stLane = normalize(dto.getAddress1stLane());
+        String address2ndLane = normalize(dto.getAddress2ndLane());
+        String address3rdLane = normalize(dto.getAddress3rdLane());
+
+        validateAddress(address1stLane, "Address 1st Lane");
+        validateAddress(address2ndLane, "Address 2nd Lane");
+        validateAddress(address3rdLane, "Address 3rd Lane");
+
+        user.setGender(gender);
+        user.setPhoneNumber(phoneNumber);
+        user.setAddress1stLane(address1stLane);
+        user.setAddress2ndLane(address2ndLane);
+        user.setAddress3rdLane(address3rdLane);
+
+        student.setDob(dob);
+        student.setCategory(category);
+
+        userRepository.save(user);
+        return studentRepository.save(student);
+    }
+
+    /**
+     * Change student password with current password check and strong password policy.
+     */
+    @Transactional
+    public void changeStudentPassword(Integer userId, ChangePasswordDTO dto) {
+        Student student = getStudentByUserId(userId);
+        User user = student.getUser();
+
+        if (dto.getCurrentPassword() == null || !passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect.");
+        }
+
+        if (dto.getNewPassword() == null || !dto.getNewPassword().equals(dto.getConfirmNewPassword())) {
+            throw new RuntimeException("New password and confirm password do not match.");
+        }
+
+        if (!isStrongPassword(dto.getNewPassword())) {
+            throw new RuntimeException("Password must be at least 12 characters and include uppercase, lowercase, number, and special character.");
+        }
+
+        if (passwordEncoder.matches(dto.getNewPassword(), user.getPassword())) {
+            throw new RuntimeException("New password must be different from your current password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    public boolean isStrongPassword(String password) {
+        return password != null && STRONG_PASSWORD_PATTERN.matcher(password).matches() && !password.contains(" ");
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private void validateAddress(String address, String label) {
+        if (address == null) {
+            return;
+        }
+        if (!ADDRESS_PATTERN.matcher(address).matches()) {
+            throw new RuntimeException(label + " must be 3-255 characters and can include letters, numbers, spaces, comma, dot, slash, # and -.");
+        }
     }
 }
