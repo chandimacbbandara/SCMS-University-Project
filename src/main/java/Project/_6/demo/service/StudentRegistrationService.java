@@ -65,6 +65,7 @@ public class StudentRegistrationService {
 
         // Create User with PENDING status
         User user = new User();
+        user.setUserId(userRepository.getNextUserId());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());

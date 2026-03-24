@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class Feedback {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FeedbackID")
     private Integer feedbackId;
 

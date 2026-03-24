@@ -66,6 +66,7 @@ public class ConcernService {
 
         // Create the concern
         Concern concern = new Concern();
+        concern.setConcernId(concernRepository.getNextConcernId());
         concern.setSubject(dto.getSubject());
         concern.setMessage(dto.getMessage());
         concern.setEvidencePath(evidencePath);
@@ -119,6 +120,7 @@ public class ConcernService {
 
         // Create a new User first
         User user = new User();
+        user.setUserId(userRepository.getNextUserId());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode("temp_" + UUID.randomUUID().toString().substring(0, 8))); // hashed temporary password
         user.setFirstName(dto.getFirstName());
