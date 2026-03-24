@@ -1,6 +1,8 @@
 package Project._6.demo.controller;
 
 import Project._6.demo.dto.LoginDTO;
+import Project._6.demo.dto.ChangePasswordDTO;
+import Project._6.demo.dto.StudentProfileUpdateDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
@@ -159,6 +161,109 @@ public class StudentRegistrationController {
         model.addAttribute("repliesMap", repliesMap);
 
         return "student-dashboard";
+    }
+
+    @GetMapping("/student/profile")
+    public String showStudentProfile(HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        Student student = registrationService.getStudentByUserId(userId);
+        if (student == null) {
+            session.invalidate();
+            return "redirect:/login";
+        }
+
+        StudentProfileUpdateDTO profileDTO = new StudentProfileUpdateDTO();
+        profileDTO.setGender(student.getUser().getGender());
+        profileDTO.setPhoneNumber(student.getUser().getPhoneNumber());
+        profileDTO.setAddress1stLane(student.getUser().getAddress1stLane());
+        profileDTO.setAddress2ndLane(student.getUser().getAddress2ndLane());
+        profileDTO.setAddress3rdLane(student.getUser().getAddress3rdLane());
+        profileDTO.setDob(student.getDob());
+        profileDTO.setCategory(student.getCategory());
+
+        model.addAttribute("student", student);
+        model.addAttribute("profileDTO", profileDTO);
+        model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
+        model.addAttribute("passwordRule", "Use at least 12 characters with uppercase, lowercase, number, and special character.");
+        return "student-profile";
+    }
+
+    @PostMapping("/student/profile/update")
+    public String updateStudentProfile(@ModelAttribute("profileDTO") StudentProfileUpdateDTO profileDTO,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Student updatedStudent = registrationService.updateStudentProfile(userId, profileDTO);
+            session.setAttribute("studentName", updatedStudent.getUser().getFirstName() + " " + updatedStudent.getUser().getLastName());
+            redirectAttributes.addFlashAttribute("successMessage", "Profile updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update profile: " + e.getMessage());
+        }
+
+        return "redirect:/student/profile";
+    }
+
+    @PostMapping("/student/profile/change-password")
+    public String changeStudentPassword(@ModelAttribute("changePasswordDTO") ChangePasswordDTO changePasswordDTO,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            registrationService.changeStudentPassword(userId, changePasswordDTO);
+            redirectAttributes.addFlashAttribute("passwordSuccessMessage", "Password changed successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("passwordErrorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/profile";
+    }
+
+    @GetMapping("/student/profile/photo")
+    @ResponseBody
+    public ResponseEntity<byte[]> getOwnStudentPhoto(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        byte[] photo = registrationService.getStudentPhoto(userId);
+        if (photo == null || photo.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/student/photo/{userId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getStudentPhotoForCommunity(@PathVariable("userId") Integer userId,
+                                                              HttpSession session) {
+        if (session.getAttribute("studentUserId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        byte[] photo = registrationService.getStudentPhoto(userId);
+        if (photo == null || photo.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(photo, headers, HttpStatus.OK);
     }
 
     // ========================

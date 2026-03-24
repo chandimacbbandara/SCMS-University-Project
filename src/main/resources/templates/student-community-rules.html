@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Rules - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/CSS/student-community.css">
+</head>
+<body class="community-body">
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/student/community" class="nav-link" style="color:#e53935;">Community Talk</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="community-shell">
+    <section class="rules-hero">
+        <h1><i class="fa-solid fa-users-between-lines"></i> Student Community Talk</h1>
+        <p>Before entering the discussion board, you must accept the safety rules.</p>
+    </section>
+
+    <section class="rules-card">
+        <div class="rules-pill">Rules Version <span th:text="${rulesVersion}">1.0</span></div>
+
+        <ol class="rules-list">
+            <li>Do not share personal details: phone numbers, addresses, email addresses, IDs.</li>
+            <li>Use respectful language. Bullying, hate speech, threats, and abusive words are blocked.</li>
+            <li>No harmful or dangerous advice. Peer responses are not official institutional decisions.</li>
+            <li>Sensitive or private complaints must be submitted through the official concern portal.</li>
+            <li>Posts and replies are monitored by AI moderation and platform safety checks.</li>
+        </ol>
+
+        <div class="rules-note">
+            <i class="fa-solid fa-shield-heart"></i>
+            By accepting, you agree to keep this space safe and helpful for everyone.
+        </div>
+
+        <form action="/student/community/rules/accept" method="post" class="rules-form" onsubmit="return confirmAccept();">
+            <label class="checkbox-wrap">
+                <input type="checkbox" id="agreeRules" required>
+                <span>I understand and agree to follow all community rules.</span>
+            </label>
+
+            <button type="submit" class="btn-primary">
+                <i class="fa-solid fa-circle-check"></i>
+                Accept and Continue
+            </button>
+        </form>
+    </section>
+</main>
+
+<script>
+    function confirmAccept() {
+        const agreed = document.getElementById('agreeRules').checked;
+        if (!agreed) {
+            alert('Please accept the rules to continue.');
+            return false;
+        }
+        return true;
+    }
+</script>
+</body>
+</html>

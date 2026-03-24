@@ -118,3 +118,64 @@ from Admin_reply
 
 select *
 from Notification
+
+
+/* =============================
+   Student Community Talk Module
+   ============================= */
+
+CREATE TABLE Student_Community_Post (
+    PostID INT IDENTITY(1,1) PRIMARY KEY,
+    Title VARCHAR(160) NOT NULL,
+    Message VARCHAR(MAX) NOT NULL,
+    Category VARCHAR(80) NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    CreatedTime DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedTime DATETIME NOT NULL DEFAULT GETDATE(),
+    StudentID_FK INT NOT NULL,
+    CONSTRAINT FK_CommunityPost_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID)
+);
+
+CREATE TABLE Student_Community_Reply (
+    ReplyID INT IDENTITY(1,1) PRIMARY KEY,
+    Message VARCHAR(MAX) NOT NULL,
+    Status VARCHAR(20) NOT NULL DEFAULT 'ACTIVE',
+    CreatedTime DATETIME NOT NULL DEFAULT GETDATE(),
+    UpdatedTime DATETIME NOT NULL DEFAULT GETDATE(),
+    PostID_FK INT NOT NULL,
+    StudentID_FK INT NOT NULL,
+    CONSTRAINT FK_CommunityReply_Post FOREIGN KEY (PostID_FK) REFERENCES Student_Community_Post(PostID),
+    CONSTRAINT FK_CommunityReply_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID)
+);
+
+CREATE TABLE Student_Community_Rules_Acceptance (
+    AcceptanceID INT IDENTITY(1,1) PRIMARY KEY,
+    RulesVersion VARCHAR(20) NOT NULL,
+    AcceptedAt DATETIME NOT NULL DEFAULT GETDATE(),
+    StudentID_FK INT NOT NULL UNIQUE,
+    CONSTRAINT FK_CommunityRules_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID)
+);
+
+CREATE TABLE Student_Community_Moderation_Log (
+    LogID INT IDENTITY(1,1) PRIMARY KEY,
+    ContentType VARCHAR(20) NOT NULL,
+    Decision VARCHAR(10) NOT NULL,
+    Reasons VARCHAR(1000),
+    RiskScore INT,
+    CreatedTime DATETIME NOT NULL DEFAULT GETDATE(),
+    StudentID_FK INT NULL,
+    CONSTRAINT FK_CommunityModLog_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID)
+);
+
+CREATE INDEX IDX_CommunityPost_Status_CreatedTime
+ON Student_Community_Post(Status, CreatedTime DESC);
+
+CREATE INDEX IDX_CommunityReply_Post_Status
+ON Student_Community_Reply(PostID_FK, Status, CreatedTime ASC);
+
+
+-- Helpful verification queries
+SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
+SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
+SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
+SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;

@@ -18,13 +18,17 @@ public class NotificationService {
         this.notificationRepository = notificationRepository;
     }
 
+    private Notification newNotification() {
+        return new Notification();
+    }
+
     /**
      * Create a notification when a student submits a concern.
      * Step 1: "Concern Submitted"
      */
     @Transactional
     public Notification notifyConcernSubmitted(Concern concern) {
-        Notification notification = new Notification();
+        Notification notification = newNotification();
         notification.setTitle("Concern Submitted Successfully");
         notification.setMessage("Your concern \"" + concern.getSubject() + "\" (REF: CON-" + concern.getConcernId()
                 + ") has been submitted and is awaiting admin review.");
@@ -40,7 +44,7 @@ public class NotificationService {
      */
     @Transactional
     public Notification notifyConcernInProgress(Concern concern) {
-        Notification notification = new Notification();
+        Notification notification = newNotification();
         notification.setTitle("Concern Under Review");
         notification.setMessage("Your concern \"" + concern.getSubject() + "\" (REF: CON-" + concern.getConcernId()
                 + ") has been reviewed by an administrator and is now being processed.");
@@ -56,7 +60,7 @@ public class NotificationService {
      */
     @Transactional
     public Notification notifyConcernComplete(Concern concern) {
-        Notification notification = new Notification();
+        Notification notification = newNotification();
         notification.setTitle("Concern Resolved");
         notification.setMessage("Your concern \"" + concern.getSubject() + "\" (REF: CON-" + concern.getConcernId()
                 + ") has been resolved by the admin. Check the reply for more details.");
@@ -130,7 +134,7 @@ public class NotificationService {
      */
     @Transactional
     public Notification createBroadcastNotification(String title, String message, String targetAudience, Integer adminIdFk) {
-        Notification notification = new Notification();
+        Notification notification = newNotification();
         notification.setTitle(title);
         notification.setMessage(message);
         notification.setType("BROADCAST");

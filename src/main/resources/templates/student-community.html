@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Community Talk - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="/CSS/student-community.css">
+</head>
+<body class="community-body">
+<header>
+    <div class="navbar">
+        <div class="logo">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/student/community" class="nav-link" style="color:#e53935;">Community Talk</a></li>
+                <li><a href="/submit-concern" class="nav-link">Official Concern</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="community-shell">
+    <section class="community-hero">
+        <div>
+            <h1><i class="fa-solid fa-comments"></i> Student Community Talk</h1>
+            <p>Discuss concerns, get peer support, and keep the space respectful.</p>
+        </div>
+        <a href="/submit-concern" class="official-link"><i class="fa-solid fa-shield-heart"></i> Use Official Concern Channel</a>
+    </section>
+
+    <div class="community-grid">
+        <aside class="community-side">
+            <h3 class="side-heading"><i class="fa-solid fa-shield-halved"></i> Safety Rules</h3>
+            <ul class="side-rules">
+                <li>No phone numbers, addresses, emails, or private IDs.</li>
+                <li>No abusive or bullying language.</li>
+                <li>No harmful advice or threatening messages.</li>
+                <li>Use official concern flow for private/sensitive issues.</li>
+            </ul>
+            <hr class="side-separator">
+            <h3 class="side-heading"><i class="fa-solid fa-circle-info"></i> Quick Note</h3>
+            <p class="side-note">
+                Peer replies are community guidance only. For official university decisions, use the concern portal.
+            </p>
+
+            <hr class="side-separator">
+            <h3 class="side-heading"><i class="fa-solid fa-user"></i> You</h3>
+            <div class="current-user">
+                <img class="avatar-img"
+                     th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                     src="/images/img1.jpeg"
+                     alt="My profile picture"
+                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                <span class="avatar-fallback" style="display:none;" th:text="${#strings.substring(studentName, 0, 1)}">S</span>
+                <div>
+                    <div class="current-user-name" th:text="${studentName}">Student Name</div>
+                    <div class="current-user-sub">Community member</div>
+                </div>
+            </div>
+        </aside>
+
+        <section class="community-main-card">
+            <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}">Success</div>
+            <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}">Error</div>
+
+            <form class="compose-form" action="/student/community/posts" method="post">
+                <div class="compose-top">
+                    <img class="avatar-img"
+                         th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                         src="/images/img1.jpeg"
+                         alt="My profile picture"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                    <span class="avatar-fallback" style="display:none;" th:text="${#strings.substring(studentName, 0, 1)}">S</span>
+                    <div>
+                        <div class="compose-name" th:text="${studentName}">Student Name</div>
+                        <div class="compose-sub">Ask your question to all students</div>
+                    </div>
+                </div>
+                <div class="row">
+                    <input type="text" name="title" maxlength="160" placeholder="Short title for your issue" required>
+                    <select name="category" required>
+                        <option value="">Select category</option>
+                        <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}">Academic</option>
+                    </select>
+                </div>
+                <textarea name="message" data-mod-type="post" maxlength="2000" placeholder="Describe your issue or ask for guidance..." required></textarea>
+                <div class="moderation-hint"></div>
+                <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                    <button type="submit" class="primary-submit"><i class="fa-solid fa-paper-plane"></i> Publish Post</button>
+                </div>
+            </form>
+
+            <div th:if="${#lists.isEmpty(posts)}" class="post-card post-empty">
+                <h3 style="margin:0 0 8px;">No posts yet</h3>
+                <p style="margin:0;color:#6a748a;">Be the first student to ask or share a solution.</p>
+            </div>
+
+            <article class="post-card" th:each="post : ${posts}">
+                <div class="post-head">
+                    <img class="avatar-img"
+                         th:src="@{'/student/photo/' + ${post.student.userId}}"
+                         src="/images/img1.jpeg"
+                         alt="Student profile picture"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                    <span class="avatar-fallback" style="display:none;" th:text="${#strings.substring(post.student.user.firstName, 0, 1)}">S</span>
+
+                    <div class="post-user-block">
+                        <div class="post-user-line">
+                            <span class="post-user-name" th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student Name</span>
+                            <span class="post-tag" th:text="${post.category}">Category</span>
+                        </div>
+                        <span class="post-time" th:text="${#temporals.format(post.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan</span>
+                    </div>
+                </div>
+
+                <h3 class="post-title" th:text="${post.title}">Post Title</h3>
+                <div class="post-body" th:text="${post.message}">Post body</div>
+
+                <div class="post-meta">
+                    <span><i class="fa-solid fa-user"></i> <span th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student</span></span>
+                    <span><i class="fa-solid fa-reply"></i> <span th:text="${#lists.size(repliesMap[post.postId])}">0</span> Replies</span>
+                </div>
+
+                <div class="post-actions" th:if="${session.studentUserId == post.student.userId}">
+                    <button type="button" class="ghost-btn" th:attr="data-toggle-id='edit-post-' + ${post.postId}">Edit Post</button>
+                    <form th:action="@{'/student/community/posts/' + ${post.postId} + '/delete'}" method="post" onsubmit="return confirm('Delete this post?');">
+                        <button type="submit" class="danger-btn">Delete Post</button>
+                    </form>
+                </div>
+
+                <form class="edit-form" th:id="'edit-post-' + ${post.postId}" style="display:none;"
+                      th:action="@{'/student/community/posts/' + ${post.postId} + '/update'}" method="post">
+                    <div class="row">
+                        <input type="text" name="title" maxlength="160" th:value="${post.title}" required>
+                        <select name="category" required>
+                            <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
+                                    th:selected="${cat == post.category}">Academic</option>
+                        </select>
+                    </div>
+                    <textarea name="message" data-mod-type="post" maxlength="2000" th:text="${post.message}" required></textarea>
+                    <div class="moderation-hint"></div>
+                    <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                        <button type="submit" class="secondary-submit">Save Post</button>
+                    </div>
+                </form>
+
+                <section class="reply-list">
+                    <div class="reply-item" th:each="reply : ${repliesMap[post.postId]}">
+                        <div class="reply-head">
+                            <img class="avatar-img small"
+                                 th:src="@{'/student/photo/' + ${reply.student.userId}}"
+                                 src="/images/img1.jpeg"
+                                 alt="Reply student profile picture"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                            <span class="avatar-fallback small" style="display:none;" th:text="${#strings.substring(reply.student.user.firstName, 0, 1)}">S</span>
+                            <div class="reply-user-meta">
+                                <span th:text="${reply.student.user.firstName + ' ' + reply.student.user.lastName}">Student</span>
+                                <span th:text="${#temporals.format(reply.createdTime, 'dd MMM yyyy, hh:mm a')}">Time</span>
+                            </div>
+                        </div>
+                        <div class="reply-text" th:text="${reply.message}">Reply message</div>
+                        <div class="reply-meta">
+                            Community reply
+                        </div>
+
+                        <div class="reply-actions" th:if="${session.studentUserId == reply.student.userId}">
+                            <button type="button" class="ghost-btn" th:attr="data-toggle-id='edit-reply-' + ${reply.replyId}">Edit Reply</button>
+                            <form th:action="@{'/student/community/replies/' + ${reply.replyId} + '/delete'}" method="post"
+                                  onsubmit="return confirm('Delete this reply?');">
+                                <button type="submit" class="danger-btn">Delete Reply</button>
+                            </form>
+                        </div>
+
+                        <form class="edit-form" th:id="'edit-reply-' + ${reply.replyId}" style="display:none;"
+                              th:action="@{'/student/community/replies/' + ${reply.replyId} + '/update'}" method="post">
+                            <textarea name="message" data-mod-type="reply" maxlength="1200" th:text="${reply.message}" required></textarea>
+                            <div class="moderation-hint"></div>
+                            <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                                <button type="submit" class="secondary-submit">Save Reply</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <form class="reply-form" th:action="@{'/student/community/posts/' + ${post.postId} + '/replies'}" method="post">
+                        <textarea name="message" data-mod-type="reply" maxlength="1200" placeholder="Add your solution or guidance..." required></textarea>
+                        <div class="moderation-hint"></div>
+                        <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                            <button type="submit" class="secondary-submit"><i class="fa-solid fa-reply"></i> Reply</button>
+                        </div>
+                    </form>
+                </section>
+            </article>
+        </section>
+    </div>
+</main>
+
+<script src="/js/student-community.js"></script>
+</body>
+</html>
