@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Dashboard - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --primary-deeper: #b71c1c;
+            --primary-light: #ff6f60;
+            --primary-bg: rgba(229, 57, 53, 0.08);
+            --accent-green: #16a34a;
+            --accent-blue: #2563eb;
+            --accent-orange: #f97316;
+            --accent-purple: #7c3aed;
+            --accent-teal: #0d9488;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        /* ===== Scrollbar ===== */
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: #f0f0f0; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ===== Animations ===== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes pulseRing {
+            0%   { box-shadow: 0 0 0 0 rgba(229,57,53,0.35); }
+            70%  { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
+            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes bounceIn {
+            0%   { transform: scale(0.3); opacity: 0; }
+            50%  { transform: scale(1.05); }
+            70%  { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes countUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in  { animation: fadeSlideUp 0.7s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .18s; }
+        .delay-3 { animation-delay: .26s; }
+        .delay-4 { animation-delay: .34s; }
+
+        /* ===== Page Layout ===== */
+        .owner-container {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Page Hero ===== */
+        .page-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 40%, #020617 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            border-radius: var(--radius-lg);
+            padding: 40px 42px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 50px rgba(15,23,42,0.4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .page-hero .hero-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3Cpath d='M0 0h20v20H0z'/%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(229,57,53,0.15) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .hero-eyebrow {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(229,57,53,0.2);
+            backdrop-filter: blur(8px);
+            padding: 5px 16px;
+            border-radius: 100px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #ff6f60;
+            margin-bottom: 14px;
+        }
+        .hero-eyebrow .eyebrow-dot {
+            width: 6px; height: 6px;
+            background: #ff6f60;
+            border-radius: 50%;
+            animation: pulseRing 2s infinite;
+        }
+        .hero-title {
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .hero-right {
+            position: relative; z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .hero-icon-wrap {
+            width: 88px; height: 88px;
+            border-radius: 50%;
+            background: rgba(229,57,53,0.15);
+            border: 3px solid rgba(229,57,53,0.3);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; color: #ff6f60;
+            animation: float 4s ease-in-out infinite;
+        }
+        .hero-icon-wrap::after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255,255,255,0.1);
+            animation: spin 15s linear infinite;
+        }
+
+        /* ===== Stats Bar ===== */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-pill {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            display: flex; align-items: center; gap: 14px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-pill::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 4px 0 0 4px;
+        }
+        .stat-pill:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .stat-pill.total::before   { background: linear-gradient(180deg, var(--accent-purple), #a78bfa); }
+        .stat-pill.created::before  { background: linear-gradient(180deg, var(--accent-green), #4ade80); }
+        .stat-pill.avg::before      { background: linear-gradient(180deg, var(--accent-blue), #60a5fa); }
+        .stat-pill-icon {
+            width: 48px; height: 48px; border-radius: var(--radius-sm);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; flex-shrink: 0;
+        }
+        .stat-pill.total   .stat-pill-icon { background: #ede9fe; color: var(--accent-purple); }
+        .stat-pill.created .stat-pill-icon { background: #f0fdf4; color: var(--accent-green); }
+        .stat-pill.avg     .stat-pill-icon { background: #eff6ff; color: var(--accent-blue); }
+        .stat-pill-info .stat-pill-label {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px;
+            text-transform: uppercase; color: var(--text-light);
+        }
+        .stat-pill-info .stat-pill-val {
+            font-size: 24px; font-weight: 900; color: var(--text-dark);
+            animation: countUp 0.6s ease both;
+        }
+
+        /* ===== Alert Toasts ===== */
+        .alert-toast {
+            padding: 16px 22px; border-radius: var(--radius-sm);
+            margin-bottom: 18px; font-weight: 700; font-size: 13px;
+            display: flex; align-items: center; gap: 12px;
+            animation: bounceIn 0.5s cubic-bezier(.22,1,.36,1) both;
+        }
+        .alert-toast.success {
+            background: linear-gradient(135deg, rgba(240,253,244,0.95), rgba(220,252,231,0.95));
+            color: #15803d; border: 1px solid #bbf7d0;
+        }
+        .alert-toast.error {
+            background: linear-gradient(135deg, rgba(254,242,242,0.95), rgba(254,226,226,0.95));
+            color: #dc2626; border: 1px solid #fecaca;
+        }
+
+        /* ===== Two Column Layout ===== */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        /* ===== Create Report Card ===== */
+        .create-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .create-card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            padding: 22px 28px;
+            display: flex; align-items: center; gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .create-card-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            animation: shimmer 4s infinite;
+        }
+        .create-card-header-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.15);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #fff;
+        }
+        .create-card-header-text h2 {
+            font-size: 16px; font-weight: 800; color: #fff;
+        }
+        .create-card-header-text p {
+            font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;
+        }
+        .create-card-body {
+            padding: 28px;
+        }
+
+        /* ===== Form Styles ===== */
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-label {
+            display: block;
+            font-size: 11px; font-weight: 800;
+            text-transform: uppercase; letter-spacing: 1px;
+            color: var(--text-mid);
+            margin-bottom: 7px;
+        }
+        .form-label i {
+            margin-right: 5px;
+            color: var(--primary);
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #eee;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background: #fafafa;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .form-control:focus {
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(229,57,53,0.08);
+        }
+        .form-control::placeholder { color: #bbb; }
+        select.form-control {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        .form-hint {
+            font-size: 10px; color: #aaa; margin-top: 4px;
+            display: flex; align-items: center; gap: 4px;
+        }
+
+        .btn-create {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff; border: none;
+            padding: 14px 32px; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            box-shadow: 0 6px 24px rgba(229,57,53,0.3);
+            width: 100%;
+            justify-content: center;
+            margin-top: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-create::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-create:hover::before { left: 100%; }
+        .btn-create:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 36px rgba(229,57,53,0.4);
+        }
+
+        /* ===== Reports List Card ===== */
+        .reports-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+        .reports-card-header {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 22px 28px;
+            display: flex; align-items: center; gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+        .reports-card-header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 4s infinite;
+        }
+        .reports-card-header-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; color: #94a3b8;
+        }
+        .reports-card-header-text h2 {
+            font-size: 16px; font-weight: 800; color: #fff;
+        }
+        .reports-card-header-text p {
+            font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;
+        }
+        .reports-card-body {
+            padding: 20px 24px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        /* ===== Report Row ===== */
+        .report-item {
+            background: #fafbfc;
+            border: 1px solid #f0f0f0;
+            border-radius: var(--radius-sm);
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .report-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue));
+            border-radius: 4px 0 0 4px;
+        }
+        .report-item:hover {
+            border-color: #ddd;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            transform: translateX(4px);
+        }
+        .report-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+        }
+        .report-id {
+            font-size: 11px; font-weight: 800;
+            color: var(--accent-purple);
+            background: #ede9fe;
+            padding: 3px 12px;
+            border-radius: 6px;
+            letter-spacing: 0.5px;
+        }
+        .report-time {
+            font-size: 11px; color: #999;
+            display: flex; align-items: center; gap: 5px;
+        }
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .report-field {
+            display: flex; flex-direction: column; gap: 2px;
+        }
+        .report-field-label {
+            font-size: 9px; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.8px;
+            color: #aaa;
+        }
+        .report-field-value {
+            font-size: 13px; font-weight: 700; color: var(--text-dark);
+        }
+        .report-field-value.highlight {
+            color: var(--accent-blue);
+        }
+
+        /* ===== Empty State ===== */
+        .empty-reports {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        .empty-reports-icon {
+            width: 70px; height: 70px; border-radius: 50%;
+            background: #f5f5f5;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #ccc;
+            margin: 0 auto 16px;
+        }
+        .empty-reports h4 {
+            font-size: 15px; font-weight: 800; color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+        .empty-reports p {
+            font-size: 12px; color: var(--text-light); line-height: 1.6;
+        }
+
+        /* ===== Auto-fill badge ===== */
+        .auto-fill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 800;
+            transition: all 0.4s cubic-bezier(.22,1,.36,1);
+        }
+        .auto-fill-badge.loading {
+            background: #f5f5f5;
+            color: #aaa;
+        }
+        .auto-fill-badge.loaded {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            color: var(--accent-blue);
+            border: 1px solid #bfdbfe;
+        }
+        .auto-fill-badge .badge-icon {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px;
+        }
+        .auto-fill-badge.loaded .badge-icon {
+            background: var(--accent-blue);
+            color: #fff;
+        }
+        .auto-fill-badge .badge-number {
+            font-size: 22px;
+            letter-spacing: -0.5px;
+        }
+        .auto-fill-badge .badge-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .auto-fill-info {
+            margin-top: 6px;
+            font-size: 10px;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .auto-fill-info.has-data {
+            color: var(--accent-green);
+        }
+
+        /* Sentiment display */
+        .sentiment-display {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            transition: all 0.4s;
+        }
+        .sentiment-display.positive {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+        }
+        .sentiment-display.neutral {
+            background: #f5f5f5;
+            border: 1px solid #e8e8e8;
+        }
+        .sentiment-display.low {
+            background: linear-gradient(135deg, #fef2f2, #fecaca);
+            border: 1px solid #fecaca;
+        }
+        .sentiment-score-val {
+            font-size: 26px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+        .sentiment-display.positive .sentiment-score-val { color: var(--accent-green); }
+        .sentiment-display.neutral .sentiment-score-val { color: #aaa; }
+        .sentiment-display.low .sentiment-score-val { color: #dc2626; }
+        .sentiment-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+        .sentiment-meta .meta-label {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #aaa;
+        }
+        .sentiment-meta .meta-info {
+            font-size: 11px;
+            color: var(--text-mid);
+        }
+        .sentiment-stars {
+            display: flex; gap: 2px;
+        }
+        .sentiment-stars i {
+            font-size: 14px;
+        }
+        .sentiment-stars i.filled { color: #facc15; }
+        .sentiment-stars i.empty { color: #e0e0e0; }
+
+        /* Admin select styling */
+        .admin-select-wrapper {
+            position: relative;
+        }
+
+        /* ===== Refresh Buttons ===== */
+        .btn-refresh-all {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #94a3b8;
+            padding: 6px 14px; border-radius: 8px;
+            font-size: 11px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-left: auto;
+        }
+        .btn-refresh-all:hover {
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        .btn-refresh-all.refreshing {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .btn-refresh-all.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+        .btn-refresh-single {
+            display: inline-flex; align-items: center; gap: 4px;
+            background: #f0f0f0;
+            border: 1px solid #e0e0e0;
+            color: #888;
+            padding: 4px 10px; border-radius: 6px;
+            font-size: 10px; font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-refresh-single:hover {
+            background: #e8e8e8;
+            color: var(--accent-blue);
+            border-color: #bfdbfe;
+        }
+        .btn-refresh-single.refreshing {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .btn-refresh-single.refreshing i {
+            animation: spin 1s linear infinite;
+        }
+        .report-item-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 10px;
+            gap: 8px;
+        }
+        .report-header-left {
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 768px) {
+            .stats-bar { grid-template-columns: 1fr; }
+            .page-hero { flex-direction: column; gap: 18px; align-items: flex-start; padding: 28px 24px; }
+            .hero-right { display: none; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/owner/dashboard" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Owner Dashboard</a></li>
+                <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="owner-container">
+
+        <!-- Flash Messages -->
+        <div th:if="${successMessage}" class="alert-toast success animate-in">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert-toast error animate-in">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <!-- Page Hero -->
+        <div class="page-hero animate-in">
+            <div class="hero-pattern"></div>
+            <div class="hero-left">
+                <p class="hero-eyebrow"><span class="eyebrow-dot"></span> Owner Portal</p>
+                <h1 class="hero-title">Analytics Dashboard</h1>
+                <p class="hero-sub">
+                    <i class="fas fa-chart-line"></i>
+                    Create and manage analytics reports
+                </p>
+            </div>
+            <div class="hero-right">
+                <div class="hero-icon-wrap">
+                    <i class="fas fa-crown"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar animate-in delay-1">
+            <div class="stat-pill total">
+                <div class="stat-pill-icon"><i class="fas fa-file-lines"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Total Reports</div>
+                    <div class="stat-pill-val" th:text="${reports != null ? #lists.size(reports) : 0}">0</div>
+                </div>
+            </div>
+            <div class="stat-pill created">
+                <div class="stat-pill-icon"><i class="fas fa-circle-plus"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">This Month</div>
+                    <div class="stat-pill-val" id="thisMonthCount">0</div>
+                </div>
+            </div>
+            <div class="stat-pill avg">
+                <div class="stat-pill-icon"><i class="fas fa-chart-bar"></i></div>
+                <div class="stat-pill-info">
+                    <div class="stat-pill-label">Active Period</div>
+                    <div class="stat-pill-val" style="font-size:16px;" id="activePeriod">—</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+            <!-- LEFT: Create Report Form -->
+            <div class="create-card animate-in delay-2">
+                <div class="create-card-header">
+                    <div class="create-card-header-icon"><i class="fas fa-plus"></i></div>
+                    <div class="create-card-header-text">
+                        <h2>Create Analytics Report</h2>
+                        <p>Generate a new analytics report entry</p>
+                    </div>
+                </div>
+                <div class="create-card-body">
+                    <form th:action="@{/owner/report/create}" method="post" id="reportForm">
+
+                        <!-- Time Period -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-calendar-days"></i> Time Period</label>
+                            <select name="timePeriod" class="form-control" required>
+                                <option value="" disabled selected>Select time period</option>
+                                <option value="Daily">Daily</option>
+                                <option value="Weekly">Weekly</option>
+                                <option value="Monthly">Monthly</option>
+                                <option value="Quarterly">Quarterly</option>
+                                <option value="Yearly">Yearly</option>
+                            </select>
+                        </div>
+
+                        <!-- Most Frequent Category -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-tag"></i> Most Frequent Category</label>
+                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" required>
+                                <option value="" disabled selected>Select a category</option>
+                                <option value="Education (Creative and IT)">Education (Creative and IT)</option>
+                                <option value="Institute Problem">Institute Related Problem</option>
+                                <option value="Registration">Registration &amp; Enrollment</option>
+                                <option value="Administrative">Administrative Services</option>
+                                <option value="Financial">Financial &amp; Payments</option>
+                                <option value="Other">Other General Concern</option>
+                            </select>
+                        </div>
+
+                        <!-- Total Concerns (auto-filled) & Avg Resolution Time -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-hashtag"></i> Total Concerns</label>
+                                <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control"
+                                       placeholder="Select a category first" min="0" required readonly
+                                       style="background:#f0f0f0; cursor:not-allowed;">
+                                <div class="auto-fill-info" id="totalConcernsInfo">
+                                    <i class="fas fa-info-circle"></i> Auto-filled when category is selected
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-clock"></i> Avg Resolution Time</label>
+                                <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control"
+                                       placeholder="Select a category first" step="0.01" min="0" required readonly
+                                       style="background:#f0f0f0; cursor:not-allowed;">
+                                <div class="auto-fill-info" id="avgResolutionInfo">
+                                    <i class="fas fa-info-circle"></i> Auto-filled in hours (decimal)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Admin Selection -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-user-shield"></i> Select Admin</label>
+                            <div class="admin-select-wrapper">
+                                <select name="adminIdFk" id="adminSelect" class="form-control">
+                                    <option value="" selected>Loading admins...</option>
+                                </select>
+                            </div>
+                            <div class="form-hint"><i class="fas fa-info-circle"></i> Sentiment score auto-fills based on feedback</div>
+                        </div>
+
+                        <!-- Sentiment Trend Score (auto-filled) -->
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-face-smile"></i> Sentiment Score</label>
+                            <input type="hidden" name="sentimentTrendScore" id="sentimentInput" value="0">
+                            <div id="sentimentDisplay" class="sentiment-display neutral">
+                                <span class="sentiment-score-val" id="sentimentVal">—</span>
+                                <div class="sentiment-meta">
+                                    <span class="meta-label">Avg Feedback Rating</span>
+                                    <div class="sentiment-stars" id="sentimentStars"></div>
+                                    <span class="meta-info" id="sentimentInfo">Select an admin to view</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn-create">
+                            <i class="fas fa-paper-plane"></i> Create Report
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- RIGHT: Recent Reports List -->
+            <div class="reports-card animate-in delay-3">
+                <div class="reports-card-header">
+                    <div class="reports-card-header-icon"><i class="fas fa-list-ul"></i></div>
+                    <div class="reports-card-header-text">
+                        <h2>Recent Reports</h2>
+                        <p>Previously created analytics reports</p>
+                    </div>
+                    <button type="button" class="btn-refresh-all" id="refreshAllBtn" onclick="refreshAllReports(this)">
+                        <i class="fas fa-rotate"></i> Refresh All
+                    </button>
+                </div>
+                <div class="reports-card-body">
+
+                    <!-- Empty State -->
+                    <div th:if="${reports == null or #lists.isEmpty(reports)}" class="empty-reports">
+                        <div class="empty-reports-icon"><i class="fas fa-chart-pie"></i></div>
+                        <h4>No Reports Yet</h4>
+                        <p>Create your first analytics report using the form on the left.</p>
+                    </div>
+
+                    <!-- Report Items -->
+                    <div th:each="report, iterStat : ${reports}" class="report-item"
+                         th:attr="data-report-id=${report.reportId}"
+                         th:style="'animation: fadeSlideUp 0.5s ease both; animation-delay: ' + ${0.06 * iterStat.index} + 's'">
+                        <div class="report-item-header">
+                            <div class="report-header-left">
+                                <span class="report-id" th:text="'RPT-' + ${report.reportId}">RPT-1</span>
+                                <button type="button" class="btn-refresh-single" th:attr="onclick='refreshSingleReport(this, ' + ${report.reportId} + ')'">
+                                    <i class="fas fa-rotate"></i> Refresh
+                                </button>
+                            </div>
+                            <span class="report-time">
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${report.createdTime != null ? #temporals.format(report.createdTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01 Jan 2026</span>
+                            </span>
+                        </div>
+                        <div class="report-grid">
+                            <div class="report-field">
+                                <span class="report-field-label">Time Period</span>
+                                <span class="report-field-value" th:text="${report.timePeriod}">Monthly</span>
+                            </div>
+                            <div class="report-field">
+                                <span class="report-field-label">Total Concerns</span>
+                                <span class="report-field-value highlight" th:text="${report.totalConcerns}">0</span>
+                            </div>
+                            <div class="report-field">
+                                <span class="report-field-label">Avg Resolution</span>
+                                <span class="report-field-value" th:text="${report.avgResolutionTime + ' hrs'}">0 hrs</span>
+                            </div>
+                            <div class="report-field">
+                                <span class="report-field-label">Top Category</span>
+                                <span class="report-field-value" th:text="${report.mostFrequentCategory}">—</span>
+                            </div>
+                            <div class="report-field">
+                                <span class="report-field-label">Sentiment Score</span>
+                                <span class="report-field-value" th:text="${report.sentimentTrendScore}">0</span>
+                            </div>
+                            <div class="report-field">
+                                <span class="report-field-label">Admin ID</span>
+                                <span class="report-field-value" th:text="${report.adminIdFk != null ? report.adminIdFk : '—'}">—</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div><!-- /.dashboard-grid -->
+
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    // ===== Auto-dismiss alert toasts =====
+    document.querySelectorAll('.alert-toast').forEach(toast => {
+        setTimeout(() => {
+            toast.style.transition = 'all 0.5s ease';
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(-10px)';
+            setTimeout(() => toast.remove(), 500);
+        }, 5000);
+    });
+
+    // ===== Staggered stat pill entrance =====
+    document.querySelectorAll('.stat-pill').forEach((pill, i) => {
+        pill.style.opacity = '0';
+        pill.style.transform = 'translateY(20px)';
+        setTimeout(() => {
+            pill.style.transition = 'all 0.5s cubic-bezier(.22,1,.36,1)';
+            pill.style.opacity = '1';
+            pill.style.transform = 'translateY(0)';
+        }, 300 + i * 100);
+    });
+
+    // ===== Auto-fill Total Concerns on category change =====
+    const categorySelect = document.getElementById('categorySelect');
+    const totalConcernsInput = document.getElementById('totalConcernsInput');
+    const totalConcernsInfo = document.getElementById('totalConcernsInfo');
+
+    categorySelect.addEventListener('change', function() {
+        const category = this.value;
+        if (!category) return;
+
+        totalConcernsInput.value = '';
+        totalConcernsInput.placeholder = 'Loading...';
+        totalConcernsInfo.className = 'auto-fill-info';
+        totalConcernsInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching count...';
+
+        fetch('/owner/api/concerns/count?category=' + encodeURIComponent(category))
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                console.log('Category count result:', data);
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                const count = (data.count !== undefined) ? data.count : 0;
+                totalConcernsInput.value = count;
+                totalConcernsInput.style.background = '#eff6ff';
+                totalConcernsInput.style.borderColor = '#bfdbfe';
+                totalConcernsInput.style.color = '#2563eb';
+                totalConcernsInput.style.fontWeight = '800';
+                totalConcernsInput.style.fontSize = '16px';
+                totalConcernsInfo.className = 'auto-fill-info has-data';
+                totalConcernsInfo.innerHTML = '<i class="fas fa-circle-check"></i> ' + count + ' concerns found in "' + category + '"';
+            })
+            .catch((err) => {
+                console.error('Error fetching count:', err);
+                totalConcernsInput.placeholder = 'Error loading';
+                totalConcernsInfo.className = 'auto-fill-info';
+                totalConcernsInfo.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed to load count: ' + err.message;
+            });
+
+        // Also fetch avg resolution time for this category
+        const avgResolutionInput = document.getElementById('avgResolutionInput');
+        const avgResolutionInfo = document.getElementById('avgResolutionInfo');
+
+        avgResolutionInput.value = '';
+        avgResolutionInput.placeholder = 'Loading...';
+        avgResolutionInfo.className = 'auto-fill-info';
+        avgResolutionInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+
+        fetch('/owner/api/resolution-time?category=' + encodeURIComponent(category))
+            .then(res => {
+                if (!res.ok) throw new Error('Network error');
+                return res.json();
+            })
+            .then(data => {
+                if (data.error) throw new Error(data.error);
+                const avg = (data.avgHours !== undefined) ? data.avgHours : 0;
+                avgResolutionInput.value = avg;
+                avgResolutionInput.style.background = '#eff6ff';
+                avgResolutionInput.style.borderColor = '#bfdbfe';
+                avgResolutionInput.style.color = '#2563eb';
+                avgResolutionInput.style.fontWeight = '800';
+                avgResolutionInput.style.fontSize = '16px';
+                avgResolutionInfo.className = 'auto-fill-info has-data';
+                if (data.count > 0) {
+                    avgResolutionInfo.innerHTML = '<i class="fas fa-circle-check"></i> ' + avg + ' hrs avg across ' + data.count + ' resolved concern(s)';
+                } else {
+                    avgResolutionInfo.innerHTML = '<i class="fas fa-info-circle"></i> ' + (data.message || 'No resolved concerns');
+                }
+            })
+            .catch((err) => {
+                avgResolutionInput.placeholder = 'Error loading';
+                avgResolutionInfo.className = 'auto-fill-info';
+                avgResolutionInfo.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed: ' + err.message;
+            });
+    });
+
+    // ===== Load Admins on page load =====
+    const adminSelect = document.getElementById('adminSelect');
+
+    fetch('/owner/api/admins')
+        .then(res => res.json())
+        .then(admins => {
+            adminSelect.innerHTML = '<option value="" selected>-- Select an Admin --</option>';
+            admins.forEach(admin => {
+                const opt = document.createElement('option');
+                opt.value = admin.userId;
+                opt.textContent = admin.fullName + ' (' + admin.staffId + ')';
+                adminSelect.appendChild(opt);
+            });
+            if (admins.length === 0) {
+                adminSelect.innerHTML = '<option value="" disabled selected>No admins found</option>';
+            }
+        })
+        .catch(() => {
+            adminSelect.innerHTML = '<option value="" disabled selected>Error loading admins</option>';
+        });
+
+    // ===== Auto-fill Sentiment Score on admin selection =====
+    const sentimentInput = document.getElementById('sentimentInput');
+    const sentimentVal = document.getElementById('sentimentVal');
+    const sentimentDisplay = document.getElementById('sentimentDisplay');
+    const sentimentStars = document.getElementById('sentimentStars');
+    const sentimentInfo = document.getElementById('sentimentInfo');
+
+    adminSelect.addEventListener('change', function() {
+        const adminId = this.value;
+        if (!adminId) {
+            sentimentDisplay.className = 'sentiment-display neutral';
+            sentimentVal.textContent = '—';
+            sentimentStars.innerHTML = '';
+            sentimentInfo.textContent = 'Select an admin to view';
+            sentimentInput.value = '0';
+            return;
+        }
+
+        sentimentVal.textContent = '...';
+        sentimentInfo.textContent = 'Loading...';
+        sentimentStars.innerHTML = '';
+
+        fetch('/owner/api/sentiment?adminId=' + adminId)
+            .then(res => res.json())
+            .then(data => {
+                const score = parseFloat(data.score) || 0;
+                sentimentInput.value = score;
+                sentimentVal.textContent = score.toFixed(2);
+
+                // Stars
+                let starsHtml = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHtml += '<i class="fas fa-star ' + (i <= Math.round(score) ? 'filled' : 'empty') + '"></i>';
+                }
+                sentimentStars.innerHTML = starsHtml;
+
+                // Color class
+                if (score >= 3.5) {
+                    sentimentDisplay.className = 'sentiment-display positive';
+                } else if (score >= 2) {
+                    sentimentDisplay.className = 'sentiment-display neutral';
+                } else {
+                    sentimentDisplay.className = 'sentiment-display low';
+                }
+
+                if (data.count > 0) {
+                    sentimentInfo.textContent = 'Based on ' + data.count + ' feedback rating(s)';
+                } else {
+                    sentimentInfo.textContent = data.message || 'No feedback data';
+                }
+            })
+            .catch(() => {
+                sentimentVal.textContent = 'ERR';
+                sentimentInfo.textContent = 'Failed to load sentiment';
+                sentimentDisplay.className = 'sentiment-display neutral';
+            });
+    });
+
+    // ===== Count this month's reports =====
+    (function() {
+        const items = document.querySelectorAll('.report-item');
+        let thisMonth = 0;
+        let latestPeriod = '—';
+        const now = new Date();
+        items.forEach((item, i) => {
+            const timeEl = item.querySelector('.report-time span:last-child');
+            if (timeEl) {
+                const d = new Date(timeEl.textContent);
+                if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
+                    thisMonth++;
+                }
+            }
+            if (i === 0) {
+                const periodEl = item.querySelector('.report-field-value');
+                if (periodEl) latestPeriod = periodEl.textContent;
+            }
+        });
+        const monthEl = document.getElementById('thisMonthCount');
+        const periodEl = document.getElementById('activePeriod');
+        if (monthEl) monthEl.textContent = thisMonth;
+        if (periodEl) periodEl.textContent = latestPeriod;
+    })();
+
+    // ===== Refresh Single Report =====
+    function refreshSingleReport(btn, reportId) {
+        btn.classList.add('refreshing');
+        btn.innerHTML = '<i class="fas fa-rotate"></i> Refreshing...';
+
+        fetch('/owner/api/report/refresh/' + reportId, { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) throw new Error(data.error);
+
+                // Update the report item in the DOM
+                const reportItem = document.querySelector('.report-item[data-report-id="' + reportId + '"]');
+                if (reportItem) {
+                    const values = reportItem.querySelectorAll('.report-field-value');
+                    // values order: Time Period, Total Concerns, Avg Resolution, Top Category, Sentiment Score, Admin ID
+                    if (values[1]) values[1].textContent = data.totalConcerns;
+                    if (values[2]) values[2].textContent = data.avgResolutionTime + ' hrs';
+                    if (values[4]) values[4].textContent = data.sentimentTrendScore;
+
+                    // Flash green briefly
+                    reportItem.style.transition = 'background 0.3s';
+                    reportItem.style.background = '#f0fdf4';
+                    setTimeout(() => { reportItem.style.background = '#fafbfc'; }, 1500);
+                }
+
+                btn.classList.remove('refreshing');
+                btn.innerHTML = '<i class="fas fa-circle-check" style="color: var(--accent-green)"></i> Updated';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh'; }, 2000);
+            })
+            .catch(err => {
+                btn.classList.remove('refreshing');
+                btn.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh'; }, 2000);
+            });
+    }
+
+    // ===== Refresh All Reports =====
+    function refreshAllReports(btn) {
+        btn.classList.add('refreshing');
+        btn.innerHTML = '<i class="fas fa-rotate"></i> Refreshing...';
+
+        fetch('/owner/api/reports/refresh-all', { method: 'POST' })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) throw new Error(data.error);
+
+                btn.classList.remove('refreshing');
+                btn.innerHTML = '<i class="fas fa-circle-check"></i> Updated ' + data.updatedCount + ' report(s)';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh All';
+                    // Reload page to show updated values
+                    window.location.reload();
+                }, 1200);
+            })
+            .catch(err => {
+                btn.classList.remove('refreshing');
+                btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh All'; }, 2000);
+            });
+    }
+</script>
+</body>
+</html>

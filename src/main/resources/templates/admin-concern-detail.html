@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Concern Detail - Admin</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --primary-deeper: #b71c1c;
+            --primary-light: #ff6f60;
+            --primary-bg: rgba(229, 57, 53, 0.08);
+            --accent-green: #16a34a;
+            --accent-blue: #2563eb;
+            --accent-orange: #f97316;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+        }
+
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        @keyframes floatReverse {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(3deg); }
+        }
+        @keyframes pulseRing {
+            0% { box-shadow: 0 0 0 0 rgba(229,57,53,0.3); }
+            70% { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
+            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(24px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .animate-in { animation: fadeSlideUp 0.7s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .18s; }
+        .delay-3 { animation-delay: .26s; }
+        .delay-4 { animation-delay: .34s; }
+
+        .detail-container {
+            max-width: 980px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 24px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            padding: 8px 12px;
+            border-radius: 8px;
+        }
+
+        .back-link:hover {
+            color: var(--primary-dark);
+            background: var(--primary-bg);
+            transform: translateX(-4px);
+        }
+
+        /* Concern Card */
+        .concern-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1) both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .concern-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--accent-green));
+            border-radius: 4px;
+        }
+
+        .concern-card:hover {
+            box-shadow: var(--card-shadow-hover);
+            border-color: rgba(229,57,53,0.2);
+            transform: translateY(-4px);
+        }
+
+        .concern-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .concern-card .concern-id {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .concern-card h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin: 6px 0 0;
+            font-weight: 800;
+        }
+
+        .concern-meta {
+            display: flex;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-bg), rgba(37,99,235,0.04));
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .concern-meta .meta-item {
+            font-size: 14px;
+        }
+
+        .concern-meta .meta-label {
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .concern-meta .meta-value {
+            color: var(--text-mid);
+            font-weight: 500;
+        }
+
+        .concern-message {
+            padding: 22px;
+            background: linear-gradient(135deg, #fafbfc, #f8f9fa);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin-bottom: 18px;
+            position: relative;
+        }
+
+        .concern-message::before {
+            content: '💬';
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            opacity: 0.1;
+            font-size: 36px;
+        }
+
+        .evidence-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: linear-gradient(135deg, #e3f2fd, #dbeafe);
+            color: var(--accent-blue);
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1.5px solid #bfdbfe;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+        }
+
+        .evidence-link:hover {
+            background: linear-gradient(135deg, #bbdefb, #bfdbfe);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.2);
+        }
+
+        /* Status section */
+        .status-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1) 0.1s both;
+        }
+
+        .status-section:hover {
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .status-section h3 {
+            color: var(--primary);
+            margin-bottom: 18px;
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-form {
+            display: flex;
+            gap: 14px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .status-form select {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: #fafafa;
+            min-width: 200px;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .status-form select:hover {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .status-form select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-bg);
+        }
+
+        .status-form button {
+            padding: 12px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(229,57,53,0.25);
+        }
+
+        .status-form button:active {
+            transform: translateY(0);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            flex-shrink: 0;
+        }
+
+        .status-pending { 
+            background: linear-gradient(135deg, rgba(255,152,0,0.08), rgba(255,152,0,0.03));
+            color: #e65100;
+            border: 1px solid rgba(255,152,0,0.2);
+        }
+        .status-inprogress { 
+            background: linear-gradient(135deg, rgba(37,99,235,0.08), rgba(37,99,235,0.03));
+            color: #1e40af;
+            border: 1px solid rgba(37,99,235,0.2);
+            animation: pulseRing 2s infinite;
+        }
+        .status-complete { 
+            background: linear-gradient(135deg, rgba(22,163,74,0.08), rgba(22,163,74,0.03));
+            color: #15803d;
+            border: 1px solid rgba(22,163,74,0.2);
+        }
+
+        /* Replies section */
+        .replies-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1) 0.2s both;
+        }
+
+        .replies-section h3 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid var(--primary-bg);
+            padding-bottom: 14px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reply-item {
+            padding: 24px;
+            background: linear-gradient(135deg, #fff8f7, #fff5f5);
+            border-radius: var(--radius-sm);
+            margin-bottom: 16px;
+            border: 1.5px solid #fde8e8;
+            border-left: 4px solid #4caf50;
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1) both;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .reply-item:hover {
+            box-shadow: 0 8px 24px rgba(76,175,80,0.12);
+            transform: translateX(4px);
+            border-left-width: 6px;
+        }
+
+        .reply-item .reply-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .reply-item .reply-admin {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .reply-item .reply-admin::before {
+            content: '👤';
+            font-size: 16px;
+        }
+
+        .reply-item .reply-time {
+            color: var(--text-light);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .reply-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .delete-reply-form {
+            margin: 0;
+        }
+
+        .delete-reply-btn {
+            border: 1.5px solid #ef9a9a;
+            background: #fff;
+            color: #c62828;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.22,1,.36,1);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .delete-reply-btn:hover {
+            background: #ffebee;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(198,40,40,0.15);
+        }
+
+        .delete-reply-btn::before {
+            content: '🗑️';
+            font-size: 13px;
+        }
+
+        .update-reply-btn {
+            border: 1.5px solid #90caf9;
+            background: #fff;
+            color: #1565c0;
+            border-radius: var(--radius-sm);
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.22,1,.36,1);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .update-reply-btn:hover {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33,150,243,0.15);
+        }
+
+        .update-reply-btn::before {
+            content: '✏️';
+            margin-right: 4px;
+            font-size: 13px;
+        }
+
+        .update-reply-form {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 14px;
+            background: #f5f7ff;
+            border-radius: 10px;
+        }
+
+        .update-reply-textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px 14px;
+            border: 1.5px solid #cce4ff;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            resize: vertical;
+            background: #fff;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s;
+        }
+
+        .update-reply-textarea:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+            background: #fff;
+        }
+
+        .update-reply-submit {
+            align-self: flex-start;
+            border: none;
+            background: linear-gradient(135deg, var(--accent-blue), #1e40af);
+            color: #fff;
+            border-radius: var(--radius-sm);
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.22,1,.36,1);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .update-reply-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(37,99,235,0.25);
+        }
+
+        .reply-attachment-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 12px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #1565c0;
+            background: linear-gradient(135deg, #e3f2fd, #dbeafe);
+            border: 1.5px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 6px 12px;
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+        }
+
+        .reply-attachment-link:hover {
+            background: linear-gradient(135deg, #bbdefb, #bfdbfe);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+        }
+
+        .reply-file-input {
+            margin-top: 10px;
+            width: 100%;
+            font-size: 13px;
+            color: var(--text-mid);
+            padding: 8px;
+            border: 2px dashed var(--border);
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, rgba(37,99,235,0.02), rgba(22,163,74,0.02));
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .reply-file-input:hover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(229,57,53,0.05), rgba(229,57,53,0.03));
+        }
+
+        .reply-item .reply-message {
+            font-size: 15px;
+            line-height: 1.8;
+            color: var(--text-dark);
+            margin: 0;
+        }
+
+        .no-replies {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+            background: linear-gradient(135deg, var(--primary-bg), rgba(37,99,235,0.04));
+            border-radius: var(--radius-sm);
+            border: 2px dashed var(--border);
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1);
+        }
+
+        .no-replies::before {
+            content: '📭';
+            display: block;
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        /* Reply form */
+        .reply-form-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 28px;
+            border: 1px solid var(--border);
+            animation: slideInRight 0.7s cubic-bezier(.22,1,.36,1) 0.3s both;
+        }
+
+        .reply-form-section:hover {
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .reply-form-section h3 {
+            color: var(--primary);
+            font-size: 22px;
+            margin-bottom: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reply-form-section h3::before {
+            content: '💬';
+            font-size: 24px;
+        }
+
+        .reply-form textarea {
+            width: 100%;
+            min-height: 140px;
+            padding: 16px 18px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            margin-bottom: 18px;
+            background: linear-gradient(135deg, #fafbfc, #fff);
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+        }
+
+        .reply-form textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-bg);
+            background: #fff;
+        }
+
+        .reply-form textarea::placeholder {
+            color: var(--text-light);
+        }
+
+        .reply-form .form-row {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .reply-form .form-row label {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .reply-form .form-row select {
+            padding: 12px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            background: #fafafa;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .reply-form .form-row select:hover {
+            border-color: var(--primary);
+            background: #fff;
+        }
+
+        .reply-form .form-row select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-bg);
+        }
+
+        .reply-form .submit-reply-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 13px 32px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            margin-top: 18px;
+            box-shadow: 0 4px 15px rgba(229,57,53,0.25);
+        }
+
+        .reply-form .submit-reply-btn::before {
+            content: '✓';
+            font-size: 16px;
+        }
+
+        .reply-form .submit-reply-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 28px rgba(229,57,53,0.35);
+        }
+
+        .reply-form .submit-reply-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .mark-read-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 12px 24px;
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mark-read-btn::before {
+            content: '👁️';
+            font-size: 14px;
+        }
+
+        .mark-read-btn:hover {
+            background: var(--primary-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(229,57,53,0.15);
+        }
+
+        /* Alert */
+        .alert {
+            padding: 16px 22px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 24px;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: bounceIn 0.5s cubic-bezier(.22,1,.36,1) both;
+            border: 1.5px solid;
+        }
+
+        .alert::before {
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
+            color: #2e7d32;
+            border-color: #81c784;
+        }
+
+        .alert-success::before {
+            content: '✓';
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, #ffebee, #ffcdd2);
+            color: #c62828;
+            border-color: #ef9a9a;
+        }
+
+        .alert-error::before {
+            content: '✕';
+        }
+
+        @media (max-width: 768px) {
+            .detail-container { 
+                margin: 20px 12px;
+                padding: 0 12px;
+            }
+            .concern-card,
+            .status-section,
+            .replies-section,
+            .reply-form-section { 
+                padding: 24px;
+            }
+            .concern-card h2 { font-size: 22px; }
+            .concern-meta { flex-direction: column; gap: 14px; }
+            .reply-form .form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .status-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .status-form select,
+            .reply-form .form-row select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/admin/student-review" class="nav-link">Student Review</a></li>
+                    <li><a href="/admin/dashboard" class="nav-link" style="color: #e53935;">Admin Dashboard</a></li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="detail-container">
+
+            <a th:href="${concern.category == 'Education (Creative and IT)'} ? @{/admin/edu-dashboard} : @{/admin/dashboard}" class="back-link">&larr; Back to Dashboard</a>
+
+            <!-- Alerts -->
+            <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+            <!-- Concern Details -->
+            <div class="concern-card">
+                <div class="card-header">
+                    <div>
+                        <span class="concern-id" th:text="'CON-' + ${concern.concernId}">CON-1</span>
+                        <h2 th:text="${concern.subject}">Concern Subject</h2>
+                    </div>
+                    <span class="status-badge"
+                          th:classappend="${concern.status == 'Pending'} ? 'status-pending' : (${concern.status == 'In Progress'} ? 'status-inprogress' : (${concern.status == 'Complete'} ? 'status-complete' : 'status-complete'))"
+                          th:text="${concern.status}">Pending</span>
+                </div>
+
+                <div class="concern-meta">
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Student</span>
+                        <span class="meta-value" th:text="${concern.student.user.firstName + ' ' + concern.student.user.lastName}">Name</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Student ID</span>
+                        <span class="meta-value" th:text="${concern.student.studentId}">STU001</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null}">
+                        <span class="meta-label">Category</span>
+                        <span class="meta-value" th:text="${concern.category != null ? concern.category : '-'}">-</span>
+                    </div>
+                    <div class="meta-item" th:if="${concern.student != null and concern.student.user.email != null}">
+                        <span class="meta-label">Email</span>
+                        <span class="meta-value" th:text="${concern.student.user.email}">email@test.com</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Submitted</span>
+                        <span class="meta-value" th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, HH:mm')}">01 Jan 2026</span>
+                    </div>
+                </div>
+
+                <div class="concern-message" th:text="${concern.message}">
+                    Concern message goes here...
+                </div>
+
+                <a th:if="${concern.evidencePath != null}" th:href="'/uploads/' + ${concern.evidencePath}"
+                   class="evidence-link" target="_blank">
+                    📎 View Attached Evidence
+                </a>
+            </div>
+
+            <div class="status-section">
+                <h3><i class="fas fa-code-branch"></i> Reassign Department</h3>
+                <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/category'}" method="post" class="status-form"
+                      onsubmit="return confirm('Change this concern department? This will update dashboard categorization.');">
+                    <select name="category" required>
+                        <option value="Institute Problem" th:selected="${concern.category == 'Institute Problem'}">Institute Problem</option>
+                        <option value="Registration" th:selected="${concern.category == 'Registration'}">Registration</option>
+                        <option value="Administrative" th:selected="${concern.category == 'Administrative'}">Administrative</option>
+                        <option value="Financial" th:selected="${concern.category == 'Financial'}">Financial</option>
+                        <option value="Other" th:selected="${concern.category == 'Other'}">Other</option>
+                        <option value="Education (Creative and IT)" th:selected="${concern.category == 'Education (Creative and IT)'}">Education (Creative and IT)</option>
+                    </select>
+                    <button type="submit">Update Department</button>
+                </form>
+            </div>
+
+            <!-- Previous Replies -->
+            <div class="replies-section">
+                <h3>Admin Replies</h3>
+
+                <div th:if="${#lists.isEmpty(replies)}" class="no-replies">
+                    <p>No replies yet. Be the first to respond to this concern.</p>
+                </div>
+
+                <div th:each="reply, iterStat : ${replies}" class="reply-item">
+                    <div class="reply-header">
+                        <span class="reply-admin">
+                            <span th:if="${reply.admin != null and reply.admin.user != null}"
+                                  th:text="'Admin: ' + ${reply.admin.user.firstName} + ' ' + ${reply.admin.user.lastName}">
+                                Admin
+                            </span>
+                            <span th:if="${reply.admin != null}">
+                                (<span th:text="${reply.admin.staffId}">ADMIN001</span>)
+                            </span>
+                        </span>
+                        <div class="reply-header-actions">
+                            <span class="reply-time" th:text="${#temporals.format(reply.replyTime, 'dd MMM yyyy, HH:mm')}">01 Jan 2026</span>
+                            <details th:if="${iterStat.first}">
+                                <summary class="update-reply-btn">Update</summary>
+                                <form class="update-reply-form"
+                                      th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply/' + ${reply.replyId} + '/update'}"
+                                      method="post"
+                                      onsubmit="return confirm('Update this latest reply?');">
+                                    <textarea class="update-reply-textarea" name="replyMessage" th:text="${reply.replyMessage}" required></textarea>
+                                    <button type="submit" class="update-reply-submit">Save Update</button>
+                                </form>
+                            </details>
+                            <form class="delete-reply-form"
+                                  th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply/' + ${reply.replyId} + '/delete'}"
+                                  method="post"
+                                  onsubmit="return confirm('Are you sure you want to delete this reply?');">
+                                <button type="submit" class="delete-reply-btn">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="reply-message" th:text="${reply.replyMessage}">Reply content here...</div>
+                    <a th:if="${reply.resolutionScreenshotPath != null}"
+                       th:href="@{'/uploads/' + ${reply.resolutionScreenshotPath}}"
+                       class="reply-attachment-link"
+                       target="_blank">
+                        📎 View Attachment
+                    </a>
+                </div>
+            </div>
+
+            <!-- Reply Form -->
+            <div class="reply-form-section">
+                <h3>Send Reply</h3>
+                                <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply'}" method="post" enctype="multipart/form-data" class="reply-form"
+                      th:object="${replyDTO}">
+
+                    <textarea th:field="*{replyMessage}" placeholder="Type your reply to the student's concern..." required></textarea>
+                                        <input type="file" name="resolutionFile" class="reply-file-input" accept="image/*,application/pdf" />
+
+                    <!-- Official replies mark the concern as Complete -->
+                    <input type="hidden" name="newStatus" value="Complete" />
+
+                    <div class="form-row">
+                        <!-- Mark as Read updates status to In Progress -->
+                        <button type="button" class="mark-read-btn" onclick="document.getElementById('markAsReadForm').submit();" 
+                                th:if="${concern.status == 'Pending'}">Mark as Read</button>
+                        <button type="submit" class="submit-reply-btn">Submit Reply</button>
+                    </div>
+                </form>
+
+                <!-- Hidden form for Mark as Read functionality -->
+                <form id="markAsReadForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}" method="post" style="display:none;">
+                    <input type="hidden" name="status" value="In Progress" />
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

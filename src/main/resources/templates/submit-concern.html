@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit Concern - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; }
+
+        /* ===== Animations ===== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-7px); }
+        }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        @keyframes checkBounce {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        .animate-in { animation: fadeSlideUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .08s; }
+        .delay-2 { animation-delay: .16s; }
+        .delay-3 { animation-delay: .24s; }
+        .delay-4 { animation-delay: .32s; }
+        .delay-5 { animation-delay: .40s; }
+        .delay-6 { animation-delay: .48s; }
+
+        /* ===== Page Layout ===== */
+        .concern-wrapper {
+            display: flex;
+            min-height: calc(100vh - 160px);
+            align-items: flex-start;
+            justify-content: center;
+            padding: 36px 20px;
+        }
+        .concern-layout {
+            display: flex;
+            max-width: 1080px;
+            width: 100%;
+            gap: 24px;
+        }
+
+        /* ===== Left Sidebar ===== */
+        .concern-sidebar {
+            flex: 0 0 280px;
+            position: sticky;
+            top: 100px;
+        }
+        .sidebar-card {
+            background: #fff;
+            border-radius: 18px;
+            padding: 28px 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            margin-bottom: 18px;
+        }
+        .sidebar-brand {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .sidebar-brand img {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            animation: float 4s ease-in-out infinite;
+        }
+        .sidebar-brand h3 {
+            font-size: 15px;
+            font-weight: 800;
+            color: #222;
+            margin: 0 0 3px;
+        }
+        .sidebar-brand p {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .progress-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            position: relative;
+            padding-bottom: 20px;
+        }
+        .progress-step:last-child { padding-bottom: 0; }
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 34px;
+            width: 2px;
+            height: calc(100% - 34px);
+            background: #eee;
+            transition: background 0.4s;
+        }
+        .progress-step.active:not(:last-child)::after { background: #e53935; }
+        .progress-step.completed:not(:last-child)::after { background: #43a047; }
+
+        .step-circle {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            border: 2px solid #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: #bbb;
+            flex-shrink: 0;
+            transition: all 0.4s;
+            background: #fff;
+        }
+        .progress-step.active .step-circle {
+            border-color: #e53935;
+            color: #e53935;
+            box-shadow: 0 0 0 4px rgba(229,57,53,0.1);
+        }
+        .progress-step.completed .step-circle {
+            border-color: #43a047;
+            background: #43a047;
+            color: #fff;
+            animation: checkBounce 0.4s;
+        }
+
+        .step-text h5 {
+            font-size: 13px;
+            font-weight: 700;
+            color: #666;
+            margin: 4px 0 2px;
+            transition: color 0.3s;
+        }
+        .progress-step.active .step-text h5 { color: #e53935; }
+        .progress-step.completed .step-text h5 { color: #43a047; }
+        .step-text p {
+            font-size: 11px;
+            color: #bbb;
+            margin: 0;
+        }
+
+        /* Guidelines card */
+        .guidelines-card {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            border-radius: 18px;
+            padding: 24px;
+            color: #fff;
+        }
+        .guidelines-card h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0 0 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .guidelines-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .guidelines-card li {
+            font-size: 12px;
+            padding: 6px 0;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .guidelines-card li i { font-size: 10px; opacity: 0.7; }
+
+        /* ===== Main Form Area ===== */
+        .concern-main {
+            flex: 1;
+            min-width: 0;
+        }
+        .form-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 36px 38px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+        .form-header {
+            margin-bottom: 28px;
+        }
+        .form-header h2 {
+            font-size: 26px;
+            font-weight: 800;
+            color: #222;
+            margin: 0 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-header h2 i { color: #e53935; font-size: 22px; }
+        .form-header p {
+            color: #888;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-bottom: 22px;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+        .alert-error   { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+
+        /* Section Titles */
+        .section-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #e53935;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #fdeaea;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i { font-size: 14px; }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 700;
+            color: #444;
+            margin-bottom: 7px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+        }
+        .form-group label .required { color: #e53935; }
+
+        .input-field {
+            position: relative;
+        }
+        .input-field i.field-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 15px;
+            transition: color 0.3s;
+            z-index: 1;
+        }
+        .input-field input,
+        .input-field select {
+            width: 100%;
+            padding: 13px 16px 13px 44px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: all 0.3s;
+            background: #fafbfc;
+            appearance: none;
+        }
+        .input-field select {
+            cursor: pointer;
+            padding-right: 40px;
+        }
+        .input-field .select-arrow {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 12px;
+            pointer-events: none;
+        }
+        .input-field input:focus,
+        .input-field select:focus {
+            outline: none;
+            border-color: #e53935;
+            box-shadow: 0 0 0 4px rgba(229,57,53,0.08);
+            background: #fff;
+        }
+        .input-field input:focus ~ i.field-icon,
+        .input-field select:focus ~ i.field-icon { color: #e53935; }
+        .input-field input::placeholder { color: #bbb; }
+
+        /* Textarea */
+        .textarea-field {
+            position: relative;
+        }
+        .textarea-field textarea {
+            width: 100%;
+            padding: 16px 18px 16px 44px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 14px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            transition: all 0.3s;
+            background: #fafbfc;
+            min-height: 140px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+        .textarea-field textarea:focus {
+            outline: none;
+            border-color: #e53935;
+            box-shadow: 0 0 0 4px rgba(229,57,53,0.08);
+            background: #fff;
+        }
+        .textarea-field i.field-icon {
+            position: absolute;
+            left: 15px;
+            top: 18px;
+            color: #bbb;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+        .textarea-field textarea:focus ~ i.field-icon { color: #e53935; }
+        .textarea-field textarea::placeholder { color: #bbb; }
+        .char-count {
+            text-align: right;
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 16px;
+        }
+        .form-row .form-group { flex: 1; }
+
+        /* File Upload */
+        .file-upload-area {
+            border: 2px dashed #ddd;
+            border-radius: 16px;
+            padding: 30px 24px;
+            text-align: center;
+            background: #fafbfc;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .file-upload-area:hover {
+            border-color: #e53935;
+            background: #fff5f5;
+        }
+        .file-upload-area.has-file {
+            border-color: #43a047;
+            background: #f1f8e9;
+        }
+        .file-upload-area.dragover {
+            border-color: #e53935;
+            background: #fdeaea;
+            transform: scale(1.01);
+        }
+
+        .upload-icon-box {
+            width: 56px; height: 56px;
+            border-radius: 16px;
+            background: #fdeaea;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        .upload-icon-box i { font-size: 22px; color: #e53935; }
+        .file-upload-area.has-file .upload-icon-box { background: #e8f5e9; }
+        .file-upload-area.has-file .upload-icon-box i { color: #43a047; }
+
+        .file-upload-text {
+            color: #666;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .file-upload-text strong { color: #e53935; }
+        .file-upload-text small { color: #aaa; font-size: 11px; }
+        .file-upload-area input[type="file"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-chosen {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #43a047;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #e53935, #c62828);
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(229,57,53,0.3);
+        }
+        .submit-btn:active { transform: translateY(0); }
+
+        .back-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 20px;
+            color: #999;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        .back-link:hover { color: #e53935; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 860px) {
+            .concern-layout { flex-direction: column; }
+            .concern-sidebar {
+                flex: none;
+                position: static;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 16px;
+            }
+            .sidebar-brand { display: none; }
+        }
+        @media (max-width: 580px) {
+            .concern-sidebar { grid-template-columns: 1fr; }
+            .form-card { padding: 26px 20px; }
+            .form-row { flex-direction: column; gap: 0; }
+            .concern-wrapper { padding: 20px 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
+                    <li><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="concern-wrapper">
+            <div class="concern-layout">
+
+                <!-- ===== Left Sidebar ===== -->
+                <aside class="concern-sidebar animate-in">
+                    <div class="sidebar-card">
+                        <div class="sidebar-brand">
+                            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Logo">
+                            <h3>Submit Concern</h3>
+                            <p>Help us improve your experience</p>
+                        </div>
+                        <ul class="progress-steps" id="progressSteps">
+                            <li class="progress-step active" data-step="1">
+                                <div class="step-circle">1</div>
+                                <div class="step-text">
+                                    <h5>Your Details</h5>
+                                    <p>Student information</p>
+                                </div>
+                            </li>
+                            <li class="progress-step" data-step="2">
+                                <div class="step-circle">2</div>
+                                <div class="step-text">
+                                    <h5>Concern Info</h5>
+                                    <p>Category &amp; subject</p>
+                                </div>
+                            </li>
+                            <li class="progress-step" data-step="3">
+                                <div class="step-circle">3</div>
+                                <div class="step-text">
+                                    <h5>Description</h5>
+                                    <p>Detailed message</p>
+                                </div>
+                            </li>
+                            <li class="progress-step" data-step="4">
+                                <div class="step-circle">4</div>
+                                <div class="step-text">
+                                    <h5>Evidence</h5>
+                                    <p>Upload documents</p>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="guidelines-card">
+                        <h4><i class="fas fa-lightbulb"></i> Quick Tips</h4>
+                        <ul>
+                            <li><i class="fas fa-check"></i> Be specific about the issue</li>
+                            <li><i class="fas fa-check"></i> Include dates &amp; locations</li>
+                            <li><i class="fas fa-check"></i> Attach supporting evidence</li>
+                            <li><i class="fas fa-check"></i> Provide accurate contact info</li>
+                            <li><i class="fas fa-check"></i> Use a clear, descriptive subject</li>
+                        </ul>
+                    </div>
+                </aside>
+
+                <!-- ===== Main Form ===== -->
+                <div class="concern-main">
+                    <div class="form-card animate-in delay-1">
+
+                        <div class="form-header">
+                            <h2><i class="fas fa-pen-to-square"></i> Submit a Concern</h2>
+                            <p>We're here to help. Describe your issue and we'll address it promptly.</p>
+                        </div>
+
+                        <!-- Success Message -->
+                        <div th:if="${successMessage}" class="alert alert-success">
+                            <i class="fas fa-circle-check"></i>
+                            <span th:text="${successMessage}"></span>
+                        </div>
+
+                        <!-- Error Message -->
+                        <div th:if="${errorMessage}" class="alert alert-error">
+                            <i class="fas fa-circle-exclamation"></i>
+                            <span th:text="${errorMessage}"></span>
+                        </div>
+
+                        <form action="/submit-concern" method="post" enctype="multipart/form-data" id="concernForm">
+
+                            <!-- Section 1: Student Info -->
+                            <div class="form-section" data-section="1">
+                                <div class="section-title animate-in delay-1">
+                                    <i class="fas fa-user"></i> Your Details
+                                </div>
+                                <div class="animate-in delay-1" style="display:flex;align-items:center;gap:8px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#1d4ed8;font-weight:600;">
+                                    <i class="fas fa-lock"></i>
+                                    These details are automatically filled from your account and cannot be changed.
+                                </div>
+                                <div class="form-row animate-in delay-2">
+                                    <div class="form-group">
+                                        <label>Student ID</label>
+                                        <div class="input-field" style="background:#f4f6fb;">
+                                            <i class="fas fa-id-badge field-icon"></i>
+                                            <input type="text" name="studentId"
+                                                   th:value="${loggedStudent.studentId}"
+                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
+                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <div class="input-field" style="background:#f4f6fb;">
+                                            <i class="fas fa-envelope field-icon"></i>
+                                            <input type="email" name="email"
+                                                   th:value="${loggedStudent.user.email}"
+                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
+                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-row animate-in delay-2">
+                                    <div class="form-group">
+                                        <label>First Name</label>
+                                        <div class="input-field" style="background:#f4f6fb;">
+                                            <i class="fas fa-user field-icon"></i>
+                                            <input type="text" name="firstName"
+                                                   th:value="${loggedStudent.user.firstName}"
+                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
+                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Last Name</label>
+                                        <div class="input-field" style="background:#f4f6fb;">
+                                            <i class="fas fa-user field-icon"></i>
+                                            <input type="text" name="lastName"
+                                                   th:value="${loggedStudent.user.lastName}"
+                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
+                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2: Concern Details -->
+                            <div class="form-section" data-section="2">
+                                <div class="section-title animate-in delay-3">
+                                    <i class="fas fa-clipboard-list"></i> Concern Details
+                                </div>
+                                <div class="form-group animate-in delay-3">
+                                    <label>Category <span class="required">*</span></label>
+                                    <div class="input-field">
+                                        <i class="fas fa-tags field-icon"></i>
+                                        <select name="category" required>
+                                            <option value="" disabled selected>Select a category</option>
+                                            <option value="Education (Creative and IT)">Education (Creative and IT)</option>
+                                            <option value="Institute Problem">Institute Related Problem</option>
+                                            <option value="Registration">Registration &amp; Enrollment</option>
+                                            <option value="Administrative">Administrative Services</option>
+                                            <option value="Financial">Financial &amp; Payments</option>
+                                            <option value="Other">Other General Concern</option>
+                                        </select>
+                                        <i class="fas fa-chevron-down select-arrow"></i>
+                                    </div>
+                                </div>
+                                <div class="form-group animate-in delay-3">
+                                    <label>Subject <span class="required">*</span></label>
+                                    <div class="input-field">
+                                        <i class="fas fa-heading field-icon"></i>
+                                        <input type="text" name="subject" placeholder="Brief subject of your concern" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 3: Message -->
+                            <div class="form-section" data-section="3">
+                                <div class="section-title animate-in delay-4">
+                                    <i class="fas fa-message"></i> Description
+                                </div>
+                                <div class="form-group animate-in delay-4">
+                                    <label>Message <span class="required">*</span></label>
+                                    <div class="textarea-field">
+                                        <i class="fas fa-align-left field-icon"></i>
+                                        <textarea name="message" id="messageArea" placeholder="Describe your concern in detail. Include relevant dates, locations, and any other information that may help us address this effectively." required></textarea>
+                                    </div>
+                                    <div class="char-count"><span id="charCount">0</span> characters</div>
+                                </div>
+                            </div>
+
+                            <!-- Section 4: Evidence -->
+                            <div class="form-section" data-section="4">
+                                <div class="section-title animate-in delay-5">
+                                    <i class="fas fa-paperclip"></i> Evidence (Optional)
+                                </div>
+                                <div class="form-group animate-in delay-5">
+                                    <label>Supporting Document</label>
+                                    <div class="file-upload-area" id="uploadArea">
+                                        <div class="upload-icon-box">
+                                            <i class="fas fa-cloud-arrow-up" id="uploadIcon"></i>
+                                        </div>
+                                        <p class="file-upload-text">
+                                            <strong>Click to upload</strong> or drag &amp; drop<br>
+                                            <small>Images, PDF, Word documents (Max 10MB)</small>
+                                        </p>
+                                        <input type="file" name="evidence" id="evidenceFile" accept="image/*,.pdf,.doc,.docx">
+                                        <div class="file-chosen" id="fileName"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn animate-in delay-6">
+                                <i class="fas fa-paper-plane"></i> Submit Concern
+                            </button>
+                        </form>
+
+                        <a href="/" class="back-link animate-in delay-6">
+                            <i class="fas fa-arrow-left"></i> Back to Home
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ===== Live Progress Steps =====
+        const form = document.getElementById('concernForm');
+        const steps = document.querySelectorAll('.progress-step');
+        const sections = document.querySelectorAll('.form-section');
+
+        function getFilledSections() {
+            const filled = new Set();
+            sections.forEach(sec => {
+                const num = sec.dataset.section;
+                const inputs = sec.querySelectorAll('input, select, textarea');
+                let allFilled = true;
+                let anyFilled = false;
+                inputs.forEach(inp => {
+                    if (inp.type === 'file') {
+                        if (inp.files && inp.files.length > 0) anyFilled = true;
+                        // file is optional, don't block
+                    } else if (inp.value && inp.value.trim() !== '' && inp.value !== inp.querySelector?.('option[disabled]')?.value) {
+                        anyFilled = true;
+                    } else if (inp.required) {
+                        allFilled = false;
+                    }
+                });
+                if (allFilled && anyFilled) filled.add(num);
+            });
+            return filled;
+        }
+
+        function getCurrentSection() {
+            const focusEl = document.activeElement;
+            if (focusEl) {
+                const sec = focusEl.closest('.form-section');
+                if (sec) return sec.dataset.section;
+            }
+            return null;
+        }
+
+        function updateProgress() {
+            const filled = getFilledSections();
+            const current = getCurrentSection();
+            steps.forEach(step => {
+                const num = step.dataset.step;
+                step.classList.remove('active', 'completed');
+                const circle = step.querySelector('.step-circle');
+                if (filled.has(num)) {
+                    step.classList.add('completed');
+                    circle.innerHTML = '<i class="fas fa-check" style="font-size:13px"></i>';
+                } else if (num === current) {
+                    step.classList.add('active');
+                    circle.textContent = num;
+                } else {
+                    circle.textContent = num;
+                }
+            });
+        }
+
+        form.addEventListener('input', updateProgress);
+        form.addEventListener('change', updateProgress);
+        form.addEventListener('focusin', updateProgress);
+
+        // ===== Character Count =====
+        const messageArea = document.getElementById('messageArea');
+        const charCount = document.getElementById('charCount');
+        messageArea.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // ===== File Upload =====
+        const fileInput = document.getElementById('evidenceFile');
+        const uploadArea = document.getElementById('uploadArea');
+        const fileNameEl = document.getElementById('fileName');
+        const uploadIcon = document.getElementById('uploadIcon');
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                fileNameEl.innerHTML = '<i class="fas fa-check-circle"></i> ' + this.files[0].name;
+                uploadArea.classList.add('has-file');
+                uploadIcon.classList.remove('fa-cloud-arrow-up');
+                uploadIcon.classList.add('fa-circle-check');
+                updateProgress();
+            } else {
+                fileNameEl.innerHTML = '';
+                uploadArea.classList.remove('has-file');
+                uploadIcon.classList.remove('fa-circle-check');
+                uploadIcon.classList.add('fa-cloud-arrow-up');
+                updateProgress();
+            }
+        });
+
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('dragover');
+        });
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.classList.remove('dragover');
+        });
+        uploadArea.addEventListener('drop', function(e) {
+            this.classList.remove('dragover');
+        });
+
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>

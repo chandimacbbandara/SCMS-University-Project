@@ -1,0 +1,21 @@
+<svg width="800" height="420" viewBox="0 0 800 420" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Registration">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff9f8"/>
+      <stop offset="100%" stop-color="#ffefed"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#bg)"/>
+  <circle cx="90" cy="330" r="140" fill="#ffffff" fill-opacity="0.5"/>
+  <circle cx="730" cy="80" r="150" fill="#ffffff" fill-opacity="0.45"/>
+  <rect x="150" y="92" width="500" height="250" rx="22" fill="#f7dcda"/>
+  <rect x="150" y="92" width="500" height="44" rx="22" fill="#e53935" fill-opacity="0.16"/>
+  <circle cx="188" cy="114" r="7" fill="#fff" fill-opacity="0.85"/>
+  <circle cx="214" cy="114" r="7" fill="#fff" fill-opacity="0.85"/>
+  <circle cx="240" cy="114" r="7" fill="#fff" fill-opacity="0.85"/>
+  <rect x="190" y="164" width="190" height="16" rx="8" fill="#fff" fill-opacity="0.85"/>
+  <rect x="190" y="193" width="315" height="14" rx="7" fill="#fff" fill-opacity="0.78"/>
+  <rect x="190" y="220" width="280" height="14" rx="7" fill="#fff" fill-opacity="0.78"/>
+  <rect x="190" y="247" width="340" height="14" rx="7" fill="#fff" fill-opacity="0.78"/>
+  <text x="190" y="300" font-family="Segoe UI, Arial, sans-serif" font-size="28" font-weight="700" fill="#b33636">Registration</text>
+</svg>

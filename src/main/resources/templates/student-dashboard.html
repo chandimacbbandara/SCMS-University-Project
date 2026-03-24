@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --primary-deeper: #b71c1c;
+            --primary-light: #ff6f60;
+            --primary-bg: rgba(229, 57, 53, 0.08);
+            --accent-green: #43a047;
+            --accent-blue: #1e88e5;
+            --accent-orange: #ef6c00;
+            --accent-teal: #009688;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+        }
+
+        /* ===== Custom Scrollbar ===== */
+        ::-webkit-scrollbar { width: 7px; }
+        ::-webkit-scrollbar-track { background: #f0f0f0; }
+        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+        /* ===== Animations ===== */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%,100% { transform: translateY(0); }
+            50%     { transform: translateY(-8px); }
+        }
+        @keyframes floatReverse {
+            0%,100% { transform: translateY(0) rotate(0deg); }
+            50%     { transform: translateY(-10px) rotate(3deg); }
+        }
+        @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+        @keyframes pulseRing {
+            0%   { box-shadow: 0 0 0 0 rgba(229,57,53,0.3); }
+            70%  { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
+            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(30px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(2.4); opacity: 0; }
+        }
+        .animate-in  { animation: fadeSlideUp 0.7s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .18s; }
+        .delay-3 { animation-delay: .26s; }
+        .delay-4 { animation-delay: .34s; }
+        .delay-5 { animation-delay: .42s; }
+        .delay-6 { animation-delay: .50s; }
+
+        /* ===== Dashboard Layout ===== */
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Welcome Hero ===== */
+        .welcome-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 40%, var(--primary-deeper) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 38px 40px;
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 50px rgba(229,57,53,0.3);
+        }
+        .welcome-hero .hero-pattern {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3Cpath d='M0 0h20v20H0z'/%3E%3C/g%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+        .welcome-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+        .welcome-hero::after {
+            content: '';
+            position: absolute;
+            bottom: -100px; left: 20%;
+            width: 320px; height: 320px;
+            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: floatReverse 8s ease-in-out infinite;
+        }
+        .hero-left { position: relative; z-index: 1; }
+        .hero-greeting {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            padding: 5px 16px;
+            border-radius: 100px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+        }
+        .hero-greeting .greeting-dot {
+            width: 7px; height: 7px;
+            background: #fff;
+            border-radius: 50%;
+            animation: pulseRing 2s infinite;
+        }
+        .hero-name {
+            font-size: 32px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            line-height: 1.15;
+        }
+        .hero-meta {
+            display: flex;
+            gap: 18px;
+            align-items: center;
+            font-size: 13px;
+            opacity: 0.85;
+        }
+        .hero-meta span { display: flex; align-items: center; gap: 6px; }
+        .hero-meta i { font-size: 13px; }
+
+        .hero-right {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            position: relative;
+            z-index: 1;
+        }
+        .hero-avatar {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            border: 3px solid rgba(255,255,255,0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 900;
+            text-transform: uppercase;
+            backdrop-filter: blur(12px);
+            animation: float 4s ease-in-out infinite;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+        }
+        .hero-date-time {
+            text-align: right;
+            font-size: 12px;
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(8px);
+            padding: 14px 20px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .hero-date-time .clock-icon {
+            font-size: 13px;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 6px;
+        }
+        .hero-date-time .hero-time {
+            font-size: 26px;
+            font-weight: 900;
+            opacity: 1;
+            letter-spacing: -0.5px;
+        }
+
+        /* ===== Alert ===== */
+        .alert {
+            padding: 16px 22px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 22px;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeSlideUp 0.5s ease both;
+            backdrop-filter: blur(8px);
+        }
+        .alert-success {
+            background: linear-gradient(135deg, rgba(232,245,233,0.95), rgba(200,230,201,0.95));
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+            box-shadow: 0 4px 15px rgba(46,125,50,0.1);
+        }
+
+        /* ===== Stat Strip ===== */
+        .stat-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 24px 26px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 4px; height: 100%;
+            border-radius: 4px 0 0 4px;
+            transition: width 0.3s;
+        }
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--card-shadow-hover);
+        }
+        .stat-card:hover::before { width: 6px; }
+        .stat-card.red::before    { background: linear-gradient(180deg, var(--primary), var(--primary-light)); }
+        .stat-card.green::before  { background: linear-gradient(180deg, var(--accent-green), #66bb6a); }
+        .stat-card.blue::before   { background: linear-gradient(180deg, var(--accent-blue), #64b5f6); }
+
+        .stat-icon {
+            width: 52px; height: 52px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 21px;
+            flex-shrink: 0;
+            transition: transform 0.3s;
+        }
+        .stat-card:hover .stat-icon { transform: scale(1.08); }
+        .stat-card.red  .stat-icon { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .stat-card.green .stat-icon { background: rgba(67,160,71,0.1); color: var(--accent-green); }
+        .stat-card.blue  .stat-icon { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
+
+        .stat-info .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+        .stat-info .stat-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        /* ===== Two Column Layout ===== */
+        .dash-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 28px;
+        }
+
+        /* ===== Profile Card ===== */
+        .profile-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--accent-orange));
+        }
+        .profile-card .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card-title i {
+            color: var(--primary);
+            font-size: 17px;
+            background: var(--primary-bg);
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-avatar-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-bottom: 22px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f5f5f5;
+        }
+        .profile-avatar-lg {
+            width: 68px; height: 68px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 6px 20px rgba(229,57,53,0.3);
+            position: relative;
+        }
+        .profile-avatar-lg::after {
+            content: '';
+            position: absolute;
+            inset: -3px;
+            border-radius: 50%;
+            border: 2px dashed rgba(229,57,53,0.2);
+            animation: spin 12s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .profile-avatar-info h4 {
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 0 0 3px;
+        }
+        .profile-avatar-info p {
+            font-size: 13px;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        .profile-details { list-style: none; padding: 0; margin: 0; }
+        .profile-details li {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 0;
+            border-bottom: 1px solid #f5f5f5;
+            font-size: 14px;
+            transition: all 0.25s;
+        }
+        .profile-details li:hover {
+            padding-left: 6px;
+            background: linear-gradient(90deg, rgba(229,57,53,0.03), transparent);
+        }
+        .profile-details li:last-child { border-bottom: none; }
+        .profile-details .detail-icon {
+            width: 38px; height: 38px;
+            border-radius: var(--radius-sm);
+            background: var(--primary-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 14px;
+            flex-shrink: 0;
+            transition: all 0.25s;
+        }
+        .profile-details li:hover .detail-icon {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.05);
+        }
+        .profile-details .detail-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+            font-weight: 700;
+        }
+        .profile-details .detail-value {
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge.approved {
+            background: rgba(76,175,80,0.1);
+            color: #2e7d32;
+            border: 1px solid rgba(76,175,80,0.25);
+        }
+        .status-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            animation: pulse 2s infinite;
+        }
+
+        /* ===== Quick Actions Card ===== */
+        .actions-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .actions-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-teal), var(--accent-green));
+        }
+        .actions-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .action-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: inherit;
+            background: #fafbfc;
+            border: 1.5px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .action-item::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 0;
+            background: linear-gradient(135deg, rgba(229,57,53,0.05), rgba(229,57,53,0.02));
+            transition: width 0.4s;
+        }
+        .action-item::after {
+            content: '\f054';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 18px;
+            color: #ddd;
+            font-size: 12px;
+            transition: all 0.35s;
+        }
+        .action-item:hover {
+            border-color: var(--primary);
+            transform: translateX(6px);
+            box-shadow: 0 4px 15px rgba(229,57,53,0.08);
+        }
+        .action-item:hover::before { width: 100%; }
+        .action-item:hover::after { color: var(--primary); right: 14px; }
+
+        .action-item-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+            transition: transform 0.3s;
+        }
+        .action-item:hover .action-item-icon { transform: scale(1.08) rotate(-3deg); }
+        .action-item-icon.report  { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .action-item-icon.home    { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
+        .action-item-icon.profile { background: rgba(239,108,0,0.1); color: var(--accent-orange); }
+
+        .action-item-text { position: relative; z-index: 1; }
+        .action-item-text h4 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin: 0 0 2px;
+        }
+        .action-item-text p {
+            font-size: 12px;
+            color: var(--text-light);
+            margin: 0;
+        }
+
+        /* ===== Tips Section ===== */
+        .tips-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .tips-section::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent-orange), var(--accent-green), var(--accent-blue));
+        }
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .tip-card {
+            padding: 26px 20px;
+            border-radius: var(--radius-sm);
+            background: #fafbfc;
+            border: 1.5px solid var(--border);
+            text-align: center;
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            position: relative;
+        }
+        .tip-card::before {
+            content: '';
+            position: absolute;
+            top: -1px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 3px;
+            border-radius: 0 0 4px 4px;
+            transition: width 0.3s;
+        }
+        .tip-card:nth-child(1)::before { background: var(--primary); }
+        .tip-card:nth-child(2)::before { background: var(--accent-green); }
+        .tip-card:nth-child(3)::before { background: var(--accent-blue); }
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border-color: transparent;
+        }
+        .tip-card:hover::before { width: 80%; }
+        .tip-card .tip-icon {
+            width: 52px; height: 52px;
+            border-radius: var(--radius-sm);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            margin-bottom: 14px;
+            transition: transform 0.3s;
+        }
+        .tip-card:hover .tip-icon { transform: scale(1.1) rotate(-5deg); }
+        .tip-card:nth-child(1) .tip-icon { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .tip-card:nth-child(2) .tip-icon { background: rgba(67,160,71,0.1); color: var(--accent-green); }
+        .tip-card:nth-child(3) .tip-icon { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
+
+        .tip-card h5 { font-size: 13px; font-weight: 700; color: var(--text-dark); margin: 0 0 6px; }
+        .tip-card p  { font-size: 12px; color: var(--text-light); margin: 0; line-height: 1.6; }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 768px) {
+            .welcome-hero { flex-direction: column; text-align: center; gap: 16px; padding: 28px 22px; }
+            .hero-right { justify-content: center; flex-wrap: wrap; }
+            .hero-meta { justify-content: center; flex-wrap: wrap; }
+            .hero-date-time { text-align: center; }
+            .hero-greeting { margin: 0 auto 12px; }
+            .stat-strip { grid-template-columns: 1fr; }
+            .dash-grid { grid-template-columns: 1fr; }
+            .tips-grid { grid-template-columns: 1fr; }
+        }
+        @media (max-width: 480px) {
+            .dashboard-container { padding: 0 14px; }
+            .welcome-hero { padding: 22px 18px; }
+            .hero-name { font-size: 24px; }
+        }
+
+        /* ===== Notification Bell in Nav ===== */
+        .nav-bell {
+            position: relative;
+            cursor: pointer;
+            padding: 8px 12px;
+            font-size: 18px;
+            color: var(--text-mid);
+            transition: all 0.3s;
+        }
+        .nav-bell:hover { color: var(--primary); transform: rotate(-10deg); }
+        .nav-bell .bell-badge {
+            position: absolute;
+            top: 0; right: 2px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            font-size: 9px;
+            font-weight: 800;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: bounceIn 0.5s both, pulse 2s 0.5s infinite;
+            box-shadow: 0 2px 8px rgba(229,57,53,0.4);
+        }
+        .bell-badge.hidden { display: none; }
+
+        /* ===== Notification Panel (Slide-in) ===== */
+        .notif-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s;
+        }
+        .notif-overlay.active { opacity: 1; visibility: visible; }
+
+        .notif-panel {
+            position: fixed;
+            top: 0; right: -420px;
+            width: 400px;
+            height: 100vh;
+            background: var(--bg-white);
+            z-index: 1000;
+            box-shadow: -12px 0 50px rgba(0,0,0,0.18);
+            transition: right 0.45s cubic-bezier(.22,1,.36,1);
+            display: flex;
+            flex-direction: column;
+            border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+            overflow: hidden;
+        }
+        .notif-panel.active { right: 0; }
+
+        .notif-panel-header {
+            padding: 24px 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .notif-panel-header h3 { font-size: 18px; font-weight: 800; margin: 0; }
+        .notif-panel-header .notif-close {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: #fff;
+            width: 34px; height: 34px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .notif-panel-header .notif-close:hover {
+            background: rgba(255,255,255,0.35);
+            transform: rotate(90deg);
+        }
+
+        .notif-panel-actions {
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .notif-panel-actions .notif-count {
+            font-size: 13px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+        .notif-panel-actions .mark-all-btn {
+            background: var(--primary-bg);
+            border: none;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            transition: all 0.3s;
+        }
+        .notif-panel-actions .mark-all-btn:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px 0;
+        }
+
+        .notif-item {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            gap: 14px;
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+        }
+        .notif-item:hover {
+            background: #fafafa;
+            padding-left: 28px;
+        }
+        .notif-item.unread { background: rgba(229,57,53,0.03); }
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary), var(--primary-light));
+            border-radius: 0 4px 4px 0;
+        }
+
+        .notif-icon-wrap {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            transition: transform 0.25s;
+        }
+        .notif-item:hover .notif-icon-wrap { transform: scale(1.05); }
+        .notif-icon-wrap.submitted { background: rgba(21,101,192,0.08); color: #1565c0; }
+        .notif-icon-wrap.in-progress { background: rgba(239,108,0,0.1); color: #ef6c00; }
+        .notif-icon-wrap.complete { background: rgba(46,125,50,0.08); color: #2e7d32; }
+        .notif-icon-wrap.broadcast { background: rgba(249,115,22,0.1); color: #ea580c; }
+
+        .notif-content { flex: 1; min-width: 0; }
+        .notif-content .notif-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+        .notif-content .notif-message {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .notif-content .notif-time {
+            font-size: 11px;
+            color: #bbb;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notif-empty {
+            text-align: center;
+            padding: 70px 30px;
+            color: #ccc;
+        }
+        .notif-empty i {
+            font-size: 52px;
+            margin-bottom: 16px;
+            display: block;
+            animation: float 3s ease-in-out infinite;
+        }
+        .notif-empty p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+
+        /* ===== Concern Tracking Section ===== */
+        .tracking-section {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 28px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+        .tracking-section::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-orange), var(--primary), var(--accent-green));
+        }
+
+        .tracking-empty {
+            text-align: center;
+            padding: 50px 20px;
+            color: #ccc;
+        }
+        .tracking-empty i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            display: block;
+            color: #ddd;
+            animation: float 3s ease-in-out infinite;
+        }
+        .tracking-empty p { font-size: 14px; color: var(--text-light); line-height: 1.6; }
+
+        .concern-track-card {
+            background: #fafbfc;
+            border: 1.5px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 26px;
+            margin-bottom: 18px;
+            transition: all 0.35s cubic-bezier(.22,1,.36,1);
+            position: relative;
+            overflow: hidden;
+        }
+        .concern-track-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0;
+            width: 4px;
+            background: var(--primary);
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .concern-track-card:hover {
+            border-color: rgba(229,57,53,0.2);
+            box-shadow: 0 8px 30px rgba(229,57,53,0.08);
+            transform: translateY(-2px);
+        }
+        .concern-track-card:hover::before { opacity: 1; }
+        .concern-track-card:last-child { margin-bottom: 0; }
+
+        .track-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .track-card-header .track-ref {
+            font-size: 10px;
+            color: var(--text-light);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .track-card-header .track-ref::before {
+            content: '';
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+        }
+        .track-card-header .track-subject {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-dark);
+            margin: 4px 0 0;
+        }
+        .track-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+        }
+        .track-status-badge.pending {
+            background: rgba(255,152,0,0.1);
+            color: #e65100;
+            border: 1px solid rgba(255,152,0,0.25);
+        }
+        .track-status-badge.in-progress {
+            background: rgba(21,101,192,0.08);
+            color: #1565c0;
+            border: 1px solid rgba(21,101,192,0.2);
+        }
+        .track-status-badge.complete {
+            background: rgba(46,125,50,0.08);
+            color: #2e7d32;
+            border: 1px solid rgba(46,125,50,0.2);
+        }
+
+        /* ===== Step-by-Step Tracker ===== */
+        .step-tracker {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            position: relative;
+            padding: 8px 0;
+        }
+        .step-tracker::before {
+            content: '';
+            position: absolute;
+            top: 28px;
+            left: 40px;
+            right: 40px;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .tracker-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            flex: 1;
+        }
+        .tracker-step-dot {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+            border: 3px solid #e0e0e0;
+            background: var(--bg-white);
+            color: #bbb;
+            transition: all 0.5s cubic-bezier(.22,1,.36,1);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+        .tracker-step.active .tracker-step-dot {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            box-shadow: 0 0 0 6px rgba(229,57,53,0.15), 0 6px 20px rgba(229,57,53,0.25);
+            animation: pulseRing 2s infinite;
+        }
+        .tracker-step.done .tracker-step-dot {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, var(--accent-green), #66bb6a);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(67,160,71,0.25);
+        }
+        .tracker-step-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-light);
+            text-align: center;
+            max-width: 100px;
+            line-height: 1.3;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .tracker-step.active .tracker-step-label { color: var(--primary); }
+        .tracker-step.done .tracker-step-label { color: var(--accent-green); }
+
+        .tracker-step-time {
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 6px;
+            text-align: center;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        .tracker-step.done .tracker-step-time,
+        .tracker-step.active .tracker-step-time { color: var(--text-mid); }
+
+        /* Progress line fill */
+        .step-tracker .progress-line {
+            position: absolute;
+            top: 30px;
+            left: 40px;
+            right: 40px;
+            height: 4px;
+            background: #e8e8e8;
+            z-index: 0;
+            border-radius: 4px;
+        }
+        .step-tracker .progress-line::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-green), #66bb6a);
+            border-radius: 4px;
+            box-shadow: 0 0 12px rgba(67,160,71,0.35);
+            transition: width 1s cubic-bezier(.22,1,.36,1);
+            width: var(--progress-width, 0%);
+        }
+
+        .track-date {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding-top: 12px;
+            border-top: 1px solid var(--border);
+        }
+        .track-date i { color: var(--primary); }
+
+        .admin-attachment-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #bbdefb;
+            font-size: 11px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .admin-attachment-pill:hover {
+            background: #bbdefb;
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 768px) {
+            .notif-panel { width: 100%; right: -100%; border-radius: 0; }
+            .step-tracker { flex-direction: column; gap: 0; }
+            .step-tracker::before { display: none; }
+            .step-tracker .progress-line { display: none; }
+            .tracker-step { flex-direction: row; gap: 12px; padding: 8px 0; }
+            .tracker-step-dot { margin-bottom: 0; width: 40px; height: 40px; font-size: 16px; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/student/dashboard" class="nav-link" style="color: #e53935;">Dashboard</a></li>
+                    <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                    <li><a href="/student/profile" class="nav-link">Profile</a></li>
+                    <li>
+                        <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                            <i class="fas fa-bell"></i>
+                            <span class="bell-badge" id="bellBadge"
+                                  th:text="${unreadCount}"
+                                  th:classappend="${unreadCount == 0} ? 'hidden' : ''">0</span>
+                        </div>
+                    </li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="dashboard-container">
+
+            <!-- Success Message -->
+            <div th:if="${successMessage}" class="alert alert-success">
+                <i class="fas fa-circle-check"></i>
+                <span th:text="${successMessage}"></span>
+            </div>
+
+            <!-- Welcome Hero Banner -->
+            <div class="welcome-hero animate-in">
+                <div class="hero-pattern"></div>
+                <div class="hero-left">
+                    <div class="hero-greeting" id="greetingText">
+                        <span class="greeting-dot"></span>
+                        Good Morning
+                    </div>
+                    <div class="hero-name">
+                        <span th:text="${student.user.firstName}">Student</span>
+                        <span th:text="${student.user.lastName}">Name</span>
+                    </div>
+                    <div class="hero-meta">
+                        <span><i class="fas fa-id-badge"></i> <span th:text="${student.studentId}">STU001</span></span>
+                        <span><i class="fas fa-circle-check"></i> Account Active</span>
+                    </div>
+                </div>
+                <div class="hero-right">
+                    <div class="hero-date-time">
+                        <div class="clock-icon"><i class="fas fa-clock"></i></div>
+                        <div class="hero-time" id="liveClock">--:--</div>
+                        <div id="liveDate">Loading...</div>
+                    </div>
+                    <div class="hero-avatar" th:text="${student.user.firstName.substring(0,1)}">S</div>
+                </div>
+            </div>
+
+            <!-- Stat Strip -->
+            <div class="stat-strip">
+                <div class="stat-card red animate-in delay-1">
+                    <div class="stat-icon"><i class="fas fa-shield-halved"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">Account Status</div>
+                        <div class="stat-value">Verified &amp; Active</div>
+                    </div>
+                </div>
+                <div class="stat-card green animate-in delay-2">
+                    <div class="stat-icon"><i class="fas fa-paper-plane"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">Concern Portal</div>
+                        <div class="stat-value">Ready to Submit</div>
+                    </div>
+                </div>
+                <div class="stat-card blue animate-in delay-3" style="cursor:pointer;" onclick="toggleNotifPanel()">
+                    <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                    <div class="stat-info">
+                        <div class="stat-label">Notifications</div>
+                        <div class="stat-value">
+                            <span th:if="${unreadCount > 0}" th:text="${unreadCount} + ' unread'">0 unread</span>
+                            <span th:if="${unreadCount == 0}">All caught up</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Two-Column Grid -->
+            <div class="dash-grid">
+
+                <!-- Profile Card -->
+                <div class="profile-card animate-in delay-3">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-user-circle"></i> Your Profile</div>
+                    </div>
+                    <div class="profile-avatar-row">
+                        <div class="profile-avatar-lg" th:text="${student.user.firstName.substring(0,1)}">S</div>
+                        <div class="profile-avatar-info">
+                            <h4 th:text="${student.user.firstName + ' ' + student.user.lastName}">John Doe</h4>
+                            <p>Student Member</p>
+                        </div>
+                    </div>
+                    <ul class="profile-details">
+                        <li>
+                            <div class="detail-icon"><i class="fas fa-envelope"></i></div>
+                            <div>
+                                <div class="detail-label">Email</div>
+                                <div class="detail-value" th:text="${student.user.email}">email@example.com</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="detail-icon"><i class="fas fa-id-card"></i></div>
+                            <div>
+                                <div class="detail-label">Student ID</div>
+                                <div class="detail-value" th:text="${student.studentId}">STU001</div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="detail-icon"><i class="fas fa-circle-check"></i></div>
+                            <div>
+                                <div class="detail-label">Status</div>
+                                <div class="detail-value">
+                                    <span class="status-badge approved">
+                                        <span class="status-dot"></span> Approved
+                                    </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Quick Actions Card -->
+                <div class="actions-card animate-in delay-4">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-bolt"></i> Quick Actions</div>
+                    </div>
+                    <div class="actions-list">
+                        <a href="/submit-concern" class="action-item">
+                            <div class="action-item-icon report"><i class="fas fa-pen-to-square"></i></div>
+                            <div class="action-item-text">
+                                <h4>Submit a Concern</h4>
+                                <p>Report an academic or campus issue</p>
+                            </div>
+                        </a>
+                        <a href="/student/concern-history" class="action-item">
+                            <div class="action-item-icon home"><i class="fas fa-clock-rotate-left"></i></div>
+                            <div class="action-item-text">
+                                <h4>View Concern History</h4>
+                                <p>See all submitted concerns &amp; replies</p>
+                            </div>
+                        </a>
+                        <a href="/student/profile" class="action-item">
+                            <div class="action-item-icon profile"><i class="fas fa-user-gear"></i></div>
+                            <div class="action-item-text">
+                                <h4>Open Profile</h4>
+                                <p>View and update your profile details</p>
+                            </div>
+                        </a>
+                        <a href="/" class="action-item">
+                            <div class="action-item-icon home" style="background:rgba(67,160,71,0.1);color:#43a047;"><i class="fas fa-house"></i></div>
+                            <div class="action-item-text">
+                                <h4>Back to Home</h4>
+                                <p>Return to the main website</p>
+                            </div>
+                        </a>
+                        <a href="/student/dashboard" class="action-item">
+                            <div class="action-item-icon profile"><i class="fas fa-gear"></i></div>
+                            <div class="action-item-text">
+                                <h4>Refresh Dashboard</h4>
+                                <p>Reload your latest data</p>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Concern Tracking Section -->
+            <div class="tracking-section animate-in delay-5">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-route"></i> My Concerns - Live Tracking</div>
+                </div>
+
+                <div th:if="${#lists.isEmpty(concerns)}" class="tracking-empty">
+                    <i class="fas fa-inbox"></i>
+                    <p>No concerns submitted yet. Use "Report Issue" to submit your first concern.</p>
+                </div>
+
+                <div th:each="concern : ${concerns}" class="concern-track-card">
+                    <div class="track-card-header">
+                        <div>
+                            <div class="track-ref" th:text="'REF: CON-' + ${concern.concernId}">REF: CON-1</div>
+                            <div class="track-subject" th:text="${concern.subject}">Subject</div>
+                        </div>
+                        <span class="track-status-badge"
+                              th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : 'complete')"
+                              th:text="${concern.status}">Status</span>
+                    </div>
+
+                    <!-- Step-by-Step Tracker -->
+                    <div class="step-tracker">
+                        <!-- Progress line fill -->
+                        <div class="progress-line"
+                             th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : '100%'))"></div>
+
+                        <!-- Step 1: Submitted -->
+                        <div class="tracker-step done">
+                            <div class="tracker-step-dot"><i class="fas fa-paper-plane"></i></div>
+                            <div class="tracker-step-label">Submitted</div>
+                            <div class="tracker-step-time" th:text="${#temporals.format(concern.createdTime, 'dd MMM, HH:mm')}">01 Jan, 09:00</div>
+                        </div>
+
+                        <!-- Step 2: Under Review -->
+                        <div class="tracker-step"
+                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Complete'} ? 'done' : '')">
+                            <div class="tracker-step-dot"><i class="fas fa-eye"></i></div>
+                            <div class="tracker-step-label">Under Review</div>
+                            <div class="tracker-step-time"
+                                 th:text="${concern.status == 'Pending'} ? 'Waiting...' : 'Reviewed'">Waiting...</div>
+                        </div>
+
+                        <!-- Step 3: Resolved -->
+                        <div class="tracker-step"
+                             th:classappend="${concern.status == 'Complete'} ? 'done' : ''">
+                            <div class="tracker-step-dot"><i class="fas fa-circle-check"></i></div>
+                            <div class="tracker-step-label">Resolved</div>
+                            <div class="tracker-step-time"
+                                 th:text="${concern.status == 'Complete'} ? 'Completed' : 'Pending...'">Pending...</div>
+                        </div>
+                    </div>
+
+                    <div class="track-date">
+                        <i class="fas fa-clock"></i>
+                        <span>Submitted: </span>
+                        <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
+                    </div>
+
+                    <div th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}">
+                        <a th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
+                           target="_blank"
+                           class="admin-attachment-pill">
+                            <i class="fas fa-paperclip"></i>
+                            View Admin Attachment
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tips Section -->
+            <div class="tips-section animate-in delay-6">
+                <div class="card-header">
+                    <div class="card-title"><i class="fas fa-lightbulb"></i> Getting Started</div>
+                </div>
+                <div class="tips-grid">
+                    <div class="tip-card">
+                        <div class="tip-icon"><i class="fas fa-file-lines"></i></div>
+                        <h5>Submit a Concern</h5>
+                        <p>Use the report tool to raise any academic or campus issue directly to the admin team.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon"><i class="fas fa-clock-rotate-left"></i></div>
+                        <h5>Track Progress</h5>
+                        <p>Once submitted, your concern is reviewed by administrators and prioritized accordingly.</p>
+                    </div>
+                    <div class="tip-card">
+                        <div class="tip-icon"><i class="fas fa-comments"></i></div>
+                        <h5>Get Responses</h5>
+                        <p>Administrators will reply to your concern and keep you updated on the resolution status.</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notification Slide-in Panel -->
+    <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
+    <div class="notif-panel" id="notifPanel">
+        <div class="notif-panel-header">
+            <h3><i class="fas fa-bell" style="margin-right:8px;"></i> Notifications</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notif-panel-actions">
+            <span class="notif-count" th:text="${#lists.size(notifications)} + ' notifications'">0 notifications</span>
+            <button class="mark-all-btn" onclick="markAllRead()">Mark all as read</button>
+        </div>
+        <div class="notif-list" id="notifList">
+            <div th:if="${#lists.isEmpty(notifications)}" class="notif-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>No notifications yet.<br>Submit a concern to get started!</p>
+            </div>
+
+            <div th:each="notif : ${notifications}" class="notif-item"
+                 th:classappend="${!notif.isRead} ? 'unread' : ''"
+                 th:attr="data-id=${notif.notificationId}"
+                 onclick="markNotifRead(this)">
+                <div class="notif-icon-wrap"
+                     th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
+                    <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : (${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check'))"></i>
+                </div>
+                <div class="notif-content">
+                    <div class="notif-title" th:text="${notif.title}">Notification Title</div>
+                    <div class="notif-message" th:text="${notif.message}">Notification message here...</div>
+                    <div class="notif-time">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Live clock & dynamic greeting
+        function updateClock() {
+            const now = new Date();
+            const h = now.getHours(), m = now.getMinutes(), s = now.getSeconds();
+            const pad = n => String(n).padStart(2, '0');
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const h12 = h % 12 || 12;
+            document.getElementById('liveClock').textContent = pad(h12) + ':' + pad(m) + ' ' + ampm;
+
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('liveDate').textContent = now.toLocaleDateString('en-US', options);
+
+            // Dynamic greeting (preserve the dot element)
+            let greeting = 'Good Evening';
+            if (h < 12) greeting = 'Good Morning';
+            else if (h < 17) greeting = 'Good Afternoon';
+            const greetEl = document.getElementById('greetingText');
+            const dotEl = greetEl.querySelector('.greeting-dot');
+            greetEl.innerHTML = '';
+            if (dotEl) greetEl.appendChild(dotEl);
+            greetEl.appendChild(document.createTextNode(' ' + greeting));
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Intersection Observer for scroll animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.tip-card, .concern-track-card').forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'all 0.6s cubic-bezier(.22,1,.36,1) ' + (i * 0.1) + 's';
+            observer.observe(card);
+        });
+
+        // Stagger stat cards entrance
+        document.querySelectorAll('.stat-card').forEach((card, i) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(15px)';
+            setTimeout(() => {
+                card.style.transition = 'all 0.5s cubic-bezier(.22,1,.36,1)';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, 200 + i * 100);
+        });
+
+        // ===== Notification Panel =====
+        function toggleNotifPanel() {
+            document.getElementById('notifPanel').classList.toggle('active');
+            document.getElementById('notifOverlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('notifPanel').classList.contains('active') ? 'hidden' : '';
+        }
+
+        // Mark a single notification as read
+        function markNotifRead(el) {
+            const id = el.getAttribute('data-id');
+            if (el.classList.contains('unread')) {
+                fetch('/api/notifications/' + id + '/read', { method: 'POST' })
+                    .then(res => res.json())
+                    .then(() => {
+                        el.classList.remove('unread');
+                        updateBadge();
+                    });
+            }
+        }
+
+        // Mark all as read
+        function markAllRead() {
+            fetch('/api/notifications/mark-all-read', { method: 'POST' })
+                .then(res => res.json())
+                .then(() => {
+                    document.querySelectorAll('.notif-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                    });
+                    updateBadge();
+                });
+        }
+
+        // Update badge count
+        function updateBadge() {
+            fetch('/api/notifications/unread-count')
+                .then(res => res.json())
+                .then(data => {
+                    const badge = document.getElementById('bellBadge');
+                    if (data.unreadCount > 0) {
+                        badge.textContent = data.unreadCount;
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
+        }
+
+        // Poll for new notifications every 30 seconds
+        setInterval(updateBadge, 30000);
+    </script>
+</body>
+</html>
