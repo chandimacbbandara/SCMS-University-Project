@@ -66,7 +66,6 @@ public class ConcernService {
 
         // Create the concern
         Concern concern = new Concern();
-        concern.setConcernId(concernRepository.getNextConcernId());
         concern.setSubject(dto.getSubject());
         concern.setMessage(dto.getMessage());
         concern.setEvidencePath(evidencePath);

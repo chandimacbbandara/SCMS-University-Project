@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class Feedback {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "FeedbackID")
     private Integer feedbackId;
 
@@ -23,7 +24,7 @@ public class Feedback {
     @Column(name = "Comments", columnDefinition = "VARCHAR(MAX)")
     private String comments;
 
-    @Column(name = "SubmissionTime")
+    @Column(name = "submission_time")
     private LocalDateTime submissionTime;
 
     @ManyToOne

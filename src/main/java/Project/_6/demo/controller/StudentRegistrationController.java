@@ -248,6 +248,24 @@ public class StudentRegistrationController {
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
     }
 
+    @GetMapping("/student/photo/{userId}")
+    @ResponseBody
+    public ResponseEntity<byte[]> getStudentPhotoForCommunity(@PathVariable("userId") Integer userId,
+                                                              HttpSession session) {
+        if (session.getAttribute("studentUserId") == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        byte[] photo = registrationService.getStudentPhoto(userId);
+        if (photo == null || photo.length == 0) {
+            return ResponseEntity.notFound().build();
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
+
     // ========================
     // STUDENT REGISTRATION
     // ========================

@@ -197,7 +197,6 @@ public class AdminService {
 
         // Create reply
         AdminReply reply = new AdminReply();
-        reply.setReplyId(adminReplyRepository.getNextReplyId());
         reply.setReplyMessage(dto.getReplyMessage());
         reply.setConcern(concern);
         reply.setAdmin(admin);
