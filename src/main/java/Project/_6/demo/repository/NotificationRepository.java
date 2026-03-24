@@ -2,12 +2,16 @@ package Project._6.demo.repository;
 
 import Project._6.demo.entity.Notification;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Integer> {
+
+    @Query(value = "SELECT COALESCE(MAX(NotificationID), 0) + 1 FROM Notification", nativeQuery = true)
+    Integer getNextNotificationId();
 
     List<Notification> findByStudent_UserIdOrderBySentTimeDesc(Integer userId);
 

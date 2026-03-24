@@ -197,6 +197,7 @@ public class AdminService {
 
         // Create reply
         AdminReply reply = new AdminReply();
+        reply.setReplyId(adminReplyRepository.getNextReplyId());
         reply.setReplyMessage(dto.getReplyMessage());
         reply.setConcern(concern);
         reply.setAdmin(admin);
@@ -307,10 +308,12 @@ public class AdminService {
 
         // Create a default admin user
         User adminUser = new User();
+        adminUser.setUserId(userRepository.getNextUserId());
         adminUser.setEmail("admin@akb.edu");
         adminUser.setPassword(passwordEncoder.encode("admin_" + UUID.randomUUID().toString().substring(0, 8)));
         adminUser.setFirstName("System");
         adminUser.setLastName("Admin");
+        adminUser.setRegistrationStatus("APPROVED");
         adminUser = userRepository.save(adminUser);
 
         Admin admin = new Admin();

@@ -36,6 +36,7 @@ public class FeedbackService {
                 .orElseThrow(() -> new RuntimeException("Concern not found."));
 
         Feedback feedback = new Feedback();
+        feedback.setFeedbackId(feedbackRepository.getNextFeedbackId());
         feedback.setConcern(concern);
         feedback.setRating(dto.getRating());
         feedback.setComments(dto.getComments());

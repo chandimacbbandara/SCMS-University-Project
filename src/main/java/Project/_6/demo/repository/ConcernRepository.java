@@ -2,6 +2,7 @@ package Project._6.demo.repository;
 
 import Project._6.demo.entity.Concern;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,9 @@ public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     List<Concern> findAllByOrderByCreatedTimeDesc();
     List<Concern> findByStatusOrderByCreatedTimeDesc(String status);
     long countByStatus(String status);
+
+    @Query(value = "SELECT COALESCE(MAX(ConcernID), 0) + 1 FROM Concern", nativeQuery = true)
+    Integer getNextConcernId();
 
     // Category count
     long countByCategory(String category);
