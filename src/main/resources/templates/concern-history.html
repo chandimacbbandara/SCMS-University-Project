@@ -1049,11 +1049,21 @@
         </div>
         <nav>
             <ul>
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
-                <li><a href="/submit-concern" class="nav-link" style="color:#e53935; font-weight:700;">Report Issue</a></li>
-                <li><a href="/student/concern-history" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">My History</a></li>
-                <li><a href="/logout" class="btn-red">Logout</a></li>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/student/dashboard" class="nav-link" style="color: #e53935;">Dashboard</a></li>
+                    <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/community" class="nav-link">Community Talk</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                    <li><a href="/student/profile" class="nav-link">Profile</a></li>
+                    <li>
+                        <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                            <i class="fas fa-bell"></i>
+                            <span class="bell-badge" id="bellBadge"
+                                  th:text="${unreadCount}"
+                                  th:classappend="${unreadCount == 0} ? 'hidden' : ''">0</span>
+                        </div>
+                    </li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
         </nav>
     </div>
