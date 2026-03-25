@@ -491,8 +491,20 @@
             <nav>
                 <ul>
                     <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
-                    <li><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+                    <li><a href="/student/dashboard" class="nav-link" style="color: #e53935;">Dashboard</a></li>
+                    <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/community" class="nav-link">Community Talk</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                    <li><a href="/student/profile" class="nav-link">Profile</a></li>
+                    <li>
+                        <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                            <i class="fas fa-bell"></i>
+                            <span class="bell-badge" id="bellBadge"
+                                  th:text="${unreadCount}"
+                                  th:classappend="${unreadCount == 0} ? 'hidden' : ''">0</span>
+                        </div>
+                    </li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
                 </ul>
             </nav>
         </div>
@@ -756,6 +768,12 @@
             return filled;
         }
 
+        function toggleNotifPanel() {
+            document.getElementById('notifPanel').classList.toggle('active');
+            document.getElementById('notifOverlay').classList.toggle('active');
+            document.body.style.overflow = document.getElementById('notifPanel').classList.contains('active') ? 'hidden' : '';
+        }
+        
         function getCurrentSection() {
             const focusEl = document.activeElement;
             if (focusEl) {
