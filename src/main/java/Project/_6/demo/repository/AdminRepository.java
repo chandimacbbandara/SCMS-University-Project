@@ -10,6 +10,7 @@ import java.util.Optional;
 public interface AdminRepository extends JpaRepository<Admin, Integer> {
     Optional<Admin> findByStaffId(String staffId);
     Optional<Admin> findByStaffIdIgnoreCase(String staffId);
+    Optional<Admin> findByUser_EmailIgnoreCase(String email);
     boolean existsByStaffIdIgnoreCase(String staffId);
     boolean existsByUser_UserId(Integer userId);
 }

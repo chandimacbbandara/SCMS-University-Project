@@ -723,6 +723,7 @@
                 <li><a href="/">Home</a></li>
                 <li><a href="/admin/student-review">Student Review</a></li>
                 <li><a href="/admin/dashboard" class="active">Admin Dashboard</a></li>
+                <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
         </div>
@@ -740,6 +741,9 @@
                     <div class="hero-btns">
                         <a th:href="@{/admin/edu-dashboard}" class="hero-btn hero-btn-primary">
                             <i class="fas fa-graduation-cap"></i> View Education Dashboard
+                        </a>
+                        <a th:href="@{/admin/feedback}" class="hero-btn hero-btn-primary">
+                            <i class="fas fa-star-half-stroke"></i> Feedback Dashboard
                         </a>
                         <a href="/admin/student-review" class="hero-btn hero-btn-outline">
                             <i class="fas fa-users"></i> Student Accounts

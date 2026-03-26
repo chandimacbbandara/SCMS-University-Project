@@ -4,6 +4,7 @@ import Project._6.demo.dto.AdminReplyDTO;
 import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.User;
 import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.AdminReplyRepository;
@@ -23,9 +24,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -106,7 +110,7 @@ public class AdminService {
 
         if (hasCategory) {
             concerns = concerns.stream()
-                    .filter(c -> category.equals(c.getCategory()))
+                    .filter(c -> Objects.equals(category, c.getCategory()))
                     .collect(Collectors.toList());
         }
 
@@ -151,8 +155,7 @@ public class AdminService {
         Concern concern = getConcernById(concernId);
 
         // Explicitly remove dependent records first to satisfy FK constraints.
-        feedbackRepository.findByConcern_ConcernId(concernId)
-                .ifPresent(feedbackRepository::delete);
+        feedbackRepository.deleteByConcern_ConcernId(concernId);
 
         List<AdminReply> replies = adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId);
         if (!replies.isEmpty()) {
@@ -307,7 +310,6 @@ public class AdminService {
 
         // Create a default admin user
         User adminUser = new User();
-        adminUser.setUserId(userRepository.getNextUserId());
         adminUser.setEmail("admin@akb.edu");
         adminUser.setPassword(passwordEncoder.encode("admin_" + UUID.randomUUID().toString().substring(0, 8)));
         adminUser.setFirstName("System");
@@ -338,6 +340,62 @@ public class AdminService {
 
     public long getCompleteCount() {
         return concernRepository.countByStatus("Complete");
+    }
+
+    public Optional<Admin> getAdminByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return Optional.empty();
+        }
+        return adminRepository.findByUser_EmailIgnoreCase(email.trim());
+    }
+
+    public List<Feedback> getFeedbackHistoryByAdminUserId(Integer adminUserId) {
+        if (adminUserId == null) {
+            return List.of();
+        }
+        return feedbackRepository.findByConcern_Admin_UserId(adminUserId);
+    }
+
+    public List<Feedback> getFeedbackHistory() {
+        return feedbackRepository.findAllByOrderBySubmissionTimeDesc();
+    }
+
+    public Map<String, Double> getDepartmentAverageRatings(List<Feedback> feedbackHistory) {
+        return feedbackHistory.stream()
+                .filter(feedback -> feedback.getConcern() != null)
+                .collect(Collectors.groupingBy(
+                        feedback -> normalizeDepartment(feedback.getConcern().getCategory()),
+                        LinkedHashMap::new,
+                        Collectors.averagingDouble(Feedback::getRating)
+                ));
+    }
+
+    public Map<String, Integer[]> getDepartmentStarCounts(List<Feedback> feedbackHistory) {
+        Map<String, Integer[]> starCounts = new LinkedHashMap<>();
+
+        for (Feedback feedback : feedbackHistory) {
+            if (feedback == null || feedback.getConcern() == null) {
+                continue;
+            }
+
+            int rating = feedback.getRating() == null ? 0 : feedback.getRating();
+            if (rating < 1 || rating > 5) {
+                continue;
+            }
+
+            String department = normalizeDepartment(feedback.getConcern().getCategory());
+            Integer[] counts = starCounts.computeIfAbsent(department, key -> new Integer[]{0, 0, 0, 0, 0, 0});
+            counts[rating] = counts[rating] + 1;
+        }
+
+        return starCounts;
+    }
+
+    private String normalizeDepartment(String category) {
+        if (category == null || category.trim().isEmpty()) {
+            return "Other";
+        }
+        return category.trim();
     }
 
     /**

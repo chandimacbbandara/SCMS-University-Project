@@ -76,9 +76,13 @@ public class ConcernController {
         List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
         Map<Integer, List<AdminReply>> repliesMap = concernService.getRepliesMap(concerns);
         Map<Integer, Feedback> feedbackMap = feedbackService.getFeedbackMap(concerns);
+        Map<Integer, Boolean> feedbackActionAllowedMap = feedbackService.getFeedbackActionAllowedMap(concerns);
+        Map<Integer, Boolean> feedbackUpdateAllowedMap = feedbackService.getFeedbackUpdateAllowedMap(concerns);
         model.addAttribute("concerns", concerns);
         model.addAttribute("repliesMap", repliesMap);
         model.addAttribute("feedbackMap", feedbackMap);
+        model.addAttribute("feedbackActionAllowedMap", feedbackActionAllowedMap);
+        model.addAttribute("feedbackUpdateAllowedMap", feedbackUpdateAllowedMap);
         return "concern-history";
     }
 
@@ -93,11 +97,50 @@ public class ConcernController {
             return "redirect:/login";
         }
         try {
-            feedbackService.submitFeedback(feedbackDTO);
+            Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+            feedbackService.submitFeedback(feedbackDTO, studentUserId);
             redirectAttributes.addFlashAttribute("feedbackSuccess", "Thank you for your feedback!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
         }
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/feedback/update")
+    public String updateFeedback(@ModelAttribute FeedbackDTO feedbackDTO,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        try {
+            feedbackService.updateFeedback(feedbackDTO.getConcernId(), studentUserId, feedbackDTO);
+            redirectAttributes.addFlashAttribute("feedbackSuccess", "Your feedback has been updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/feedback/delete")
+    public String deleteFeedback(@RequestParam("concernId") Integer concernId,
+                                 HttpSession session,
+                                 RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        try {
+            feedbackService.deleteFeedback(concernId, studentUserId);
+            redirectAttributes.addFlashAttribute("feedbackSuccess", "Your feedback has been deleted.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
         return "redirect:/student/concern-history";
     }
 }

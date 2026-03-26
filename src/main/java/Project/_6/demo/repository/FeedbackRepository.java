@@ -9,7 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
-    Optional<Feedback> findByConcern_ConcernId(Integer concernId);
+    Optional<Feedback> findTopByConcern_ConcernIdOrderBySubmissionTimeDesc(Integer concernId);
+    List<Feedback> findAllByConcern_ConcernId(Integer concernId);
+    List<Feedback> findAllByOrderBySubmissionTimeDesc();
     boolean existsByConcern_ConcernId(Integer concernId);
     void deleteByConcern_ConcernId(Integer concernId);
 
