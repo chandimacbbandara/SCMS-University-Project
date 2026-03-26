@@ -4,11 +4,15 @@ import Project._6.demo.dto.LoginDTO;
 import Project._6.demo.dto.ChangePasswordDTO;
 import Project._6.demo.dto.StudentProfileUpdateDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
+import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.Student;
 import Project._6.demo.entity.User;
+import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.StudentRepository;
 import Project._6.demo.repository.UserRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +20,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 @Service
 public class StudentRegistrationService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudentRegistrationService.class);
 
     private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$"
@@ -30,15 +38,21 @@ public class StudentRegistrationService {
         private static final Pattern ADDRESS_PATTERN = Pattern.compile("^[A-Za-z0-9\\s,./#-]{3,255}$");
 
     private final UserRepository userRepository;
+    private final AdminRepository adminRepository;
     private final StudentRepository studentRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
     public StudentRegistrationService(UserRepository userRepository,
+                                      AdminRepository adminRepository,
                                       StudentRepository studentRepository,
-                                      PasswordEncoder passwordEncoder) {
+                                      PasswordEncoder passwordEncoder,
+                                      EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
+        this.adminRepository = adminRepository;
         this.studentRepository = studentRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
 
     /**
@@ -53,22 +67,43 @@ public class StudentRegistrationService {
             throw new RuntimeException("Passwords do not match.");
         }
 
-        // Check if email already exists
-        if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("An account with this email already exists.");
+        String normalizedEmail = normalizeEmail(dto.getEmail());
+        if (normalizedEmail == null) {
+            throw new RuntimeException("Email is required.");
         }
 
-        // Check if student ID already exists
-        if (studentRepository.existsByStudentId(dto.getStudentId())) {
-            throw new RuntimeException("A student with this Student ID already exists.");
+        Set<Integer> removedRejectedUserIds = new HashSet<>();
+
+        Optional<User> existingUserOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        if (existingUserOpt.isPresent()) {
+            User existingUser = existingUserOpt.get();
+            if (!"REJECTED".equalsIgnoreCase(existingUser.getRegistrationStatus())) {
+                throw new RuntimeException("An account with this email already exists.");
+            }
+            removeRejectedAccount(existingUser.getUserId());
+            removedRejectedUserIds.add(existingUser.getUserId());
+        }
+
+        Optional<Student> existingStudentByIdOpt = studentRepository.findByStudentId(dto.getStudentId());
+        if (existingStudentByIdOpt.isPresent()) {
+            Student existingStudent = existingStudentByIdOpt.get();
+            User existingUser = existingStudent.getUser();
+            Integer existingUserId = existingStudent.getUserId();
+
+            if (existingUser == null || !"REJECTED".equalsIgnoreCase(existingUser.getRegistrationStatus())) {
+                throw new RuntimeException("A student with this Student ID already exists.");
+            }
+
+            if (!removedRejectedUserIds.contains(existingUserId)) {
+                removeRejectedAccount(existingUserId);
+            }
         }
 
         // Create User with PENDING status
         User user = new User();
-        user.setUserId(userRepository.getNextUserId());
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
+        user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRegistrationStatus("PENDING");
         user = userRepository.save(user);
@@ -83,7 +118,19 @@ public class StudentRegistrationService {
             student.setStudentPhoto(studentIdPhoto.getBytes());
         }
 
-        return studentRepository.save(student);
+        Student savedStudent = studentRepository.save(student);
+
+        try {
+            emailVerificationService.sendPendingReviewEmail(
+                    user.getEmail(),
+                    user.getFirstName(),
+                    savedStudent.getStudentId()
+            );
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to send pending review email for userId={}", user.getUserId(), ex);
+        }
+
+        return savedStudent;
     }
 
     /**
@@ -116,6 +163,17 @@ public class StudentRegistrationService {
                 .orElseThrow(() -> new RuntimeException("Student not found with UserID: " + userId));
         student.getUser().setRegistrationStatus("APPROVED");
         userRepository.save(student.getUser());
+
+        try {
+            emailVerificationService.sendApprovalEmail(
+                    student.getUser().getEmail(),
+                    student.getUser().getFirstName(),
+                    student.getStudentId()
+            );
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to send approval email for userId={}", userId, ex);
+        }
+
         return student;
     }
 
@@ -128,6 +186,31 @@ public class StudentRegistrationService {
                 .orElseThrow(() -> new RuntimeException("Student not found with UserID: " + userId));
         student.getUser().setRegistrationStatus("REJECTED");
         userRepository.save(student.getUser());
+
+        try {
+            emailVerificationService.sendRejectionEmail(
+                    student.getUser().getEmail(),
+                    student.getUser().getFirstName(),
+                    student.getStudentId()
+            );
+        } catch (Exception ex) {
+            LOGGER.warn("Failed to send rejection email for userId={}", userId, ex);
+        }
+
+        return student;
+    }
+
+    /**
+     * Permanently delete a student account (Student + User records).
+     */
+    @Transactional
+    public Student deleteStudentAccount(Integer userId) {
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found with UserID: " + userId));
+
+        studentRepository.delete(student);
+        userRepository.deleteById(userId);
+
         return student;
     }
 
@@ -173,8 +256,13 @@ public class StudentRegistrationService {
      * Only APPROVED students can log in.
      */
     public Student loginStudent(LoginDTO dto) {
+        String normalizedEmail = normalizeEmail(dto.getEmail());
+        if (normalizedEmail == null) {
+            throw new RuntimeException("Email is required.");
+        }
+
         // Find user by email
-        Optional<User> userOpt = userRepository.findByEmail(dto.getEmail());
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
         if (userOpt.isEmpty()) {
             throw new RuntimeException("No account found with this email address.");
         }
@@ -206,6 +294,89 @@ public class StudentRegistrationService {
         }
 
         return studentOpt.get();
+    }
+
+    public Admin loginAdmin(LoginDTO dto) {
+        String normalizedEmail = normalizeEmail(dto.getEmail());
+        if (normalizedEmail == null) {
+            throw new RuntimeException("Email is required.");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> new RuntimeException("No account found with this email address."));
+
+        if (!passwordEncoder.matches(dto.getPassword(), user.getPassword())) {
+            throw new RuntimeException("Invalid password.");
+        }
+
+        if (!adminRepository.existsByUser_UserId(user.getUserId())) {
+            throw new RuntimeException("No admin account found with this email address.");
+        }
+
+        return adminRepository.findById(user.getUserId())
+                .orElseThrow(() -> new RuntimeException("Admin account not found."));
+    }
+
+    public boolean emailExists(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        return normalizedEmail != null && userRepository.existsByEmailIgnoreCase(normalizedEmail);
+    }
+
+    public boolean canRegisterWithEmail(String email) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail == null) {
+            return false;
+        }
+
+        Optional<User> userOpt = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        if (userOpt.isEmpty()) {
+            return true;
+        }
+
+        return "REJECTED".equalsIgnoreCase(userOpt.get().getRegistrationStatus());
+    }
+
+    @Transactional
+    public void resetPasswordByEmail(String email, String newPassword, String confirmPassword) {
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail == null) {
+            throw new RuntimeException("Email is required.");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseThrow(() -> new RuntimeException("No account found with this email address."));
+
+        if (newPassword == null || !newPassword.equals(confirmPassword)) {
+            throw new RuntimeException("New password and confirm password do not match.");
+        }
+
+        if (!isStrongPassword(newPassword)) {
+            throw new RuntimeException("Password must be at least 12 characters and include uppercase, lowercase, number, and special character.");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("New password must be different from your current password.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        String trimmed = email.trim();
+        return trimmed.isEmpty() ? null : trimmed.toLowerCase();
+    }
+
+    private void removeRejectedAccount(Integer userId) {
+        if (userId == null) {
+            return;
+        }
+
+        studentRepository.findById(userId).ifPresent(studentRepository::delete);
+        userRepository.deleteById(userId);
     }
 
     /**
@@ -315,4 +486,5 @@ public class StudentRegistrationService {
             throw new RuntimeException(label + " must be 3-255 characters and can include letters, numbers, spaces, comma, dot, slash, # and -.");
         }
     }
+
 }

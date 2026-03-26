@@ -363,6 +363,15 @@
             padding: 24px 26px 0;
             display: flex; align-items: center; gap: 16px;
         }
+        .sc-photo-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+            flex-shrink: 0;
+        }
         .sc-avatar {
             width: 54px; height: 54px;
             border-radius: 14px;
@@ -503,6 +512,15 @@
         .reject-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(229,57,53,0.35);
+        }
+        .delete-btn {
+            background: linear-gradient(135deg, #424242, #1f1f1f);
+            color: #fff;
+            box-shadow: 0 3px 12px rgba(33,33,33,0.25);
+        }
+        .delete-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(33,33,33,0.4);
         }
         .action-btn:disabled {
             opacity: 0.35; cursor: not-allowed;
@@ -700,11 +718,6 @@
                     <i class="fas fa-circle-xmark"></i> Rejected
                     <span class="pill-count" th:text="${rejectedCount}">0</span>
                 </a>
-                <a th:href="@{/admin/student-review(filter='ALL')}"
-                   th:classappend="${selectedFilter == 'ALL'} ? 'active' : ''"
-                   class="filter-pill">
-                    <i class="fas fa-users"></i> All Students
-                </a>
             </div>
         </div>
 
@@ -726,7 +739,12 @@
 
                 <!-- Card Header -->
                 <div class="sc-header">
-                    <div class="sc-avatar"
+                    <img th:if="${student.studentPhoto != null}"
+                        class="sc-photo-avatar"
+                        th:src="@{'/admin/student-review/' + ${student.userId} + '/photo'}"
+                        alt="Student photo">
+                    <div th:if="${student.studentPhoto == null}"
+                        class="sc-avatar"
                          th:classappend="'av-' + ${(iterStat.index % 5) + 1}"
                          th:text="${student.user.firstName.substring(0,1)}">S</div>
                     <div class="sc-header-info">
@@ -810,6 +828,13 @@
                                 th:disabled="${student.user.registrationStatus != 'PENDING'}"
                                 onclick="return confirm('Reject this student registration?')">
                             <i class="fas fa-xmark"></i> Reject
+                        </button>
+                    </form>
+                    <form th:action="@{'/admin/student-review/' + ${student.userId} + '/delete'}" method="post">
+                        <button type="submit" class="action-btn delete-btn"
+                                th:disabled="${student.user.registrationStatus == 'PENDING'}"
+                                onclick="return confirm('Delete this student account permanently? This action cannot be undone.')">
+                            <i class="fas fa-trash"></i> Delete
                         </button>
                     </form>
                 </div>

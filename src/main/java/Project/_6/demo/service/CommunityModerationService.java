@@ -30,7 +30,7 @@ public class CommunityModerationService {
             "fuck", "shit", "bitch", "asshole", "bastard", "slut", "idiot", "stupid", "dumb"
     );
 
-        private static final Pattern ENGLISH_ONLY_PATTERN = Pattern.compile("^[\\x09\\x0A\\x0D\\x20-\\x7E]+$");
+    private static final Pattern ENGLISH_ONLY_PATTERN = Pattern.compile("^[\\x09\\x0A\\x0D\\x20-\\x7E]+$");
     private static final Pattern PHONE_PATTERN = Pattern.compile("(?:\\+?\\d{1,3}[\\s-]?)?(?:\\d[\\s-]?){9,12}");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}");
 

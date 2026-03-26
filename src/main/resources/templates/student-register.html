@@ -258,6 +258,41 @@
         .input-field input:focus ~ i.field-icon { color: #e53935; }
         .input-field input::placeholder { color: #bbb; }
 
+        .email-verify-row {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+        }
+        .email-verify-row .input-field {
+            flex: 1;
+        }
+        .verify-btn {
+            border: none;
+            border-radius: 12px;
+            background: #e53935;
+            color: #fff;
+            padding: 0 16px;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .verify-btn:hover { background: #c62828; }
+        .verify-btn.secondary {
+            background: #f3f4f6;
+            color: #333;
+        }
+        .verify-btn.secondary:hover {
+            background: #e7e9ed;
+        }
+        .verify-status {
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            display: none;
+        }
+        .verify-status.ok { color: #2e7d32; display: block; }
+        .verify-status.error { color: #c62828; display: block; }
+
         .form-row {
             display: flex;
             gap: 16px;
@@ -470,6 +505,11 @@
                         <div class="step-connector"></div>
                         <li>
                             <span class="step-num">4</span>
+                            <span>Verify email with code</span>
+                        </li>
+                        <div class="step-connector"></div>
+                        <li>
+                            <span class="step-num">5</span>
                             <span>Wait for admin approval</span>
                         </li>
                     </ul>
@@ -496,7 +536,7 @@
 
                     <div class="info-note animate-in delay-1">
                         <i class="fas fa-info-circle"></i>
-                        <span>Your registration will be reviewed by an administrator. You'll be notified once approved.</span>
+                        <span>Type your email, click Verify, and enter the 6-digit code here before creating your account. Admin approval is required after registration.</span>
                     </div>
 
                     <form th:action="@{/register}" method="post" enctype="multipart/form-data" id="registerForm">
@@ -525,10 +565,27 @@
 
                         <div class="form-group animate-in delay-2">
                             <label>Email Address <span class="required">*</span></label>
-                            <div class="input-field">
-                                <i class="fas fa-envelope field-icon"></i>
-                                <input type="email" name="email" placeholder="you@example.com" required>
+                            <div class="email-verify-row">
+                                <div class="input-field">
+                                    <i class="fas fa-envelope field-icon"></i>
+                                    <input type="email" name="email" id="emailInput" placeholder="you@example.com" required>
+                                </div>
+                                <button type="button" class="verify-btn" id="sendCodeBtn">Verify</button>
                             </div>
+                            <div class="verify-status" id="sendCodeStatus"></div>
+                        </div>
+
+                        <div class="form-group animate-in delay-2">
+                            <label>Email Verification Code <span class="required">*</span></label>
+                            <div class="email-verify-row">
+                                <div class="input-field">
+                                    <i class="fas fa-key field-icon"></i>
+                                    <input type="text" id="emailCodeInput" placeholder="Enter 6-digit code" pattern="[0-9]{6}" maxlength="6" required>
+                                </div>
+                                <button type="button" class="verify-btn secondary" id="confirmCodeBtn">Confirm Code</button>
+                            </div>
+                            <div class="verify-status" id="confirmCodeStatus"></div>
+                            <input type="hidden" id="emailVerifiedFlag" value="false">
                         </div>
 
                         <div class="form-group animate-in delay-2">
@@ -656,6 +713,13 @@
         const password = document.getElementById('password');
         const confirmPassword = document.getElementById('confirmPassword');
         const passwordError = document.getElementById('passwordError');
+        const emailInput = document.getElementById('emailInput');
+        const emailCodeInput = document.getElementById('emailCodeInput');
+        const sendCodeBtn = document.getElementById('sendCodeBtn');
+        const confirmCodeBtn = document.getElementById('confirmCodeBtn');
+        const sendCodeStatus = document.getElementById('sendCodeStatus');
+        const confirmCodeStatus = document.getElementById('confirmCodeStatus');
+        const emailVerifiedFlag = document.getElementById('emailVerifiedFlag');
 
         function validatePassword() {
             if (confirmPassword.value && password.value !== confirmPassword.value) {
@@ -669,6 +733,79 @@
             }
         }
 
+        function setStatus(element, message, ok) {
+            element.textContent = message;
+            element.className = 'verify-status ' + (ok ? 'ok' : 'error');
+        }
+
+        function clearVerificationState() {
+            emailVerifiedFlag.value = 'false';
+            confirmCodeStatus.className = 'verify-status';
+            confirmCodeStatus.textContent = '';
+        }
+
+        emailInput.addEventListener('input', clearVerificationState);
+
+        sendCodeBtn.addEventListener('click', async function() {
+            const email = emailInput.value.trim();
+            const firstNameInput = document.querySelector('input[name="firstName"]');
+            const firstName = firstNameInput ? firstNameInput.value.trim() : '';
+
+            if (!email) {
+                setStatus(sendCodeStatus, 'Please enter your email first.', false);
+                return;
+            }
+
+            sendCodeBtn.disabled = true;
+            sendCodeBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch('/register/send-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email, firstName }).toString()
+                });
+                const data = await response.json();
+                setStatus(sendCodeStatus, data.message || 'Failed to send code.', response.ok && data.status === 'ok');
+            } catch (error) {
+                setStatus(sendCodeStatus, 'Unable to send code right now. Try again.', false);
+            } finally {
+                sendCodeBtn.disabled = false;
+                sendCodeBtn.textContent = 'Verify';
+            }
+        });
+
+        confirmCodeBtn.addEventListener('click', async function() {
+            const email = emailInput.value.trim();
+            const code = emailCodeInput.value.trim();
+
+            if (!email || !code) {
+                setStatus(confirmCodeStatus, 'Enter email and verification code first.', false);
+                return;
+            }
+
+            confirmCodeBtn.disabled = true;
+            confirmCodeBtn.textContent = 'Checking...';
+
+            try {
+                const response = await fetch('/register/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email, code }).toString()
+                });
+                const data = await response.json();
+                const ok = response.ok && data.status === 'ok';
+                setStatus(confirmCodeStatus, data.message || 'Verification failed.', ok);
+                emailVerifiedFlag.value = ok ? 'true' : 'false';
+            } catch (error) {
+                setStatus(confirmCodeStatus, 'Unable to verify code right now. Try again.', false);
+                emailVerifiedFlag.value = 'false';
+            } finally {
+                confirmCodeBtn.disabled = false;
+                confirmCodeBtn.textContent = 'Confirm Code';
+            }
+        });
+
         confirmPassword.addEventListener('input', validatePassword);
         password.addEventListener('input', validatePassword);
 
@@ -676,6 +813,13 @@
             if (!validatePassword()) {
                 e.preventDefault();
                 confirmPassword.focus();
+                return;
+            }
+
+            if (emailVerifiedFlag.value !== 'true') {
+                e.preventDefault();
+                setStatus(confirmCodeStatus, 'Please verify your email code before creating the account.', false);
+                emailCodeInput.focus();
             }
         });
     </script>
