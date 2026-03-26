@@ -689,6 +689,8 @@
             <ul>
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/owner/dashboard" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Owner Dashboard</a></li>
+                <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
+                <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
                 <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
@@ -721,9 +723,9 @@
                 </p>
             </div>
             <div class="hero-right">
-                <div class="hero-icon-wrap">
-                    <i class="fas fa-crown"></i>
-                </div>
+                <a href="/owner/admin/create-page" class="btn-red" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                    <i class="fas fa-user-shield"></i> Create Admin Account
+                </a>
             </div>
         </div>
 
@@ -1199,6 +1201,7 @@
                 setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh All'; }, 2000);
             });
     }
+
 </script>
 </body>
 </html>

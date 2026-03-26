@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Admin Accounts - Owner Dashboard</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+            min-height: 100vh;
+        }
+
+        .owner-container {
+            max-width: 1160px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        .page-hero {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 40%, #020617 100%);
+            border-radius: var(--radius-lg);
+            padding: 32px 34px;
+            margin-bottom: 22px;
+            box-shadow: 0 16px 50px rgba(15,23,42,0.38);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            gap: 16px;
+        }
+
+        .hero-title {
+            font-size: 30px;
+            font-weight: 900;
+            margin-bottom: 6px;
+        }
+
+        .hero-sub {
+            font-size: 13px;
+            color: rgba(255,255,255,0.72);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-soft,
+        .btn-primary {
+            text-decoration: none;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 14px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-soft {
+            color: #fff;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+
+        .alert {
+            border-radius: var(--radius-sm);
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert.success {
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .alert.error {
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 18px;
+        }
+
+        .admin-card {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
+            padding: 18px;
+        }
+
+        .admin-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .admin-title {
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .admin-id {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 999px;
+            padding: 3px 10px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            color: var(--text-mid);
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #e5e7eb;
+            background: #fafafa;
+            color: var(--text-dark);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(229,57,53,0.1);
+            background: #fff;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .btn-update,
+        .btn-delete {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: #fff;
+            min-width: 108px;
+        }
+
+        .empty {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+            box-shadow: var(--card-shadow);
+        }
+
+        @media (max-width: 768px) {
+            .page-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .row-2 {
+                grid-template-columns: 1fr;
+            }
+            .actions {
+                grid-template-columns: 1fr;
+            }
+            .btn-delete {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
+                <li><a href="/owner/admin/manage" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Manage Admins</a></li>
+                <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="owner-container">
+        <div class="page-hero">
+            <div>
+                <h1 class="hero-title">Manage Admin Accounts</h1>
+                <p class="hero-sub"><i class="fas fa-users-gear"></i> View all admins, update account details, or delete unused admin accounts</p>
+            </div>
+            <div class="header-actions">
+                <a href="/owner/admin/create-page" class="btn-primary"><i class="fas fa-user-plus"></i> Create New Admin</a>
+                <a href="/owner/dashboard" class="btn-soft"><i class="fas fa-arrow-left"></i> Back Dashboard</a>
+            </div>
+        </div>
+
+        <div th:if="${successMessage}" class="alert success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}">Success</span>
+        </div>
+        <div th:if="${errorMessage}" class="alert error">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}">Error</span>
+        </div>
+
+        <div th:if="${admins == null or #lists.isEmpty(admins)}" class="empty">
+            <i class="fas fa-user-slash" style="font-size:28px; margin-bottom:10px;"></i>
+            <h3 style="font-size:18px; margin-bottom:8px; color:#1f2937;">No Admin Accounts Found</h3>
+            <p>No admins are available right now. Create a new admin to get started.</p>
+        </div>
+
+        <div th:if="${admins != null and !#lists.isEmpty(admins)}" class="grid">
+            <div class="admin-card" th:each="admin : ${admins}">
+                <div class="admin-head">
+                    <div class="admin-title" th:text="${admin.user.firstName}">Admin</div>
+                    <div class="admin-id" th:text="'User ID: ' + ${admin.userId}">User ID</div>
+                </div>
+
+                <form th:action="@{'/owner/admin/' + ${admin.userId} + '/update'}" method="post">
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="form-control" name="email" th:value="${admin.user.email}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-id-badge"></i> Username</label>
+                        <input type="text" class="form-control" name="username" th:value="${admin.staffId}" required>
+                    </div>
+
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-lock"></i> New Password (optional)</label>
+                            <input type="password" class="form-control" name="newPassword" placeholder="Leave blank to keep current">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-shield-halved"></i> Confirm Password</label>
+                            <input type="password" class="form-control" name="confirmPassword" placeholder="Re-enter new password">
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button type="submit" class="btn-update"><i class="fas fa-pen-to-square"></i> Update Admin</button>
+                    </div>
+                </form>
+
+                <form th:action="@{'/owner/admin/' + ${admin.userId} + '/delete'}" method="post" style="margin-top:8px;">
+                    <button type="submit" class="btn-delete"
+                            onclick="return confirm('Delete this admin account? This action cannot be undone.');">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+</body>
+</html>

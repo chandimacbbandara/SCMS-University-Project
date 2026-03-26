@@ -7,14 +7,20 @@ import Project._6.demo.entity.AnalyticsReport;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Notification;
+import Project._6.demo.entity.User;
 import Project._6.demo.repository.AnalyticsReportRepository;
 import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.FeedbackRepository;
+import Project._6.demo.repository.UserRepository;
 import Project._6.demo.service.AnalyticsReportService;
+import Project._6.demo.service.EmailVerificationService;
 import Project._6.demo.service.NotificationService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +30,10 @@ import jakarta.servlet.http.HttpSession;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 @Controller
 @RequestMapping("/owner")
@@ -35,24 +43,41 @@ public class OwnerController {
     private final AnalyticsReportRepository analyticsReportRepository;
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
+    private final UserRepository userRepository;
     private final FeedbackRepository feedbackRepository;
     private final AdminReplyRepository adminReplyRepository;
     private final NotificationService notificationService;
+    private final EmailVerificationService emailVerificationService;
+    private final PasswordEncoder passwordEncoder;
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$");
+
+    private static final String OWNER_ADMIN_VERIFY_EMAIL = "ownerAdminVerifyEmail";
+    private static final String OWNER_ADMIN_VERIFY_CODE = "ownerAdminVerifyCode";
+    private static final String OWNER_ADMIN_VERIFY_EXPIRY = "ownerAdminVerifyExpiry";
+    private static final String OWNER_ADMIN_VERIFY_CONFIRMED = "ownerAdminVerifyConfirmed";
 
     public OwnerController(AnalyticsReportService analyticsReportService,
                            AnalyticsReportRepository analyticsReportRepository,
                            ConcernRepository concernRepository,
                            AdminRepository adminRepository,
+                           UserRepository userRepository,
                            FeedbackRepository feedbackRepository,
                            AdminReplyRepository adminReplyRepository,
-                           NotificationService notificationService) {
+                           NotificationService notificationService,
+                           EmailVerificationService emailVerificationService,
+                           PasswordEncoder passwordEncoder) {
         this.analyticsReportService = analyticsReportService;
         this.analyticsReportRepository = analyticsReportRepository;
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
+        this.userRepository = userRepository;
         this.feedbackRepository = feedbackRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.notificationService = notificationService;
+        this.emailVerificationService = emailVerificationService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/dashboard")
@@ -66,6 +91,124 @@ public class OwnerController {
         model.addAttribute("reportDTO", new AnalyticsReportDTO());
 
         return "owner-dashboard";
+    }
+
+    @GetMapping("/admin/create-page")
+    public String showCreateAdminPage(HttpSession session) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        return "owner-create-admin";
+    }
+
+    @GetMapping("/admin/manage")
+    public String showManageAdminsPage(HttpSession session, Model model) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        List<Admin> admins = adminRepository.findAll().stream()
+                .sorted(Comparator.comparing(Admin::getUserId))
+                .collect(Collectors.toList());
+        model.addAttribute("admins", admins);
+        return "owner-manage-admins";
+    }
+
+    @PostMapping("/admin/{userId}/update")
+    public String updateAdminAccount(@PathVariable("userId") Integer userId,
+                                     @RequestParam("email") String email,
+                                     @RequestParam("username") String username,
+                                     @RequestParam(value = "newPassword", required = false) String newPassword,
+                                     @RequestParam(value = "confirmPassword", required = false) String confirmPassword,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            Admin admin = adminRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Admin account not found."));
+
+            String normalizedEmail = normalizeEmail(email);
+            String normalizedUsername = normalize(username);
+
+            if (normalizedEmail == null || !EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+                throw new RuntimeException("Please enter a valid email address.");
+            }
+            if (normalizedUsername == null) {
+                throw new RuntimeException("Username is required.");
+            }
+
+            Optional<User> userWithEmail = userRepository.findByEmailIgnoreCase(normalizedEmail);
+            if (userWithEmail.isPresent() && !userWithEmail.get().getUserId().equals(userId)) {
+                throw new RuntimeException("Another account already uses this email.");
+            }
+
+            Optional<Admin> adminWithStaffId = adminRepository.findByStaffIdIgnoreCase(normalizedUsername);
+            if (adminWithStaffId.isPresent() && !adminWithStaffId.get().getUserId().equals(userId)) {
+                throw new RuntimeException("Another admin already uses this username.");
+            }
+
+            User user = admin.getUser();
+            user.setEmail(normalizedEmail);
+            user.setFirstName(normalizedUsername);
+            user.setLastName("Admin");
+
+            String normalizedNewPassword = normalize(newPassword);
+            String normalizedConfirmPassword = normalize(confirmPassword);
+            if (normalizedNewPassword != null || normalizedConfirmPassword != null) {
+                if (normalizedNewPassword == null || normalizedConfirmPassword == null
+                        || !normalizedNewPassword.equals(normalizedConfirmPassword)) {
+                    throw new RuntimeException("New password and confirm password do not match.");
+                }
+                if (!STRONG_PASSWORD_PATTERN.matcher(normalizedNewPassword).matches()) {
+                    throw new RuntimeException("Password must be at least 12 characters and include uppercase, lowercase, number, and special character.");
+                }
+                user.setPassword(passwordEncoder.encode(normalizedNewPassword));
+            }
+
+            admin.setStaffId(normalizedUsername);
+            userRepository.save(user);
+            adminRepository.save(admin);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Admin account updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to update admin: " + e.getMessage());
+        }
+
+        return "redirect:/owner/admin/manage";
+    }
+
+    @PostMapping("/admin/{userId}/delete")
+    public String deleteAdminAccount(@PathVariable("userId") Integer userId,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            Admin admin = adminRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("Admin account not found."));
+
+            List<Concern> assignedConcerns = concernRepository.findByAdmin_UserId(userId);
+            if (!assignedConcerns.isEmpty()) {
+                for (Concern concern : assignedConcerns) {
+                    concern.setAdmin(null);
+                }
+                concernRepository.saveAll(assignedConcerns);
+            }
+
+            adminRepository.delete(admin);
+            userRepository.deleteById(userId);
+
+            redirectAttributes.addFlashAttribute("successMessage", "Admin account deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete admin: " + e.getMessage());
+        }
+
+        return "redirect:/owner/admin/manage";
     }
 
     @PostMapping("/report/create")
@@ -86,6 +229,184 @@ public class OwnerController {
         }
 
         return "redirect:/owner/dashboard";
+    }
+
+    @PostMapping("/admin/send-code")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> sendAdminCreateCode(@RequestParam("email") String email,
+                                                                   HttpSession session) {
+        Map<String, String> result = new HashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("status", "error");
+            result.put("message", "Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        String normalizedEmail = normalizeEmail(email);
+        if (normalizedEmail == null || !EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            result.put("status", "error");
+            result.put("message", "Please enter a valid email address.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "An account with this email already exists.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        String code = String.valueOf(100000 + new Random().nextInt(900000));
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(10);
+
+        try {
+            emailVerificationService.sendAdminCreationVerificationCode(normalizedEmail, code);
+        } catch (Exception ex) {
+            result.put("status", "error");
+            result.put("message", "Could not send verification code. Check mail settings and try again.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+
+        session.setAttribute(OWNER_ADMIN_VERIFY_EMAIL, normalizedEmail);
+        session.setAttribute(OWNER_ADMIN_VERIFY_CODE, code);
+        session.setAttribute(OWNER_ADMIN_VERIFY_EXPIRY, expiry);
+        session.setAttribute(OWNER_ADMIN_VERIFY_CONFIRMED, false);
+
+        result.put("status", "ok");
+        result.put("message", "Verification code sent to admin email.");
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/verify-code")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> verifyAdminCreateCode(@RequestParam("email") String email,
+                                                                     @RequestParam("code") String code,
+                                                                     HttpSession session) {
+        Map<String, String> result = new HashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("status", "error");
+            result.put("message", "Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        String normalizedEmail = normalizeEmail(email);
+        String normalizedCode = code == null ? "" : code.trim();
+
+        String savedEmail = (String) session.getAttribute(OWNER_ADMIN_VERIFY_EMAIL);
+        String savedCode = (String) session.getAttribute(OWNER_ADMIN_VERIFY_CODE);
+        LocalDateTime expiry = (LocalDateTime) session.getAttribute(OWNER_ADMIN_VERIFY_EXPIRY);
+
+        if (savedEmail == null || savedCode == null || expiry == null) {
+            result.put("status", "error");
+            result.put("message", "Please send verification code first.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (normalizedEmail == null || !savedEmail.equalsIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "Email does not match verification request.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (LocalDateTime.now().isAfter(expiry)) {
+            result.put("status", "error");
+            result.put("message", "Verification code expired. Request a new code.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (!savedCode.equals(normalizedCode)) {
+            result.put("status", "error");
+            result.put("message", "Invalid verification code.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        session.setAttribute(OWNER_ADMIN_VERIFY_CONFIRMED, true);
+        result.put("status", "ok");
+        result.put("message", "Admin email verified successfully.");
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/create")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> createAdminAccount(@RequestParam("email") String email,
+                                                                  @RequestParam("username") String username,
+                                                                  @RequestParam("password") String password,
+                                                                  @RequestParam("confirmPassword") String confirmPassword,
+                                                                  HttpSession session) {
+        Map<String, String> result = new HashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("status", "error");
+            result.put("message", "Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        String normalizedEmail = normalizeEmail(email);
+        String normalizedUsername = normalize(username);
+        Boolean emailVerified = (Boolean) session.getAttribute(OWNER_ADMIN_VERIFY_CONFIRMED);
+        String verifiedEmail = (String) session.getAttribute(OWNER_ADMIN_VERIFY_EMAIL);
+
+        if (!Boolean.TRUE.equals(emailVerified) || verifiedEmail == null || !verifiedEmail.equalsIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "Please verify admin email before creating the account.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (normalizedEmail == null || !EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            result.put("status", "error");
+            result.put("message", "Please enter a valid email address.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "An account with this email already exists.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (normalizedUsername == null) {
+            result.put("status", "error");
+            result.put("message", "Username is required.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (adminRepository.existsByStaffIdIgnoreCase(normalizedUsername)) {
+            result.put("status", "error");
+            result.put("message", "Username already in use.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (password == null || !password.equals(confirmPassword)) {
+            result.put("status", "error");
+            result.put("message", "Password and confirm password do not match.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (!STRONG_PASSWORD_PATTERN.matcher(password).matches()) {
+            result.put("status", "error");
+            result.put("message", "Password must be at least 12 characters and include uppercase, lowercase, number, and special character.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        User user = new User();
+        user.setEmail(normalizedEmail);
+        user.setFirstName(normalizedUsername);
+        user.setLastName("Admin");
+        user.setPassword(passwordEncoder.encode(password));
+        user.setRegistrationStatus("APPROVED");
+        user = userRepository.save(user);
+
+        Admin admin = new Admin();
+        admin.setUser(user);
+        admin.setStaffId(normalizedUsername);
+        adminRepository.save(admin);
+
+        session.removeAttribute(OWNER_ADMIN_VERIFY_EMAIL);
+        session.removeAttribute(OWNER_ADMIN_VERIFY_CODE);
+        session.removeAttribute(OWNER_ADMIN_VERIFY_EXPIRY);
+        session.removeAttribute(OWNER_ADMIN_VERIFY_CONFIRMED);
+
+        result.put("status", "ok");
+        result.put("message", "Admin account created successfully.");
+        return ResponseEntity.ok(result);
     }
 
     // ========================
@@ -362,5 +683,21 @@ public class OwnerController {
 
     private boolean isOwnerLoggedIn(HttpSession session) {
         return Boolean.TRUE.equals(session.getAttribute("ownerLoggedIn"));
+    }
+
+    private String normalizeEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        String trimmed = email.trim();
+        return trimmed.isEmpty() ? null : trimmed.toLowerCase();
+    }
+
+    private String normalize(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

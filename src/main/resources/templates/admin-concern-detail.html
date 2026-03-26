@@ -165,6 +165,59 @@
             border: 1px solid var(--border);
         }
 
+        .student-profile-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            min-width: 250px;
+        }
+
+        .student-profile-photo {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .student-profile-fallback {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: #fff;
+            font-weight: 800;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .student-profile-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .student-profile-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .student-profile-id {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
         .concern-meta .meta-item {
             font-size: 14px;
         }
@@ -853,6 +906,19 @@
                 </div>
 
                 <div class="concern-meta">
+                    <div class="student-profile-meta" th:if="${concern.student != null}">
+                        <img th:if="${concern.student.studentPhoto != null}"
+                             class="student-profile-photo"
+                             th:src="@{'/admin/student-review/' + ${concern.student.userId} + '/photo'}"
+                             alt="Student photo">
+                        <div th:if="${concern.student.studentPhoto == null}"
+                             class="student-profile-fallback"
+                             th:text="${concern.student.user != null and concern.student.user.firstName != null} ? ${#strings.substring(concern.student.user.firstName, 0, 1)} : '?'">S</div>
+                        <div class="student-profile-text">
+                            <span class="student-profile-name" th:text="${concern.student.user.firstName + ' ' + concern.student.user.lastName}">Student Name</span>
+                            <span class="student-profile-id" th:text="${concern.student.studentId}">STU001</span>
+                        </div>
+                    </div>
                     <div class="meta-item" th:if="${concern.student != null}">
                         <span class="meta-label">Student</span>
                         <span class="meta-value" th:text="${concern.student.user.firstName + ' ' + concern.student.user.lastName}">Name</span>

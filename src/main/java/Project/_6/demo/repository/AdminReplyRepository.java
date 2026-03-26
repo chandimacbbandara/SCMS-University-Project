@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer> {
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
     List<AdminReply> findByConcern_Category(String category);
+    List<AdminReply> findByAdmin_UserId(Integer adminUserId);
     Optional<AdminReply> findFirstByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
     void deleteByConcern_ConcernId(Integer concernId);
 }
