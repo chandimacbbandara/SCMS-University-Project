@@ -119,7 +119,6 @@ public class ConcernService {
 
         // Create a new User first
         User user = new User();
-        user.setUserId(userRepository.getNextUserId());
         user.setEmail(dto.getEmail());
         user.setPassword(passwordEncoder.encode("temp_" + UUID.randomUUID().toString().substring(0, 8))); // hashed temporary password
         user.setFirstName(dto.getFirstName());

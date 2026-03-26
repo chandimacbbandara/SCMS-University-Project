@@ -3,7 +3,9 @@ package Project._6.demo.controller;
 import Project._6.demo.dto.AdminReplyDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.Feedback;
 import Project._6.demo.service.AdminService;
+import Project._6.demo.service.FeedbackService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,16 +17,21 @@ import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/admin")
 public class AdminController {
 
     private final AdminService adminService;
+    private final FeedbackService feedbackService;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, FeedbackService feedbackService) {
         this.adminService = adminService;
+        this.feedbackService = feedbackService;
     }
 
     /**
@@ -91,6 +98,39 @@ public class AdminController {
         model.addAttribute("inProgressCount", adminService.getInProgressCount());
         model.addAttribute("completeCount", adminService.getCompleteCount());
 
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        List<Feedback> adminFeedbacks = adminService.getAdminByEmail(adminEmail)
+            .map(admin -> adminService.getFeedbackHistoryByAdminUserId(admin.getUserId()))
+            .orElseGet(List::of);
+
+        long totalFeedback = adminFeedbacks.size();
+        long star5 = adminFeedbacks.stream().filter(f -> f.getRating() != null && f.getRating() == 5).count();
+        long star4 = adminFeedbacks.stream().filter(f -> f.getRating() != null && f.getRating() == 4).count();
+        long star3 = adminFeedbacks.stream().filter(f -> f.getRating() != null && f.getRating() == 3).count();
+        long star2 = adminFeedbacks.stream().filter(f -> f.getRating() != null && f.getRating() == 2).count();
+        long star1 = adminFeedbacks.stream().filter(f -> f.getRating() != null && f.getRating() == 1).count();
+
+        double averageRating = totalFeedback == 0
+            ? 0.0
+            : adminFeedbacks.stream()
+            .filter(f -> f.getRating() != null)
+            .mapToInt(Feedback::getRating)
+            .average()
+            .orElse(0.0);
+
+        model.addAttribute("adminFeedbackCount", totalFeedback);
+        model.addAttribute("adminAverageRating", String.format(Locale.US, "%.1f", averageRating));
+        model.addAttribute("adminStar5Count", star5);
+        model.addAttribute("adminStar4Count", star4);
+        model.addAttribute("adminStar3Count", star3);
+        model.addAttribute("adminStar2Count", star2);
+        model.addAttribute("adminStar1Count", star1);
+        model.addAttribute("adminStar5Percent", totalFeedback == 0 ? 0.0 : (star5 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar4Percent", totalFeedback == 0 ? 0.0 : (star4 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar3Percent", totalFeedback == 0 ? 0.0 : (star3 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar2Percent", totalFeedback == 0 ? 0.0 : (star2 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar1Percent", totalFeedback == 0 ? 0.0 : (star1 * 100.0) / totalFeedback);
+
         return "admin-dashboard";
     }
 
@@ -112,6 +152,79 @@ public class AdminController {
         return "admin-edu-dashboard";
     }
 
+    @GetMapping("/feedback")
+    public String showFeedbackDashboard(HttpSession session, Model model) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        String adminEmail = (String) session.getAttribute("adminEmail");
+        List<Feedback> adminFeedbackHistory = adminService.getAdminByEmail(adminEmail)
+            .map(admin -> adminService.getFeedbackHistoryByAdminUserId(admin.getUserId()))
+            .orElseGet(List::of);
+
+        List<Feedback> feedbackHistory = adminService.getFeedbackHistory();
+        List<Feedback> ratingSource = adminFeedbackHistory.isEmpty() ? feedbackHistory : adminFeedbackHistory;
+
+        long totalFeedback = ratingSource.size();
+        long star5 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 5).count();
+        long star4 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 4).count();
+        long star3 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 3).count();
+        long star2 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 2).count();
+        long star1 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 1).count();
+
+        double averageRating = totalFeedback == 0
+            ? 0.0
+            : ratingSource.stream()
+            .filter(f -> f.getRating() != null)
+            .mapToInt(Feedback::getRating)
+            .average()
+            .orElse(0.0);
+
+        Map<String, Double> departmentAverages = adminService.getDepartmentAverageRatings(feedbackHistory);
+        Map<String, Integer[]> departmentStarCounts = adminService.getDepartmentStarCounts(feedbackHistory);
+
+        List<String> deptRatingLabels = new ArrayList<>(departmentAverages.keySet());
+        List<Double> deptRatingValues = deptRatingLabels.stream()
+                .map(label -> departmentAverages.getOrDefault(label, 0.0))
+                .toList();
+
+        String topRatedDepartment = null;
+        Double topRatedAverage = null;
+        if (!departmentAverages.isEmpty()) {
+            topRatedDepartment = departmentAverages.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(Map.Entry::getKey)
+                    .orElse(null);
+
+            topRatedAverage = departmentAverages.entrySet().stream()
+                    .max(Map.Entry.comparingByValue())
+                    .map(entry -> Math.round(entry.getValue() * 100.0) / 100.0)
+                    .orElse(null);
+        }
+
+        model.addAttribute("feedbackHistory", feedbackHistory);
+        model.addAttribute("departmentStarCounts", departmentStarCounts);
+        model.addAttribute("deptRatingLabels", deptRatingLabels);
+        model.addAttribute("deptRatingValues", deptRatingValues);
+        model.addAttribute("topRatedDepartment", topRatedDepartment);
+        model.addAttribute("topRatedAverage", topRatedAverage);
+        model.addAttribute("adminFeedbackCount", totalFeedback);
+        model.addAttribute("adminAverageRating", String.format(Locale.US, "%.1f", averageRating));
+        model.addAttribute("adminStar5Count", star5);
+        model.addAttribute("adminStar4Count", star4);
+        model.addAttribute("adminStar3Count", star3);
+        model.addAttribute("adminStar2Count", star2);
+        model.addAttribute("adminStar1Count", star1);
+        model.addAttribute("adminStar5Percent", totalFeedback == 0 ? 0.0 : (star5 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar4Percent", totalFeedback == 0 ? 0.0 : (star4 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar3Percent", totalFeedback == 0 ? 0.0 : (star3 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar2Percent", totalFeedback == 0 ? 0.0 : (star2 * 100.0) / totalFeedback);
+        model.addAttribute("adminStar1Percent", totalFeedback == 0 ? 0.0 : (star1 * 100.0) / totalFeedback);
+
+        return "admin-feedback";
+    }
+
     /**
      * View a single concern with its replies
      */
@@ -122,9 +235,11 @@ public class AdminController {
         }
         Concern concern = adminService.getConcernById(id);
         List<AdminReply> replies = adminService.getRepliesForConcern(id);
+        Feedback feedback = feedbackService.getFeedbackByConcernId(id).orElse(null);
 
         model.addAttribute("concern", concern);
         model.addAttribute("replies", replies);
+        model.addAttribute("feedback", feedback);
         model.addAttribute("replyDTO", new AdminReplyDTO());
 
         return "admin-concern-detail";

@@ -643,6 +643,59 @@
             opacity: 0.5;
         }
 
+        .student-feedback-panel {
+            margin-top: 18px;
+            padding: 20px;
+            border-radius: var(--radius-sm);
+            border: 1.5px solid #bfdbfe;
+            background: linear-gradient(135deg, #eff6ff, #eef2ff);
+            border-left: 4px solid #2563eb;
+        }
+
+        .student-feedback-panel h4 {
+            margin: 0 0 8px;
+            font-size: 16px;
+            color: #1e3a8a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .student-feedback-meta {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .student-feedback-stars {
+            display: inline-flex;
+            gap: 4px;
+            margin-bottom: 10px;
+        }
+
+        .student-feedback-stars i {
+            font-size: 16px;
+        }
+
+        .student-feedback-stars i.filled {
+            color: #f59e0b;
+        }
+
+        .student-feedback-stars i.empty {
+            color: #cbd5e1;
+        }
+
+        .student-feedback-comment {
+            font-size: 14px;
+            line-height: 1.7;
+            color: #1e293b;
+            background: #ffffff;
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
         /* Reply form */
         .reply-form-section {
             background: var(--bg-white);
@@ -1013,6 +1066,28 @@
                        target="_blank">
                         📎 View Attachment
                     </a>
+                </div>
+
+                <div th:if="${feedback != null}" class="student-feedback-panel">
+                    <h4><i class="fas fa-star"></i> Student Feedback</h4>
+                    <div class="student-feedback-meta"
+                         th:text="'Submitted on ' + ${#temporals.format(feedback.submissionTime, 'dd MMM yyyy, HH:mm')}">
+                        Submitted on 01 Jan 2026, 10:30
+                    </div>
+                    <div class="student-feedback-stars" th:with="r=${feedback.rating}">
+                        <i th:each="n : ${#numbers.sequence(1,5)}"
+                           th:class="${n <= r} ? 'fas fa-star filled' : 'fas fa-star empty'"></i>
+                    </div>
+                    <div class="student-feedback-comment"
+                         th:if="${feedback.comments != null and !feedback.comments.isEmpty()}"
+                         th:text="${feedback.comments}">
+                        Student comment
+                    </div>
+                    <div class="student-feedback-comment"
+                         th:if="${feedback.comments == null or feedback.comments.isEmpty()}"
+                         style="color:#64748b; font-style:italic;">
+                        Student submitted a rating without a written comment.
+                    </div>
                 </div>
             </div>
 
