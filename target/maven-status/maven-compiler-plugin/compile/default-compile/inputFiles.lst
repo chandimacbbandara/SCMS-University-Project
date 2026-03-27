@@ -16,6 +16,7 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/ConcernSubmissionDTO.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/FeedbackDTO.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/LoginDTO.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/ReplySpellCheckResultDTO.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/StudentProfileUpdateDTO.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/dto/StudentRegistrationDTO.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Admin.java
@@ -50,5 +51,6 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/FeedbackModerationService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/FeedbackService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/NotificationService.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/ReplySpellcheckService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentCommunityService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentRegistrationService.java
