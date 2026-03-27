@@ -572,3 +572,65 @@
         align-items: flex-start;
     }
 }
+
+@media (max-width: 600px) {
+    .community-shell {
+        margin: 18px auto;
+        padding: 0 12px 28px;
+    }
+
+    .community-body .navbar {
+        padding: 8px 12px;
+        gap: 12px;
+    }
+
+    .community-body nav ul {
+        width: 100%;
+        gap: 6px;
+    }
+
+    .community-hero,
+    .rules-hero,
+    .rules-card,
+    .community-side,
+    .community-main-card {
+        border-radius: 14px;
+    }
+
+    .community-hero {
+        padding: 16px;
+    }
+
+    .community-hero h1,
+    .rules-hero h1,
+    .community-main-card h2 {
+        font-size: 22px;
+    }
+
+    .post-card,
+    .compose-form,
+    .reply-form,
+    .edit-form {
+        padding: 12px;
+    }
+
+    .post-title {
+        font-size: 16px;
+    }
+
+    .reply-text {
+        padding-left: 0;
+        margin-top: 6px;
+    }
+
+    .primary-submit,
+    .secondary-submit,
+    .danger-btn,
+    .ghost-btn,
+    .btn-primary,
+    .official-link {
+        width: 100%;
+        justify-content: center;
+        text-align: center;
+    }
+}
