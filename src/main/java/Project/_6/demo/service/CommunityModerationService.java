@@ -48,7 +48,7 @@ public class CommunityModerationService {
         String contentType = rawContentType == null ? "post" : rawContentType.trim().toLowerCase(Locale.ROOT);
 
         if (message.isBlank()) {
-            return new CommunityModerationResultDTO("BLOCK", "Message cannot be empty.", 100);
+            return new CommunityModerationResultDTO("BLOCK", "Message cannot be empty.", 100, "");
         }
 
         CommunityModerationResultDTO localResult = runLocalChecks(message);
@@ -57,7 +57,7 @@ public class CommunityModerationService {
         }
 
         if (geminiApiKey == null || geminiApiKey.isBlank()) {
-            return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 20);
+            return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 20, "");
         }
 
         try {
@@ -66,7 +66,7 @@ public class CommunityModerationService {
                 if ("WARN".equals(aiResult.getDecision())
                         && aiResult.getReason() != null
                         && aiResult.getReason().contains("HTTP 429")) {
-                    return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 25);
+                    return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 25, "");
                 }
                 return aiResult;
             }
@@ -74,41 +74,57 @@ public class CommunityModerationService {
             // Fall back to local checks when AI moderation is unavailable.
         }
 
-        return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 25);
+        return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 25, "");
     }
 
     public CommunityModerationResultDTO moderateLiveText(String rawMessage, String rawContentType) {
         String message = rawMessage == null ? "" : rawMessage.trim();
         if (message.isBlank()) {
-            return new CommunityModerationResultDTO("ALLOW", "", 0);
+            return new CommunityModerationResultDTO("ALLOW", "", 0, "");
         }
-        return runLocalChecks(message);
+        
+        CommunityModerationResultDTO localResult = runLocalChecks(message);
+        if ("BLOCK".equals(localResult.getDecision())) {
+            return localResult;
+        }
+
+        if (geminiApiKey != null && !geminiApiKey.isBlank()) {
+            try {
+                return runGeminiLiveModeration(message);
+            } catch (Exception ignored) {
+                ignored.printStackTrace();
+                System.err.println("AI live moderation failed: " + ignored.getMessage());
+                // fallback to local checks
+            }
+        }
+        
+        return localResult;
     }
 
     private CommunityModerationResultDTO runLocalChecks(String message) {
         String lower = message.toLowerCase(Locale.ROOT);
 
         if (PHONE_PATTERN.matcher(message).find()) {
-            return new CommunityModerationResultDTO("BLOCK", "Phone numbers are not allowed in public posts.", 95);
+            return new CommunityModerationResultDTO("BLOCK", "Phone numbers are not allowed in public posts.", 95, "");
         }
 
         if (EMAIL_PATTERN.matcher(message).find()) {
-            return new CommunityModerationResultDTO("BLOCK", "Email addresses are not allowed in public posts.", 95);
+            return new CommunityModerationResultDTO("BLOCK", "Email addresses are not allowed in public posts.", 95, "");
         }
 
         if (containsAddressLikePii(lower)) {
-            return new CommunityModerationResultDTO("BLOCK", "Address or personal location details are not allowed.", 90);
+            return new CommunityModerationResultDTO("BLOCK", "Address or personal location details are not allowed.", 90, "");
         }
 
         if (containsBadWords(lower)) {
-            return new CommunityModerationResultDTO("BLOCK", "Inappropriate language detected. Please use respectful words.", 90);
+            return new CommunityModerationResultDTO("BLOCK", "Inappropriate language detected. Please use respectful words.", 90, "");
         }
 
         if (!isEnglishOnly(message)) {
-            return new CommunityModerationResultDTO("BLOCK", "Only English language is allowed in community chat.", 98);
+            return new CommunityModerationResultDTO("BLOCK", "Only English language is allowed in community chat.", 98, "");
         }
 
-        return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 20);
+        return new CommunityModerationResultDTO("ALLOW", "Passed local moderation checks.", 20, "");
     }
 
     private boolean isEnglishOnly(String message) {
@@ -125,6 +141,37 @@ public class CommunityModerationService {
             }
         }
         return false;
+    }
+
+    private CommunityModerationResultDTO runGeminiLiveModeration(String message) throws IOException, InterruptedException {
+        String moderationPrompt = "You are a strict language gate and spell checker for a university student chat. "
+                + "Rules: BLOCK if text is Sinhala script or transliterated Sinhala (Singlish/romanized Sinhala). "
+                + "If text is English, ALLOW it and return corrected English in correctedText. "
+                + "If English is already correct, keep correctedText exactly equal to input. "
+                + "Return JSON only with keys: decision, reason, riskScore, correctedText. "
+                + "decision must be ALLOW or BLOCK. riskScore must be an integer 0-100. "
+                + "Input text: " + message;
+
+        String rawModelOutput = invokeGeminiAndExtractText(moderationPrompt, 220, 10);
+        String json = extractAiJsonText(rawModelOutput);
+
+        String decision = safeUpper(extractQuotedJsonValue(json, "decision"));
+        if (!("ALLOW".equals(decision) || "BLOCK".equals(decision))) {
+            decision = "ALLOW";
+        }
+
+        String reason = stringOrEmpty(extractQuotedJsonValue(json, "reason")).trim();
+        if (reason.isBlank() && "ALLOW".equals(decision)) {
+            reason = "Passed moderation checks.";
+        }
+
+        int risk = clampRisk(extractIntJsonValue(json, "riskScore", 0));
+        String correctedText = stringOrEmpty(extractQuotedJsonValue(json, "correctedText")).trim();
+        if (correctedText.isBlank()) {
+            correctedText = message;
+        }
+
+        return new CommunityModerationResultDTO(decision, reason, risk, correctedText);
     }
 
     private boolean containsAddressLikePii(String lowerMessage) {
@@ -152,15 +199,38 @@ public class CommunityModerationService {
                 + "If uncertain, prefer BLOCK. "
                 + "contentType=" + contentType + ". text=" + message;
 
-        String escapedPrompt = moderationPrompt
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", " ");
+        String rawModelOutput = invokeGeminiAndExtractText(moderationPrompt, 180, 10);
+            String json = extractAiJsonText(rawModelOutput);
+
+            String decision = safeUpper(extractQuotedJsonValue(json, "decision"));
+            String reason = stringOrEmpty(extractQuotedJsonValue(json, "reason")).trim();
+            int risk = clampRisk(extractIntJsonValue(json, "riskScore", 0));
+
+        if (decision == null || decision.isBlank()) {
+            decision = "ALLOW";
+        }
+        if (reason == null || reason.isBlank()) {
+            reason = "Passed moderation checks.";
+        }
+
+        if (!("ALLOW".equals(decision) || "WARN".equals(decision) || "BLOCK".equals(decision))) {
+            decision = "ALLOW";
+        }
+
+        return new CommunityModerationResultDTO(decision, reason, risk, "");
+    }
+
+    private String invokeGeminiAndExtractText(String prompt, int maxOutputTokens, int timeoutSeconds)
+            throws IOException, InterruptedException {
+        String escapedPrompt = prompt
+                .replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", " ");
 
         String requestBody = "{"
-            + "\"contents\":[{\"parts\":[{\"text\":\"" + escapedPrompt + "\"}]}],"
-            + "\"generationConfig\":{\"temperature\":0.1,\"maxOutputTokens\":180,\"responseMimeType\":\"application/json\"}"
-            + "}";
+                + "\"contents\":[{\"parts\":[{\"text\":\"" + escapedPrompt + "\"}]}],"
+                + "\"generationConfig\":{\"temperature\":0.1,\"maxOutputTokens\":" + maxOutputTokens + ",\"responseMimeType\":\"application/json\"}"
+                + "}";
 
         Set<String> modelCandidates = new LinkedHashSet<>();
         modelCandidates.add(normalizeModelName(geminiModel));
@@ -171,93 +241,92 @@ public class CommunityModerationService {
 
         for (String modelName : modelCandidates) {
             for (String apiVersion : API_VERSIONS) {
-            String endpoint = "https://generativelanguage.googleapis.com/"
-                + apiVersion + "/models/" + modelName + ":generateContent?key=" + geminiApiKey;
+                String endpoint = "https://generativelanguage.googleapis.com/"
+                        + apiVersion + "/models/" + modelName + ":generateContent?key=" + geminiApiKey;
 
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(endpoint))
-                .header("Content-Type", "application/json")
-                .timeout(Duration.ofSeconds(8))
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create(endpoint))
+                        .header("Content-Type", "application/json")
+                        .timeout(Duration.ofSeconds(timeoutSeconds))
+                        .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                        .build();
 
-            response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            lastStatus = response.statusCode();
+                response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                lastStatus = response.statusCode();
 
-            if (lastStatus == 404) {
-                continue;
-            }
+                if (lastStatus == 404) {
+                    continue;
+                }
 
-            if (lastStatus >= 300) {
-                return new CommunityModerationResultDTO(
-                    "WARN",
-                    "AI moderation service error (HTTP " + lastStatus + "). Please try again.",
-                    85
-                );
-            }
+                if (lastStatus >= 300) {
+                    throw new IOException("AI moderation service error (HTTP " + lastStatus + ")");
+                }
 
-            break;
+                break;
             }
 
             if (response != null && response.statusCode() < 300) {
-            break;
+                break;
             }
         }
 
         if (response == null || response.statusCode() >= 300) {
-            return new CommunityModerationResultDTO(
-                "WARN",
-                "AI moderation model was not found (HTTP " + (lastStatus == 0 ? 404 : lastStatus) + "). Update gemini.model and try again.",
-                85
-            );
+            throw new IOException("AI moderation model was not found (HTTP " + (lastStatus == 0 ? 404 : lastStatus) + ")");
         }
 
-        String text = extractQuotedJsonValue(response.body(), "text");
-        if (text == null || text.isBlank()) {
-            return new CommunityModerationResultDTO(
-                    "WARN",
-                    "AI moderation response could not be parsed. Please try again.",
-                    85
-            );
+        String text = extractModelTextFromResponseBody(response.body());
+        if (text.isBlank()) {
+            throw new IOException("AI moderation response was empty");
         }
+        return text;
+    }
 
-        text = text.trim();
-        int start = text.indexOf('{');
-        int end = text.lastIndexOf('}');
+    private String extractAiJsonText(String modelText) throws IOException {
+        String cleaned = modelText == null ? "" : modelText.trim();
+        cleaned = cleaned.replace("```json", "").replace("```", "").trim();
+
+        int start = cleaned.indexOf('{');
+        int end = cleaned.lastIndexOf('}');
         if (start < 0 || end <= start) {
-            return new CommunityModerationResultDTO(
-                    "WARN",
-                    "AI moderation response format was invalid. Please try again.",
-                    85
-            );
+            throw new IOException("AI response format was invalid");
         }
 
-        String json = text.substring(start, end + 1);
-        String decision = extractQuotedJsonValue(json, "decision");
-        String reason = extractQuotedJsonValue(json, "reason");
-        int risk = extractIntJsonValue(json, "riskScore", 0);
+        return cleaned.substring(start, end + 1);
+    }
 
-        if (decision == null || decision.isBlank()) {
-            decision = "ALLOW";
-        } else {
-            decision = decision.toUpperCase(Locale.ROOT);
-        }
-        if (reason == null || reason.isBlank()) {
-            reason = "Passed moderation checks.";
+    private String extractModelTextFromResponseBody(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return "";
         }
 
-        if (!("ALLOW".equals(decision) || "WARN".equals(decision) || "BLOCK".equals(decision))) {
-            decision = "ALLOW";
+        Pattern candidateTextPattern = Pattern.compile("\\\"parts\\\"\\s*:\\s*\\[\\s*\\{\\s*\\\"text\\\"\\s*:\\s*\\\"((?:\\\\.|[^\\\"\\\\])*)\\\"");
+        Matcher matcher = candidateTextPattern.matcher(responseBody);
+        if (matcher.find()) {
+            return unescapeJsonString(matcher.group(1));
         }
 
-        if (risk < 0) {
-            risk = 0;
-        }
-        if (risk > 100) {
-            risk = 100;
-        }
+        return "";
+    }
 
-        return new CommunityModerationResultDTO(decision, reason, risk);
+    private int clampRisk(int value) {
+        if (value < 0) {
+            return 0;
+        }
+        if (value > 100) {
+            return 100;
+        }
+        return value;
+    }
+
+    private String safeUpper(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private String stringOrEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private String normalizeModelName(String configuredModel) {

@@ -1,12 +1,17 @@
 package Project._6.demo.controller;
 
 import Project._6.demo.dto.AdminReplyDTO;
+import Project._6.demo.dto.CommunityModerationRequestDTO;
+import Project._6.demo.dto.CommunityModerationResultDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.service.AdminService;
+import Project._6.demo.service.CommunityModerationService;
 import Project._6.demo.service.FeedbackService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +34,15 @@ public class AdminController {
     private final AdminService adminService;
     private final FeedbackService feedbackService;
     private final Project._6.demo.service.StudentCommunityService communityService;
+    private final CommunityModerationService moderationService;
 
     public AdminController(AdminService adminService, FeedbackService feedbackService,
-                           Project._6.demo.service.StudentCommunityService communityService) {
+                           Project._6.demo.service.StudentCommunityService communityService,
+                           CommunityModerationService moderationService) {
         this.adminService = adminService;
         this.feedbackService = feedbackService;
         this.communityService = communityService;
+        this.moderationService = moderationService;
     }
 
     /**
@@ -469,6 +477,47 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());
         }
         return "redirect:/admin/community";
+    }
+
+    /**
+     * Moderator Reply to Post (template-compatible route)
+     */
+    @PostMapping("/community/post/{id}/replies")
+    public String replyToPostTemplateRoute(@PathVariable("id") Integer id,
+                                           @RequestParam("message") String message,
+                                           HttpSession session,
+                                           RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            CommunityModerationResultDTO moderation = moderationService.moderateText(message, "reply");
+            if (!"ALLOW".equals(moderation.getDecision())) {
+                redirectAttributes.addFlashAttribute("errorMessage", moderation.getReason());
+                return "redirect:/admin/community";
+            }
+
+            communityService.addAdminReply(id, message, "Admin");
+            redirectAttributes.addFlashAttribute("successMessage", "Reply added successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());
+        }
+        return "redirect:/admin/community";
+    }
+
+    @PostMapping("/community/moderate")
+    @ResponseBody
+    public ResponseEntity<CommunityModerationResultDTO> moderateAdminMessage(@RequestBody CommunityModerationRequestDTO dto,
+                                                                              HttpSession session) {
+        if (!isAdminLoggedIn(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommunityModerationResultDTO("BLOCK", "Please log in again.", 100, ""));
+        }
+
+        String contentType = dto.getContentType() == null ? "reply" : dto.getContentType();
+        CommunityModerationResultDTO result = moderationService.moderateLiveText(dto.getMessage(), contentType);
+        return ResponseEntity.ok(result);
     }
 
     /**
