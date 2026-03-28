@@ -178,4 +178,5 @@ ON Student_Community_Reply(PostID_FK, Status, CreatedTime ASC);
 SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
-SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;
+SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
+ALTER TABLE Student_Community_Reply ADD AdminName VARCHAR(100) NULL;

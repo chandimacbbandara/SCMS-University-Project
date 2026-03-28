@@ -27,6 +27,7 @@ Project/_6/demo/entity/Student.class
 Project/_6/demo/dto/AdminReplyDTO.class
 Project/_6/demo/repository/StudentCommunityReplyRepository.class
 Project/_6/demo/repository/AdminReplyRepository.class
+Project/_6/demo/controller/AdminController.class
 Project/_6/demo/service/AdminService.class
 Project/_6/demo/entity/AdminReply.class
 Project/_6/demo/dto/LoginDTO.class

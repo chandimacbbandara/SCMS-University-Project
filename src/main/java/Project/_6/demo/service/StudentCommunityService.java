@@ -129,6 +129,15 @@ public class StudentCommunityService {
     }
 
     @Transactional
+    public void deletePostAsModerator(Integer postId, Integer adminId, String reason) {
+        StudentCommunityPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found."));
+        post.setStatus("DELETED_BY_MODERATOR");
+        // You can save the reason in a log if needed
+        postRepository.save(post);
+    }
+
+    @Transactional
     public void createReply(Integer postId, Integer userId, CommunityReplyDTO dto) {
         validateReply(dto);
 
@@ -178,6 +187,35 @@ public class StudentCommunityService {
         StudentCommunityReply reply = replyRepository.findByReplyIdAndStudent_UserId(replyId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found or access denied."));
         reply.setStatus("DELETED");
+        replyRepository.save(reply);
+    }
+
+    @Transactional
+    public void deleteReplyAsModerator(Integer replyId, Integer adminId, String reason) {
+        StudentCommunityReply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new IllegalArgumentException("Reply not found."));
+        reply.setStatus("DELETED_BY_MODERATOR");
+        replyRepository.save(reply);
+    }
+
+    @Transactional
+    public void addAdminReply(Integer postId, String message, String adminUsername) {
+        if (message == null || message.trim().isBlank()) {
+            throw new IllegalArgumentException("Reply message is required.");
+        }
+
+        StudentCommunityPost post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("Post not found."));
+        if (!"ACTIVE".equals(post.getStatus())) {
+            throw new IllegalArgumentException("This post is no longer available.");
+        }
+
+        StudentCommunityReply reply = new StudentCommunityReply();
+        reply.setPost(post);
+        // Student remains null for admin replies
+        reply.setMessage(message.trim());
+        reply.setStatus("ACTIVE");
+        reply.setAdminName(adminUsername != null ? adminUsername : "Admin");
         replyRepository.save(reply);
     }
 

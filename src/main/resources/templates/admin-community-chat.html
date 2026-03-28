@@ -3,11 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - Academy of Knowledge Bridge</title>
+    <title>Student Community Talk - Academy of Knowledge Bridge</title>
+    
+    
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="/CSS/student-community.css">
     <link rel="stylesheet" href="/CSS/admin-tour.css">
-    <style>
+<style>
         :root {
             --primary: #dc2626;
             --primary-dark: #991b1b;
@@ -690,8 +695,7 @@
     </style>
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar">
+<nav class="navbar">
         <div class="navbar-inner">
             <a href="/" class="nav-brand">
                 <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Logo">
@@ -700,380 +704,213 @@
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
                 <li><a href="/admin/student-review">Student Review</a></li>
-                <li><a href="/admin/community">Community Chat</a></li>
-                <li><a href="/admin/dashboard" class="active">Admin Dashboard</a></li>
+                <li><a href="/admin/community" class="active">Community Chat</a></li>
+                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
                 <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- Hero Banner -->
-    <section class="hero">
-        <div class="hero-pattern"></div>
-        <div class="container">
-            <div class="hero-content anim-up">
-                <div class="hero-left">
-                    <div class="hero-badge"><span class="dot"></span> Admin Panel</div>
-                    <h1><i class="fas fa-shield-halved" style="margin-right:8px;opacity:0.8;"></i> Admin Dashboard</h1>
-                    <p class="hero-sub">Monitor, manage &amp; respond to student concerns in real time. Your centralized control panel for academic excellence.</p>
-                    <div class="hero-btns">
-                        <a th:href="@{/admin/edu-dashboard}" class="hero-btn hero-btn-primary">
-                            <i class="fas fa-graduation-cap"></i> View Education Dashboard
-                        </a>
-                        <a th:href="@{/admin/feedback}" class="hero-btn hero-btn-primary">
-                            <i class="fas fa-star-half-stroke"></i> Feedback Dashboard
-                        </a>
-                        <a href="/admin/student-review" class="hero-btn hero-btn-outline">
-                            <i class="fas fa-users"></i> Student Accounts
-                        </a>
-                    </div>
-                </div>
-                <div class="hero-right">
-                    <div class="hero-clock-card">
-                        <div class="clock-icon"><i class="far fa-calendar-alt"></i></div>
-                        <span id="currentDate">Loading...</span>
-                        <span id="currentTime">00:00:00</span>
-                    </div>
-                </div>
-            </div>
+<main class="community-shell">
+    <section class="community-hero">
+        <div>
+            <h1><i class="fa-solid fa-comments"></i> Student Community Talk</h1>
+            <p>Discuss concerns, get peer support, and keep the space respectful.</p>
         </div>
+        <a href="/submit-concern" class="official-link"><i class="fa-solid fa-shield-heart"></i> Use Official Concern Channel</a>
     </section>
 
-    <main class="container">
-        <div th:if="${successMessage}" class="alert-toast success">
-            <i class="fas fa-circle-check"></i>
-            <span th:text="${successMessage}">Success</span>
-        </div>
-        <div th:if="${errorMessage}" class="alert-toast error">
-            <i class="fas fa-circle-exclamation"></i>
-            <span th:text="${errorMessage}">Error</span>
-        </div>
+    <div class="community-grid">
+        <aside class="community-side">
+            <h3 class="side-heading"><i class="fa-solid fa-shield-halved"></i> Safety Rules</h3>
+            <ul class="side-rules">
+                <li>No phone numbers, addresses, emails, or private IDs.</li>
+                <li>No abusive or bullying language.</li>
+                <li>No harmful advice or threatening messages.</li>
+                <li>Use official concern flow for private/sensitive issues.</li>
+            </ul>
+            <hr class="side-separator">
+            <h3 class="side-heading"><i class="fa-solid fa-circle-info"></i> Quick Note</h3>
+            <p class="side-note">
+                Peer replies are community guidance only. For official university decisions, use the concern portal.
+            </p>
 
-        <!-- Stats Row -->
-        <div class="stats-row">
-            <div class="stat-card sc-total anim-scale d1">
-                <div class="stat-icon-wrap"><i class="fas fa-layer-group"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number" data-count th:text="${totalConcerns}">0</div>
-                    <div class="stat-label">Total Concerns</div>
+            <hr class="side-separator">
+            
+        </aside>
+
+        <section class="community-main-card">
+            <div th:if="${successMessage}" class="flash-success" th:text="${successMessage}">Success</div>
+            <div th:if="${errorMessage}" class="flash-error" th:text="${errorMessage}">Error</div>
+
+            <div class="feed-head">
+                <div>
+                    <h2 class="feed-title"><i class="fa-solid fa-message"></i> Community Feed</h2>
+                    <p class="feed-sub">Ask clearly, reply respectfully, and help each other with practical answers.</p>
+                </div>
+                <div class="feed-stats">
+                    <span class="stat-chip" th:text="${#lists.size(posts)} + ' Active Posts'">0 Active Posts</span>
+                    <span class="stat-chip soft"><i class="fa-solid fa-users"></i> Peer-to-peer discussion</span>
                 </div>
             </div>
-            <div class="stat-card sc-pending anim-scale d2">
-                <div class="stat-icon-wrap"><i class="fas fa-clock"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number" data-count th:text="${pendingCount}">0</div>
-                    <div class="stat-label">Pending</div>
+
+            
+
+            <div class="feed-stream">
+                <div class="stream-label">
+                    <span><i class="fa-solid fa-wave-square"></i> Live Student Conversations</span>
                 </div>
-            </div>
-            <div class="stat-card sc-progress anim-scale d3">
-                <div class="stat-icon-wrap"><i class="fas fa-spinner"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number" data-count th:text="${inProgressCount}">0</div>
-                    <div class="stat-label">In Progress</div>
+
+                <div th:if="${#lists.isEmpty(posts)}" class="post-card post-empty">
+                    <h3 style="margin:0 0 8px;">No conversations yet</h3>
+                    <p style="margin:0;color:#6a748a;">Start the first discussion and invite helpful replies from students.</p>
                 </div>
-            </div>
-            <div class="stat-card sc-resolved anim-scale d4">
-                <div class="stat-icon-wrap"><i class="fas fa-check-circle"></i></div>
-                <div class="stat-info">
-                    <div class="stat-number" data-count th:text="${completeCount}">0</div>
-                    <div class="stat-label">Resolved</div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Department Categories -->
-        <section class="department-section anim-up d3">
-            <div class="department-header">
-                <h3><i class="fas fa-building-columns"></i> Department Categories</h3>
-                <span class="department-sub">Click a department to filter concerns</span>
-            </div>
-            <div class="department-tabs-wrap">
-                <div class="department-tabs" role="tablist" aria-label="Department categories">
-                    <a th:href="@{/admin/dashboard(status='All',category='Institute Problem',timePeriod=${selectedTimePeriod})}"
-                       class="department-tab"
-                       th:classappend="${selectedCategory == 'Institute Problem'} ? ' active'"
-                       role="tab"
-                       th:attr="aria-selected=${selectedCategory == 'Institute Problem'}">
-                        <div class="department-tab-top">
-                            <span class="department-tab-name">Institute Problem</span>
-                            <span class="department-tab-icon"><i class="fas fa-school"></i></span>
-                        </div>
-                        <span class="department-tab-meta"><i class="fas fa-inbox"></i> <span th:text="${instituteCount}">0</span> Concerns</span>
-                    </a>
+                <article class="post-card post-thread" th:each="post : ${posts}">
+                    <div class="post-head">
+                        <img class="avatar-img"
+                             th:src="${'/student/photo/' + post.student.userId}"
+                             src="/images/img1.jpeg"
+                             alt="Student profile picture"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                        <span class="avatar-fallback" style="display:none;" th:text="${#strings.substring(post.student.user.firstName, 0, 1)}">S</span>
 
-                    <a th:href="@{/admin/dashboard(status='All',category='Registration',timePeriod=${selectedTimePeriod})}"
-                       class="department-tab"
-                       th:classappend="${selectedCategory == 'Registration'} ? ' active'"
-                       role="tab"
-                       th:attr="aria-selected=${selectedCategory == 'Registration'}">
-                        <div class="department-tab-top">
-                            <span class="department-tab-name">Registration</span>
-                            <span class="department-tab-icon"><i class="fas fa-id-card"></i></span>
+                        <div class="post-user-block">
+                            <div class="post-user-line">
+                                <span class="post-user-name" th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student Name</span>
+                                <span class="post-tag" th:text="${post.category}">Category</span>
+                            </div>
+                            <span class="post-time" th:text="${#temporals.format(post.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan</span>
                         </div>
-                        <span class="department-tab-meta"><i class="fas fa-inbox"></i> <span th:text="${registrationCount}">0</span> Concerns</span>
-                    </a>
+                    </div>
 
-                    <a th:href="@{/admin/dashboard(status='All',category='Administrative',timePeriod=${selectedTimePeriod})}"
-                       class="department-tab"
-                       th:classappend="${selectedCategory == 'Administrative'} ? ' active'"
-                       role="tab"
-                       th:attr="aria-selected=${selectedCategory == 'Administrative'}">
-                        <div class="department-tab-top">
-                            <span class="department-tab-name">Administrative</span>
-                            <span class="department-tab-icon"><i class="fas fa-user-shield"></i></span>
-                        </div>
-                        <span class="department-tab-meta"><i class="fas fa-inbox"></i> <span th:text="${administrativeCount}">0</span> Concerns</span>
-                    </a>
+                    <h3 class="post-title" th:text="${post.title}">Post Title</h3>
+                    <div class="post-body" th:text="${post.message}">Post body</div>
 
-                    <a th:href="@{/admin/dashboard(status='All',category='Financial',timePeriod=${selectedTimePeriod})}"
-                       class="department-tab"
-                       th:classappend="${selectedCategory == 'Financial'} ? ' active'"
-                       role="tab"
-                       th:attr="aria-selected=${selectedCategory == 'Financial'}">
-                        <div class="department-tab-top">
-                            <span class="department-tab-name">Financial</span>
-                            <span class="department-tab-icon"><i class="fas fa-coins"></i></span>
-                        </div>
-                        <span class="department-tab-meta"><i class="fas fa-inbox"></i> <span th:text="${financialCount}">0</span> Concerns</span>
-                    </a>
+                    <div class="post-meta">
+                        <span><i class="fa-solid fa-user"></i> <span th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student</span></span>
+                        <span><i class="fa-solid fa-reply"></i> <span th:text="${#lists.size(repliesMap[post.postId])}">0</span> Replies</span>
+                        <span><i class="fa-solid fa-circle-check"></i> Open Discussion</span>
+                    </div>
 
-                    <a th:href="@{/admin/dashboard(status='All',category='Other',timePeriod=${selectedTimePeriod})}"
-                       class="department-tab"
-                       th:classappend="${selectedCategory == 'Other'} ? ' active'"
-                       role="tab"
-                       th:attr="aria-selected=${selectedCategory == 'Other'}">
-                        <div class="department-tab-top">
-                            <span class="department-tab-name">Other</span>
-                            <span class="department-tab-icon"><i class="fas fa-ellipsis"></i></span>
+                    
+                        <div class="post-actions" style="margin-top:10px;">
+                            <form th:action="@{'/admin/community/post/' + ${post.postId} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Delete this post as admin?');">
+                                <button type="submit" class="danger-btn" style="background:#e11d48;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Delete Post</button>
+                            </form>
                         </div>
-                        <span class="department-tab-meta"><i class="fas fa-inbox"></i> <span th:text="${otherCount}">0</span> Concerns</span>
-                    </a>
-                </div>
+
+
+                    <form class="edit-form" th:id="'edit-post-' + ${post.postId}" style="display:none;"
+                          th:action="@{'/admin/community/post/' + ${post.postId} + '/update'}" method="post">
+                        <div class="row">
+                            <input type="text" name="title" maxlength="160" th:value="${post.title}" required>
+                            <select name="category" required>
+                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
+                                        th:selected="${cat == post.category}">Academic</option>
+                            </select>
+                        </div>
+                        <textarea name="message" data-mod-type="post" maxlength="2000" th:text="${post.message}" required></textarea>
+                        <div class="moderation-hint"></div>
+                        <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                            <button type="submit" class="btn-apply" style="border:none; cursor:pointer;">Save Post</button>
+                        </div>
+                    </form>
+
+                    <section class="reply-list">
+                        <div class="reply-list-title">
+                            <i class="fa-solid fa-comments"></i>
+                            Replies (<span th:text="${#lists.size(repliesMap[post.postId])}">0</span>)
+                        </div>
+
+                        <div class="reply-item" th:each="reply : ${repliesMap[post.postId]}">
+                            <div class="reply-head">
+                                <img class="avatar-img small"
+                                     th:src="${reply.student != null ? '/student/photo/' + reply.student.userId : '/images/img1.jpeg'}"
+                                     src="/images/img1.jpeg"
+                                     alt="Reply student profile picture"
+                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                                <span class="avatar-fallback small" style="display:none;" th:text="${reply.student != null} ? ${#strings.substring(reply.student.user.firstName, 0, 1)} : 'A'">S</span>
+                                <div class="reply-user-meta">
+                                    <span th:text="${reply.student != null} ? ${reply.student.user.firstName + ' ' + reply.student.user.lastName} : ${reply.adminName + ' (Admin)'}">Student</span>
+                                    <span th:text="${#temporals.format(reply.createdTime, 'dd MMM yyyy, hh:mm a')}">Time</span>
+                                </div>
+                            </div>
+
+                            <div class="reply-text" th:text="${reply.message}">Reply message</div>
+                            <div class="reply-meta">
+                                Community reply
+                            </div>
+
+                            
+                            <div class="reply-actions" style="margin-top:5px;text-align:right;">
+                                <form th:action="@{'/admin/community/reply/' + ${reply.replyId} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Delete this reply as admin?');">
+                                    <button type="submit" class="danger-btn" style="background:#e11d48;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:12px;">Delete Reply</button>
+                                </form>
+                            </div>
+
+
+                            <form class="edit-form" th:id="'edit-reply-' + ${reply.replyId}" style="display:none;"
+                                  th:action="@{'/admin/community/reply/' + ${reply.replyId} + '/update'}" method="post">
+                                <textarea name="message" data-mod-type="reply" maxlength="1200" th:text="${reply.message}" required></textarea>
+                                <div class="moderation-hint"></div>
+                                <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                                    <button type="submit" class="btn-apply" style="border:none; cursor:pointer;">Save Reply</button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <form class="reply-form" th:action="@{'/admin/community/post/' + ${post.postId} + '/replies'}" method="post">
+                            <textarea name="message" data-mod-type="reply" maxlength="1200" placeholder="Reply as admin..." required></textarea>
+                            <div class="moderation-hint"></div>
+                            <div style="margin-top:10px;display:flex;justify-content:flex-end;">
+                                <button type="submit" class="btn-apply" style="border:none; cursor:pointer;"><i class="fa-solid fa-reply"></i> Reply</button>
+                            </div>
+                        </form>
+                    </section>
+                </article>
             </div>
         </section>
+    </div>
+</main>
 
-        <!-- Filter Card -->
-        <div class="filter-card anim-up d4">
-            <div class="filter-header" onclick="toggleFilter()">
-                <h3><i class="fas fa-sliders-h"></i> Filter Concerns</h3>
-                <button type="button" class="filter-toggle-btn" id="filterToggleBtn">
-                    <i class="fas fa-chevron-up"></i> Toggle
-                </button>
-            </div>
-            <div class="filter-body" id="filterBody">
-                <form th:action="@{/admin/dashboard}" method="get" class="filter-form">
-                    <div class="filter-group">
-                        <label>STATUS</label>
-                        <select name="status">
-                            <option value="All" th:selected="${selectedStatus == 'All'}">All Status</option>
-                            <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Pending</option>
-                            <option value="In Progress" th:selected="${selectedStatus == 'In Progress'}">In Progress</option>
-                            <option value="Complete" th:selected="${selectedStatus == 'Complete'}">Complete</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>CATEGORY</label>
-                        <select name="category">
-                            <option value="All" th:selected="${selectedCategory == 'All'}">All Categories</option>
-                            <option value="Institute Problem" th:selected="${selectedCategory == 'Institute Problem'}">Institute Problem</option>
-                            <option value="Registration" th:selected="${selectedCategory == 'Registration'}">Registration</option>
-                            <option value="Administrative" th:selected="${selectedCategory == 'Administrative'}">Administrative</option>
-                            <option value="Financial" th:selected="${selectedCategory == 'Financial'}">Financial</option>
-                            <option value="Other" th:selected="${selectedCategory == 'Other'}">Other</option>
-                        </select>
-                    </div>
-                    <div class="filter-group">
-                        <label>TIME PERIOD</label>
-                        <select name="timePeriod">
-                            <option value="All" th:selected="${selectedTimePeriod == 'All'}">All Time</option>
-                            <option value="Today" th:selected="${selectedTimePeriod == 'Today'}">Today</option>
-                            <option value="Last7Days" th:selected="${selectedTimePeriod == 'Last7Days'}">Last 7 Days</option>
-                            <option value="Last30Days" th:selected="${selectedTimePeriod == 'Last30Days'}">Last 30 Days</option>
-                            <option value="Older" th:selected="${selectedTimePeriod == 'Older'}">Older</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-apply"><i class="fas fa-filter"></i> APPLY</button>
-                    <a href="/admin/dashboard" class="btn-clear">Clear</a>
-                </form>
-            </div>
-        </div>
 
-        <!-- Concerns Table -->
-        <div class="table-card anim-up d5">
-            <div class="table-header">
-                <div class="table-header-left">
-                    <div class="table-header-icon"><i class="fas fa-stream"></i></div>
-                    <div>
-                        <h3>General Student Concerns</h3>
-                        <div class="sub">Institute, Registration, Administrative, Financial &amp; Other</div>
-                    </div>
-                </div>
-                <div class="concern-count-badge">
-                    <span th:text="${#lists.size(concerns.?[category != 'Education (Creative and IT)'])}">0</span>
-                    <span class="concern-count-label">Concerns</span>
-                </div>
-            </div>
 
-            <div class="table-body" th:if="${!#lists.isEmpty(concerns.?[category != 'Education (Creative and IT)'])}">
-                <div class="table-scroll">
-                    <table class="concern-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Student</th>
-                                <th>Subject</th>
-                                <th>Category</th>
-                                <th>Status</th>
-                                <th>Submitted</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="concern, iterStat : ${concerns}" th:if="${concern.category != 'Education (Creative and IT)'}">
-                                <td>
-                                    <span class="id-pill" th:text="'CON-' + ${concern.concernId}">CON-1</span>
-                                </td>
-                                <td>
-                                    <div class="student-cell">
-                                        <img th:if="${concern.student != null and concern.student.studentPhoto != null}"
-                                            class="student-photo"
-                                            th:src="@{'/admin/student-review/' + ${concern.student.userId} + '/photo'}"
-                                            alt="Student photo">
-                                        <div th:if="${concern.student == null or concern.student.studentPhoto == null}"
-                                            class="student-avatar"
-                                             th:classappend="'av-' + ${(iterStat.index % 5) + 1}"
-                                             th:text="${concern.student != null and concern.student.user != null} ? ${#strings.substring(concern.student.user.firstName, 0, 1)} : '?'">K</div>
-                                        <div>
-                                            <div class="student-name" th:text="${concern.student != null and concern.student.user != null} ? ${concern.student.user.firstName + ' ' + concern.student.user.lastName} : 'Unknown'">Student</div>
-                                            <div class="student-id-text" th:text="${concern.student != null} ? ${concern.student.studentId} : 'N/A'">ID</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="subject-text" th:text="${concern.subject}">Subject</div>
-                                    <div class="desc-text" th:text="${#strings.abbreviate(concern.message, 45)}">Desc...</div>
-                                </td>
-                                <td>
-                                    <span class="cat-badge" th:text="${concern.category}">Category</span>
-                                </td>
-                                <td>
-                                    <span class="status-pill"
-                                          th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : 'st-complete')">
-                                        <span class="status-dot"></span>
-                                        <span th:text="${concern.status}">Status</span>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="date-text" th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy')}">Date</div>
-                                    <div class="time-text" th:text="${#temporals.format(concern.createdTime, 'HH:mm')}">Time</div>
-                                </td>
-                                <td>
-                                    <div class="row-actions">
-                                        <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">
-                                            <i class="fas fa-arrow-right"></i> VIEW
-                                        </a>
-                                        <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
-                                              method="post"
-                                              onsubmit="return confirm('Delete this concern and related replies/feedback?');">
-                                            <input type="hidden" name="redirectTo" value="dashboard" />
-                                            <button type="submit" class="delete-btn">
-                                                <i class="fas fa-trash"></i> DELETE
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
-            <div th:if="${#lists.isEmpty(concerns.?[category != 'Education (Creative and IT)'])}" class="empty-state">
-                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
-                <p>No concerns found. Everything looks great!</p>
-            </div>
-        </div>
-    </main>
 
-    <footer class="site-footer">
-        <p>&copy; 2026 Academy of Knowledge Bridge &mdash; Student Concern Management System &bull; Made with <span class="heart">&#10084;</span></p>
-    </footer>
 
-    <script th:inline="javascript">
-        /* Clock */
-        function updateClock() {
-            const now = new Date();
-            document.getElementById('currentTime').textContent =
-                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
-            document.getElementById('currentDate').textContent =
-                now.toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
+<script>
+    window.adminTourConfig = {
+        pageId: 'community-chat',
+        autoStart: false,
+        storageKey: 'akb_admin_tour_completed',
+        steps: [
+            {
+                selector: '.nav-links',
+                title: 'Community Navigation',
+                content: 'Use this menu to return to Dashboard, Education Dashboard, or other admin areas.'
+            },
+            {
+                selector: '.community-hero',
+                title: 'Student Community',
+                content: 'Welcome to the Student Community. Here you can observe public discussions among students.'
+            },
+            {
+                selector: '.feed-stats',
+                title: 'Community Activity',
+                content: 'See the total number of active posts and discussions happening right now.'
+            },
+            {
+                selector: '.feed-stream',
+                title: 'Moderate Posts',
+                content: 'Review student posts. You can delete inappropriate posts or provide official replies as an Admin.'
+            }
+        ]
+    };
+</script>
+<script src="/js/admin-tour.js"></script>
 
-        /* Filter toggle */
-        function toggleFilter() {
-            const body = document.getElementById('filterBody');
-            const btn  = document.getElementById('filterToggleBtn');
-            body.classList.toggle('hidden');
-            btn.classList.toggle('collapsed');
-        }
-
-        /* Animated counters */
-        function animateCounters() {
-            document.querySelectorAll('[data-count]').forEach(el => {
-                const target = parseInt(el.textContent) || 0;
-                if (target === 0) return;
-                const dur = 1200;
-                const start = performance.now();
-                function tick(now) {
-                    const p = Math.min((now - start) / dur, 1);
-                    const ease = 1 - Math.pow(1 - p, 4);
-                    el.textContent = Math.round(target * ease);
-                    if (p < 1) requestAnimationFrame(tick);
-                }
-                el.textContent = '0';
-                requestAnimationFrame(tick);
-            });
-        }
-        window.addEventListener('DOMContentLoaded', () => setTimeout(animateCounters, 300));
-    </script>
-    <script>
-        window.adminTourConfig = {
-            pageId: 'dashboard',
-            autoStart: true,
-            storageKey: 'akb_admin_tour_completed',
-            nextPage: '/admin/student-review',
-            steps: [
-                {
-                    selector: '.nav-links',
-                    title: 'Navigation Bar',
-                    content: 'Use this menu to quickly move between Student Review, Feedback, and other admin pages.'
-                },
-                {
-                    selector: '.hero-left',
-                    title: 'Dashboard Overview',
-                    content: 'This hero section explains the dashboard purpose and gives quick-access shortcuts.'
-                },
-                {
-                    selector: '.stats-row',
-                    title: 'Key Metrics',
-                    content: 'Track key concern counts like Pending, In Progress, and Complete in real time.'
-                },
-                {
-                    selector: '.filter-card',
-                    title: 'Filter Controls',
-                    content: 'Use category, status, and date-range filters to narrow the concern list.'
-                },
-                {
-                    selector: '.table-card',
-                    title: 'Concern Table',
-                    content: 'Open a concern detail view from this table to reply and manage each case.'
-                }
-            ]
-        };
-    </script>
-    <script src="/js/admin-tour.js"></script>
+<script src="/js/student-community.js"></script>
 </body>
 </html>

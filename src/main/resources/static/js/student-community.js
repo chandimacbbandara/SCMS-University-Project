@@ -1,4 +1,11 @@
 (function () {
+    function getModerationEndpoint() {
+        if (window.location.pathname.startsWith('/admin/community')) {
+            return '/admin/community/moderate';
+        }
+        return '/student/community/moderate';
+    }
+
     function debounce(fn, delay) {
         let timer;
         return function (...args) {
@@ -8,7 +15,7 @@
     }
 
     async function callModeration(text, contentType) {
-        const response = await fetch('/student/community/moderate', {
+        const response = await fetch(getModerationEndpoint(), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text, contentType: contentType })
@@ -54,7 +61,25 @@
 
             const normalized = (result.decision || 'ALLOW').toLowerCase();
             hint.className = 'moderation-hint ' + normalized;
-            hint.textContent = result.reason || 'Moderation checked.';
+            
+            if (normalized === 'allow' && result.correctedText && result.correctedText !== value) {
+                const cursorStart = textarea.selectionStart;
+                const cursorEnd = textarea.selectionEnd;
+                const diff = result.correctedText.length - value.length;
+                
+                textarea.value = result.correctedText;
+                
+                try {
+                    textarea.setSelectionRange(
+                        Math.max(0, cursorStart + diff),
+                        Math.max(0, cursorEnd + diff)
+                    );
+                } catch(e) {}
+                
+                hint.textContent = 'Autocorrected spelling.';
+            } else {
+                hint.textContent = result.reason || 'Moderation checked.';
+            }
 
             if (submitBtn) {
                 submitBtn.disabled = normalized !== 'allow';

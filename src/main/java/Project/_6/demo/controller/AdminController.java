@@ -1,12 +1,17 @@
 package Project._6.demo.controller;
 
 import Project._6.demo.dto.AdminReplyDTO;
+import Project._6.demo.dto.CommunityModerationRequestDTO;
+import Project._6.demo.dto.CommunityModerationResultDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.service.AdminService;
+import Project._6.demo.service.CommunityModerationService;
 import Project._6.demo.service.FeedbackService;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -28,10 +33,16 @@ public class AdminController {
 
     private final AdminService adminService;
     private final FeedbackService feedbackService;
+    private final Project._6.demo.service.StudentCommunityService communityService;
+    private final CommunityModerationService moderationService;
 
-    public AdminController(AdminService adminService, FeedbackService feedbackService) {
+    public AdminController(AdminService adminService, FeedbackService feedbackService,
+                           Project._6.demo.service.StudentCommunityService communityService,
+                           CommunityModerationService moderationService) {
         this.adminService = adminService;
         this.feedbackService = feedbackService;
+        this.communityService = communityService;
+        this.moderationService = moderationService;
     }
 
     /**
@@ -369,6 +380,144 @@ public class AdminController {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to update department: " + e.getMessage());
         }
         return "redirect:/admin/concern/" + id;
+    }
+
+    /**
+     * View Student Community Chat
+     */
+    @GetMapping("/community")
+    public String showCommunity(HttpSession session, Model model) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        List<Project._6.demo.entity.StudentCommunityPost> posts = communityService.getActivePosts();
+        Map<Integer, List<Project._6.demo.entity.StudentCommunityReply>> repliesMap = communityService.getRepliesMap(posts);
+
+        model.addAttribute("adminName", session.getAttribute("adminEmail") != null ? "Admin" : "Admin");
+        model.addAttribute("posts", posts);
+        model.addAttribute("repliesMap", repliesMap);
+        model.addAttribute("categories", communityService.getAllowedCategories());
+
+        return "admin-community-chat";
+    }
+
+    /**
+     * Moderator Delete Post
+     */
+    @PostMapping("/community/post/{id}/delete")
+    public String deletePost(@PathVariable("id") Integer id,
+                             @RequestParam(value = "reason", required = false, defaultValue = "Moderator deletion") String reason,
+                             HttpSession session,
+                             RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        
+        Integer adminId = (Integer) session.getAttribute("adminId");
+        if (adminId == null) {
+            // fallback if ID not strictly stored, though it usually is
+            adminId = 0;
+        }
+
+        try {
+            communityService.deletePostAsModerator(id, adminId, reason);
+            redirectAttributes.addFlashAttribute("successMessage", "Post deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete post: " + e.getMessage());
+        }
+        return "redirect:/admin/community";
+    }
+
+    /**
+     * Moderator Delete Reply
+     */
+    @PostMapping("/community/reply/{id}/delete")
+    public String deleteReply(@PathVariable("id") Integer id,
+                              @RequestParam(value = "reason", required = false, defaultValue = "Moderator deletion") String reason,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        Integer adminId = (Integer) session.getAttribute("adminId");
+        if (adminId == null) {
+            adminId = 0;
+        }
+
+        try {
+            communityService.deleteReplyAsModerator(id, adminId, reason);
+            redirectAttributes.addFlashAttribute("successMessage", "Reply deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete reply: " + e.getMessage());
+        }
+        return "redirect:/admin/community";
+    }
+
+    /**
+     * Moderator Reply to Post
+     */
+    @PostMapping("/community/post/{id}/reply")
+    public String replyToPost(@PathVariable("id") Integer id,
+                              @RequestParam("content") String content,
+                              HttpSession session,
+                              RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            // You can mark admin replies differently if needed or use a separate service/flag.
+            // But we can just create a reply as normal using a placeholder studentId or use a dedicated admin logic.
+            // Alternatively, wait, the standard service requires `studentId`. So we need a special method.
+            communityService.addAdminReply(id, content, "Admin");
+            redirectAttributes.addFlashAttribute("successMessage", "Reply added successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());
+        }
+        return "redirect:/admin/community";
+    }
+
+    /**
+     * Moderator Reply to Post (template-compatible route)
+     */
+    @PostMapping("/community/post/{id}/replies")
+    public String replyToPostTemplateRoute(@PathVariable("id") Integer id,
+                                           @RequestParam("message") String message,
+                                           HttpSession session,
+                                           RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            CommunityModerationResultDTO moderation = moderationService.moderateText(message, "reply");
+            if (!"ALLOW".equals(moderation.getDecision())) {
+                redirectAttributes.addFlashAttribute("errorMessage", moderation.getReason());
+                return "redirect:/admin/community";
+            }
+
+            communityService.addAdminReply(id, message, "Admin");
+            redirectAttributes.addFlashAttribute("successMessage", "Reply added successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());
+        }
+        return "redirect:/admin/community";
+    }
+
+    @PostMapping("/community/moderate")
+    @ResponseBody
+    public ResponseEntity<CommunityModerationResultDTO> moderateAdminMessage(@RequestBody CommunityModerationRequestDTO dto,
+                                                                              HttpSession session) {
+        if (!isAdminLoggedIn(session)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new CommunityModerationResultDTO("BLOCK", "Please log in again.", 100, ""));
+        }
+
+        String contentType = dto.getContentType() == null ? "reply" : dto.getContentType();
+        CommunityModerationResultDTO result = moderationService.moderateLiveText(dto.getMessage(), contentType);
+        return ResponseEntity.ok(result);
     }
 
     /**
