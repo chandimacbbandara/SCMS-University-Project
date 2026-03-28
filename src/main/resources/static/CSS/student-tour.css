@@ -1,0 +1,114 @@
+.student-tour-launch {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 5000;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #fff;
+    background: linear-gradient(135deg, #e53935, #c62828);
+    box-shadow: 0 10px 24px rgba(229, 57, 53, 0.3);
+    cursor: pointer;
+}
+
+.student-tour-launch:hover {
+    transform: translateY(-1px);
+}
+
+.student-tour-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.42);
+    z-index: 5100;
+}
+
+.student-tour-tooltip {
+    position: fixed;
+    width: min(360px, calc(100vw - 24px));
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.28);
+    z-index: 5200;
+    padding: 14px;
+}
+
+.student-tour-step {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.student-tour-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.25;
+    color: #0f172a;
+}
+
+.student-tour-text {
+    margin: 0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.student-tour-actions {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.student-tour-left,
+.student-tour-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.student-tour-btn {
+    border: 1px solid #dbe2ea;
+    background: #fff;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.student-tour-btn.primary {
+    border-color: transparent;
+    color: #fff;
+    background: linear-gradient(135deg, #e53935, #c62828);
+}
+
+.student-tour-btn:hover {
+    filter: brightness(0.97);
+}
+
+.student-tour-highlight {
+    position: relative;
+    z-index: 5300 !important;
+    box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.32), 0 0 0 10px rgba(255, 111, 96, 0.2);
+    border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+    .student-tour-launch {
+        right: 12px;
+        bottom: 12px;
+        font-size: 11px;
+        padding: 9px 12px;
+    }
+}

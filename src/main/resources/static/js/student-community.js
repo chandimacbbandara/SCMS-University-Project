@@ -26,6 +26,7 @@
         const hint = textarea.parentElement.querySelector('.moderation-hint');
         const form = textarea.closest('form');
         const submitBtn = form ? form.querySelector('button[type="submit"]') : null;
+        let moderationRequestId = 0;
 
         const run = debounce(async () => {
             const value = textarea.value || '';
@@ -40,7 +41,13 @@
                 return;
             }
 
+            const requestId = ++moderationRequestId;
+
             const result = await callModeration(value, contentType);
+            if (requestId !== moderationRequestId) {
+                return;
+            }
+
             if (!hint) {
                 return;
             }
@@ -50,11 +57,14 @@
             hint.textContent = result.reason || 'Moderation checked.';
 
             if (submitBtn) {
-                submitBtn.disabled = normalized === 'block';
+                submitBtn.disabled = normalized !== 'allow';
             }
         }, 800);
 
-        textarea.addEventListener('input', run);
+        textarea.addEventListener('input', function () {
+            run();
+        });
+
     }
 
     function toggleById(id) {

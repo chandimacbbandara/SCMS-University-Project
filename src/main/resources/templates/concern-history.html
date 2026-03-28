@@ -6,6 +6,7 @@
     <title>Concern History - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -1872,5 +1873,41 @@
 
     setInterval(updateBadge, 30000);
 </script>
+<script>
+    window.studentTourConfig = {
+        pageId: 'concern-history',
+        autoStart: false,
+        storageKey: 'akb_student_tour_completed',
+        nextPage: '/student/profile',
+        steps: [
+            {
+                selector: '.page-hero',
+                title: 'History Overview',
+                content: 'This section introduces your concern history and overall tracking context.'
+            },
+            {
+                selector: '.stats-bar',
+                title: 'Concern Analytics',
+                content: 'See total, pending, in-progress, and resolved counts at a glance.'
+            },
+            {
+                selector: '.filter-bar',
+                title: 'Status Filters',
+                content: 'Filter cards by status to focus on concerns that need your attention.'
+            },
+            {
+                selector: '#concernsList',
+                title: 'Concern Cards',
+                content: 'Expand each card to review details, replies, and any shared evidence.'
+            },
+            {
+                selector: '.feedback-section',
+                title: 'Feedback Area',
+                content: 'When a concern is complete, you can rate the response and leave feedback.'
+            }
+        ]
+    };
+</script>
+<script src="/js/student-tour.js"></script>
 </body>
 </html>

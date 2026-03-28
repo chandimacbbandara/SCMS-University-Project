@@ -6,6 +6,7 @@
     <title>Student Community Talk - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/CSS/student-community.css">
 </head>
@@ -330,6 +331,43 @@
 
     setInterval(updateBadge, 30000);
 </script>
+
+<script>
+    window.studentTourConfig = {
+        pageId: 'student-community',
+        autoStart: false,
+        storageKey: 'akb_student_tour_completed',
+        steps: [
+            {
+                selector: '.community-hero',
+                title: 'Community Space',
+                content: 'This page is for respectful peer discussion and non-sensitive student support.'
+            },
+            {
+                selector: '.side-rules',
+                title: 'Safety Guidelines',
+                content: 'Follow these rules to keep the community safe and helpful for everyone.'
+            },
+            {
+                selector: '.compose-form',
+                title: 'Create A Post',
+                content: 'Write a clear title and message to ask the community for practical advice.'
+            },
+            {
+                selector: '.feed-stream',
+                title: 'Community Feed',
+                content: 'Browse active discussions, replies, and updates from other students.'
+            },
+            {
+                selector: '.official-link',
+                title: 'Official Concern Channel',
+                content: 'Use this shortcut whenever your issue should go through official concern handling.'
+            }
+        ]
+    };
+</script>
+
+<script src="/js/student-tour.js"></script>
 
 <script src="/js/student-community.js"></script>
 </body>

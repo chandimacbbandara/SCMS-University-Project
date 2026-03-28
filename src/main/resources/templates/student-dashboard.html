@@ -6,6 +6,7 @@
     <title>Student Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -1867,5 +1868,41 @@
         // Poll for new notifications every 30 seconds
         setInterval(updateBadge, 30000);
     </script>
+    <script>
+        window.studentTourConfig = {
+            pageId: 'student-dashboard',
+            autoStart: true,
+            storageKey: 'akb_student_tour_completed',
+            nextPage: '/submit-concern',
+            steps: [
+                {
+                    selector: '.welcome-hero',
+                    title: 'Welcome Panel',
+                    content: 'This banner shows your identity, live time, and quick account snapshot each time you sign in.'
+                },
+                {
+                    selector: '.dashboard-controls',
+                    title: 'Search And Filters',
+                    content: 'Use search and status filters to quickly narrow active concern cards and dashboard content.'
+                },
+                {
+                    selector: '.actions-list',
+                    title: 'Quick Actions',
+                    content: 'Jump straight to Report Issue, Community Talk, or refresh your dashboard from here.'
+                },
+                {
+                    selector: '.tracking-section',
+                    title: 'Live Concern Tracking',
+                    content: 'Monitor Pending and In Progress concerns with real-time status progression.'
+                },
+                {
+                    selector: '.tips-section',
+                    title: 'Getting Started Tips',
+                    content: 'These tips explain the best flow for submitting concerns and following updates effectively.'
+                }
+            ]
+        };
+    </script>
+    <script src="/js/student-tour.js"></script>
 </body>
 </html>

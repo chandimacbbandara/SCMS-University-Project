@@ -6,6 +6,7 @@
     <title>Community Rules - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/CSS/student-community.css">
 </head>
@@ -174,5 +175,35 @@
 
     setInterval(updateBadge, 30000);
 </script>
+<script>
+    window.studentTourConfig = {
+        pageId: 'student-community-rules',
+        autoStart: false,
+        storageKey: 'akb_student_tour_completed',
+        steps: [
+            {
+                selector: '.rules-hero',
+                title: 'Rules Introduction',
+                content: 'Review this page before joining student community discussions.'
+            },
+            {
+                selector: '.rules-list',
+                title: 'Community Rules',
+                content: 'These rules protect privacy, respect, and safety across all conversations.'
+            },
+            {
+                selector: '.rules-note',
+                title: 'Safety Commitment',
+                content: 'This note summarizes why rule acceptance is required for participation.'
+            },
+            {
+                selector: '.rules-form',
+                title: 'Accept And Continue',
+                content: 'Tick agreement and continue to enter the student community talk area.'
+            }
+        ]
+    };
+</script>
+<script src="/js/student-tour.js"></script>
 </body>
 </html>

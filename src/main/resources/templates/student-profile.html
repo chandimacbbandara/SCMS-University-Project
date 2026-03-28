@@ -6,6 +6,7 @@
     <title>Student Profile - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -891,5 +892,41 @@
 
     setInterval(updateBadge, 30000);
 </script>
+<script>
+    window.studentTourConfig = {
+        pageId: 'student-profile',
+        autoStart: false,
+        storageKey: 'akb_student_tour_completed',
+        nextPage: '/student/community',
+        steps: [
+            {
+                selector: '.profile-hero',
+                title: 'Profile Header',
+                content: 'This section gives a quick summary of your protected student profile information.'
+            },
+            {
+                selector: '.readonly-list',
+                title: 'Locked Details',
+                content: 'These account fields are read-only and managed by the system for safety.'
+            },
+            {
+                selector: '#profileViewSection',
+                title: 'Editable Personal Data',
+                content: 'View your current editable profile details before opening edit mode.'
+            },
+            {
+                selector: '#profileEditForm',
+                title: 'Profile Update Form',
+                content: 'Use this form to update allowed personal fields with built-in validation.'
+            },
+            {
+                selector: '#changePasswordForm',
+                title: 'Change Password',
+                content: 'Secure your account by setting a strong new password here.'
+            }
+        ]
+    };
+</script>
+<script src="/js/student-tour.js"></script>
 </body>
 </html>

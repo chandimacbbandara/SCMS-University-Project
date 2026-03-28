@@ -6,6 +6,7 @@
     <title>Submit Concern - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { background: #f4f6fb; }
@@ -933,5 +934,41 @@
         updateProgress();
         setInterval(updateBadge, 30000);
     </script>
+    <script>
+        window.studentTourConfig = {
+            pageId: 'submit-concern',
+            autoStart: false,
+            storageKey: 'akb_student_tour_completed',
+            nextPage: '/student/concern-history',
+            steps: [
+                {
+                    selector: '.concern-sidebar',
+                    title: 'Submission Progress',
+                    content: 'This sidebar keeps you aware of each concern submission stage from details to evidence.'
+                },
+                {
+                    selector: '.form-header',
+                    title: 'Concern Form Intro',
+                    content: 'Use this form to submit your issue clearly so admins can respond faster and more accurately.'
+                },
+                {
+                    selector: 'select[name="category"]',
+                    title: 'Category And Subject',
+                    content: 'Choose the best category and write a clear subject to help route your concern correctly.'
+                },
+                {
+                    selector: '#messageArea',
+                    title: 'Detailed Description',
+                    content: 'Describe what happened with useful context such as dates, locations, and impact.'
+                },
+                {
+                    selector: '#uploadArea',
+                    title: 'Optional Evidence',
+                    content: 'Attach files if needed to provide stronger context before submitting your concern.'
+                }
+            ]
+        };
+    </script>
+    <script src="/js/student-tour.js"></script>
 </body>
 </html>

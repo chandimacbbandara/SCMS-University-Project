@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.regex.Pattern;
 
 @Service
 public class StudentCommunityService {
@@ -20,8 +19,6 @@ public class StudentCommunityService {
     private static final Set<String> ALLOWED_CATEGORIES = Set.of(
             "Academic", "Registration", "Finance", "Hostel", "IT Services", "Other"
     );
-
-        private static final Pattern ENGLISH_ONLY_PATTERN = Pattern.compile("^[\\x09\\x0A\\x0D\\x20-\\x7E]+$");
 
     private final StudentRepository studentRepository;
     private final StudentCommunityPostRepository postRepository;
@@ -87,7 +84,7 @@ public class StudentCommunityService {
         validatePost(dto);
 
         Student student = getStudent(userId);
-        CommunityModerationResultDTO moderation = moderationService.moderateText(dto.getMessage(), "post");
+        CommunityModerationResultDTO moderation = moderationService.moderateText(buildPostModerationPayload(dto), "post");
         saveModerationLog(student, "POST", moderation);
 
         if (!"ALLOW".equals(moderation.getDecision())) {
@@ -110,7 +107,7 @@ public class StudentCommunityService {
         StudentCommunityPost post = postRepository.findByPostIdAndStudent_UserId(postId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Post not found or access denied."));
 
-        CommunityModerationResultDTO moderation = moderationService.moderateText(dto.getMessage(), "post");
+        CommunityModerationResultDTO moderation = moderationService.moderateText(buildPostModerationPayload(dto), "post");
         saveModerationLog(post.getStudent(), "POST", moderation);
 
         if (!"ALLOW".equals(moderation.getDecision())) {
@@ -187,7 +184,7 @@ public class StudentCommunityService {
     @Transactional
     public CommunityModerationResultDTO runLiveModeration(Integer userId, String message, String contentType) {
         Student student = getStudent(userId);
-        CommunityModerationResultDTO result = moderationService.moderateText(message, contentType);
+        CommunityModerationResultDTO result = moderationService.moderateLiveText(message, contentType);
         saveModerationLog(student, "LIVE", result);
         return result;
     }
@@ -207,18 +204,12 @@ public class StudentCommunityService {
         if (title.length() > 160) {
             throw new IllegalArgumentException("Title must be 160 characters or less.");
         }
-        if (!isEnglishOnly(title)) {
-            throw new IllegalArgumentException("Post title must be in English only.");
-        }
 
         if (message.isBlank()) {
             throw new IllegalArgumentException("Message is required.");
         }
         if (message.length() > 2000) {
             throw new IllegalArgumentException("Message must be 2000 characters or less.");
-        }
-        if (!isEnglishOnly(message)) {
-            throw new IllegalArgumentException("Post message must be in English only.");
         }
 
         if (!ALLOWED_CATEGORIES.contains(category)) {
@@ -238,16 +229,12 @@ public class StudentCommunityService {
         if (message.length() > 1200) {
             throw new IllegalArgumentException("Reply must be 1200 characters or less.");
         }
-        if (!isEnglishOnly(message)) {
-            throw new IllegalArgumentException("Reply message must be in English only.");
-        }
     }
 
-    private boolean isEnglishOnly(String text) {
-        if (!ENGLISH_ONLY_PATTERN.matcher(text).matches()) {
-            return false;
-        }
-        return Pattern.compile("[A-Za-z]").matcher(text).find();
+    private String buildPostModerationPayload(CommunityPostDTO dto) {
+        String title = dto.getTitle() == null ? "" : dto.getTitle().trim();
+        String message = dto.getMessage() == null ? "" : dto.getMessage().trim();
+        return "Title: " + title + "\nMessage: " + message;
     }
 
     private Student getStudent(Integer userId) {
