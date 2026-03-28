@@ -785,6 +785,34 @@
             flex-wrap: wrap;
         }
 
+        .field-feedback {
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
+        }
+
+        .field-feedback.error {
+            color: #b91c1c;
+        }
+
+        .field-feedback.ok {
+            color: #166534;
+        }
+
+        .reply-form textarea.input-invalid,
+        .reply-file-input.input-invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14);
+        }
+
+        .submit-reply-btn:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
         .reply-form-meta {
             margin-top: 8px;
             display: flex;
@@ -1090,13 +1118,15 @@
             <!-- Reply Form -->
             <div class="reply-form-section">
                 <h3>Send Reply</h3>
-                                <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply'}" method="post" enctype="multipart/form-data" class="reply-form"
+                <form id="replyForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply'}" method="post" enctype="multipart/form-data" class="reply-form"
                       th:object="${replyDTO}">
 
-                    <textarea id="replyMessageInput" th:field="*{replyMessage}" placeholder="Type your reply to the student's concern..." required></textarea>
+                    <textarea id="replyMessageInput" th:field="*{replyMessage}" placeholder="Type your reply to the student's concern..." maxlength="1200" required></textarea>
+                    <div id="replyMessageFeedback" class="field-feedback" aria-live="polite"></div>
                     <input id="resolutionFileInput" type="file" name="resolutionFile" class="reply-file-input" accept="image/*,application/pdf" />
+                    <div id="replyFileFeedback" class="field-feedback" aria-live="polite"></div>
                     <div class="reply-form-meta">
-                        <span>Tip: keep the reply clear and action-oriented.</span>
+                        <span>Tip: keep the reply clear and action-oriented (10-1200 chars).</span>
                         <span id="replyCharCount">0 characters</span>
                     </div>
 
@@ -1107,7 +1137,7 @@
                         <!-- Mark as Read updates status to In Progress -->
                         <button type="button" class="mark-read-btn" onclick="document.getElementById('markAsReadForm').submit();" 
                                 th:if="${concern.status == 'Pending'}">Mark as Read</button>
-                        <button type="submit" class="submit-reply-btn">Submit Reply</button>
+                        <button id="submitReplyBtn" type="submit" class="submit-reply-btn">Submit Reply</button>
                     </div>
                 </form>
 
@@ -1137,9 +1167,111 @@
 
     <script>
         (function () {
+            var replyForm = document.getElementById('replyForm');
             var replyInput = document.getElementById('replyMessageInput');
+            var replyMessageFeedback = document.getElementById('replyMessageFeedback');
             var charCounter = document.getElementById('replyCharCount');
             var fileInput = document.getElementById('resolutionFileInput');
+            var fileFeedback = document.getElementById('replyFileFeedback');
+            var submitReplyBtn = document.getElementById('submitReplyBtn');
+
+            var MIN_REPLY_LENGTH = 10;
+            var MAX_FILE_SIZE_MB = 10;
+            var MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+            var allowedMimeTypes = [
+                'application/pdf',
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'image/webp'
+            ];
+
+            var setFeedback = function (element, message, type) {
+                if (!element) {
+                    return;
+                }
+
+                element.textContent = message || '';
+                element.classList.remove('error', 'ok');
+                if (type === 'error' || type === 'ok') {
+                    element.classList.add(type);
+                }
+            };
+
+            var validateReplyMessage = function () {
+                if (!replyInput) {
+                    return true;
+                }
+
+                var raw = replyInput.value || '';
+                var trimmed = raw.trim();
+
+                replyInput.classList.remove('input-invalid');
+
+                if (trimmed.length === 0) {
+                    setFeedback(replyMessageFeedback, 'Reply message is required.', 'error');
+                    replyInput.classList.add('input-invalid');
+                    return false;
+                }
+
+                if (trimmed.length < MIN_REPLY_LENGTH) {
+                    setFeedback(replyMessageFeedback, 'Reply is too short. Please write at least ' + MIN_REPLY_LENGTH + ' characters.', 'error');
+                    replyInput.classList.add('input-invalid');
+                    return false;
+                }
+
+                if (!/[A-Za-z]/.test(trimmed)) {
+                    setFeedback(replyMessageFeedback, 'Reply should include readable text.', 'error');
+                    replyInput.classList.add('input-invalid');
+                    return false;
+                }
+
+                setFeedback(replyMessageFeedback, 'Looks good.', 'ok');
+                return true;
+            };
+
+            var validateAttachment = function () {
+                if (!fileInput) {
+                    return true;
+                }
+
+                fileInput.classList.remove('input-invalid');
+
+                if (!fileInput.files || fileInput.files.length === 0) {
+                    setFeedback(fileFeedback, '', '');
+                    return true;
+                }
+
+                var file = fileInput.files[0];
+                var fileName = file.name || 'Selected file';
+
+                if (file.size > MAX_FILE_SIZE_BYTES) {
+                    setFeedback(fileFeedback, 'File is too large. Maximum allowed size is ' + MAX_FILE_SIZE_MB + 'MB.', 'error');
+                    fileInput.classList.add('input-invalid');
+                    return false;
+                }
+
+                var mimeAllowed = allowedMimeTypes.indexOf(file.type) !== -1;
+                var extensionAllowed = /\.(pdf|jpg|jpeg|png|gif|webp)$/i.test(fileName);
+                if (!mimeAllowed && !extensionAllowed) {
+                    setFeedback(fileFeedback, 'Invalid file type. Please upload PDF or image files only.', 'error');
+                    fileInput.classList.add('input-invalid');
+                    return false;
+                }
+
+                setFeedback(fileFeedback, 'Attachment ready: ' + fileName, 'ok');
+                return true;
+            };
+
+            var updateSubmitState = function () {
+                if (!submitReplyBtn) {
+                    return;
+                }
+
+                var messageValid = validateReplyMessage();
+                var attachmentValid = validateAttachment();
+                submitReplyBtn.disabled = !(messageValid && attachmentValid);
+            };
 
             if (replyInput && charCounter) {
                 var updateCounter = function () {
@@ -1148,19 +1280,42 @@
                 };
 
                 updateCounter();
-                replyInput.addEventListener('input', updateCounter);
+                replyInput.addEventListener('input', function () {
+                    updateCounter();
+                    updateSubmitState();
+                });
+                replyInput.addEventListener('blur', updateSubmitState);
             }
 
             if (fileInput) {
                 fileInput.addEventListener('change', function () {
                     if (!fileInput.files || fileInput.files.length === 0) {
+                        updateSubmitState();
                         return;
                     }
 
                     var fileName = fileInput.files[0].name;
                     fileInput.title = fileName;
+                    updateSubmitState();
                 });
             }
+
+            if (replyForm) {
+                replyForm.addEventListener('submit', function (event) {
+                    updateSubmitState();
+
+                    if (submitReplyBtn && submitReplyBtn.disabled) {
+                        event.preventDefault();
+                        if (replyInput && replyInput.classList.contains('input-invalid')) {
+                            replyInput.focus();
+                        } else if (fileInput && fileInput.classList.contains('input-invalid')) {
+                            fileInput.focus();
+                        }
+                    }
+                });
+            }
+
+            updateSubmitState();
         })();
     </script>
     <script>
