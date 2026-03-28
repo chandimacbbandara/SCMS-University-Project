@@ -57,6 +57,11 @@ public class OwnerController {
     private static final String OWNER_ADMIN_VERIFY_CODE = "ownerAdminVerifyCode";
     private static final String OWNER_ADMIN_VERIFY_EXPIRY = "ownerAdminVerifyExpiry";
     private static final String OWNER_ADMIN_VERIFY_CONFIRMED = "ownerAdminVerifyConfirmed";
+    private static final String OWNER_ADMIN_UPDATE_VERIFY_USER_ID = "ownerAdminUpdateVerifyUserId";
+    private static final String OWNER_ADMIN_UPDATE_VERIFY_EMAIL = "ownerAdminUpdateVerifyEmail";
+    private static final String OWNER_ADMIN_UPDATE_VERIFY_CODE = "ownerAdminUpdateVerifyCode";
+    private static final String OWNER_ADMIN_UPDATE_VERIFY_EXPIRY = "ownerAdminUpdateVerifyExpiry";
+    private static final String OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED = "ownerAdminUpdateVerifyConfirmed";
 
     public OwnerController(AnalyticsReportService analyticsReportService,
                            AnalyticsReportRepository analyticsReportRepository,
@@ -151,6 +156,26 @@ public class OwnerController {
             }
 
             User user = admin.getUser();
+
+            String currentEmail = normalizeEmail(user.getEmail());
+            boolean emailChanged = currentEmail == null
+                    ? normalizedEmail != null
+                    : !currentEmail.equalsIgnoreCase(normalizedEmail);
+
+            if (emailChanged) {
+                Integer verifiedUserId = (Integer) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_USER_ID);
+                String verifiedEmail = (String) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_EMAIL);
+                Boolean verified = (Boolean) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED);
+
+                if (!Boolean.TRUE.equals(verified)
+                        || verifiedUserId == null
+                        || !verifiedUserId.equals(userId)
+                        || verifiedEmail == null
+                        || !verifiedEmail.equalsIgnoreCase(normalizedEmail)) {
+                    throw new RuntimeException("Please verify the new email with the code before updating this admin account.");
+                }
+            }
+
             user.setEmail(normalizedEmail);
             user.setFirstName(normalizedUsername);
             user.setLastName("Admin");
@@ -171,6 +196,12 @@ public class OwnerController {
             admin.setStaffId(normalizedUsername);
             userRepository.save(user);
             adminRepository.save(admin);
+
+            session.removeAttribute(OWNER_ADMIN_UPDATE_VERIFY_USER_ID);
+            session.removeAttribute(OWNER_ADMIN_UPDATE_VERIFY_EMAIL);
+            session.removeAttribute(OWNER_ADMIN_UPDATE_VERIFY_CODE);
+            session.removeAttribute(OWNER_ADMIN_UPDATE_VERIFY_EXPIRY);
+            session.removeAttribute(OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED);
 
             redirectAttributes.addFlashAttribute("successMessage", "Admin account updated successfully.");
         } catch (Exception e) {
@@ -209,6 +240,127 @@ public class OwnerController {
         }
 
         return "redirect:/owner/admin/manage";
+    }
+
+    @PostMapping("/admin/{userId}/email/send-code")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> sendAdminUpdateEmailCode(@PathVariable("userId") Integer userId,
+                                                                        @RequestParam("email") String email,
+                                                                        HttpSession session) {
+        Map<String, String> result = new HashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("status", "error");
+            result.put("message", "Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        Admin admin = adminRepository.findById(userId)
+                .orElse(null);
+        if (admin == null || admin.getUser() == null) {
+            result.put("status", "error");
+            result.put("message", "Admin account not found.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        String normalizedEmail = normalizeEmail(email);
+        String currentEmail = normalizeEmail(admin.getUser().getEmail());
+
+        if (normalizedEmail == null || !EMAIL_PATTERN.matcher(normalizedEmail).matches()) {
+            result.put("status", "error");
+            result.put("message", "Please enter a valid email address.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (currentEmail != null && currentEmail.equalsIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "Email is unchanged.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        Optional<User> userWithEmail = userRepository.findByEmailIgnoreCase(normalizedEmail);
+        if (userWithEmail.isPresent() && !userWithEmail.get().getUserId().equals(userId)) {
+            result.put("status", "error");
+            result.put("message", "Another account already uses this email.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        String code = String.valueOf(100000 + new Random().nextInt(900000));
+        LocalDateTime expiry = LocalDateTime.now().plusMinutes(10);
+
+        try {
+            emailVerificationService.sendAdminCreationVerificationCode(normalizedEmail, code);
+        } catch (Exception ex) {
+            result.put("status", "error");
+            result.put("message", "Could not send verification code. Check mail settings and try again.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(result);
+        }
+
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_USER_ID, userId);
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_EMAIL, normalizedEmail);
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_CODE, code);
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_EXPIRY, expiry);
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED, false);
+
+        result.put("status", "ok");
+        result.put("message", "Verification code sent to the new email.");
+        return ResponseEntity.ok(result);
+    }
+
+    @PostMapping("/admin/{userId}/email/verify-code")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> verifyAdminUpdateEmailCode(@PathVariable("userId") Integer userId,
+                                                                          @RequestParam("email") String email,
+                                                                          @RequestParam("code") String code,
+                                                                          HttpSession session) {
+        Map<String, String> result = new HashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("status", "error");
+            result.put("message", "Unauthorized");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(result);
+        }
+
+        String normalizedEmail = normalizeEmail(email);
+        String normalizedCode = code == null ? "" : code.trim();
+
+        Integer savedUserId = (Integer) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_USER_ID);
+        String savedEmail = (String) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_EMAIL);
+        String savedCode = (String) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_CODE);
+        LocalDateTime expiry = (LocalDateTime) session.getAttribute(OWNER_ADMIN_UPDATE_VERIFY_EXPIRY);
+
+        if (savedUserId == null || savedEmail == null || savedCode == null || expiry == null) {
+            result.put("status", "error");
+            result.put("message", "Please request a verification code first.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (!savedUserId.equals(userId)) {
+            result.put("status", "error");
+            result.put("message", "Verification request does not match this admin account.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (normalizedEmail == null || !savedEmail.equalsIgnoreCase(normalizedEmail)) {
+            result.put("status", "error");
+            result.put("message", "Email does not match verification request.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (LocalDateTime.now().isAfter(expiry)) {
+            result.put("status", "error");
+            result.put("message", "Verification code expired. Request a new code.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        if (!savedCode.equals(normalizedCode)) {
+            result.put("status", "error");
+            result.put("message", "Invalid verification code.");
+            return ResponseEntity.badRequest().body(result);
+        }
+
+        session.setAttribute(OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED, true);
+        result.put("status", "ok");
+        result.put("message", "Email verified successfully.");
+        return ResponseEntity.ok(result);
     }
 
     @PostMapping("/report/create")
@@ -523,7 +675,7 @@ public class OwnerController {
             return result;
         }
 
-        List<Feedback> feedbacks = feedbackRepository.findByConcern_Admin_UserId(adminId);
+        List<Feedback> feedbacks = feedbackRepository.findByRatedAdminUserId(adminId);
         if (feedbacks.isEmpty()) {
             result.put("score", 0);
             result.put("count", 0);
@@ -638,7 +790,7 @@ public class OwnerController {
 
         // 3. Sentiment Score
         if (report.getAdminIdFk() != null) {
-            List<Feedback> feedbacks = feedbackRepository.findByConcern_Admin_UserId(report.getAdminIdFk());
+            List<Feedback> feedbacks = feedbackRepository.findByRatedAdminUserId(report.getAdminIdFk());
             if (!feedbacks.isEmpty()) {
                 double avg = feedbacks.stream().mapToInt(Feedback::getRating).average().orElse(0.0);
                 report.setSentimentTrendScore(

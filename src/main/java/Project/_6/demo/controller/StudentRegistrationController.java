@@ -7,10 +7,12 @@ import Project._6.demo.dto.StudentRegistrationDTO;
 import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.Student;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.EmailVerificationService;
+import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentRegistrationService;
 
@@ -40,6 +42,7 @@ public class StudentRegistrationController {
     private final EmailVerificationService emailVerificationService;
     private final NotificationService notificationService;
     private final ConcernService concernService;
+    private final FeedbackService feedbackService;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final String REG_VERIFY_EMAIL = "regVerifyEmail";
@@ -54,18 +57,22 @@ public class StudentRegistrationController {
     public StudentRegistrationController(StudentRegistrationService registrationService,
                                          EmailVerificationService emailVerificationService,
                                          NotificationService notificationService,
-                                         ConcernService concernService) {
+                                         ConcernService concernService,
+                                         FeedbackService feedbackService) {
         this.registrationService = registrationService;
         this.emailVerificationService = emailVerificationService;
         this.notificationService = notificationService;
         this.concernService = concernService;
+        this.feedbackService = feedbackService;
     }
 
     /**
      * Home Page - maps to /
      */
     @GetMapping("/")
-    public String showIndex() {
+    public String showIndex(Model model) {
+        List<Feedback> bestFeedbackList = feedbackService.getTopPositiveFeedbackForHome(5);
+        model.addAttribute("bestFeedbackList", bestFeedbackList);
         return "index";
     }
 
@@ -210,8 +217,8 @@ public class StudentRegistrationController {
 
     // Predefined admin credentials
     // Predefined owner credentials
-    private static final String OWNER_EMAIL = "owner@gmail.com";
-    private static final String OWNER_PASSWORD = "123456";
+    private static final String OWNER_EMAIL = "admin@akbinstitute.edu.lk";
+    private static final String OWNER_PASSWORD = "akb@18789691";
 
     /**
      * Handle login form submission - checks owner first, then admin, then student
@@ -240,7 +247,10 @@ public class StudentRegistrationController {
             loginDTO.setEmail(email);
             Admin admin = registrationService.loginAdmin(loginDTO);
             session.setAttribute("adminLoggedIn", true);
+            session.setAttribute("adminUserId", admin.getUserId());
+            session.setAttribute("adminId", admin.getUserId());
             session.setAttribute("adminEmail", admin.getUser().getEmail());
+            session.setAttribute("adminDisplayName", admin.getUser().getFirstName() + " " + admin.getUser().getLastName());
             redirectAttributes.addFlashAttribute("successMessage", "Welcome, Admin!");
             return "redirect:/admin/dashboard";
         } catch (Exception ignored) {

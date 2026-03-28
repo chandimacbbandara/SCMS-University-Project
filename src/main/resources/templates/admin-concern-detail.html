@@ -1110,11 +1110,9 @@
                     <div class="reply-header">
                         <span class="reply-admin">
                             <span th:if="${reply.admin != null and reply.admin.user != null}"
-                                  th:text="'Admin: ' + ${reply.admin.user.firstName} + ' ' + ${reply.admin.user.lastName}">
+                                  th:text="'Admin: ' + ${((reply.admin.staffId != null and !reply.admin.staffId.isEmpty()) ? reply.admin.staffId : reply.admin.user.firstName)} + ' (Admin)'
+                                  ">
                                 Admin
-                            </span>
-                            <span th:if="${reply.admin != null}">
-                                (<span th:text="${reply.admin.staffId}">ADMIN001</span>)
                             </span>
                         </span>
                         <div class="reply-header-actions">

@@ -11,6 +11,7 @@ import Project._6.demo.repository.FeedbackRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +66,12 @@ public class FeedbackService {
                     .orElseThrow(() -> new RuntimeException("Concern not found."));
         }
 
+        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concern.getConcernId())
+            .orElseThrow(() -> new RuntimeException("Feedback can only be submitted after an admin reply is posted."));
+
         Feedback feedback = new Feedback();
         feedback.setConcern(concern);
+        feedback.setAdminReply(latestReply);
         feedback.setRating(rating);
         feedback.setComments(comments);
         return feedbackRepository.save(feedback);
@@ -87,8 +92,12 @@ public class FeedbackService {
             throw new RuntimeException("Feedback can only be updated after a new admin reply is posted.");
         }
 
+        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+                .orElseThrow(() -> new RuntimeException("No admin reply found for this concern."));
+
         feedback.setRating(rating);
         feedback.setComments(comments);
+        feedback.setAdminReply(latestReply);
         feedback.setSubmissionTime(LocalDateTime.now());
         return feedbackRepository.save(feedback);
     }
@@ -147,6 +156,18 @@ public class FeedbackService {
         }
 
         return map;
+    }
+
+    public List<Feedback> getTopPositiveFeedbackForHome(int limit) {
+        int safeLimit = Math.max(1, limit);
+        return feedbackRepository.findAllByOrderBySubmissionTimeDesc().stream()
+                .filter(feedback -> feedback != null && feedback.getRating() != null && feedback.getRating() >= 4)
+                .filter(feedback -> feedback.getComments() != null && !feedback.getComments().isBlank())
+            .sorted(Comparator
+                .comparing(Feedback::getRating, Comparator.reverseOrder())
+                .thenComparing(Feedback::getSubmissionTime, Comparator.nullsLast(Comparator.reverseOrder())))
+                .limit(safeLimit)
+                .toList();
     }
 
     private Concern validateConcernOwnership(Integer concernId, Integer studentUserId) {

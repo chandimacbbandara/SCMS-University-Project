@@ -1414,7 +1414,13 @@
                                 <div class="reply-avatar">A</div>
                                 <div class="reply-body">
                                     <div class="reply-meta-row">
-                                        <span class="reply-sender"><i class="fas fa-shield-halved"></i> Admin</span>
+                                        <span class="reply-sender" th:if="${reply.admin != null and reply.admin.user != null}">
+                                            <i class="fas fa-shield-halved"></i>
+                                            <span th:text="${((reply.admin.staffId != null and !reply.admin.staffId.isEmpty()) ? reply.admin.staffId : reply.admin.user.firstName) + ' (Admin)'}">admin001 (Admin)</span>
+                                        </span>
+                                        <span class="reply-sender" th:if="${reply.admin == null or reply.admin.user == null}">
+                                            <i class="fas fa-shield-halved"></i> Admin
+                                        </span>
                                         <span class="reply-time">
                                             <i class="fas fa-clock"></i>
                                             <span th:text="${#temporals.format(reply.replyTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
