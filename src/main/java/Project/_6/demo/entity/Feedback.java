@@ -31,6 +31,10 @@ public class Feedback {
     @JoinColumn(name = "ConcernID_FK")
     private Concern concern;
 
+    @ManyToOne
+    @JoinColumn(name = "ReplyID_FK", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private AdminReply adminReply;
+
     @PrePersist
     protected void onCreate() {
         this.submissionTime = LocalDateTime.now();

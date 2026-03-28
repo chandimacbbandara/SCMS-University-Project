@@ -1572,6 +1572,14 @@
                         <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
                     </div>
 
+                    <div class="track-date"
+                         th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId])}"
+                         th:with="latestReply=${repliesMap[concern.concernId][0]}">
+                        <i class="fas fa-shield-halved"></i>
+                        <span>Latest Reply By: </span>
+                        <span th:text="${((latestReply.admin != null and latestReply.admin.staffId != null and !latestReply.admin.staffId.isEmpty()) ? latestReply.admin.staffId : 'Admin') + ' (Admin)'}">admin001 (Admin)</span>
+                    </div>
+
                     <div th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}">
                         <a th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
                            target="_blank"

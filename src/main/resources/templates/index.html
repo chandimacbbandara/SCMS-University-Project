@@ -5,61 +5,761 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Academy of Knowledge Bridge - Student Concern Management</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --brand-red: #e53935;
+            --brand-red-dark: #b71c1c;
+            --brand-ink: #111827;
+            --brand-slate: #4b5563;
+            --brand-border: #e5e7eb;
+            --brand-bg: #f5f8fc;
+        }
+
+        body.home-page {
+            font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(180deg, #f8fafd 0%, #f1f4f9 70%, #edf2f8 100%);
+            color: var(--brand-ink);
+        }
+
+        .home-wrap {
+            width: min(1180px, 92%);
+            margin: 0 auto;
+        }
+
+        .hero-section {
+            position: relative;
+            padding: 72px 0 36px;
+            background:
+                radial-gradient(circle at 12% 10%, rgba(229, 57, 53, 0.14), transparent 38%),
+                radial-gradient(circle at 90% 20%, rgba(17, 24, 39, 0.1), transparent 42%),
+                linear-gradient(140deg, #ffffff 0%, #f5f8fc 100%);
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(229, 57, 53, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(229, 57, 53, 0.06) 1px, transparent 1px);
+            background-size: 30px 30px;
+            mask-image: radial-gradient(circle at center, #000 30%, transparent 88%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            position: relative;
+            z-index: 2;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 34px;
+            align-items: center;
+        }
+
+        .hero-kicker {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--brand-red);
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: clamp(30px, 4.7vw, 54px);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 14px;
+        }
+
+        .hero-text {
+            max-width: 620px;
+            color: var(--brand-slate);
+            font-size: 17px;
+            line-height: 1.75;
+            margin-bottom: 24px;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .hero-primary,
+        .hero-secondary {
+            text-decoration: none;
+            border-radius: 999px;
+            padding: 13px 24px;
+            font-size: 14px;
+            font-weight: 800;
+            border: 2px solid transparent;
+            transition: all 0.25s ease;
+        }
+
+        .hero-primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand-red), var(--brand-red-dark));
+            box-shadow: 0 14px 28px rgba(229, 57, 53, 0.3);
+        }
+
+        .hero-secondary {
+            color: #111;
+            border-color: #111;
+            background: #fff;
+        }
+
+        .hero-primary:hover,
+        .hero-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .hero-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .hero-tags span {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--brand-border);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .hero-visual {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 360px;
+            overflow: visible;
+        }
+
+        .hero-visual::before {
+            content: "";
+            position: absolute;
+            width: 340px;
+            height: 340px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(229, 57, 53, 0.23) 0%, rgba(229, 57, 53, 0) 72%);
+            animation: pulseGlow 3.3s ease-in-out infinite alternate;
+        }
+
+        .hero-visual::after {
+            content: "";
+            position: absolute;
+            width: 390px;
+            height: 390px;
+            border-radius: 50%;
+            border: 2px dashed rgba(229, 57, 53, 0.24);
+            animation: ringSpin 16s linear infinite;
+        }
+
+        .hero-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(0.2px);
+            z-index: 1;
+        }
+
+        .hero-orb.orb-1 {
+            width: 16px;
+            height: 16px;
+            top: 56px;
+            left: 22px;
+            background: linear-gradient(135deg, rgba(229, 57, 53, 0.95), rgba(183, 28, 28, 0.9));
+            animation: orbDrift 6s ease-in-out infinite;
+        }
+
+        .hero-orb.orb-2 {
+            width: 12px;
+            height: 12px;
+            bottom: 74px;
+            right: 24px;
+            background: rgba(17, 24, 39, 0.85);
+            animation: orbDrift 5s ease-in-out infinite reverse;
+        }
+
+        .hero-orb.orb-3 {
+            width: 8px;
+            height: 8px;
+            top: 140px;
+            right: -8px;
+            background: rgba(229, 57, 53, 0.6);
+            animation: orbDrift 4.8s ease-in-out infinite;
+        }
+
+        .hero-logo-wrap {
+            width: clamp(220px, 30vw, 300px);
+            height: clamp(220px, 30vw, 300px);
+            position: relative;
+            z-index: 2;
+            border-radius: 24px;
+            transform: rotate(-4deg);
+            animation: cardFloat 4.6s ease-in-out infinite;
+            will-change: transform;
+        }
+
+        .hero-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 24px;
+            border: 8px solid #fff;
+            box-shadow: 0 24px 54px rgba(15, 23, 42, 0.24);
+            display: block;
+            transition: transform 0.35s ease;
+        }
+
+        .hero-logo-wrap:hover .hero-logo {
+            transform: scale(1.03);
+        }
+
+        .logo-shine {
+            position: absolute;
+            inset: 8px;
+            border-radius: 16px;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .logo-shine::before {
+            content: "";
+            position: absolute;
+            top: -20%;
+            left: -70%;
+            width: 42%;
+            height: 150%;
+            transform: rotate(22deg);
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.42) 50%, rgba(255,255,255,0) 100%);
+            animation: shineSweep 5.8s ease-in-out infinite;
+        }
+
+        .hero-chip {
+            position: absolute;
+            z-index: 3;
+            border-radius: 999px;
+            border: 1px solid var(--brand-border);
+            background: #fff;
+            color: #1f2937;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 8px 13px;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.12);
+        }
+
+        .hero-chip.top {
+            top: 44px;
+            right: 0;
+        }
+
+        .hero-chip.bottom {
+            bottom: 48px;
+            left: 0;
+        }
+
+        .stats {
+            padding: 14px 0 26px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border: 1px solid var(--brand-border);
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            padding: 16px;
+        }
+
+        .stat-number {
+            color: var(--brand-red);
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            color: #4b5563;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .about {
+            padding: 14px 0 28px;
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .about-main,
+        .about-item {
+            background: #fff;
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.06);
+        }
+
+        .about-main {
+            padding: 22px;
+        }
+
+        .about-main .section-subtitle,
+        .resources .section-subtitle,
+        .feedback .section-subtitle {
+            letter-spacing: 3px;
+            color: var(--brand-red);
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .about-main h2,
+        .resources h3,
+        .feedback h3 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+        }
+
+        .about-main h2 {
+            font-size: clamp(24px, 3vw, 34px);
+            margin-bottom: 10px;
+        }
+
+        .about-main p {
+            color: #556173;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .about-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .about-item {
+            border-left: 4px solid var(--brand-red);
+            padding: 15px 16px;
+        }
+
+        .about-item h4 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: 17px;
+            margin-bottom: 4px;
+        }
+
+        .about-item p {
+            color: #556173;
+            font-size: 14px;
+            line-height: 1.66;
+        }
+
+        .resources {
+            padding: 56px 0;
+            text-align: center;
+        }
+
+        .section-divider {
+            width: 60px;
+            height: 4px;
+            background: var(--brand-red);
+            margin: 0 auto 20px;
+            border-radius: 2px;
+        }
+
+        .section-underline {
+            width: 50px;
+            height: 4px;
+            background: var(--brand-red);
+            margin: 0 auto 42px;
+            border-radius: 2px;
+        }
+
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .resource-card {
+            text-align: left;
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            padding: 22px 20px;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 18px 34px rgba(15, 23, 42, 0.1);
+        }
+
+        .resource-card h4 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+        }
+
+        .resource-card p {
+            color: #596579;
+        }
+
+        .resource-card.highlight {
+            border-color: #ffd4d4;
+            background: linear-gradient(180deg, #fff8f8 0%, #ffffff 100%);
+        }
+
+        .feedback {
+            padding: 10px 0 34px;
+            text-align: center;
+        }
+
+        .feedback-controls {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .feedback-controls button {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid var(--brand-border);
+            background: #fff;
+            color: #1f2937;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .feedback-window {
+            overflow: hidden;
+        }
+
+        .feedback-grid {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: calc((100% - 24px) / 3);
+            gap: 12px;
+            transition: transform 0.35s ease;
+        }
+
+        .feedback-card {
+            border: 1px solid var(--brand-border);
+            border-left: 4px solid var(--brand-red);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            padding: 16px;
+            text-align: left;
+        }
+
+        .feedback-stars {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+            color: #f59e0b;
+            font-size: 18px;
+        }
+
+        .feedback-stars small {
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .feedback-comment {
+            color: #334155;
+            font-size: 14px;
+            line-height: 1.75;
+            margin-bottom: 10px;
+        }
+
+        .feedback-meta {
+            display: inline-flex;
+            align-items: center;
+            border: 1px solid var(--brand-border);
+            border-radius: 999px;
+            background: #f7f8fb;
+            padding: 7px 11px;
+        }
+
+        .feedback-meta span {
+            color: #4b5563;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .cta {
+            padding: 4px 0 70px;
+        }
+
+        .cta-box {
+            text-align: center;
+            border: 1px solid var(--brand-border);
+            border-radius: 20px;
+            background:
+                radial-gradient(circle at 88% 14%, rgba(229, 57, 53, 0.17), transparent 32%),
+                linear-gradient(135deg, #ffffff 0%, #f8fafd 100%);
+            box-shadow: 0 14px 30px rgba(2, 6, 23, 0.07);
+            padding: 30px 22px;
+        }
+
+        .cta-box h3 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: clamp(25px, 4vw, 38px);
+            margin-bottom: 6px;
+        }
+
+        .cta-box p {
+            color: #556173;
+            margin-bottom: 16px;
+        }
+
+        .reveal {
+            opacity: 0;
+            transform: translateY(18px);
+            transition: opacity 0.55s ease, transform 0.55s ease;
+        }
+
+        .reveal.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulseGlow {
+            from {
+                transform: scale(0.9);
+                opacity: 0.45;
+            }
+            to {
+                transform: scale(1.12);
+                opacity: 0.92;
+            }
+        }
+
+        @keyframes ringSpin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes orbDrift {
+            0% { transform: translateY(0px) translateX(0px); }
+            50% { transform: translateY(-12px) translateX(6px); }
+            100% { transform: translateY(0px) translateX(0px); }
+        }
+
+        @keyframes cardFloat {
+            0% { transform: rotate(-4deg) translateY(0px); }
+            50% { transform: rotate(-2.5deg) translateY(-10px); }
+            100% { transform: rotate(-4deg) translateY(0px); }
+        }
+
+        @keyframes shineSweep {
+            0%, 14% { left: -70%; }
+            36%, 100% { left: 140%; }
+        }
+
+        @media (max-width: 1024px) {
+            .hero-grid,
+            .about-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-content {
+                text-align: center;
+            }
+
+            .hero-actions,
+            .hero-tags {
+                justify-content: center;
+            }
+
+            .hero-chip.top,
+            .hero-chip.bottom {
+                position: static;
+                margin-top: 8px;
+            }
+
+            .hero-visual {
+                min-height: 320px;
+                flex-direction: column;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .resources-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feedback-grid {
+                grid-auto-columns: calc((100% - 12px) / 2);
+            }
+        }
+
+        @media (max-width: 640px) {
+            .home-wrap {
+                width: min(1180px, 94%);
+            }
+
+            .hero-section {
+                padding-top: 58px;
+            }
+
+            .hero-logo {
+                border-radius: 16px;
+            }
+
+            .hero-logo-wrap {
+                transform: rotate(0deg);
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .feedback-grid {
+                grid-auto-columns: 100%;
+            }
+        }
+    </style>
 </head>
-<body>
-    <header>
-        <div class="container header-content">
-            <div class="logo-area">
-                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-                <div class="logo-text">
-                    <span>Academy of</span>
-                    <span>Knowledge Bridge</span>
-                </div>
+<body class="home-page">
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
             </div>
-            <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
-                <ul>
-                    <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="#about" class="nav-link">About</a></li>
-
-                    <li th:if="${student == null and admin == null}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
-                    <li th:if="${student == null and admin == null}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
-                    
-                    <li th:if="${student != null}"><a th:href="@{/student/dashboard}" class="btn-red">Back to Dashboard</a></li>
-                    <li th:if="${admin != null}"><a th:href="@{/admin/dashboard}" class="btn-red">Back to Admin Dashboard</a></li>
-                </ul>
-            </nav>
         </div>
-    </header>
+        <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="#about" class="nav-link">About</a></li>
 
-    <main>
-        <section class="hero">
-            <div class="hero-bg-image">
-                <img th:src="@{/images/img4.jpeg}" src="/images/img1.jpeg" alt="Background" class="hero-bg-img">
-            </div>
-            <div class="hero-overlay"></div>
+                <li th:if="${student == null and admin == null}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
+                <li th:if="${student == null and admin == null}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+
+                <li th:if="${student != null}"><a th:href="@{/student/dashboard}" class="btn-red">Back to Dashboard</a></li>
+                <li th:if="${admin != null}"><a th:href="@{/admin/dashboard}" class="btn-red">Back to Admin Dashboard</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <section class="hero-section reveal">
+        <div class="home-wrap hero-grid">
             <div class="hero-content">
-                <p class="hero-subtitle">ACADEMY OF KNOWLEDGE BRIDGE</p>
-                <div class="hero-logo-container">
-                    <div class="hero-logo-glow"></div>
-                    <img th:src="@{/images/img2.jpeg}" src="/images/img2.jpeg" alt="Academy Logo" class="hero-main-logo">
-                    <div class="hero-logo-ring"></div>
+                <p class="hero-kicker">Academy of Knowledge Bridge</p>
+                <h1 class="hero-title">Professional Student Concern Management for an Institute That Cares</h1>
+                <p class="hero-text">Raise concerns confidently, track progress clearly, and receive meaningful responses quickly through one secure and structured platform.</p>
+                <div class="hero-actions">
+                    <a th:href="@{/submit-concern}" href="/submit-concern" class="hero-primary">Submit Concern</a>
+                    <a href="#resources" class="hero-secondary">View Resources</a>
                 </div>
-                <p class="hero-description">Empowering students with the knowledge and support they need to excel in their academic journey.</p>
-                <div class="hero-buttons">
-                    <a th:href="@{/submit-concern}" href="/submit-concern" class="btn-get-started">GET STARTED</a>
-                    <a href="#resources" class="btn-learn-more">LEARN MORE</a>
+                <div class="hero-tags">
+                    <span>Immediate acknowledgement</span>
+                    <span>24h resolution promise</span>
+                    <span>Confidential support</span>
                 </div>
             </div>
-        </section>
 
-        <section class="resources" id="resources">
+            <div class="hero-visual">
+                <span class="hero-orb orb-1" aria-hidden="true"></span>
+                <span class="hero-orb orb-2" aria-hidden="true"></span>
+                <span class="hero-orb orb-3" aria-hidden="true"></span>
+                <div class="hero-logo-wrap">
+                    <img th:src="@{/images/img2.jpeg}" src="/images/img2.jpeg" alt="Academy Logo" class="hero-logo">
+                    <span class="logo-shine" aria-hidden="true"></span>
+                </div>
+                <div class="hero-chip top">Institute-grade support process</div>
+                <div class="hero-chip bottom">Transparent and student-focused</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats reveal">
+        <div class="home-wrap stats-grid">
+            <article class="stat-card">
+                <div class="stat-number" data-target="24">0</div>
+                <p class="stat-label">Hour response commitment</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-number" data-target="100">0</div>
+                <p class="stat-label">Percent confidential handling</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-number" data-target="5">0</div>
+                <p class="stat-label">Top feedback cards shown</p>
+            </article>
+            <article class="stat-card">
+                <div class="stat-number" data-target="1">0</div>
+                <p class="stat-label">Unified portal for all concerns</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="about reveal" id="about">
+        <div class="home-wrap about-grid">
+            <article class="about-main">
+                <p class="section-subtitle">ABOUT THE PLATFORM</p>
+                <h2>Built to represent your institute's quality and trust</h2>
+                <p>This system helps students report concerns in a simple way while giving administrators a clear and accountable process to respond. The experience is designed to feel professional, safe, and transparent from start to finish.</p>
+            </article>
+            <div class="about-list">
+                <article class="about-item">
+                    <h4>Clear communication flow</h4>
+                    <p>Students can submit concerns and receive timely updates with less uncertainty.</p>
+                </article>
+                <article class="about-item">
+                    <h4>Strong institutional presence</h4>
+                    <p>A polished interface that reflects the standard and reputation of your academy.</p>
+                </article>
+                <article class="about-item">
+                    <h4>Secure and responsible process</h4>
+                    <p>Student information is handled with strict confidentiality and professionalism.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="resources reveal" id="resources">
+        <div class="home-wrap">
             <div class="section-divider"></div>
             <p class="section-subtitle">RESOURCES</p>
-            <h3 class="section-title">Student Support &amp; Guidelines</h3>
+            <h3>Student Support and Guidelines</h3>
             <div class="section-underline"></div>
 
             <div class="resources-grid">
-                <div class="resource-card">
+                <article class="resource-card">
                     <div class="resource-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
@@ -70,8 +770,9 @@
                     </div>
                     <h4>How to Submit a Concern</h4>
                     <p>Follow our streamlined process to raise academic or administrative concerns. We ensure every voice is heard.</p>
-                </div>
-                <div class="resource-card">
+                </article>
+
+                <article class="resource-card highlight">
                     <div class="resource-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <circle cx="12" cy="12" r="10"></circle>
@@ -79,37 +780,172 @@
                         </svg>
                     </div>
                     <h4>Our Response Timeline</h4>
-                    <p>All submitted concerns are acknowledged within 24 hours and resolved within 5 working days.</p>
-                </div>
-                <div class="resource-card">
+                    <p>We do not believe in waiting. Every concern is acknowledged immediately and fully resolved within 24 hours.</p>
+                </article>
+
+                <article class="resource-card">
                     <div class="resource-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#e53935" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                             <polyline points="9 12 11 14 15 10"></polyline>
                         </svg>
                     </div>
-                    <h4>Privacy &amp; Security</h4>
+                    <h4>Privacy and Security</h4>
                     <p>Your data and identity are protected under our strict confidentiality and data protection policies.</p>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer>
-        <div class="footer-content">
-            <div class="footer-left">
-                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
-                <div class="footer-text-area">
-                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
-                    <p class="footer-sub">Academy of Knowledge Bridge</p>
-                </div>
-            </div>
-            <div class="footer-right">
-                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+                </article>
             </div>
         </div>
-    </footer>
+    </section>
 
-    <script src="/JS/main.js"></script>
+    <section class="feedback reveal" id="feedback" th:if="${bestFeedbackList != null and !#lists.isEmpty(bestFeedbackList)}">
+        <div class="home-wrap">
+            <div class="section-divider"></div>
+            <p class="section-subtitle">STUDENT VOICES</p>
+            <h3>Best Student Feedback</h3>
+            <div class="section-underline"></div>
+
+            <div class="feedback-controls" th:if="${#lists.size(bestFeedbackList) > 1}">
+                <button type="button" id="feedbackPrev" aria-label="Previous feedback">&lt;</button>
+                <button type="button" id="feedbackNext" aria-label="Next feedback">&gt;</button>
+            </div>
+
+            <div class="feedback-window">
+                <div class="feedback-grid" id="feedbackTrack">
+                    <article class="feedback-card" th:each="feedback : ${bestFeedbackList}">
+                        <div class="feedback-stars" th:with="starCount=${feedback.rating != null ? feedback.rating : 0}">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${i <= starCount ? '★' : '☆'}">★</span>
+                            <small th:text="'(' + ${starCount} + '/5)'">(5/5)</small>
+                        </div>
+                        <p class="feedback-comment" th:text="${feedback.comments}">Excellent support and quick resolution.</p>
+                        <div class="feedback-meta">
+                            <span th:text="${feedback.concern != null and feedback.concern.category != null ? feedback.concern.category : 'General'}">Category</span>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta reveal">
+        <div class="home-wrap">
+            <div class="cta-box">
+                <h3>Your voice deserves immediate action</h3>
+                <p>Submit concerns with confidence and let our institute support team take it forward.</p>
+                <a th:href="@{/submit-concern}" href="/submit-concern" class="hero-primary">Start Now</a>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        const revealItems = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('in-view');
+                    revealObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.16 });
+
+        revealItems.forEach((item) => revealObserver.observe(item));
+
+        const counters = document.querySelectorAll('.stat-number[data-target]');
+        const counterObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (!entry.isIntersecting) return;
+                const el = entry.target;
+                const target = parseInt(el.getAttribute('data-target') || '0', 10);
+                const duration = 1000;
+                const start = performance.now();
+
+                function step(now) {
+                    const progress = Math.min((now - start) / duration, 1);
+                    const value = Math.floor(progress * target);
+                    el.textContent = String(value);
+                    if (progress < 1) {
+                        requestAnimationFrame(step);
+                    } else {
+                        el.textContent = String(target);
+                    }
+                }
+
+                requestAnimationFrame(step);
+                counterObserver.unobserve(el);
+            });
+        }, { threshold: 0.45 });
+
+        counters.forEach((counter) => counterObserver.observe(counter));
+
+        const track = document.getElementById('feedbackTrack');
+        const prev = document.getElementById('feedbackPrev');
+        const next = document.getElementById('feedbackNext');
+
+        if (track && prev && next) {
+            let index = 0;
+
+            function cardsPerView() {
+                if (window.innerWidth <= 640) return 1;
+                if (window.innerWidth <= 1024) return 2;
+                return 3;
+            }
+
+            function maxIndex() {
+                const total = track.children.length;
+                return Math.max(0, total - cardsPerView());
+            }
+
+            function cardStep() {
+                const first = track.querySelector('.feedback-card');
+                if (!first) return 0;
+                const styles = window.getComputedStyle(track);
+                const gap = parseFloat(styles.columnGap || styles.gap || '12');
+                return first.getBoundingClientRect().width + gap;
+            }
+
+            function update() {
+                const step = cardStep();
+                track.style.transform = 'translateX(' + (index * -step) + 'px)';
+                prev.disabled = index <= 0;
+                next.disabled = index >= maxIndex();
+                prev.style.opacity = prev.disabled ? '0.45' : '1';
+                next.style.opacity = next.disabled ? '0.45' : '1';
+            }
+
+            prev.addEventListener('click', () => {
+                index = Math.max(0, index - 1);
+                update();
+            });
+
+            next.addEventListener('click', () => {
+                index = Math.min(maxIndex(), index + 1);
+                update();
+            });
+
+            window.addEventListener('resize', () => {
+                index = Math.min(index, maxIndex());
+                update();
+            });
+
+            update();
+        }
+    })();
+</script>
 </body>
 </html>

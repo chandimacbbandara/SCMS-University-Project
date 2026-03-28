@@ -270,7 +270,8 @@ public class AdminController {
         }
         try {
             replyDTO.setConcernId(id);
-            adminService.submitReply(replyDTO, resolutionFile);
+            Integer adminUserId = (Integer) session.getAttribute("adminUserId");
+            adminService.submitReply(replyDTO, resolutionFile, adminUserId);
             redirectAttributes.addFlashAttribute("successMessage", "Reply submitted successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to submit reply: " + e.getMessage());
@@ -471,7 +472,8 @@ public class AdminController {
             // You can mark admin replies differently if needed or use a separate service/flag.
             // But we can just create a reply as normal using a placeholder studentId or use a dedicated admin logic.
             // Alternatively, wait, the standard service requires `studentId`. So we need a special method.
-            communityService.addAdminReply(id, content, "Admin");
+            String adminDisplayName = (String) session.getAttribute("adminDisplayName");
+            communityService.addAdminReply(id, content, adminDisplayName != null ? adminDisplayName : "Admin");
             redirectAttributes.addFlashAttribute("successMessage", "Reply added successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());
@@ -498,7 +500,8 @@ public class AdminController {
                 return "redirect:/admin/community";
             }
 
-            communityService.addAdminReply(id, message, "Admin");
+            String adminDisplayName = (String) session.getAttribute("adminDisplayName");
+            communityService.addAdminReply(id, message, adminDisplayName != null ? adminDisplayName : "Admin");
             redirectAttributes.addFlashAttribute("successMessage", "Reply added successfully.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Failed to add reply: " + e.getMessage());

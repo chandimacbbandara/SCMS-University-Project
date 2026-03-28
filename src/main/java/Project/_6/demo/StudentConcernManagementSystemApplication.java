@@ -2,6 +2,7 @@ package Project._6.demo;
 
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.AdminReply;
+import Project._6.demo.entity.Admin;
 import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.entity.User;
 import Project._6.demo.repository.AdminRepository;
@@ -11,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,17 +25,35 @@ public class StudentConcernManagementSystemApplication {
     }
 
     @Bean
+    public CommandLineRunner ensureFeedbackReplyColumn(JdbcTemplate jdbcTemplate) {
+        return args -> {
+            Integer columnCount = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Feedback' AND COLUMN_NAME = 'ReplyID_FK'",
+                    Integer.class
+            );
+
+            if (columnCount == null || columnCount == 0) {
+                jdbcTemplate.execute("ALTER TABLE Feedback ADD ReplyID_FK INT NULL");
+            }
+        };
+    }
+
+    @Bean
     public CommandLineRunner removePredefinedAdmin(UserRepository userRepository,
                                                    AdminRepository adminRepository,
                                                    AdminReplyRepository adminReplyRepository,
                                                    ConcernRepository concernRepository) {
         return args -> {
-            Optional<User> predefinedAdminUser = userRepository.findByEmailIgnoreCase("admin@akb.edu");
-            if (predefinedAdminUser.isEmpty()) {
+            Optional<Admin> legacyAdmin = adminRepository.findByStaffId("ADMIN001");
+            if (legacyAdmin.isEmpty() || legacyAdmin.get().getUser() == null) {
                 return;
             }
 
-            User user = predefinedAdminUser.get();
+            User user = legacyAdmin.get().getUser();
+            if (user.getEmail() == null || !"admin@akb.edu".equalsIgnoreCase(user.getEmail())) {
+                return;
+            }
+
             Integer userId = user.getUserId();
 
             List<Concern> assignedConcerns = concernRepository.findByAdmin_UserId(userId);

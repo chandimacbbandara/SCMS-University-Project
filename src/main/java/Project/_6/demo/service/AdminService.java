@@ -5,14 +5,11 @@ import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
-import Project._6.demo.entity.User;
 import Project._6.demo.repository.AdminRepository;
 import Project._6.demo.repository.AdminReplyRepository;
 import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.FeedbackRepository;
-import Project._6.demo.repository.UserRepository;
 
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,23 +39,17 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final AdminReplyRepository adminReplyRepository;
     private final FeedbackRepository feedbackRepository;
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
                         FeedbackRepository feedbackRepository,
-                        UserRepository userRepository,
-                        PasswordEncoder passwordEncoder,
                         NotificationService notificationService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.feedbackRepository = feedbackRepository;
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.notificationService = notificationService;
     }
 
@@ -189,14 +180,18 @@ public class AdminService {
     }
 
     /**
-     * Submit a reply to a concern and update its status
+     * Submit a reply as the currently logged-in admin and update concern status.
      */
     @Transactional
-    public AdminReply submitReply(AdminReplyDTO dto, MultipartFile resolutionFile) {
+    public AdminReply submitReply(AdminReplyDTO dto, MultipartFile resolutionFile, Integer adminUserId) {
         Concern concern = getConcernById(dto.getConcernId());
 
-        // Get or create a default admin for now
-        Admin admin = getOrCreateDefaultAdmin();
+        if (adminUserId == null) {
+            throw new RuntimeException("Admin identity is missing. Please log in again.");
+        }
+
+        Admin admin = adminRepository.findById(adminUserId)
+                .orElseThrow(() -> new RuntimeException("Admin account not found. Please log in again."));
 
         // Create reply
         AdminReply reply = new AdminReply();
@@ -300,30 +295,6 @@ public class AdminService {
     }
 
     /**
-     * Get or create a default admin account for development
-     */
-    private Admin getOrCreateDefaultAdmin() {
-        Optional<Admin> existingAdmin = adminRepository.findByStaffId("ADMIN001");
-        if (existingAdmin.isPresent()) {
-            return existingAdmin.get();
-        }
-
-        // Create a default admin user
-        User adminUser = new User();
-        adminUser.setEmail("admin@akb.edu");
-        adminUser.setPassword(passwordEncoder.encode("admin_" + UUID.randomUUID().toString().substring(0, 8)));
-        adminUser.setFirstName("System");
-        adminUser.setLastName("Admin");
-        adminUser.setRegistrationStatus("APPROVED");
-        adminUser = userRepository.save(adminUser);
-
-        Admin admin = new Admin();
-        admin.setUser(adminUser);
-        admin.setStaffId("ADMIN001");
-        return adminRepository.save(admin);
-    }
-
-    /**
      * Get dashboard statistics
      */
     public long getTotalConcerns() {
@@ -353,7 +324,7 @@ public class AdminService {
         if (adminUserId == null) {
             return List.of();
         }
-        return feedbackRepository.findByConcern_Admin_UserId(adminUserId);
+        return feedbackRepository.findByRatedAdminUserId(adminUserId);
     }
 
     public List<Feedback> getFeedbackHistory() {
