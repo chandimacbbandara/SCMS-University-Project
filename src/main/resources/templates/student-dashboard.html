@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/student-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -308,12 +309,228 @@
             color: var(--text-dark);
         }
 
+        /* ===== Interactive Control Bar ===== */
+        .dashboard-controls {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
+            padding: 16px 18px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .control-search {
+            flex: 1 1 320px;
+            position: relative;
+        }
+        .control-search i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9aa1b5;
+            font-size: 13px;
+        }
+        .control-search input {
+            width: 100%;
+            border: 1.5px solid #e3e7f0;
+            border-radius: 12px;
+            background: #f8faff;
+            padding: 10px 14px 10px 34px;
+            font-size: 13px;
+            font-family: inherit;
+            transition: all 0.25s ease;
+        }
+        .control-search input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(229,57,53,0.08);
+        }
+        .control-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .status-filters {
+            display: inline-flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .status-filter-btn {
+            border: 1px solid #dce2ee;
+            background: #fff;
+            color: #5a647d;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .status-filter-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(229,57,53,0.04);
+        }
+        .status-filter-btn.active {
+            background: linear-gradient(135deg, rgba(229,57,53,0.14), rgba(198,40,40,0.12));
+            border-color: rgba(229,57,53,0.25);
+            color: var(--primary);
+        }
+        .compact-toggle {
+            border: none;
+            border-radius: 10px;
+            background: #eef2f8;
+            color: #4b556f;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 8px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.25s ease;
+        }
+        .compact-toggle.active {
+            background: rgba(30,136,229,0.14);
+            color: var(--accent-blue);
+        }
+        .compact-toggle:hover {
+            transform: translateY(-1px);
+        }
+
+        .status-empty-note {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 8px;
+            padding: 8px 10px;
+            border-radius: 10px;
+            background: #fafbfc;
+            border: 1px dashed #e2e7f0;
+            display: none;
+        }
+        .status-empty-note.active {
+            display: block;
+        }
+
+        body.compact-mode .dashboard-container {
+            margin-top: 20px;
+        }
+        body.compact-mode .welcome-hero,
+        body.compact-mode .stat-card,
+        body.compact-mode .profile-card,
+        body.compact-mode .actions-card,
+        body.compact-mode .tracking-section,
+        body.compact-mode .tips-section {
+            border-radius: 14px;
+        }
+        body.compact-mode .welcome-hero { padding: 28px 30px; }
+        body.compact-mode .stat-card { padding: 18px 20px; }
+        body.compact-mode .profile-card,
+        body.compact-mode .actions-card,
+        body.compact-mode .tracking-section,
+        body.compact-mode .tips-section { padding: 20px; }
+
+        .scroll-top-btn {
+            position: fixed;
+            right: 22px;
+            bottom: 24px;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            font-size: 16px;
+            box-shadow: 0 12px 24px rgba(229,57,53,0.3);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: all 0.25s ease;
+            z-index: 1200;
+        }
+        .scroll-top-btn.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .scroll-top-btn:hover {
+            transform: translateY(-2px);
+        }
+
         /* ===== Two Column Layout ===== */
         .dash-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
+            grid-template-columns: 1fr;
+            gap: 16px;
             margin-bottom: 28px;
+        }
+
+        .student-focus-panel {
+            background: linear-gradient(135deg, #ffffff, #f8fbff);
+            border-radius: var(--radius-md);
+            border: 1px solid #e2e8f3;
+            box-shadow: var(--card-shadow);
+            padding: 24px 26px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+        }
+        .student-focus-title {
+            font-size: 21px;
+            font-weight: 900;
+            color: #1d2337;
+            margin: 0 0 6px;
+        }
+        .student-focus-sub {
+            margin: 0;
+            color: #6b738b;
+            font-size: 13px;
+            max-width: 560px;
+            line-height: 1.65;
+        }
+        .student-focus-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .focus-pill {
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.45px;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .focus-pill.red {
+            background: rgba(229,57,53,0.12);
+            color: var(--primary-dark);
+            border-color: rgba(229,57,53,0.18);
+        }
+        .focus-pill.blue {
+            background: rgba(30,136,229,0.12);
+            color: #0d47a1;
+            border-color: rgba(30,136,229,0.2);
+        }
+        .focus-pill.green {
+            background: rgba(67,160,71,0.14);
+            color: #1b5e20;
+            border-color: rgba(67,160,71,0.2);
         }
 
         /* ===== Profile Card ===== */
@@ -490,24 +707,26 @@
         }
         .actions-list {
             flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
         }
 
         .action-item {
             display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px 20px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 18px;
             border-radius: var(--radius-sm);
             text-decoration: none;
             color: inherit;
-            background: #fafbfc;
+            background: linear-gradient(180deg, #fafbff 0%, #f4f8ff 100%);
             border: 1.5px solid var(--border);
             transition: all 0.35s cubic-bezier(.22,1,.36,1);
             position: relative;
             overflow: hidden;
+            min-height: 150px;
         }
         .action-item::before {
             content: '';
@@ -529,8 +748,8 @@
         }
         .action-item:hover {
             border-color: var(--primary);
-            transform: translateX(6px);
-            box-shadow: 0 4px 15px rgba(229,57,53,0.08);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 26px rgba(229,57,53,0.12);
         }
         .action-item:hover::before { width: 100%; }
         .action-item:hover::after { color: var(--primary); right: 14px; }
@@ -554,15 +773,16 @@
 
         .action-item-text { position: relative; z-index: 1; }
         .action-item-text h4 {
-            font-size: 14px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 800;
             color: var(--text-dark);
             margin: 0 0 2px;
         }
         .action-item-text p {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-light);
             margin: 0;
+            line-height: 1.55;
         }
 
         /* ===== Tips Section ===== */
@@ -640,7 +860,11 @@
             .hero-date-time { text-align: center; }
             .hero-greeting { margin: 0 auto 12px; }
             .stat-strip { grid-template-columns: 1fr; }
+            .dashboard-controls { padding: 14px; }
+            .control-meta { width: 100%; justify-content: space-between; }
             .dash-grid { grid-template-columns: 1fr; }
+            .student-focus-panel { padding: 18px 16px; }
+            .actions-list { grid-template-columns: 1fr; }
             .tips-grid { grid-template-columns: 1fr; }
         }
         @media (max-width: 480px) {
@@ -821,6 +1045,7 @@
             color: var(--text-light);
             line-height: 1.5;
             display: -webkit-box;
+            line-clamp: 2;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
@@ -1111,7 +1336,7 @@
         }
     </style>
 </head>
-<body>
+<body class="student-theme">
     <header>
         <div class="container header-content">
             <div class="logo-area">
@@ -1124,11 +1349,19 @@
             <nav>
                 <ul>
                     <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="/student/dashboard" class="nav-link" style="color: #e53935;">Dashboard</a></li>
+                    <li><a href="/student/dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link">My History</a></li>
-                    <li><a href="/student/profile" class="nav-link">Profile</a></li>
+                    <li>
+                        <a href="/student/profile" class="nav-profile-btn" aria-label="Student Profile" title="Student Profile">
+                            <img th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                                 src="/images/img1.jpeg"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                            <span class="nav-profile-fallback">S</span>
+                        </a>
+                    </li>
                     <li>
                         <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
                             <i class="fas fa-bell"></i>
@@ -1207,48 +1440,39 @@
                 </div>
             </div>
 
+            <div class="dashboard-controls animate-in delay-2">
+                <div class="control-search">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="dashboardSearchInput" placeholder="Search concerns, actions, or tips...">
+                </div>
+                <div class="control-meta">
+                    <div class="status-filters" id="statusFilters">
+                        <button class="status-filter-btn active" data-filter="all" type="button">All</button>
+                        <button class="status-filter-btn" data-filter="Pending" type="button">Pending</button>
+                        <button class="status-filter-btn" data-filter="In Progress" type="button">In Progress</button>
+                    </div>
+                    <button type="button" class="compact-toggle" id="compactToggleBtn">
+                        <i class="fas fa-compress"></i>
+                        Compact Mode
+                    </button>
+                </div>
+            </div>
+
             <!-- Two-Column Grid -->
             <div class="dash-grid">
 
-                <!-- Profile Card -->
-                <div class="profile-card animate-in delay-3">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-user-circle"></i> Your Profile</div>
+                <div class="student-focus-panel animate-in delay-3">
+                    <div>
+                        <h3 class="student-focus-title">Focused Student Workspace</h3>
+                        <p class="student-focus-sub">
+                            Report concerns faster, check updates quickly, and stay connected with your student community using this simplified dashboard.
+                        </p>
                     </div>
-                    <div class="profile-avatar-row">
-                        <div class="profile-avatar-lg" th:text="${student.user.firstName.substring(0,1)}">S</div>
-                        <div class="profile-avatar-info">
-                            <h4 th:text="${student.user.firstName + ' ' + student.user.lastName}">John Doe</h4>
-                            <p>Student Member</p>
-                        </div>
+                    <div class="student-focus-badges">
+                        <span class="focus-pill red"><i class="fas fa-bolt"></i> Fast Actions</span>
+                        <span class="focus-pill blue"><i class="fas fa-comments"></i> Peer Talk</span>
+                        <span class="focus-pill green"><i class="fas fa-satellite-dish"></i> Live Status</span>
                     </div>
-                    <ul class="profile-details">
-                        <li>
-                            <div class="detail-icon"><i class="fas fa-envelope"></i></div>
-                            <div>
-                                <div class="detail-label">Email</div>
-                                <div class="detail-value" th:text="${student.user.email}">email@example.com</div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="detail-icon"><i class="fas fa-id-card"></i></div>
-                            <div>
-                                <div class="detail-label">Student ID</div>
-                                <div class="detail-value" th:text="${student.studentId}">STU001</div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="detail-icon"><i class="fas fa-circle-check"></i></div>
-                            <div>
-                                <div class="detail-label">Status</div>
-                                <div class="detail-value">
-                                    <span class="status-badge approved">
-                                        <span class="status-dot"></span> Approved
-                                    </span>
-                                </div>
-                            </div>
-                        </li>
-                    </ul>
                 </div>
 
                 <!-- Quick Actions Card -->
@@ -1257,46 +1481,25 @@
                         <div class="card-title"><i class="fas fa-bolt"></i> Quick Actions</div>
                     </div>
                     <div class="actions-list">
-                        <a href="/submit-concern" class="action-item">
+                        <a href="/submit-concern" class="action-item" data-search="submit concern report issue academic campus">
                             <div class="action-item-icon report"><i class="fas fa-pen-to-square"></i></div>
                             <div class="action-item-text">
-                                <h4>Submit a Concern</h4>
-                                <p>Report an academic or campus issue</p>
+                                <h4>Submit New Concern</h4>
+                                <p>Create a new concern report with full details and attachments.</p>
                             </div>
                         </a>
-                        <a href="/student/concern-history" class="action-item">
-                            <div class="action-item-icon home"><i class="fas fa-clock-rotate-left"></i></div>
-                            <div class="action-item-text">
-                                <h4>View Concern History</h4>
-                                <p>See all submitted concerns &amp; replies</p>
-                            </div>
-                        </a>
-                        <a href="/student/profile" class="action-item">
-                            <div class="action-item-icon profile"><i class="fas fa-user-gear"></i></div>
-                            <div class="action-item-text">
-                                <h4>Open Profile</h4>
-                                <p>View and update your profile details</p>
-                            </div>
-                        </a>
-                        <a href="/student/community" class="action-item">
+                        <a href="/student/community" class="action-item" data-search="community talk peers support discussion">
                             <div class="action-item-icon home" style="background:rgba(29,53,87,0.12);color:#1d3557;"><i class="fas fa-comments"></i></div>
                             <div class="action-item-text">
                                 <h4>Student Community Talk</h4>
-                                <p>Ask peers and share solutions safely</p>
+                                <p>Discuss with peers, share experiences, and learn from others.</p>
                             </div>
                         </a>
-                        <a href="/" class="action-item">
-                            <div class="action-item-icon home" style="background:rgba(67,160,71,0.1);color:#43a047;"><i class="fas fa-house"></i></div>
-                            <div class="action-item-text">
-                                <h4>Back to Home</h4>
-                                <p>Return to the main website</p>
-                            </div>
-                        </a>
-                        <a href="/student/dashboard" class="action-item">
-                            <div class="action-item-icon profile"><i class="fas fa-gear"></i></div>
+                        <a href="/student/dashboard" class="action-item" data-search="refresh dashboard reload data latest">
+                            <div class="action-item-icon profile"><i class="fas fa-user-gear"></i></div>
                             <div class="action-item-text">
                                 <h4>Refresh Dashboard</h4>
-                                <p>Reload your latest data</p>
+                                <p>Reload your latest status, notifications, and live tracking data.</p>
                             </div>
                         </a>
                     </div>
@@ -1309,12 +1512,17 @@
                     <div class="card-title"><i class="fas fa-route"></i> My Concerns - Live Tracking</div>
                 </div>
 
-                <div th:if="${#lists.isEmpty(concerns)}" class="tracking-empty">
+                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress'])}" class="tracking-empty">
                     <i class="fas fa-inbox"></i>
-                    <p>No concerns submitted yet. Use "Report Issue" to submit your first concern.</p>
+                    <p>No active concerns in live tracking. Pending and In Progress concerns will appear here.</p>
                 </div>
 
-                <div th:each="concern : ${concerns}" class="concern-track-card">
+                <div class="status-empty-note" id="trackingEmptyState">
+                    No concern cards match your current filter/search.
+                </div>
+
+                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress']}" class="concern-track-card"
+                     th:attr="data-status=${concern.status},data-search=${concern.subject}">
                     <div class="track-card-header">
                         <div>
                             <div class="track-ref" th:text="'REF: CON-' + ${concern.concernId}">REF: CON-1</div>
@@ -1380,17 +1588,17 @@
                     <div class="card-title"><i class="fas fa-lightbulb"></i> Getting Started</div>
                 </div>
                 <div class="tips-grid">
-                    <div class="tip-card">
+                    <div class="tip-card" data-search="submit concern report issue form">
                         <div class="tip-icon"><i class="fas fa-file-lines"></i></div>
                         <h5>Submit a Concern</h5>
                         <p>Use the report tool to raise any academic or campus issue directly to the admin team.</p>
                     </div>
-                    <div class="tip-card">
+                    <div class="tip-card" data-search="track progress status review updates">
                         <div class="tip-icon"><i class="fas fa-clock-rotate-left"></i></div>
                         <h5>Track Progress</h5>
                         <p>Once submitted, your concern is reviewed by administrators and prioritized accordingly.</p>
                     </div>
-                    <div class="tip-card">
+                    <div class="tip-card" data-search="responses admin replies notifications communication">
                         <div class="tip-icon"><i class="fas fa-comments"></i></div>
                         <h5>Get Responses</h5>
                         <p>Administrators will reply to your concern and keep you updated on the resolution status.</p>
@@ -1453,6 +1661,10 @@
         </div>
     </footer>
 
+    <button type="button" class="scroll-top-btn" id="scrollTopBtn" aria-label="Scroll to top">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <script>
         // Live clock & dynamic greeting
         function updateClock() {
@@ -1513,6 +1725,104 @@
             document.getElementById('notifOverlay').classList.toggle('active');
             document.body.style.overflow = document.getElementById('notifPanel').classList.contains('active') ? 'hidden' : '';
         }
+
+        // ===== Dashboard interactive controls =====
+        const searchInput = document.getElementById('dashboardSearchInput');
+        const statusButtons = document.querySelectorAll('.status-filter-btn');
+        const concernCards = document.querySelectorAll('.concern-track-card');
+        const actionItems = document.querySelectorAll('.action-item');
+        const tipCards = document.querySelectorAll('.tip-card');
+        const compactToggleBtn = document.getElementById('compactToggleBtn');
+        const trackingEmptyState = document.getElementById('trackingEmptyState');
+        const scrollTopBtn = document.getElementById('scrollTopBtn');
+
+        let activeStatus = 'all';
+
+        function normalizeText(value) {
+            return (value || '').toLowerCase();
+        }
+
+        function applyInteractiveFilters() {
+            const query = normalizeText(searchInput ? searchInput.value : '');
+            let visibleConcerns = 0;
+
+            concernCards.forEach(card => {
+                const status = card.getAttribute('data-status') || '';
+                const searchData = normalizeText(card.getAttribute('data-search'));
+                const statusMatch = activeStatus === 'all' || status === activeStatus;
+                const searchMatch = query === '' || searchData.includes(query);
+                const show = statusMatch && searchMatch;
+                card.style.display = show ? '' : 'none';
+                if (show) visibleConcerns += 1;
+            });
+
+            if (trackingEmptyState) {
+                trackingEmptyState.classList.toggle('active', visibleConcerns === 0 && concernCards.length > 0);
+            }
+
+            const searchables = [...actionItems, ...tipCards];
+            searchables.forEach(item => {
+                const source = normalizeText(item.getAttribute('data-search') || item.textContent);
+                const show = query === '' || source.includes(query);
+                item.style.display = show ? '' : 'none';
+            });
+        }
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyInteractiveFilters);
+        }
+
+        statusButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                activeStatus = btn.getAttribute('data-filter') || 'all';
+                statusButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                applyInteractiveFilters();
+            });
+        });
+
+        function setCompactMode(enabled) {
+            document.body.classList.toggle('compact-mode', enabled);
+            if (compactToggleBtn) {
+                compactToggleBtn.classList.toggle('active', enabled);
+                compactToggleBtn.innerHTML = enabled
+                    ? '<i class="fas fa-expand"></i> Comfortable Mode'
+                    : '<i class="fas fa-compress"></i> Compact Mode';
+            }
+            localStorage.setItem('studentDashboardCompactMode', enabled ? '1' : '0');
+        }
+
+        if (compactToggleBtn) {
+            compactToggleBtn.addEventListener('click', () => {
+                const willEnable = !document.body.classList.contains('compact-mode');
+                setCompactMode(willEnable);
+            });
+        }
+
+        const savedCompact = localStorage.getItem('studentDashboardCompactMode') === '1';
+        setCompactMode(savedCompact);
+
+        document.addEventListener('keydown', (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+                event.preventDefault();
+                searchInput?.focus();
+            }
+        });
+
+        function updateScrollTopVisibility() {
+            if (!scrollTopBtn) return;
+            scrollTopBtn.classList.toggle('visible', window.scrollY > 320);
+        }
+
+        if (scrollTopBtn) {
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        window.addEventListener('scroll', updateScrollTopVisibility);
+        updateScrollTopVisibility();
+        applyInteractiveFilters();
 
         // Mark a single notification as read
         function markNotifRead(el) {

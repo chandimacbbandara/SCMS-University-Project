@@ -537,6 +537,289 @@
     color: #6f7790;
 }
 
+/* Community feed redesign */
+.community-main-card {
+    padding: 18px;
+    background:
+        radial-gradient(circle at 98% -8%, rgba(229, 57, 53, 0.08) 0%, rgba(229, 57, 53, 0) 28%),
+        radial-gradient(circle at -8% 108%, rgba(37, 99, 235, 0.07) 0%, rgba(37, 99, 235, 0) 24%),
+        #ffffff;
+}
+
+.feed-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 14px;
+    border-bottom: 1px solid #e8edf7;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+}
+
+.feed-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 900;
+    color: #1a2140;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.feed-sub {
+    margin: 6px 0 0;
+    color: #67708a;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.feed-stats {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.stat-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 999px;
+    border: 1px solid #ffd9dd;
+    background: #fff4f5;
+    color: #b71c1c;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 7px 11px;
+}
+
+.stat-chip.soft {
+    border-color: #d9e4fb;
+    background: #f4f8ff;
+    color: #1e4ea7;
+}
+
+.compose-form {
+    border: 1px solid #dfe7f5;
+    background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+    box-shadow: 0 10px 20px rgba(20, 38, 74, 0.06);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 14px;
+}
+
+.compose-form textarea {
+    min-height: 138px;
+    border-radius: 12px;
+}
+
+.compose-form input,
+.compose-form select,
+.compose-form textarea,
+.reply-form textarea,
+.edit-form input,
+.edit-form select,
+.edit-form textarea {
+    border-color: #d7e1f1;
+}
+
+.compose-form input:focus,
+.compose-form select:focus,
+.compose-form textarea:focus,
+.reply-form textarea:focus,
+.edit-form input:focus,
+.edit-form select:focus,
+.edit-form textarea:focus {
+    border-color: #e53935;
+    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
+}
+
+.feed-stream {
+    display: grid;
+    gap: 14px;
+}
+
+.stream-label {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.35px;
+    text-transform: uppercase;
+    color: #556188;
+    padding: 2px 2px 0;
+}
+
+.stream-label span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.post-card.post-thread {
+    border: 1px solid #dfe8f7;
+    border-radius: 18px;
+    padding: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    box-shadow: 0 8px 20px rgba(17, 32, 62, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.post-card.post-thread::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 5px;
+    height: 100%;
+    background: linear-gradient(180deg, #e53935, #f77f00);
+}
+
+.post-head {
+    align-items: flex-start;
+}
+
+.post-user-name {
+    font-size: 15px;
+}
+
+.post-tag {
+    background: #edf4ff;
+    border: 1px solid #d9e6ff;
+    color: #1c4d9a;
+}
+
+.post-time {
+    margin-top: 2px;
+}
+
+.post-title {
+    margin: 12px 0 8px;
+    font-size: 20px;
+    line-height: 1.3;
+}
+
+.post-body {
+    font-size: 14px;
+    line-height: 1.72;
+    background: #f7f9ff;
+    border: 1px solid #e6ecf8;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.post-meta {
+    margin-top: 11px;
+    gap: 8px;
+}
+
+.post-meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 9px;
+    border-radius: 999px;
+    background: #f3f6fc;
+    border: 1px solid #e1e8f5;
+    color: #4b5777;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.post-actions,
+.reply-actions {
+    margin-top: 10px;
+}
+
+.reply-list {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid #e8edf8;
+}
+
+.reply-list-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #40507a;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 10px;
+}
+
+.reply-item {
+    border: 1px solid #e3ebfa;
+    border-radius: 14px;
+    padding: 11px 12px;
+    margin-bottom: 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%);
+    position: relative;
+}
+
+.reply-item::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 10px;
+    bottom: 10px;
+    width: 2px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(229, 57, 53, 0.35), rgba(37, 99, 235, 0.22));
+}
+
+.reply-head,
+.reply-text,
+.reply-meta,
+.reply-actions,
+.reply-item .edit-form {
+    margin-left: 12px;
+}
+
+.reply-user-meta {
+    font-size: 11px;
+    color: #59637f;
+}
+
+.reply-text {
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid #e8eef9;
+    margin-top: 8px;
+    color: #2a334d;
+}
+
+.reply-meta {
+    margin-top: 7px;
+    font-size: 11px;
+}
+
+.reply-form,
+.edit-form {
+    border: 1px dashed #d7e1f1;
+    border-radius: 14px;
+    background: #f9fbff;
+}
+
+.reply-form textarea,
+.edit-form textarea {
+    border-radius: 11px;
+    min-height: 94px;
+}
+
+.ghost-btn {
+    border: 1px solid #d2dced;
+    background: #fff;
+}
+
+.danger-btn {
+    background: linear-gradient(135deg, #d32f2f, #9f1b1b);
+}
+
+.post-empty {
+    border: 1px dashed #d4deef;
+    background: linear-gradient(180deg, #ffffff 0%, #f5f9ff 100%);
+}
+
 @media (max-width: 980px) {
     .community-body .navbar {
         flex-wrap: wrap;
@@ -558,6 +841,15 @@
         grid-template-columns: 1fr;
     }
 
+    .feed-head {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .feed-stats {
+        justify-content: flex-start;
+    }
+
     .community-side {
         position: static;
     }
@@ -570,6 +862,28 @@
     .community-hero {
         flex-direction: column;
         align-items: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+    .feed-title {
+        font-size: 21px;
+    }
+
+    .post-card.post-thread {
+        padding: 13px;
+    }
+
+    .post-body {
+        padding: 10px;
+    }
+
+    .reply-head,
+    .reply-text,
+    .reply-meta,
+    .reply-actions,
+    .reply-item .edit-form {
+        margin-left: 8px;
     }
 }
 

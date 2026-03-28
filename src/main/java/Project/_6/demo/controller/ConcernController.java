@@ -5,8 +5,10 @@ import Project._6.demo.dto.FeedbackDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
+import Project._6.demo.entity.Notification;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.FeedbackService;
+import Project._6.demo.service.NotificationService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,10 +25,14 @@ public class ConcernController {
 
     private final ConcernService concernService;
     private final FeedbackService feedbackService;
+    private final NotificationService notificationService;
 
-    public ConcernController(ConcernService concernService, FeedbackService feedbackService) {
+    public ConcernController(ConcernService concernService,
+                             FeedbackService feedbackService,
+                             NotificationService notificationService) {
         this.concernService = concernService;
         this.feedbackService = feedbackService;
+        this.notificationService = notificationService;
     }
 
     // Serve the concern submission form
@@ -39,6 +45,7 @@ public class ConcernController {
         var student = concernService.getStudentByUserId(userId);
         model.addAttribute("concernDTO", new ConcernSubmissionDTO());
         model.addAttribute("loggedStudent", student);
+        addNotificationAttributes(model, userId);
         return "submit-concern";
     }
 
@@ -83,7 +90,22 @@ public class ConcernController {
         model.addAttribute("feedbackMap", feedbackMap);
         model.addAttribute("feedbackActionAllowedMap", feedbackActionAllowedMap);
         model.addAttribute("feedbackUpdateAllowedMap", feedbackUpdateAllowedMap);
+        addNotificationAttributes(model, userId);
         return "concern-history";
+    }
+
+    private void addNotificationAttributes(Model model, Integer userId) {
+        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+        allNotifications.addAll(broadcastNotifications);
+        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+
+        long unreadCount = notificationService.getUnreadCount(userId)
+                + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+
+        model.addAttribute("notifications", allNotifications);
+        model.addAttribute("unreadCount", unreadCount);
     }
 
     // Submit feedback for a completed concern
