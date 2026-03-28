@@ -350,6 +350,18 @@ public class StudentRegistrationController {
         model.addAttribute("profileDTO", profileDTO);
         model.addAttribute("changePasswordDTO", new ChangePasswordDTO());
         model.addAttribute("passwordRule", "Use at least 12 characters with uppercase, lowercase, number, and special character.");
+
+        // Keep notification drawer data available on profile page
+        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+        allNotifications.addAll(broadcastNotifications);
+        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        long unreadCount = notificationService.getUnreadCount(userId)
+            + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+        model.addAttribute("notifications", allNotifications);
+        model.addAttribute("unreadCount", unreadCount);
+
         return "student-profile";
     }
 

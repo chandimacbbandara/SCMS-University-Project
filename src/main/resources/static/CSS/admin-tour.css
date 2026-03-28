@@ -1,0 +1,114 @@
+.admin-tour-launch {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 1100;
+    border: none;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.4px;
+    color: #fff;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+    box-shadow: 0 10px 24px rgba(220, 38, 38, 0.3);
+    cursor: pointer;
+}
+
+.admin-tour-launch:hover {
+    transform: translateY(-1px);
+}
+
+.admin-tour-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.55);
+    z-index: 1200;
+}
+
+.admin-tour-tooltip {
+    position: fixed;
+    width: min(360px, calc(100vw - 24px));
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 20px 55px rgba(15, 23, 42, 0.28);
+    z-index: 1210;
+    padding: 14px;
+}
+
+.admin-tour-step {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.admin-tour-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    line-height: 1.25;
+    color: #0f172a;
+}
+
+.admin-tour-text {
+    margin: 0;
+    color: #475569;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.admin-tour-actions {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.admin-tour-left,
+.admin-tour-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-tour-btn {
+    border: 1px solid #dbe2ea;
+    background: #fff;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 7px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+}
+
+.admin-tour-btn.primary {
+    border-color: transparent;
+    color: #fff;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.admin-tour-btn:hover {
+    filter: brightness(0.97);
+}
+
+.admin-tour-highlight {
+    position: relative;
+    z-index: 1220 !important;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.22), 0 0 0 8px rgba(248, 113, 113, 0.2);
+    border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+    .admin-tour-launch {
+        right: 12px;
+        bottom: 12px;
+        font-size: 11px;
+        padding: 9px 12px;
+    }
+}

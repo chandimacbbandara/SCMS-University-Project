@@ -1,8 +1,10 @@
 package Project._6.demo.controller;
 
 import Project._6.demo.dto.*;
+import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.StudentCommunityPost;
 import Project._6.demo.entity.StudentCommunityReply;
+import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentCommunityService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.HttpStatus;
@@ -20,9 +22,12 @@ import java.util.Map;
 public class StudentCommunityController {
 
     private final StudentCommunityService communityService;
+    private final NotificationService notificationService;
 
-    public StudentCommunityController(StudentCommunityService communityService) {
+    public StudentCommunityController(StudentCommunityService communityService,
+                                      NotificationService notificationService) {
         this.communityService = communityService;
+        this.notificationService = notificationService;
     }
 
     @GetMapping
@@ -44,6 +49,7 @@ public class StudentCommunityController {
         model.addAttribute("repliesMap", repliesMap);
         model.addAttribute("categories", communityService.getAllowedCategories());
         model.addAttribute("postDTO", new CommunityPostDTO());
+        addNotificationAttributes(model, userId);
 
         return "student-community";
     }
@@ -61,7 +67,22 @@ public class StudentCommunityController {
 
         model.addAttribute("studentName", session.getAttribute("studentName"));
         model.addAttribute("rulesVersion", StudentCommunityService.RULES_VERSION);
+        addNotificationAttributes(model, userId);
         return "student-community-rules";
+    }
+
+    private void addNotificationAttributes(Model model, Integer userId) {
+        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+        allNotifications.addAll(broadcastNotifications);
+        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+
+        long unreadCount = notificationService.getUnreadCount(userId)
+                + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+
+        model.addAttribute("notifications", allNotifications);
+        model.addAttribute("unreadCount", unreadCount);
     }
 
     @PostMapping("/rules/accept")
