@@ -201,13 +201,13 @@
                         <div class="reply-item" th:each="reply : ${repliesMap[post.postId]}">
                             <div class="reply-head">
                                 <img class="avatar-img small"
-                                     th:src="@{'/student/photo/' + ${reply.student.userId}}"
+                                     th:src="${reply.student != null ? '/student/photo/' + reply.student.userId : '/images/img1.jpeg'}"
                                      src="/images/img1.jpeg"
                                      alt="Reply student profile picture"
                                      onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
-                                <span class="avatar-fallback small" style="display:none;" th:text="${#strings.substring(reply.student.user.firstName, 0, 1)}">S</span>
+                                <span class="avatar-fallback small" style="display:none;" th:text="${reply.student != null ? #strings.substring(reply.student.user.firstName, 0, 1) : 'A'}">S</span>
                                 <div class="reply-user-meta">
-                                    <span th:text="${reply.student.user.firstName + ' ' + reply.student.user.lastName}">Student</span>
+                                    <span th:text="${reply.student != null ? reply.student.user.firstName + ' ' + reply.student.user.lastName : reply.adminName + ' (Admin)'}">Student</span>
                                     <span th:text="${#temporals.format(reply.createdTime, 'dd MMM yyyy, hh:mm a')}">Time</span>
                                 </div>
                             </div>
@@ -217,7 +217,7 @@
                                 Community reply
                             </div>
 
-                            <div class="reply-actions" th:if="${session.studentUserId == reply.student.userId}">
+                                <div class="reply-actions" th:if="${reply.student != null and session.studentUserId == reply.student.userId}">
                                 <button type="button" class="ghost-btn" th:attr="data-toggle-id='edit-reply-' + ${reply.replyId}">Edit Reply</button>
                                 <form th:action="@{'/student/community/replies/' + ${reply.replyId} + '/delete'}" method="post"
                                       onsubmit="return confirm('Delete this reply?');">
@@ -225,7 +225,8 @@
                                 </form>
                             </div>
 
-                            <form class="edit-form" th:id="'edit-reply-' + ${reply.replyId}" style="display:none;"
+                                <form class="edit-form" th:if="${reply.student != null and session.studentUserId == reply.student.userId}"
+                                    th:id="'edit-reply-' + ${reply.replyId}" style="display:none;"
                                   th:action="@{'/student/community/replies/' + ${reply.replyId} + '/update'}" method="post">
                                 <textarea name="message" data-mod-type="reply" maxlength="1200" th:text="${reply.message}" required></textarea>
                                 <div class="moderation-hint"></div>
