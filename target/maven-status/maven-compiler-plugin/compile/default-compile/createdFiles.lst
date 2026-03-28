@@ -39,7 +39,6 @@ Project/_6/demo/entity/AnalyticsReport.class
 Project/_6/demo/controller/StudentCommunityController.class
 Project/_6/demo/service/FeedbackModerationService.class
 Project/_6/demo/controller/StudentRegistrationController.class
-Project/_6/demo/FixDb.class
 Project/_6/demo/repository/FeedbackRepository.class
 Project/_6/demo/repository/StudentRepository.class
 Project/_6/demo/dto/ConcernSubmissionDTO.class
