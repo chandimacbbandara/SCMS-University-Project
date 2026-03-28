@@ -425,7 +425,7 @@ public class StudentRegistrationController {
     @ResponseBody
     public ResponseEntity<byte[]> getStudentPhotoForCommunity(@PathVariable("userId") Integer userId,
                                                               HttpSession session) {
-        if (session.getAttribute("studentUserId") == null) {
+        if (session.getAttribute("studentUserId") == null && session.getAttribute("adminLoggedIn") == null && session.getAttribute("ownerLoggedIn") == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

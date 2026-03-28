@@ -34,9 +34,13 @@ public class StudentCommunityReply {
     @JoinColumn(name = "PostID_FK", nullable = false)
     private StudentCommunityPost post;
 
+    // Made nullable to allow Admin replies
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "StudentID_FK", nullable = false)
+    @JoinColumn(name = "StudentID_FK", nullable = true)
     private Student student;
+
+    @Column(name = "AdminName", length = 100)
+    private String adminName;
 
     @PrePersist
     protected void onCreate() {
