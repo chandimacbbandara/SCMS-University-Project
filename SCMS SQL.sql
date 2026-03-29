@@ -113,11 +113,21 @@ from [User]
 select *
 from student
 
+SELECT *
+FROM Admin
+
 select *
 from Admin_reply
 
+SELECT *
+FROM Feedback
+
 select *
 from Notification
+
+SELECT *
+FROM Analytics_Report
+
 
 
 /* =============================
@@ -179,4 +189,4 @@ SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
 SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
-ALTER TABLE Student_Community_Reply ADD AdminName VARCHAR(100) NULL;
+
