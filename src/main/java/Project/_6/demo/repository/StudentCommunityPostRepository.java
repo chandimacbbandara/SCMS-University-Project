@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface StudentCommunityPostRepository extends JpaRepository<StudentCommunityPost, Integer> {
     List<StudentCommunityPost> findByStatusOrderByCreatedTimeDesc(String status);
     Optional<StudentCommunityPost> findByPostIdAndStudent_UserId(Integer postId, Integer userId);
+    List<StudentCommunityPost> findByStudent_UserId(Integer userId);
+    void deleteByStudent_UserId(Integer userId);
 }

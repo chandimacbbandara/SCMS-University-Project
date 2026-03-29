@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface StudentCommunityRulesAcceptanceRepository extends JpaRepository<StudentCommunityRulesAcceptance, Integer> {
     Optional<StudentCommunityRulesAcceptance> findTopByStudent_UserIdOrderByAcceptedAtDesc(Integer userId);
+    void deleteByStudent_UserId(Integer userId);
 }

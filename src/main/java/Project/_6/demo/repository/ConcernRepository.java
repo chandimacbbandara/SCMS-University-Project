@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     List<Concern> findByStudent_StudentId(String studentId);
+    List<Concern> findByStudent_UserId(Integer userId);
     List<Concern> findAllByOrderByCreatedTimeDesc();
     List<Concern> findByStatusOrderByCreatedTimeDesc(String status);
     long countByStatus(String status);

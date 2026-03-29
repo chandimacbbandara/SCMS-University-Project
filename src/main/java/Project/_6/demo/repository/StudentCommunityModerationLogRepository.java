@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StudentCommunityModerationLogRepository extends JpaRepository<StudentCommunityModerationLog, Integer> {
+	void deleteByStudent_UserId(Integer userId);
 }

@@ -5,9 +5,19 @@ import Project._6.demo.dto.ChangePasswordDTO;
 import Project._6.demo.dto.StudentProfileUpdateDTO;
 import Project._6.demo.dto.StudentRegistrationDTO;
 import Project._6.demo.entity.Admin;
+import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.StudentCommunityPost;
 import Project._6.demo.entity.Student;
 import Project._6.demo.entity.User;
 import Project._6.demo.repository.AdminRepository;
+import Project._6.demo.repository.AdminReplyRepository;
+import Project._6.demo.repository.ConcernRepository;
+import Project._6.demo.repository.FeedbackRepository;
+import Project._6.demo.repository.NotificationRepository;
+import Project._6.demo.repository.StudentCommunityModerationLogRepository;
+import Project._6.demo.repository.StudentCommunityPostRepository;
+import Project._6.demo.repository.StudentCommunityReplyRepository;
+import Project._6.demo.repository.StudentCommunityRulesAcceptanceRepository;
 import Project._6.demo.repository.StudentRepository;
 import Project._6.demo.repository.UserRepository;
 
@@ -24,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.regex.Pattern;
 
 @Service
@@ -40,17 +51,41 @@ public class StudentRegistrationService {
     private final UserRepository userRepository;
     private final AdminRepository adminRepository;
     private final StudentRepository studentRepository;
+    private final ConcernRepository concernRepository;
+    private final AdminReplyRepository adminReplyRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final NotificationRepository notificationRepository;
+    private final StudentCommunityPostRepository studentCommunityPostRepository;
+    private final StudentCommunityReplyRepository studentCommunityReplyRepository;
+    private final StudentCommunityRulesAcceptanceRepository studentCommunityRulesAcceptanceRepository;
+    private final StudentCommunityModerationLogRepository studentCommunityModerationLogRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationService emailVerificationService;
 
     public StudentRegistrationService(UserRepository userRepository,
                                       AdminRepository adminRepository,
                                       StudentRepository studentRepository,
+                                      ConcernRepository concernRepository,
+                                      AdminReplyRepository adminReplyRepository,
+                                      FeedbackRepository feedbackRepository,
+                                      NotificationRepository notificationRepository,
+                                      StudentCommunityPostRepository studentCommunityPostRepository,
+                                      StudentCommunityReplyRepository studentCommunityReplyRepository,
+                                      StudentCommunityRulesAcceptanceRepository studentCommunityRulesAcceptanceRepository,
+                                      StudentCommunityModerationLogRepository studentCommunityModerationLogRepository,
                                       PasswordEncoder passwordEncoder,
                                       EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.adminRepository = adminRepository;
         this.studentRepository = studentRepository;
+        this.concernRepository = concernRepository;
+        this.adminReplyRepository = adminReplyRepository;
+        this.feedbackRepository = feedbackRepository;
+        this.notificationRepository = notificationRepository;
+        this.studentCommunityPostRepository = studentCommunityPostRepository;
+        this.studentCommunityReplyRepository = studentCommunityReplyRepository;
+        this.studentCommunityRulesAcceptanceRepository = studentCommunityRulesAcceptanceRepository;
+        this.studentCommunityModerationLogRepository = studentCommunityModerationLogRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailVerificationService = emailVerificationService;
     }
@@ -208,10 +243,43 @@ public class StudentRegistrationService {
         Student student = studentRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Student not found with UserID: " + userId));
 
+        deleteStudentDependencies(userId);
+
         studentRepository.delete(student);
         userRepository.deleteById(userId);
 
         return student;
+    }
+
+    private void deleteStudentDependencies(Integer userId) {
+        // Remove direct student-linked records first.
+        notificationRepository.deleteByStudent_UserId(userId);
+        studentCommunityRulesAcceptanceRepository.deleteByStudent_UserId(userId);
+        studentCommunityModerationLogRepository.deleteByStudent_UserId(userId);
+
+        // Remove community replies authored by the student.
+        studentCommunityReplyRepository.deleteByStudent_UserId(userId);
+
+        // Remove replies on posts created by the student before deleting posts.
+        List<Integer> studentPostIds = studentCommunityPostRepository.findByStudent_UserId(userId).stream()
+                .map(StudentCommunityPost::getPostId)
+                .collect(Collectors.toList());
+        if (!studentPostIds.isEmpty()) {
+            studentCommunityReplyRepository.deleteByPost_PostIdIn(studentPostIds);
+        }
+        studentCommunityPostRepository.deleteByStudent_UserId(userId);
+
+        // Remove concern graph dependencies, then concerns.
+        List<Concern> concerns = concernRepository.findByStudent_UserId(userId);
+        for (Concern concern : concerns) {
+            Integer concernId = concern.getConcernId();
+            feedbackRepository.deleteByConcern_ConcernId(concernId);
+            adminReplyRepository.deleteByConcern_ConcernId(concernId);
+            notificationRepository.deleteByConcern_ConcernId(concernId);
+        }
+        if (!concerns.isEmpty()) {
+            concernRepository.deleteAll(concerns);
+        }
     }
 
     /**
