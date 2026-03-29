@@ -66,6 +66,7 @@
             z-index: 700;
             background: rgba(15, 23, 42, 0.92);
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
         .navbar-inner {
@@ -433,9 +434,10 @@
         </a>
         <ul class="nav-links">
             <li><a href="/">Home</a></li>
+            <li><a href="/admin/dashboard">Admin Dashboard</a></li>
+            <li><a href="/admin/edu-dashboard">Edu Dashboard</a></li>
             <li><a href="/admin/student-review">Student Review</a></li>
             <li><a href="/admin/community">Community Chat</a></li>
-            <li><a href="/admin/dashboard">Admin Dashboard</a></li>
             <li><a href="/admin/feedback" class="active">Feedback</a></li>
             <li><a href="/logout" class="nav-logout">Logout</a></li>
         </ul>
@@ -487,7 +489,7 @@
 
     <section class="rating-overview-card" aria-label="Average rating summary">
         <h2 class="rating-overview-title">Ratings and Reviews</h2>
-        <p class="rating-overview-sub">Average rating based on this admin account activities. If none exist, existing overall ratings are shown.</p>
+        <p class="rating-overview-sub">Average rating based only on this admin account's student feedback.</p>
 
         <div class="rating-overview-grid">
             <div>
@@ -546,7 +548,7 @@
             </div>
 
             <aside class="analytics-summary">
-                <h4><i class="fas fa-trophy" style="color:#f59e0b;margin-right:6px;"></i> Best Service Department</h4>
+                <h4><i class="fas fa-trophy"></i> Best Service Department</h4>
                 <div class="best-department-pill">
                     <i class="fas fa-star"></i>
                     <span th:text="${topRatedDepartment + ' - ' + topRatedAverage + '/5'}">Department - 0/5</span>
@@ -680,12 +682,11 @@
         pageId: 'feedback',
         autoStart: false,
         storageKey: 'akb_admin_tour_completed',
-        nextPage: '/admin/edu-dashboard',
         steps: [
             {
                 selector: '.nav-links',
                 title: 'Navigation Controls',
-                content: 'Use this navbar to move across dashboard pages and continue your reporting flow.'
+                content: 'Use this menu in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
             },
             {
                 selector: '.rating-overview-card',

@@ -129,6 +129,7 @@
             align-items: center;
             gap: 8px;
             background: rgba(229,57,53,0.2);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 5px 16px;
             border-radius: 100px;
@@ -230,6 +231,7 @@
             font-size: 24px; font-weight: 900; color: var(--text-dark);
             animation: countUp 0.6s ease both;
         }
+        .stat-pill-info .stat-pill-val.period-size { font-size: 16px; }
 
         /* ===== Alert Toasts ===== */
         .alert-toast {
@@ -322,6 +324,10 @@
             transition: all 0.3s;
             outline: none;
         }
+        .form-control.readonly-field {
+            background: #f0f0f0;
+            cursor: not-allowed;
+        }
         .form-control:focus {
             border-color: var(--primary);
             background: #fff;
@@ -373,6 +379,12 @@
         .btn-create:hover {
             transform: translateY(-3px);
             box-shadow: 0 12px 36px rgba(229,57,53,0.4);
+        }
+        .create-admin-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         /* ===== Reports List Card ===== */
@@ -688,7 +700,7 @@
         <nav>
             <ul>
                 <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/owner/dashboard" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Owner Dashboard</a></li>
+                <li><a href="/owner/dashboard" class="nav-link active">Owner Dashboard</a></li>
                 <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
                 <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
                 <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
@@ -723,7 +735,7 @@
                 </p>
             </div>
             <div class="hero-right">
-                <a href="/owner/admin/create-page" class="btn-red" style="text-decoration:none; display:inline-flex; align-items:center; gap:8px;">
+                <a href="/owner/admin/create-page" class="btn-red create-admin-link">
                     <i class="fas fa-user-shield"></i> Create Admin Account
                 </a>
             </div>
@@ -749,7 +761,7 @@
                 <div class="stat-pill-icon"><i class="fas fa-chart-bar"></i></div>
                 <div class="stat-pill-info">
                     <div class="stat-pill-label">Active Period</div>
-                    <div class="stat-pill-val" style="font-size:16px;" id="activePeriod">—</div>
+                    <div class="stat-pill-val period-size" id="activePeriod">—</div>
                 </div>
             </div>
         </div>
@@ -772,7 +784,7 @@
                         <!-- Time Period -->
                         <div class="form-group">
                             <label class="form-label"><i class="fas fa-calendar-days"></i> Time Period</label>
-                            <select name="timePeriod" class="form-control" required>
+                            <select name="timePeriod" class="form-control" title="Report time period" required>
                                 <option value="" disabled selected>Select time period</option>
                                 <option value="Daily">Daily</option>
                                 <option value="Weekly">Weekly</option>
@@ -785,7 +797,7 @@
                         <!-- Most Frequent Category -->
                         <div class="form-group">
                             <label class="form-label"><i class="fas fa-tag"></i> Most Frequent Category</label>
-                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" required>
+                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" title="Most frequent category" required>
                                 <option value="" disabled selected>Select a category</option>
                                 <option value="Education (Creative and IT)">Education (Creative and IT)</option>
                                 <option value="Institute Problem">Institute Related Problem</option>
@@ -800,18 +812,18 @@
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label"><i class="fas fa-hashtag"></i> Total Concerns</label>
-                                <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control"
+                                    <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control readonly-field"
                                        placeholder="Select a category first" min="0" required readonly
-                                       style="background:#f0f0f0; cursor:not-allowed;">
+                                        >
                                 <div class="auto-fill-info" id="totalConcernsInfo">
                                     <i class="fas fa-info-circle"></i> Auto-filled when category is selected
                                 </div>
                             </div>
                             <div class="form-group">
                                 <label class="form-label"><i class="fas fa-clock"></i> Avg Resolution Time</label>
-                                <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control"
+                                    <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control readonly-field"
                                        placeholder="Select a category first" step="0.01" min="0" required readonly
-                                       style="background:#f0f0f0; cursor:not-allowed;">
+                                        >
                                 <div class="auto-fill-info" id="avgResolutionInfo">
                                     <i class="fas fa-info-circle"></i> Auto-filled in hours (decimal)
                                 </div>
@@ -822,7 +834,7 @@
                         <div class="form-group">
                             <label class="form-label"><i class="fas fa-user-shield"></i> Select Admin</label>
                             <div class="admin-select-wrapper">
-                                <select name="adminIdFk" id="adminSelect" class="form-control">
+                                <select name="adminIdFk" id="adminSelect" class="form-control" title="Assign report to admin">
                                     <option value="" selected>Loading admins...</option>
                                 </select>
                             </div>

@@ -362,6 +362,16 @@
             color: #64748b;
             box-shadow: var(--card-shadow);
         }
+        .empty-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        .empty-title {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #1f2937;
+        }
+        .delete-form { margin-top: 8px; }
 
         @media (max-width: 768px) {
             .page-hero {
@@ -440,7 +450,7 @@
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
                 <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
-                <li><a href="/owner/admin/manage" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Manage Admins</a></li>
+                <li><a href="/owner/admin/manage" class="nav-link active">Manage Admins</a></li>
                 <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
@@ -471,8 +481,8 @@
         </div>
 
         <div th:if="${admins == null or #lists.isEmpty(admins)}" class="empty">
-            <i class="fas fa-user-slash" style="font-size:28px; margin-bottom:10px;"></i>
-            <h3 style="font-size:18px; margin-bottom:8px; color:#1f2937;">No Admin Accounts Found</h3>
+            <i class="fas fa-user-slash empty-icon"></i>
+            <h3 class="empty-title">No Admin Accounts Found</h3>
             <p>No admins are available right now. Create a new admin to get started.</p>
         </div>
 
@@ -527,7 +537,7 @@
                     </div>
                 </form>
 
-                <form th:action="@{'/owner/admin/' + ${admin.userId} + '/delete'}" method="post" style="margin-top:8px;">
+                <form th:action="@{'/owner/admin/' + ${admin.userId} + '/delete'}" method="post" class="delete-form">
                     <button type="submit" class="btn-delete"
                             onclick="return confirm('Delete this admin account? This action cannot be undone.');">
                         <i class="fas fa-trash"></i> Delete

@@ -86,8 +86,8 @@
 <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
 <div class="notif-panel" id="notifPanel">
     <div class="notif-panel-header">
-        <h3><i class="fas fa-bell" style="margin-right:8px;"></i> Notifications</h3>
-        <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
     </div>
     <div class="notif-panel-actions">
         <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>

@@ -471,7 +471,7 @@
                 <ul>
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
-                    <li><a th:href="@{/register}" href="/register" class="nav-link" style="color: #e53935;">Sign Up</a></li>
+                    <li><a th:href="@{/register}" href="/register" class="nav-link active">Sign Up</a></li>
                 </ul>
             </nav>
         </div>
@@ -487,7 +487,7 @@
                     <div class="left-title">Join Us Today</div>
                     <p class="left-subtitle">Create your student account and start managing your academic concerns.</p>
 
-                    <ul class="reg-steps">
+                    <div class="reg-steps" role="list">
                         <li>
                             <span class="step-num">1</span>
                             <span>Fill in your personal details</span>
@@ -512,7 +512,7 @@
                             <span class="step-num">5</span>
                             <span>Wait for admin approval</span>
                         </li>
-                    </ul>
+                    </div>
                 </div>
 
                 <!-- Right Panel -->
@@ -635,7 +635,7 @@
                                     <strong>Click to upload</strong> or drag &amp; drop<br>
                                     <small>JPG, PNG or GIF (Max 10MB)</small>
                                 </p>
-                                <input type="file" name="studentIdPhoto" id="studentIdPhoto" accept="image/*" required>
+                                <input type="file" name="studentIdPhoto" id="studentIdPhoto" title="Student ID photo" accept="image/*" required>
                                 <div class="file-name" id="fileName"></div>
                             </div>
                             <img class="photo-preview" id="photoPreview" alt="ID Preview">
@@ -666,6 +666,9 @@
             </div>
             <div class="footer-right">
                 <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+                <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+                <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+                <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
             </div>
         </div>
     </footer>

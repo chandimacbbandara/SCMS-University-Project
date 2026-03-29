@@ -342,6 +342,8 @@
     text-align: center;
     padding: 28px;
 }
+.post-empty h3 { margin: 0 0 8px; }
+.post-empty p { margin: 0; color: #6a748a; }
 
 .post-head {
     display: flex;
@@ -512,6 +514,7 @@
     color: #fff;
     background: linear-gradient(140deg, #ef5350, #c62828);
 }
+.avatar-fallback.hidden { display: none; }
 
 .avatar-img.small,
 .avatar-fallback.small {
@@ -730,6 +733,12 @@
     margin-top: 10px;
 }
 
+.action-row-end {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
 .reply-list {
     margin-top: 14px;
     padding-top: 12px;
@@ -799,6 +808,7 @@
     border-radius: 14px;
     background: #f9fbff;
 }
+.edit-form.hidden { display: none; }
 
 .reply-form textarea,
 .edit-form textarea {
@@ -946,6 +956,241 @@
         width: 100%;
         justify-content: center;
         text-align: center;
+    }
+}
+
+/* Student-only interactive community enhancements */
+.community-body.student-theme .hero-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.community-body.student-theme .official-link.secondary {
+    background: rgba(255, 255, 255, 0.14);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+.community-body.student-theme .official-link.secondary:hover {
+    background: rgba(255, 255, 255, 0.24);
+}
+
+.community-body.student-theme .thread-jump-list {
+    display: grid;
+    gap: 8px;
+    margin-top: 10px;
+    max-height: 260px;
+    overflow: auto;
+    padding-right: 2px;
+}
+
+.community-body.student-theme .thread-jump-link {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    border: 1px solid #dde6f5;
+    border-radius: 12px;
+    padding: 8px 10px;
+    background: #f8fbff;
+}
+
+.community-body.student-theme .thread-jump-link:hover {
+    border-color: #bfd1f2;
+    background: #eef4ff;
+}
+
+.community-body.student-theme .thread-jump-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #24304f;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.community-body.student-theme .thread-jump-count {
+    min-width: 24px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 999px;
+    background: #e8efff;
+    color: #1f4b9f;
+    padding: 3px 7px;
+}
+
+.community-body.student-theme .thread-jump-empty {
+    font-size: 12px;
+    color: #77809a;
+}
+
+.community-body.student-theme .feed-controls {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) 190px auto;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.community-body.student-theme .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #d7e1f1;
+    border-radius: 12px;
+    background: #fff;
+    padding: 0 10px;
+    min-height: 42px;
+}
+
+.community-body.student-theme .search-box i {
+    color: #7a84a1;
+    font-size: 13px;
+}
+
+.community-body.student-theme .search-box input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 13px;
+    background: transparent;
+}
+
+.community-body.student-theme #communityFilterSelect {
+    border: 1px solid #d7e1f1;
+    border-radius: 12px;
+    min-height: 42px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #253258;
+    background: #fff;
+    padding: 0 10px;
+}
+
+.community-body.student-theme .control-btn {
+    min-height: 42px;
+}
+
+.community-body.student-theme .scan-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.community-body.student-theme .scan-card {
+    border: 1px solid #dfe7f5;
+    border-radius: 14px;
+    background: linear-gradient(180deg, #fff 0%, #f7faff 100%);
+    padding: 10px 12px;
+}
+
+.community-body.student-theme .scan-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.35px;
+    color: #6a748d;
+    font-weight: 700;
+}
+
+.community-body.student-theme .scan-value {
+    display: block;
+    margin-top: 4px;
+    font-size: 22px;
+    font-weight: 900;
+    color: #1f2a49;
+    line-height: 1;
+}
+
+.community-body.student-theme .post-owner-pill,
+.community-body.student-theme .reply-owner-pill {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    border-radius: 999px;
+    padding: 4px 7px;
+    border: 1px solid transparent;
+}
+
+.community-body.student-theme .post-owner-pill.mine,
+.community-body.student-theme .reply-owner-pill.mine {
+    background: #e8f8ef;
+    color: #1e7a4f;
+    border-color: #bfe8d1;
+}
+
+.community-body.student-theme .post-owner-pill.peer,
+.community-body.student-theme .reply-owner-pill.peer {
+    background: #edf4ff;
+    color: #1f4ea4;
+    border-color: #cfe0ff;
+}
+
+.community-body.student-theme .reply-owner-pill.admin {
+    background: #fff1f2;
+    color: #b71c1c;
+    border-color: #f8c9ce;
+}
+
+.community-body.student-theme .reply-list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.community-body.student-theme .reply-visibility-btn {
+    border: 1px solid #d3dced;
+    background: #fff;
+    color: #344064;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 10px;
+    cursor: pointer;
+}
+
+.community-body.student-theme .reply-visibility-btn:hover {
+    background: #f4f8ff;
+}
+
+.community-body.student-theme .reply-items-wrap.collapsed {
+    display: none;
+}
+
+.community-body.student-theme .post-card.post-thread.focus-thread {
+    outline: 2px solid rgba(30, 78, 167, 0.45);
+    box-shadow: 0 0 0 4px rgba(30, 78, 167, 0.12);
+}
+
+.community-body.student-theme .post-card.post-empty.hidden {
+    display: none;
+}
+
+@media (max-width: 880px) {
+    .community-body.student-theme .feed-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .community-body.student-theme .scan-cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .community-body.student-theme .hero-actions {
+        width: 100%;
+        display: grid;
+    }
+
+    .community-body.student-theme .thread-jump-list {
+        max-height: 200px;
     }
 }
 

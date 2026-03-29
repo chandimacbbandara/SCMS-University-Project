@@ -71,6 +71,7 @@
             z-index: 700;
             background: rgba(15, 23, 42, 0.92);
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
 
@@ -234,6 +235,7 @@
             font-size: 14px;
             font-weight: 600;
             border: 1px solid;
+            -webkit-backdrop-filter: blur(6px);
             backdrop-filter: blur(6px);
         }
 
@@ -801,6 +803,11 @@
             line-height: 1.7;
             color: #1e293b;
         }
+        .student-feedback-comment.muted {
+            color: #64748b;
+            font-style: italic;
+        }
+        .hidden-form { display: none; }
 
         .reply-form textarea {
             min-height: 140px;
@@ -1005,10 +1012,11 @@
             <nav>
                 <ul>
                     <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a href="/admin/student-review" class="nav-link">Student Review</a></li>
-                    <li><a href="/admin/community" class="nav-link">Community Chat</a></li>
                     <li><a href="/admin/dashboard" class="nav-link" th:classappend="${concern.category == 'Education (Creative and IT)'} ? '' : ' active'">Admin Dashboard</a></li>
                     <li><a href="/admin/edu-dashboard" class="nav-link" th:classappend="${concern.category == 'Education (Creative and IT)'} ? ' active' : ''">Edu Dashboard</a></li>
+                    <li><a href="/admin/student-review" class="nav-link">Student Review</a></li>
+                    <li><a href="/admin/community" class="nav-link">Community Chat</a></li>
+                    <li><a href="/admin/feedback" class="nav-link">Feedback</a></li>
                     <li><a href="/logout" class="btn-red">Logout</a></li>
                 </ul>
             </nav>
@@ -1086,7 +1094,7 @@
                 <h3><i class="fas fa-code-branch"></i> Reassign Department</h3>
                 <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/category'}" method="post" class="status-form"
                       onsubmit="return confirm('Change this concern department? This will update dashboard categorization.');">
-                    <select name="category" required>
+                    <select name="category" title="Concern category" required>
                         <option value="Institute Problem" th:selected="${concern.category == 'Institute Problem'}">Institute Problem</option>
                         <option value="Registration" th:selected="${concern.category == 'Registration'}">Registration</option>
                         <option value="Administrative" th:selected="${concern.category == 'Administrative'}">Administrative</option>
@@ -1159,9 +1167,8 @@
                          th:text="${feedback.comments}">
                         Student comment
                     </div>
-                    <div class="student-feedback-comment"
-                         th:if="${feedback.comments == null or feedback.comments.isEmpty()}"
-                         style="color:#64748b; font-style:italic;">
+                    <div class="student-feedback-comment muted"
+                         th:if="${feedback.comments == null or feedback.comments.isEmpty()}">
                         Student submitted a rating without a written comment.
                     </div>
                 </div>
@@ -1175,7 +1182,7 @@
 
                     <textarea id="replyMessageInput" th:field="*{replyMessage}" placeholder="Type your reply to the student's concern..." maxlength="1200" required></textarea>
                     <div id="replyMessageFeedback" class="field-feedback" aria-live="polite"></div>
-                    <input id="resolutionFileInput" type="file" name="resolutionFile" class="reply-file-input" accept="image/*,application/pdf" />
+                    <input id="resolutionFileInput" type="file" name="resolutionFile" title="Resolution attachment" class="reply-file-input" accept="image/*,application/pdf" />
                     <div id="replyFileFeedback" class="field-feedback" aria-live="polite"></div>
                     <div class="reply-form-meta">
                         <span>Tip: keep the reply clear and action-oriented (10-1200 chars).</span>
@@ -1194,7 +1201,7 @@
                 </form>
 
                 <!-- Hidden form for Mark as Read functionality -->
-                <form id="markAsReadForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}" method="post" style="display:none;">
+                <form id="markAsReadForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}" method="post" class="hidden-form">
                     <input type="hidden" name="status" value="In Progress" />
                 </form>
             </div>
@@ -1379,7 +1386,7 @@
                 {
                     selector: '.header-content nav ul',
                     title: 'Page Navigation',
-                    content: 'Use these links to return to dashboard pages or switch between modules.'
+                    content: 'Use these links in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
                 },
                 {
                     selector: '.concern-card',

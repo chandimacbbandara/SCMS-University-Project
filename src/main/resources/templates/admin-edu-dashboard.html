@@ -92,6 +92,7 @@
             top: 0;
             z-index: 650;
             background: rgba(255, 255, 255, 0.8);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(99, 102, 241, 0.18);
         }
@@ -255,6 +256,7 @@
         }
         .stat-card {
             background: rgba(255, 255, 255, 0.85);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             border-radius: var(--radius-md);
             border: 1px solid rgba(221, 225, 251, 0.9);
@@ -312,6 +314,7 @@
             box-shadow: var(--card-shadow);
             margin-bottom: 34px;
             overflow: hidden;
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
         .table-header {
@@ -545,8 +548,11 @@
             </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
-                <li><a href="/admin/student-review">Student Review</a></li>
+                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
                 <li><a href="/admin/edu-dashboard" class="active">Edu Dashboard</a></li>
+                <li><a href="/admin/student-review">Student Review</a></li>
+                <li><a href="/admin/community">Community Chat</a></li>
+                <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
         </div>
@@ -565,7 +571,10 @@
                     <p class="hero-sub">Manage and review Creative &amp; IT academic concerns. Track faculty-related issues and ensure timely resolutions for students.</p>
                     <div class="hero-btns">
                         <a href="/admin/dashboard" class="hero-btn hero-btn-primary">
-                            <i class="fas fa-th-large"></i> General Dashboard
+                            <i class="fas fa-th-large"></i> Admin Dashboard
+                        </a>
+                        <a href="/admin/feedback" class="hero-btn hero-btn-primary">
+                            <i class="fas fa-star-half-stroke"></i> Feedback Dashboard
                         </a>
                         <a href="/admin/student-review" class="hero-btn hero-btn-outline">
                             <i class="fas fa-users"></i> Student Accounts
@@ -759,17 +768,17 @@
             pageId: 'edu-dashboard',
             autoStart: false,
             storageKey: 'akb_admin_tour_completed',
-            nextPage: '/admin/community',
+            nextPage: '/admin/student-review',
             steps: [
                 {
                     selector: '.nav-links',
                     title: 'Education Navigation',
-                    content: 'Switch from here to the General Dashboard, Student Review, and Feedback pages.'
+                    content: 'Use this menu in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
                 },
                 {
                     selector: '.hero-left',
                     title: 'Education Overview',
-                    content: 'This section gives an overview of Creative and IT related concerns.'
+                    content: 'This section gives an overview of Creative and IT concerns with quick shortcuts to Admin Dashboard, Feedback Dashboard, and Student Accounts.'
                 },
                 {
                     selector: '.stats-row',

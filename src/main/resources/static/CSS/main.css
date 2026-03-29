@@ -13,10 +13,6 @@ body {
     overflow-x: hidden;
 }
 
-html {
-    -webkit-text-size-adjust: 100%;
-}
-
 img,
 svg,
 video,
@@ -519,6 +515,30 @@ footer {
 .footer-right p {
     font-size: 14px;
     color: #666;
+    margin: 4px 0;
+}
+
+.notif-panel-header h3 i {
+    margin-right: 8px;
+}
+
+.footer-right a {
+    color: #9aa0a6;
+    text-decoration: none;
+}
+
+.footer-right a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.footer-contact-icon {
+    width: 14px;
+    margin-right: 8px;
+    color: #8b9096;
+    opacity: 0.8;
+    font-size: 12px;
+    text-align: center;
 }
 
 /* ===== RESPONSIVE ===== */

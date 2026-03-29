@@ -175,7 +175,7 @@ public class AdminController {
             .orElseGet(List::of);
 
         List<Feedback> feedbackHistory = adminService.getFeedbackHistory();
-        List<Feedback> ratingSource = adminFeedbackHistory.isEmpty() ? feedbackHistory : adminFeedbackHistory;
+        List<Feedback> ratingSource = adminFeedbackHistory;
 
         long totalFeedback = ratingSource.size();
         long star5 = ratingSource.stream().filter(f -> f.getRating() != null && f.getRating() == 5).count();
