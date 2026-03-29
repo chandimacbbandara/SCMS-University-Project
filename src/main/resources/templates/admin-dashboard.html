@@ -88,6 +88,7 @@
             z-index: 700;
             background: rgba(15, 23, 42, 0.92);
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
         .navbar-inner {
@@ -190,6 +191,7 @@
             margin: 0 0 12px;
             line-height: 1.15;
         }
+        .hero h1 i { margin-right: 8px; opacity: 0.8; }
         .hero-sub {
             color: rgba(226, 232, 240, 0.9);
             font-size: 15px;
@@ -699,9 +701,10 @@
             </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
+                <li><a href="/admin/dashboard" class="active">Admin Dashboard</a></li>
+                <li><a href="/admin/edu-dashboard">Edu Dashboard</a></li>
                 <li><a href="/admin/student-review">Student Review</a></li>
                 <li><a href="/admin/community">Community Chat</a></li>
-                <li><a href="/admin/dashboard" class="active">Admin Dashboard</a></li>
                 <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
@@ -715,7 +718,7 @@
             <div class="hero-content anim-up">
                 <div class="hero-left">
                     <div class="hero-badge"><span class="dot"></span> Admin Panel</div>
-                    <h1><i class="fas fa-shield-halved" style="margin-right:8px;opacity:0.8;"></i> Admin Dashboard</h1>
+                    <h1><i class="fas fa-shield-halved"></i> Admin Dashboard</h1>
                     <p class="hero-sub">Monitor, manage &amp; respond to student concerns in real time. Your centralized control panel for academic excellence.</p>
                     <div class="hero-btns">
                         <a th:href="@{/admin/edu-dashboard}" class="hero-btn hero-btn-primary">
@@ -865,7 +868,7 @@
                 <form th:action="@{/admin/dashboard}" method="get" class="filter-form">
                     <div class="filter-group">
                         <label>STATUS</label>
-                        <select name="status">
+                        <select name="status" title="Filter by status">
                             <option value="All" th:selected="${selectedStatus == 'All'}">All Status</option>
                             <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Pending</option>
                             <option value="In Progress" th:selected="${selectedStatus == 'In Progress'}">In Progress</option>
@@ -874,7 +877,7 @@
                     </div>
                     <div class="filter-group">
                         <label>CATEGORY</label>
-                        <select name="category">
+                        <select name="category" title="Filter by category">
                             <option value="All" th:selected="${selectedCategory == 'All'}">All Categories</option>
                             <option value="Institute Problem" th:selected="${selectedCategory == 'Institute Problem'}">Institute Problem</option>
                             <option value="Registration" th:selected="${selectedCategory == 'Registration'}">Registration</option>
@@ -885,7 +888,7 @@
                     </div>
                     <div class="filter-group">
                         <label>TIME PERIOD</label>
-                        <select name="timePeriod">
+                        <select name="timePeriod" title="Filter by time period">
                             <option value="All" th:selected="${selectedTimePeriod == 'All'}">All Time</option>
                             <option value="Today" th:selected="${selectedTimePeriod == 'Today'}">Today</option>
                             <option value="Last7Days" th:selected="${selectedTimePeriod == 'Last7Days'}">Last 7 Days</option>
@@ -1044,17 +1047,17 @@
             pageId: 'dashboard',
             autoStart: true,
             storageKey: 'akb_admin_tour_completed',
-            nextPage: '/admin/student-review',
+            nextPage: '/admin/edu-dashboard',
             steps: [
                 {
                     selector: '.nav-links',
                     title: 'Navigation Bar',
-                    content: 'Use this menu to quickly move between Student Review, Feedback, and other admin pages.'
+                    content: 'Use this menu in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
                 },
                 {
                     selector: '.hero-left',
                     title: 'Dashboard Overview',
-                    content: 'This hero section explains the dashboard purpose and gives quick-access shortcuts.'
+                    content: 'This hero section explains the dashboard purpose and gives quick-access shortcuts to Education, Feedback, and Student Accounts.'
                 },
                 {
                     selector: '.stats-row',

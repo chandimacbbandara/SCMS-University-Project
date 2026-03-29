@@ -93,6 +93,7 @@
             z-index: 700;
             background: rgba(15, 23, 42, 0.92);
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
         .navbar-inner {
@@ -647,6 +648,34 @@
             border: 1px solid #e5eaf3;
         }
         .empty-state p { color: var(--text-light); font-size: 14px; font-weight: 600; }
+        .post-empty h3 { margin: 0 0 8px; }
+        .post-empty p { margin: 0; color: #6a748a; }
+        .avatar-fallback.hidden { display: none; }
+        .post-actions { margin-top: 10px; }
+        .reply-actions { margin-top: 5px; text-align: right; }
+        .inline-form { display: inline; }
+        .edit-form.hidden { display: none; }
+        .action-row-end {
+            margin-top: 10px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .danger-btn {
+            background: #e11d48;
+            color: #fff;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .danger-btn.small {
+            padding: 3px 8px;
+            font-size: 12px;
+        }
+        .btn-apply.clean {
+            border: none;
+            cursor: pointer;
+        }
 
         .alert-toast {
             margin: 18px 0;
@@ -694,7 +723,7 @@
         }
     </style>
 </head>
-<body>
+<body class="community-body student-theme admin-community-view">
 <nav class="navbar">
         <div class="navbar-inner">
             <a href="/" class="nav-brand">
@@ -703,9 +732,10 @@
             </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
+                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
+                <li><a href="/admin/edu-dashboard">Edu Dashboard</a></li>
                 <li><a href="/admin/student-review">Student Review</a></li>
                 <li><a href="/admin/community" class="active">Community Chat</a></li>
-                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
                 <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
@@ -716,9 +746,12 @@
     <section class="community-hero">
         <div>
             <h1><i class="fa-solid fa-comments"></i> Student Community Talk</h1>
-            <p>Discuss concerns, get peer support, and keep the space respectful.</p>
+            <p>Monitor student discussions, keep the space safe, and respond quickly as admin.</p>
         </div>
-        <a href="/submit-concern" class="official-link"><i class="fa-solid fa-shield-heart"></i> Use Official Concern Channel</a>
+        <div class="hero-actions">
+            <a href="#communityFeedStream" class="official-link secondary"><i class="fa-solid fa-compass"></i> Explore Threads</a>
+            <a href="/admin/dashboard" class="official-link"><i class="fa-solid fa-shield-heart"></i> Back To Admin Dashboard</a>
+        </div>
     </section>
 
     <div class="community-grid">
@@ -733,11 +766,23 @@
             <hr class="side-separator">
             <h3 class="side-heading"><i class="fa-solid fa-circle-info"></i> Quick Note</h3>
             <p class="side-note">
-                Peer replies are community guidance only. For official university decisions, use the concern portal.
+                Use this page to moderate discussions and provide official admin replies where needed.
             </p>
 
             <hr class="side-separator">
-            
+            <h3 class="side-heading"><i class="fa-solid fa-map"></i> Thread Navigator</h3>
+            <p class="side-note">Jump to any discussion and check reply volume instantly.</p>
+            <div class="thread-jump-list" id="threadJumpList">
+                <a th:if="${!#lists.isEmpty(posts)}"
+                   th:each="post : ${posts}"
+                   th:href="'#post-' + ${post.postId}"
+                   class="thread-jump-link"
+                   th:attr="data-jump-post=${post.postId}">
+                    <span class="thread-jump-title" th:text="${post.title}">Post Title</span>
+                    <span class="thread-jump-count" th:text="${#lists.size(repliesMap[post.postId])}">0</span>
+                </a>
+                <div class="thread-jump-empty" th:if="${#lists.isEmpty(posts)}">No threads yet.</div>
+            </div>
         </aside>
 
         <section class="community-main-card">
@@ -747,39 +792,80 @@
             <div class="feed-head">
                 <div>
                     <h2 class="feed-title"><i class="fa-solid fa-message"></i> Community Feed</h2>
-                    <p class="feed-sub">Ask clearly, reply respectfully, and help each other with practical answers.</p>
+                    <p class="feed-sub">Review student conversations, identify risky content, and moderate with clear admin responses.</p>
                 </div>
                 <div class="feed-stats">
                     <span class="stat-chip" th:text="${#lists.size(posts)} + ' Active Posts'">0 Active Posts</span>
-                    <span class="stat-chip soft"><i class="fa-solid fa-users"></i> Peer-to-peer discussion</span>
+                    <span class="stat-chip soft"><i class="fa-solid fa-user-shield"></i> Admin moderation mode</span>
                 </div>
             </div>
 
-            
+            <div class="feed-controls" id="feedControls">
+                <label class="search-box" for="communitySearchInput">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input id="communitySearchInput" type="search" placeholder="Search post title, author, post body, or replies...">
+                </label>
+                <select id="communityFilterSelect" title="Thread filter">
+                    <option value="all">All threads</option>
+                    <option value="peer">Only student posts</option>
+                    <option value="unanswered">No replies yet</option>
+                    <option value="active">Active (2+ replies)</option>
+                </select>
+                <button type="button" class="ghost-btn control-btn" id="communityFilterReset">Reset</button>
+            </div>
 
-            <div class="feed-stream">
+            <div class="scan-cards" id="scanCards">
+                <article class="scan-card">
+                    <span class="scan-label">Visible Threads</span>
+                    <strong class="scan-value" id="visibleThreadCount" th:text="${#lists.size(posts)}">0</strong>
+                </article>
+                <article class="scan-card">
+                    <span class="scan-label">Unanswered</span>
+                    <strong class="scan-value" id="unansweredThreadCount">0</strong>
+                </article>
+                <article class="scan-card">
+                    <span class="scan-label">Active (2+ replies)</span>
+                    <strong class="scan-value" id="activeThreadCount">0</strong>
+                </article>
+            </div>
+
+            <div class="feed-stream" id="communityFeedStream">
                 <div class="stream-label">
                     <span><i class="fa-solid fa-wave-square"></i> Live Student Conversations</span>
                 </div>
 
                 <div th:if="${#lists.isEmpty(posts)}" class="post-card post-empty">
-                    <h3 style="margin:0 0 8px;">No conversations yet</h3>
-                    <p style="margin:0;color:#6a748a;">Start the first discussion and invite helpful replies from students.</p>
+                    <h3>No conversations yet</h3>
+                    <p>Start the first discussion and invite helpful replies from students.</p>
                 </div>
 
-                <article class="post-card post-thread" th:each="post : ${posts}">
+                <div id="communityNoResults" class="post-card post-empty hidden">
+                    <h3>No matching threads</h3>
+                    <p>Try changing your search text or filter to find more discussions.</p>
+                </div>
+
+                <article class="post-card post-thread"
+                         th:each="post : ${posts}"
+                         th:attr="id='post-' + ${post.postId},
+                                  data-post-id=${post.postId},
+                                  data-post-title=${post.title},
+                                  data-post-message=${post.message},
+                                  data-post-author=${post.student.user.firstName + ' ' + post.student.user.lastName},
+                                  data-replies=${#lists.size(repliesMap[post.postId])},
+                                  data-owned=${false}">
                     <div class="post-head">
                         <img class="avatar-img"
                              th:src="${'/student/photo/' + post.student.userId}"
                              src="/images/img1.jpeg"
                              alt="Student profile picture"
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
-                        <span class="avatar-fallback" style="display:none;" th:text="${#strings.substring(post.student.user.firstName, 0, 1)}">S</span>
+                        <span class="avatar-fallback hidden" th:text="${#strings.substring(post.student.user.firstName, 0, 1)}">S</span>
 
                         <div class="post-user-block">
                             <div class="post-user-line">
                                 <span class="post-user-name" th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student Name</span>
                                 <span class="post-tag" th:text="${post.category}">Category</span>
+                                <span class="post-owner-pill peer">Student Post</span>
                             </div>
                             <span class="post-time" th:text="${#temporals.format(post.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan</span>
                         </div>
@@ -789,85 +875,68 @@
                     <div class="post-body" th:text="${post.message}">Post body</div>
 
                     <div class="post-meta">
+                        <span><i class="fa-solid fa-hashtag"></i> Thread <span th:text="${post.postId}">0</span></span>
                         <span><i class="fa-solid fa-user"></i> <span th:text="${post.student.user.firstName + ' ' + post.student.user.lastName}">Student</span></span>
                         <span><i class="fa-solid fa-reply"></i> <span th:text="${#lists.size(repliesMap[post.postId])}">0</span> Replies</span>
                         <span><i class="fa-solid fa-circle-check"></i> Open Discussion</span>
                     </div>
 
-                    
-                        <div class="post-actions" style="margin-top:10px;">
-                            <form th:action="@{'/admin/community/post/' + ${post.postId} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Delete this post as admin?');">
-                                <button type="submit" class="danger-btn" style="background:#e11d48;color:white;border:none;padding:5px 10px;border-radius:4px;cursor:pointer;">Delete Post</button>
-                            </form>
-                        </div>
-
-
-                    <form class="edit-form" th:id="'edit-post-' + ${post.postId}" style="display:none;"
-                          th:action="@{'/admin/community/post/' + ${post.postId} + '/update'}" method="post">
-                        <div class="row">
-                            <input type="text" name="title" maxlength="160" th:value="${post.title}" required>
-                            <select name="category" required>
-                                <option th:each="cat : ${categories}" th:value="${cat}" th:text="${cat}"
-                                        th:selected="${cat == post.category}">Academic</option>
-                            </select>
-                        </div>
-                        <textarea name="message" data-mod-type="post" maxlength="2000" th:text="${post.message}" required></textarea>
-                        <div class="moderation-hint"></div>
-                        <div style="margin-top:10px;display:flex;justify-content:flex-end;">
-                            <button type="submit" class="btn-apply" style="border:none; cursor:pointer;">Save Post</button>
-                        </div>
-                    </form>
+                    <div class="post-actions">
+                        <form th:action="@{'/admin/community/post/' + ${post.postId} + '/delete'}" method="post" class="inline-form" onsubmit="return confirm('Delete this post as admin?');">
+                            <button type="submit" class="danger-btn">Delete Post</button>
+                        </form>
+                    </div>
 
                     <section class="reply-list">
-                        <div class="reply-list-title">
-                            <i class="fa-solid fa-comments"></i>
-                            Replies (<span th:text="${#lists.size(repliesMap[post.postId])}">0</span>)
+                        <div class="reply-list-head">
+                            <div class="reply-list-title">
+                                <i class="fa-solid fa-comments"></i>
+                                Replies (<span th:text="${#lists.size(repliesMap[post.postId])}">0</span>)
+                            </div>
+                            <button type="button"
+                                    class="reply-visibility-btn"
+                                    th:attr="data-reply-toggle='replies-' + ${post.postId}">Collapse</button>
                         </div>
 
-                        <div class="reply-item" th:each="reply : ${repliesMap[post.postId]}">
-                            <div class="reply-head">
-                                <img class="avatar-img small"
-                                     th:src="${reply.student != null ? '/student/photo/' + reply.student.userId : '/images/img1.jpeg'}"
-                                     src="/images/img1.jpeg"
-                                     alt="Reply student profile picture"
-                                     onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
-                                <span class="avatar-fallback small" style="display:none;" th:text="${reply.student != null} ? ${#strings.substring(reply.student.user.firstName, 0, 1)} : 'A'">S</span>
-                                <div class="reply-user-meta">
-                                    <span th:text="${reply.student != null} ? ${reply.student.user.firstName + ' ' + reply.student.user.lastName} : ${reply.adminName + ' (Admin)'}">Student</span>
-                                    <span th:text="${#temporals.format(reply.createdTime, 'dd MMM yyyy, hh:mm a')}">Time</span>
+                        <div class="reply-items-wrap"
+                             th:attr="id='replies-' + ${post.postId}">
+                            <div class="reply-item" th:each="reply : ${repliesMap[post.postId]}">
+                                <div class="reply-head">
+                                    <img class="avatar-img small"
+                                         th:src="${reply.student != null ? '/student/photo/' + reply.student.userId : '/images/img1.jpeg'}"
+                                         src="/images/img1.jpeg"
+                                         alt="Reply student profile picture"
+                                         onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                                    <span class="avatar-fallback small hidden" th:text="${reply.student != null} ? ${#strings.substring(reply.student.user.firstName, 0, 1)} : 'A'">S</span>
+                                    <div class="reply-user-meta">
+                                        <span th:text="${reply.student != null} ? ${reply.student.user.firstName + ' ' + reply.student.user.lastName} : ${reply.adminName + ' (Admin)'}">Student</span>
+                                        <span th:text="${#temporals.format(reply.createdTime, 'dd MMM yyyy, hh:mm a')}">Time</span>
+                                        <span class="reply-owner-pill"
+                                              th:classappend="${reply.student == null} ? 'admin' : 'peer'"
+                                              th:text="${reply.student == null} ? 'Admin Reply' : 'Student Reply'">Student Reply</span>
+                                    </div>
+                                </div>
+
+                                <div class="reply-text" th:text="${reply.message}">Reply message</div>
+                                <div class="reply-meta">
+                                    Community reply
+                                </div>
+
+                                <div class="reply-actions">
+                                    <form th:action="@{'/admin/community/reply/' + ${reply.replyId} + '/delete'}" method="post" class="inline-form" onsubmit="return confirm('Delete this reply as admin?');">
+                                        <button type="submit" class="danger-btn small">Delete Reply</button>
+                                    </form>
                                 </div>
                             </div>
 
-                            <div class="reply-text" th:text="${reply.message}">Reply message</div>
-                            <div class="reply-meta">
-                                Community reply
-                            </div>
-
-                            
-                            <div class="reply-actions" style="margin-top:5px;text-align:right;">
-                                <form th:action="@{'/admin/community/reply/' + ${reply.replyId} + '/delete'}" method="post" style="display:inline;" onsubmit="return confirm('Delete this reply as admin?');">
-                                    <button type="submit" class="danger-btn" style="background:#e11d48;color:white;border:none;padding:3px 8px;border-radius:4px;cursor:pointer;font-size:12px;">Delete Reply</button>
-                                </form>
-                            </div>
-
-
-                            <form class="edit-form" th:id="'edit-reply-' + ${reply.replyId}" style="display:none;"
-                                  th:action="@{'/admin/community/reply/' + ${reply.replyId} + '/update'}" method="post">
-                                <textarea name="message" data-mod-type="reply" maxlength="1200" th:text="${reply.message}" required></textarea>
+                            <form class="reply-form" th:action="@{'/admin/community/post/' + ${post.postId} + '/replies'}" method="post">
+                                <textarea name="message" data-mod-type="reply" maxlength="1200" placeholder="Reply as admin..." required></textarea>
                                 <div class="moderation-hint"></div>
-                                <div style="margin-top:10px;display:flex;justify-content:flex-end;">
-                                    <button type="submit" class="btn-apply" style="border:none; cursor:pointer;">Save Reply</button>
+                                <div class="action-row-end">
+                                    <button type="submit" class="btn-apply clean"><i class="fa-solid fa-reply"></i> Reply</button>
                                 </div>
                             </form>
                         </div>
-
-                        <form class="reply-form" th:action="@{'/admin/community/post/' + ${post.postId} + '/replies'}" method="post">
-                            <textarea name="message" data-mod-type="reply" maxlength="1200" placeholder="Reply as admin..." required></textarea>
-                            <div class="moderation-hint"></div>
-                            <div style="margin-top:10px;display:flex;justify-content:flex-end;">
-                                <button type="submit" class="btn-apply" style="border:none; cursor:pointer;"><i class="fa-solid fa-reply"></i> Reply</button>
-                            </div>
-                        </form>
                     </section>
                 </article>
             </div>
@@ -885,21 +954,27 @@
         pageId: 'community-chat',
         autoStart: false,
         storageKey: 'akb_admin_tour_completed',
+        nextPage: '/admin/feedback',
         steps: [
             {
                 selector: '.nav-links',
                 title: 'Community Navigation',
-                content: 'Use this menu to return to Dashboard, Education Dashboard, or other admin areas.'
+                content: 'Use this menu in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
             },
             {
                 selector: '.community-hero',
                 title: 'Student Community',
-                content: 'Welcome to the Student Community. Here you can observe public discussions among students.'
+                content: 'Use this admin view to monitor student discussions and jump quickly between threads.'
             },
             {
-                selector: '.feed-stats',
-                title: 'Community Activity',
-                content: 'See the total number of active posts and discussions happening right now.'
+                selector: '.thread-jump-list',
+                title: 'Thread Navigator',
+                content: 'Jump directly to any student thread and see reply volume at a glance.'
+            },
+            {
+                selector: '.feed-controls',
+                title: 'Search And Filters',
+                content: 'Search by title, author, post body, or replies, and filter to identify unanswered or active threads fast.'
             },
             {
                 selector: '.feed-stream',

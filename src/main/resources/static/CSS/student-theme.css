@@ -18,8 +18,8 @@ body.student-theme {
 body.student-theme header {
     border-bottom: 1px solid rgba(229, 57, 53, 0.25);
     background: var(--student-glass);
-    backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
     box-shadow: 0 10px 30px rgba(20, 28, 45, 0.08);
 }
 
@@ -158,8 +158,8 @@ body.student-theme .notif-overlay {
     right: 0;
     bottom: 0;
     background: rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(3px);
     -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
     z-index: 999;
     opacity: 0;
     visibility: hidden;

@@ -126,6 +126,7 @@
             align-items: center;
             gap: 8px;
             background: rgba(229,57,53,0.2);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 5px 16px;
             border-radius: 100px;
@@ -248,6 +249,7 @@
             font-size: 24px; font-weight: 900; color: var(--text-dark);
             animation: countUp 0.6s ease both;
         }
+        .stat-pill-info .stat-pill-val.audience-size { font-size: 16px; }
 
         /* ===== Alert Toasts ===== */
         .alert-toast {
@@ -358,6 +360,18 @@
             font-size: 10px; color: #aaa; margin-top: 4px;
             display: flex; align-items: center; gap: 4px;
         }
+        .audience-note {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            background: #f0fdf4;
+            border: 2px solid #bbf7d0;
+            border-radius: 12px;
+        }
+        .audience-note-icon { color: #16a34a; font-size: 18px; }
+        .audience-note-title { font-size: 14px; font-weight: 800; color: #15803d; }
+        .audience-note-sub { font-size: 11px; color: #4ade80; }
         .char-count {
             font-size: 10px;
             color: #aaa;
@@ -541,7 +555,7 @@
                 <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
                 <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
                 <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
-                <li><a href="/owner/notifications" class="nav-link" style="color:#e53935; font-weight:700; border-bottom:2px solid #e53935; padding-bottom:2px;">Notifications</a></li>
+                <li><a href="/owner/notifications" class="nav-link active">Notifications</a></li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
         </nav>
@@ -600,7 +614,7 @@
                 <div class="stat-pill-icon"><i class="fas fa-users"></i></div>
                 <div class="stat-pill-info">
                     <div class="stat-pill-label">Audience</div>
-                    <div class="stat-pill-val" style="font-size:16px;">All Students</div>
+                    <div class="stat-pill-val audience-size">All Students</div>
                 </div>
             </div>
         </div>
@@ -638,11 +652,11 @@
                         <div class="form-group">
                             <label class="form-label"><i class="fas fa-users"></i> Target Audience</label>
                             <input type="hidden" name="targetAudience" value="ALL_STUDENTS">
-                            <div style="display:flex; align-items:center; gap:10px; padding:12px 16px; background:#f0fdf4; border:2px solid #bbf7d0; border-radius:12px;">
-                                <i class="fas fa-users" style="color:#16a34a; font-size:18px;"></i>
+                            <div class="audience-note">
+                                <i class="fas fa-users audience-note-icon"></i>
                                 <div>
-                                    <div style="font-size:14px; font-weight:800; color:#15803d;">All Students</div>
-                                    <div style="font-size:11px; color:#4ade80;">This notification will be sent to every registered student</div>
+                                    <div class="audience-note-title">All Students</div>
+                                    <div class="audience-note-sub">This notification will be sent to every registered student</div>
                                 </div>
                             </div>
                         </div>

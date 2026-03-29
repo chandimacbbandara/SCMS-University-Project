@@ -306,6 +306,33 @@
         .input-field input:focus ~ i.field-icon,
         .input-field select:focus ~ i.field-icon { color: #e53935; }
         .input-field input::placeholder { color: #bbb; }
+        .input-field.readonly-bg { background: #f4f6fb; }
+        .input-field.readonly-bg input[readonly] {
+            background: #f4f6fb;
+            cursor: not-allowed;
+            color: #888;
+        }
+        .input-field .field-lock {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #bbb;
+            font-size: 12px;
+        }
+        .locked-info-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #eff6ff;
+            border: 1.5px solid #bfdbfe;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            font-size: 12px;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
 
         /* Textarea */
         .textarea-field {
@@ -604,51 +631,51 @@
                                 <div class="section-title animate-in delay-1">
                                     <i class="fas fa-user"></i> Your Details
                                 </div>
-                                <div class="animate-in delay-1" style="display:flex;align-items:center;gap:8px;background:#eff6ff;border:1.5px solid #bfdbfe;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;color:#1d4ed8;font-weight:600;">
+                                <div class="animate-in delay-1 locked-info-banner">
                                     <i class="fas fa-lock"></i>
                                     These details are automatically filled from your account and cannot be changed.
                                 </div>
                                 <div class="form-row animate-in delay-2">
                                     <div class="form-group">
-                                        <label>Student ID</label>
-                                        <div class="input-field" style="background:#f4f6fb;">
+                                        <label for="studentId">Student ID</label>
+                                        <div class="input-field readonly-bg">
                                             <i class="fas fa-id-badge field-icon"></i>
-                                            <input type="text" name="studentId"
+                                            <input type="text" id="studentId" name="studentId" title="Student ID"
                                                    th:value="${loggedStudent.studentId}"
-                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
-                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                                   readonly>
+                                            <i class="fas fa-lock field-lock"></i>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label>Email</label>
-                                        <div class="input-field" style="background:#f4f6fb;">
+                                        <label for="studentEmail">Email</label>
+                                        <div class="input-field readonly-bg">
                                             <i class="fas fa-envelope field-icon"></i>
-                                            <input type="email" name="email"
+                                            <input type="email" id="studentEmail" name="email" title="Student email"
                                                    th:value="${loggedStudent.user.email}"
-                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
-                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                                   readonly>
+                                            <i class="fas fa-lock field-lock"></i>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="form-row animate-in delay-2">
                                     <div class="form-group">
-                                        <label>First Name</label>
-                                        <div class="input-field" style="background:#f4f6fb;">
+                                        <label for="firstName">First Name</label>
+                                        <div class="input-field readonly-bg">
                                             <i class="fas fa-user field-icon"></i>
-                                            <input type="text" name="firstName"
+                                            <input type="text" id="firstName" name="firstName" title="First name"
                                                    th:value="${loggedStudent.user.firstName}"
-                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
-                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                                   readonly>
+                                            <i class="fas fa-lock field-lock"></i>
                                         </div>
                                     </div>
                                     <div class="form-group">
-                                        <label>Last Name</label>
-                                        <div class="input-field" style="background:#f4f6fb;">
+                                        <label for="lastName">Last Name</label>
+                                        <div class="input-field readonly-bg">
                                             <i class="fas fa-user field-icon"></i>
-                                            <input type="text" name="lastName"
+                                            <input type="text" id="lastName" name="lastName" title="Last name"
                                                    th:value="${loggedStudent.user.lastName}"
-                                                   readonly style="background:#f4f6fb; cursor:not-allowed; color:#888;">
-                                            <i class="fas fa-lock" style="position:absolute;right:14px;color:#bbb;font-size:12px;"></i>
+                                                   readonly>
+                                            <i class="fas fa-lock field-lock"></i>
                                         </div>
                                     </div>
                                 </div>
@@ -660,10 +687,10 @@
                                     <i class="fas fa-clipboard-list"></i> Concern Details
                                 </div>
                                 <div class="form-group animate-in delay-3">
-                                    <label>Category <span class="required">*</span></label>
+                                    <label for="category">Category <span class="required">*</span></label>
                                     <div class="input-field">
                                         <i class="fas fa-tags field-icon"></i>
-                                        <select name="category" required>
+                                        <select id="category" name="category" title="Concern category" required>
                                             <option value="" disabled selected>Select a category</option>
                                             <option value="Education (Creative and IT)">Education (Creative and IT)</option>
                                             <option value="Institute Problem">Institute Related Problem</option>
@@ -714,7 +741,7 @@
                                             <strong>Click to upload</strong> or drag &amp; drop<br>
                                             <small>Images, PDF, Word documents (Max 10MB)</small>
                                         </p>
-                                        <input type="file" name="evidence" id="evidenceFile" accept="image/*,.pdf,.doc,.docx">
+                                        <input type="file" name="evidence" id="evidenceFile" title="Supporting document" accept="image/*,.pdf,.doc,.docx">
                                         <div class="file-chosen" id="fileName"></div>
                                     </div>
                                 </div>
@@ -738,8 +765,8 @@
     <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
     <div class="notif-panel" id="notifPanel">
         <div class="notif-panel-header">
-            <h3><i class="fas fa-bell" style="margin-right:8px;"></i> Notifications</h3>
-            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
         </div>
         <div class="notif-panel-actions">
             <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>
@@ -782,6 +809,9 @@
             </div>
             <div class="footer-right">
                 <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+                <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+                <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+                <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
             </div>
         </div>
     </footer>

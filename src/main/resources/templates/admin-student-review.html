@@ -94,6 +94,7 @@
             z-index: 700;
             background: rgba(15, 23, 42, 0.92);
             border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+            -webkit-backdrop-filter: blur(10px);
             backdrop-filter: blur(10px);
         }
         .navbar-inner {
@@ -176,6 +177,7 @@
             letter-spacing: -1px;
             line-height: 1.15;
         }
+        .hero h1 i { margin-right: 8px; opacity: 0.8; }
         .hero-sub { color: rgba(226, 232, 240, 0.9); font-size: 15px; line-height: 1.75; max-width: 610px; margin-bottom: 26px; }
         .hero-btns { display: flex; gap: 12px; flex-wrap: wrap; }
         .hero-btn {
@@ -578,6 +580,7 @@
             z-index: 1000;
             justify-content: center; align-items: center;
             cursor: pointer;
+            -webkit-backdrop-filter: blur(6px);
             backdrop-filter: blur(6px);
         }
         .photo-modal.active { display: flex; }
@@ -597,6 +600,7 @@
             display: flex; align-items: center;
             justify-content: center; z-index: 1001;
             transition: background 0.3s;
+            -webkit-backdrop-filter: blur(6px);
             backdrop-filter: blur(6px);
         }
         .modal-close:hover { background: rgba(255,255,255,0.3); }
@@ -654,9 +658,10 @@
             </a>
             <ul class="nav-links">
                 <li><a href="/">Home</a></li>
+                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
+                <li><a href="/admin/edu-dashboard">Edu Dashboard</a></li>
                 <li><a href="/admin/student-review" class="active">Student Review</a></li>
                 <li><a href="/admin/community">Community Chat</a></li>
-                <li><a href="/admin/dashboard">Admin Dashboard</a></li>
                 <li><a href="/admin/feedback">Feedback</a></li>
                 <li><a href="/logout" class="nav-logout">Logout</a></li>
             </ul>
@@ -670,7 +675,7 @@
             <div class="hero-content anim-up">
                 <div class="hero-left">
                     <div class="hero-badge"><span class="dot"></span> Registration Management</div>
-                    <h1><i class="fas fa-user-check" style="margin-right:8px;opacity:0.8;"></i> Student Review</h1>
+                    <h1><i class="fas fa-user-check"></i> Student Review</h1>
                     <p class="hero-sub">Review, approve or reject student registration requests. Manage student accounts and verify identity documents securely.</p>
                     <div class="hero-btns">
                         <a href="/admin/dashboard" class="hero-btn hero-btn-primary">
@@ -944,12 +949,12 @@
             pageId: 'student-review',
             autoStart: false,
             storageKey: 'akb_admin_tour_completed',
-            nextPage: '/admin/feedback',
+            nextPage: '/admin/community',
             steps: [
                 {
                     selector: '.nav-links',
                     title: 'Navigation Menu',
-                    content: 'Use these navigator buttons to move between admin pages.'
+                    content: 'Use this menu in order: Home, Admin Dashboard, Edu Dashboard, Student Review, Community Chat, and Feedback.'
                 },
                 {
                     selector: '.hero-left',

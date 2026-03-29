@@ -349,7 +349,7 @@
             <nav>
                 <ul>
                     <li><a href="/" class="nav-link">Home</a></li>
-                    <li><a th:href="@{/login}" href="/login" class="nav-link" style="color: #e53935;">Login</a></li>
+                    <li><a th:href="@{/login}" href="/login" class="nav-link active">Login</a></li>
                     <li><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
                 </ul>
             </nav>
@@ -406,7 +406,7 @@
                             <div class="input-field">
                                 <i class="fas fa-lock field-icon"></i>
                                 <input type="password" name="password" id="passwordField" placeholder="Enter your password" required>
-                                <button type="button" class="toggle-pw" onclick="togglePassword()">
+                                <button type="button" class="toggle-pw" onclick="togglePassword()" title="Show or hide password" aria-label="Show or hide password">
                                     <i class="fas fa-eye" id="pwIcon"></i>
                                 </button>
                             </div>
@@ -442,6 +442,9 @@
             </div>
             <div class="footer-right">
                 <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+                <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+                <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+                <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
             </div>
         </div>
     </footer>

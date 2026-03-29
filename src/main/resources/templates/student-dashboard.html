@@ -148,6 +148,7 @@
             align-items: center;
             gap: 8px;
             background: rgba(255,255,255,0.15);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 5px 16px;
             border-radius: 100px;
@@ -198,6 +199,7 @@
             font-size: 28px;
             font-weight: 900;
             text-transform: uppercase;
+            -webkit-backdrop-filter: blur(12px);
             backdrop-filter: blur(12px);
             animation: float 4s ease-in-out infinite;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -206,6 +208,7 @@
             text-align: right;
             font-size: 12px;
             background: rgba(255,255,255,0.1);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 14px 20px;
             border-radius: var(--radius-sm);
@@ -234,6 +237,7 @@
             align-items: center;
             gap: 12px;
             animation: fadeSlideUp 0.5s ease both;
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
         .alert-success {
@@ -770,6 +774,7 @@
         .action-item:hover .action-item-icon { transform: scale(1.08) rotate(-3deg); }
         .action-item-icon.report  { background: rgba(229,57,53,0.1); color: var(--primary); }
         .action-item-icon.home    { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
+        .action-item-icon.home.custom { background: rgba(29,53,87,0.12); color: #1d3557; }
         .action-item-icon.profile { background: rgba(239,108,0,0.1); color: var(--accent-orange); }
 
         .action-item-text { position: relative; z-index: 1; }
@@ -820,6 +825,7 @@
         }
         .tip-card::before {
             content: '';
+        .stat-card.clickable { cursor: pointer; }
             position: absolute;
             top: -1px; left: 50%; transform: translateX(-50%);
             width: 40px; height: 3px;
@@ -906,6 +912,7 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.45);
+            -webkit-backdrop-filter: blur(4px);
             backdrop-filter: blur(4px);
             z-index: 999;
             opacity: 0;
@@ -1046,8 +1053,8 @@
             color: var(--text-light);
             line-height: 1.5;
             display: -webkit-box;
-            line-clamp: 2;
             -webkit-line-clamp: 2;
+            line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
@@ -1429,7 +1436,7 @@
                         <div class="stat-value">Ready to Submit</div>
                     </div>
                 </div>
-                <div class="stat-card blue animate-in delay-3" style="cursor:pointer;" onclick="toggleNotifPanel()">
+                <div class="stat-card blue clickable animate-in delay-3" onclick="toggleNotifPanel()">
                     <div class="stat-icon"><i class="fas fa-bell"></i></div>
                     <div class="stat-info">
                         <div class="stat-label">Notifications</div>
@@ -1490,7 +1497,7 @@
                             </div>
                         </a>
                         <a href="/student/community" class="action-item" data-search="community talk peers support discussion">
-                            <div class="action-item-icon home" style="background:rgba(29,53,87,0.12);color:#1d3557;"><i class="fas fa-comments"></i></div>
+                            <div class="action-item-icon home custom"><i class="fas fa-comments"></i></div>
                             <div class="action-item-text">
                                 <h4>Student Community Talk</h4>
                                 <p>Discuss with peers, share experiences, and learn from others.</p>
@@ -1622,8 +1629,8 @@
     <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
     <div class="notif-panel" id="notifPanel">
         <div class="notif-panel-header">
-            <h3><i class="fas fa-bell" style="margin-right:8px;"></i> Notifications</h3>
-            <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
         </div>
         <div class="notif-panel-actions">
             <span class="notif-count" th:text="${#lists.size(notifications)} + ' notifications'">0 notifications</span>
@@ -1666,6 +1673,9 @@
             </div>
             <div class="footer-right">
                 <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+                <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+                <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+                <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
             </div>
         </div>
     </footer>

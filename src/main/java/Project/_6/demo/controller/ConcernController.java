@@ -60,6 +60,25 @@ public class ConcernController {
         if (session.getAttribute("loggedInStudent") == null) {
             return "redirect:/login";
         }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        var student = concernService.getStudentByUserId(userId);
+        concernDTO.setStudentId(student.getStudentId());
+        concernDTO.setFirstName(student.getUser().getFirstName());
+        concernDTO.setLastName(student.getUser().getLastName());
+        concernDTO.setEmail(student.getUser().getEmail());
+
+        if (concernDTO.getSubject() == null || concernDTO.getSubject().trim().isEmpty()
+                || concernDTO.getMessage() == null || concernDTO.getMessage().trim().isEmpty()
+                || concernDTO.getCategory() == null || concernDTO.getCategory().trim().isEmpty()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Please fill in Subject, Category, and Message.");
+            return "redirect:/submit-concern";
+        }
+
         try {
             Concern saved = concernService.submitConcern(concernDTO, evidence);
             redirectAttributes.addFlashAttribute("successMessage",

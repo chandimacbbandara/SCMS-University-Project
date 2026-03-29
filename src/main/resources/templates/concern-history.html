@@ -163,6 +163,7 @@
             align-items: center;
             gap: 8px;
             background: rgba(255,255,255,0.15);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 5px 16px;
             border-radius: 100px;
@@ -206,6 +207,7 @@
             border: 3px solid rgba(255,255,255,0.25);
             display: flex; align-items: center; justify-content: center;
             font-size: 36px; color: #fff;
+            -webkit-backdrop-filter: blur(12px);
             backdrop-filter: blur(12px);
             animation: float 4s ease-in-out infinite;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -221,6 +223,7 @@
         .hero-count-badge {
             text-align: center;
             background: rgba(255,255,255,0.1);
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             padding: 14px 20px;
             border-radius: var(--radius-sm);
@@ -387,6 +390,7 @@
         }
         .empty-state h3 { font-size: 22px; font-weight: 900; color: var(--text-dark); margin-bottom: 8px; }
         .empty-state p { color: var(--text-light); font-size: 14px; margin-bottom: 26px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.7; }
+        .empty-state.hidden { display: none; }
         .btn-submit-new {
             display: inline-flex; align-items: center; gap: 8px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -447,6 +451,7 @@
             padding: 16px 24px;
             cursor: pointer;
             transition: background 0.2s ease;
+            -webkit-user-select: none;
             user-select: none;
             border-left: 4px solid transparent;
         }
@@ -568,6 +573,7 @@
             font-size: 11px; font-weight: 800;
             letter-spacing: 0.5px; text-transform: uppercase;
             flex-shrink: 0;
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
             transition: transform 0.2s;
         }
@@ -677,6 +683,7 @@
         }
         .evidence-pill i { transition: transform 0.3s; }
         .evidence-pill:hover i { transform: rotate(15deg); }
+        .evidence-wrap { margin-bottom: 14px; }
 
         /* ===== Admin Replies ===== */
         .replies-section { margin-top: 6px; }
@@ -685,12 +692,15 @@
             font-size: 12px; font-weight: 800;
             color: var(--text-mid); text-transform: uppercase; letter-spacing: 0.8px;
             margin-bottom: 12px;
-            cursor: pointer; user-select: none;
+            cursor: pointer;
+            -webkit-user-select: none;
+            user-select: none;
             padding: 8px 12px;
             border-radius: 10px;
             transition: background 0.2s;
         }
         .replies-header:hover { background: #f5f7ff; }
+        .replies-header .reply-icon { color: #2563eb; }
         .replies-header .reply-count-badge {
             background: linear-gradient(135deg, #eff6ff, #dbeafe);
             color: var(--accent-blue);
@@ -787,7 +797,7 @@
             border-radius: var(--radius-sm); padding: 14px 20px;
             font-size: 12px; color: #aaa; font-style: italic;
         }
-        .no-reply-pill i { font-size: 16px; }
+        .no-reply-pill i { font-size: 16px; color: #aaa; }
 
         /* ===== Collapse/Expand ===== */
         .replies-collapsible { display: none; }
@@ -822,6 +832,7 @@
             margin-bottom: 18px; font-weight: 700; font-size: 13px;
             display: flex; align-items: center; gap: 12px;
             animation: bounceIn 0.5s cubic-bezier(.22,1,.36,1) both;
+            -webkit-backdrop-filter: blur(8px);
             backdrop-filter: blur(8px);
         }
         .alert-toast.success {
@@ -998,6 +1009,7 @@
         .feedback-stars-display i.filled { color: #facc15; text-shadow: 0 0 8px rgba(250,204,21,0.3); }
         .feedback-stars-display i.empty  { color: #d1d5db; }
         .feedback-submitted-comment { font-size: 13px; color: #166534; line-height: 1.7; }
+        .feedback-submitted-comment.muted { color: #9ca3af; font-style: italic; }
         .feedback-submitted-time { font-size: 11px; color: #4ade80; margin-top: 6px; display: flex; align-items:center; gap:5px; }
         .feedback-action-hint {
             margin-top: 10px;
@@ -1382,7 +1394,7 @@
                     </div>
 
                     <!-- Evidence -->
-                    <div th:if="${concern.evidencePath != null}" style="margin-bottom:14px;">
+                    <div th:if="${concern.evidencePath != null}" class="evidence-wrap">
                         <a th:href="@{'/uploads/' + ${concern.evidencePath}}" target="_blank" class="evidence-pill">
                             <i class="fas fa-paperclip"></i> View Attached Evidence
                         </a>
@@ -1393,7 +1405,7 @@
                         <div class="replies-header"
                              th:attr="onclick='toggleReplies(this)'"
                              th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
-                            <i class="fas fa-reply" style="color:#2563eb;"></i>
+                            <i class="fas fa-reply reply-icon"></i>
                             <span>Admin Replies</span>
                             <span class="reply-count-badge"
                                   th:text="${#lists.size(repliesMap[concern.concernId])}">0</span>
@@ -1405,7 +1417,7 @@
 
                             <!-- No replies yet -->
                             <div th:if="${#lists.isEmpty(repliesMap[concern.concernId])}" class="no-reply-pill">
-                                <i class="fas fa-hourglass-half" style="color:#aaa;"></i>
+                                <i class="fas fa-hourglass-half"></i>
                                 Awaiting admin response — we'll notify you when a reply is received.
                             </div>
 
@@ -1505,9 +1517,9 @@
                                 <div class="feedback-submitted-comment"
                                      th:if="${feedbackMap[concern.concernId].comments != null and !feedbackMap[concern.concernId].comments.isEmpty()}"
                                      th:text="${feedbackMap[concern.concernId].comments}"></div>
-                                <div class="feedback-submitted-comment"
+                                  <div class="feedback-submitted-comment muted"
                                      th:if="${feedbackMap[concern.concernId].comments == null or feedbackMap[concern.concernId].comments.isEmpty()}"
-                                     style="color:#9ca3af; font-style:italic;">No written comment provided.</div>
+                                      >No written comment provided.</div>
                                 <div class="feedback-submitted-time">
                                     <i class="fas fa-clock"></i>
                                     <span th:text="'Submitted on ' + ${#temporals.format(feedbackMap[concern.concernId].submissionTime, 'dd MMM yyyy, hh:mm a')}"></span>
@@ -1587,7 +1599,7 @@
         </div>
 
         <!-- No results after filtering -->
-        <div id="noFilterResults" style="display:none;" class="empty-state">
+        <div id="noFilterResults" class="empty-state hidden">
             <div class="empty-icon"><i class="fas fa-filter"></i></div>
             <h3>No Concerns Found</h3>
             <p>No concerns match the selected filter. Try a different category.</p>
@@ -1599,8 +1611,8 @@
 <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
 <div class="notif-panel" id="notifPanel">
     <div class="notif-panel-header">
-        <h3><i class="fas fa-bell" style="margin-right:8px;"></i> Notifications</h3>
-        <button class="notif-close" onclick="toggleNotifPanel()"><i class="fas fa-times"></i></button>
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
     </div>
     <div class="notif-panel-actions">
         <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>
@@ -1643,6 +1655,9 @@
         </div>
         <div class="footer-right">
             <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+            <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+            <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
         </div>
     </div>
 </footer>
