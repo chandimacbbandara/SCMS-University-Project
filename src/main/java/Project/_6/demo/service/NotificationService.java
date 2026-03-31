@@ -92,6 +92,24 @@ public class NotificationService {
     }
 
     /**
+     * Send an email when a concern is deleted by an administrator.
+     */
+    public void sendConcernDeletedEmail(Concern concern) {
+        CompletableFuture.runAsync(() -> {
+            emailVerificationService.sendConcernStatusEmail(concern, "DELETED");
+        });
+    }
+
+    /**
+     * Send an email when a concern is moved to a different department/category.
+     */
+    public void sendConcernDepartmentChangedEmail(Concern concern, String previousDepartment, String newDepartment) {
+        CompletableFuture.runAsync(() -> {
+            emailVerificationService.sendConcernDepartmentChangedEmail(concern, previousDepartment, newDepartment);
+        });
+    }
+
+    /**
      * Get all notifications for a student ordered by newest first.
      */
     public List<Notification> getNotificationsForStudent(Integer userId) {

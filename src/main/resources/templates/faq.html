@@ -7,145 +7,407 @@
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/student-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { background: #f4f6fb; }
-        .faq-wrapper {
-            max-width: 1000px;
-            margin: 40px auto;
-            padding: 0 20px;
-            min-height: calc(100vh - 160px);
+        :root {
+            --brand-red: #e53935;
+            --brand-red-dark: #b71c1c;
+            --brand-ink: #111827;
+            --brand-slate: #4b5563;
+            --brand-border: #e5e7eb;
+            --brand-bg: #f5f8fc;
         }
 
-        /* Hero Section */
-        .faq-hero {
-            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
-            border-radius: 20px;
-            padding: 40px;
-            color: #fff;
-            text-align: center;
-            margin-bottom: 40px;
-            box-shadow: 0 10px 30px rgba(229,57,53,0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        .faq-hero h1 {
-            font-size: 32px;
-            font-weight: 800;
-            margin: 0 0 10px;
-        }
-        .faq-hero p {
-            font-size: 16px;
-            opacity: 0.9;
-            margin: 0;
-            max-width: 600px;
-            margin: 0 auto;
+        body.faq-public {
+            font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
+            color: var(--brand-ink);
+            background: linear-gradient(180deg, #f8fafd 0%, #f1f4f9 70%, #edf2f8 100%);
         }
 
-        /* Tips Section */
-        .tips-section {
-            margin-bottom: 50px;
-        }
-        .section-header {
-            font-size: 24px;
-            font-weight: 800;
-            color: #222;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .section-header i {
-            color: #e53935;
-        }
-        .tips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        .tip-card {
+        body.faq-public header {
+            border-bottom: 3px solid var(--brand-red);
             background: #fff;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-top: 4px solid #43a047;
-            transition: transform 0.3s;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+            -webkit-backdrop-filter: none;
+            backdrop-filter: none;
         }
-        .tip-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+
+        body.faq-public .header-content {
+            width: min(1180px, 92%);
+            margin: 0 auto;
+            padding: 8px 0;
         }
-        .tip-card h3 {
-            font-size: 16px;
+
+        body.faq-public .nav-link {
+            border-radius: 999px;
+            padding: 9px 14px;
+            font-weight: 600;
+        }
+
+        body.faq-public .nav-link.active {
+            color: var(--brand-red);
+            background: rgba(229, 57, 53, 0.12);
             font-weight: 700;
-            color: #333;
-            margin: 0 0 10px;
-            display: flex;
+        }
+
+        .faq-shell {
+            width: min(1180px, 92%);
+            margin: 42px auto 64px;
+            min-height: calc(100vh - 190px);
+        }
+
+        .faq-hero {
+            position: relative;
+            border: 1px solid var(--brand-border);
+            border-radius: 24px;
+            background:
+                radial-gradient(circle at 88% 16%, rgba(229, 57, 53, 0.18), transparent 34%),
+                linear-gradient(140deg, #ffffff 0%, #f5f8fc 100%);
+            box-shadow: 0 14px 30px rgba(2, 6, 23, 0.07);
+            padding: 36px 34px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+
+        .faq-hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(229, 57, 53, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(229, 57, 53, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            -webkit-mask-image: radial-gradient(circle at center, #000 35%, transparent 88%);
+            mask-image: radial-gradient(circle at center, #000 35%, transparent 88%);
+            pointer-events: none;
+        }
+
+        .faq-hero-grid {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 18px;
             align-items: center;
+        }
+
+        .hero-kicker {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--brand-red);
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .hero-title {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: clamp(28px, 4.4vw, 46px);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+
+        .hero-desc {
+            max-width: 620px;
+            color: #556173;
+            font-size: 16px;
+            line-height: 1.75;
+            margin-bottom: 14px;
+        }
+
+        .hero-badges {
+            display: flex;
+            flex-wrap: wrap;
             gap: 8px;
         }
-        .tip-card h3 i { color: #43a047; }
-        .tip-card p {
-            font-size: 14px;
-            color: #666;
-            margin: 0;
-            line-height: 1.6;
+
+        .hero-badges span {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--brand-border);
+            background: rgba(255, 255, 255, 0.9);
         }
 
-        /* FAQ Section (Accordion) */
-        .faq-accordion {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .hero-stats {
+            display: grid;
+            gap: 10px;
         }
-        .faq-item {
+
+        .hero-stat {
+            border: 1px solid var(--brand-border);
+            border-radius: 14px;
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
-            border: 1px solid #eee;
+            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.06);
+            padding: 12px 14px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .hero-stat span {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+
+        .hero-stat strong {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: 24px;
+            line-height: 1;
+            color: var(--brand-red);
+        }
+
+        .hero-stat p {
+            font-size: 12px;
+            color: #566174;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .info-strip {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .info-card {
+            border: 1px solid var(--brand-border);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            padding: 14px 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .info-card i {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(229, 57, 53, 0.1);
+            color: var(--brand-red);
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .info-card h3 {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: 15px;
+            margin: 0 0 2px;
+        }
+
+        .info-card p {
+            font-size: 13px;
+            color: #556173;
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        .faq-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .content-panel {
+            border: 1px solid var(--brand-border);
+            border-radius: 18px;
+            background: #fff;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
             overflow: hidden;
-            transition: all 0.3s;
+            min-height: 100%;
         }
+
+        .panel-head {
+            padding: 20px 22px;
+            border-bottom: 1px solid #eef2f7;
+            background: linear-gradient(180deg, #ffffff, #fbfcff);
+        }
+
+        .panel-kicker {
+            letter-spacing: 2px;
+            color: var(--brand-red);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .panel-title {
+            font-family: 'Sora', 'Manrope', sans-serif;
+            font-size: 24px;
+            margin: 0 0 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-text {
+            font-size: 14px;
+            color: #596579;
+            line-height: 1.65;
+            margin: 0;
+        }
+
+        .panel-body {
+            padding: 16px;
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+        }
+
+        .tip-tile {
+            border: 1px solid var(--brand-border);
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            padding: 14px 14px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tip-tile:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.1);
+        }
+
+        .tip-tile h3 {
+            font-size: 15px;
+            font-weight: 800;
+            line-height: 1.4;
+            color: #1f2937;
+            margin: 0 0 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .tip-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 8px;
+            background: rgba(22, 163, 74, 0.12);
+            color: #15803d;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .tip-tile p {
+            margin: 0;
+            font-size: 13px;
+            color: #556173;
+            line-height: 1.65;
+        }
+
+        .tips-empty,
+        .faq-empty {
+            border: 2px dashed #d7dee9;
+            border-radius: 14px;
+            background: #fbfcff;
+            text-align: center;
+            padding: 28px 14px;
+            color: #64748b;
+        }
+
+        .tips-empty i,
+        .faq-empty i {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #c3cedc;
+        }
+
+        .tips-empty p,
+        .faq-empty p {
+            margin: 0;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .faq-accordion {
+            display: grid;
+            gap: 10px;
+        }
+
+        .faq-item {
+            border: 1px solid var(--brand-border);
+            border-radius: 14px;
+            background: #fff;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
         .faq-item:hover {
-            border-color: #ddd;
-            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+            border-color: #f5b5b5;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
         }
+
         .faq-question {
-            padding: 20px 24px;
+            border: 0;
+            width: 100%;
+            text-align: left;
+            padding: 16px 16px;
             cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-weight: 700;
-            font-size: 15px;
-            color: #333;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #1f2937;
+            -webkit-user-select: none;
             user-select: none;
             background: #fff;
         }
+
         .faq-question i {
-            color: #bbb;
-            transition: transform 0.3s;
-        }
-        .faq-answer {
-            padding: 0 24px;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease, padding 0.4s ease;
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-            background: #fafbfc;
-        }
-        .faq-item.active .faq-question i {
-            transform: rotate(180deg);
-            color: #e53935;
-        }
-        .faq-item.active .faq-answer {
-            padding: 20px 24px;
-            max-height: 500px;
-            border-top: 1px solid #eee;
+            color: #94a3b8;
+            transition: transform 0.25s ease, color 0.25s ease;
         }
 
-        /* Animations */
+        .faq-answer {
+            padding: 0 16px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            font-size: 13px;
+            color: #556173;
+            line-height: 1.7;
+            background: #f9fbff;
+        }
+
+        .faq-item.active .faq-question {
+            color: #0f172a;
+        }
+
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+            color: var(--brand-red);
+        }
+
+        .faq-item.active .faq-answer {
+            padding: 14px 16px 16px;
+            max-height: 520px;
+            border-top: 1px solid #ecf1f7;
+        }
+
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(28px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -155,10 +417,50 @@
         .delay-2 { animation-delay: .2s; }
         .delay-3 { animation-delay: .3s; }
 
+        @media (max-width: 1024px) {
+            .faq-hero-grid,
+            .faq-content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-stats {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            body.faq-public .header-content {
+                width: min(1180px, 95%);
+            }
+
+            .faq-shell {
+                width: min(1180px, 95%);
+                margin-top: 26px;
+            }
+
+            .faq-hero {
+                padding: 24px 20px;
+            }
+
+            .hero-title {
+                font-size: clamp(26px, 7vw, 36px);
+            }
+
+            .hero-stats,
+            .info-strip,
+            .tips-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-title {
+                font-size: 21px;
+            }
+        }
+
     </style>
 </head>
 
-<body class="student-theme">
+<body class="student-theme faq-public">
     <header>
         <div class="container header-content">
             <div class="logo-area">
@@ -206,47 +508,116 @@
     </header>
 
     <main>
-        <div class="faq-wrapper">
-            
-            <div class="faq-hero animate-in">
-                <h1>How can we assist you?</h1>
-                <p>Welcome to the support center. Browse through our tips for submitting concerns and find answers to common questions.</p>
-            </div>
+        <div class="faq-shell">
 
-            <div class="tips-section animate-in delay-1">
-                <h2 class="section-header"><i class="fas fa-lightbulb"></i> Guidelines & Tips</h2>
-                <div class="tips-grid">
-                    <div th:each="tip : ${tips}" class="tip-card">
-                        <h3><i th:class="'fas ' + ${tip.iconClass}"></i> <span th:text="${tip.title}"></span></h3>
-                        <p th:text="${tip.description}"></p>
-                    </div>
-                    <div th:if="${tips == null or #lists.isEmpty(tips)}" class="tip-card" style="grid-column: 1 / -1; text-align: center; background: transparent; border: 2px dashed #ddd; box-shadow: none;">
-                        <i class="fas fa-ghost" style="font-size: 24px; color: #ccc; margin-bottom: 8px;"></i>
-                        <p>No tips available at this time.</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="faq-section animate-in delay-2">
-                <h2 class="section-header"><i class="fas fa-circle-question"></i> Frequently Asked Questions</h2>
-                
-                <div class="faq-accordion">
-                    
-                    <div th:each="faq : ${faqs}" class="faq-item">
-                        <div class="faq-question">
-                            <span th:text="${faq.question}"></span>
-                            <i class="fas fa-chevron-down"></i>
+            <section class="faq-hero animate-in">
+                <div class="faq-hero-grid">
+                    <div>
+                        <p class="hero-kicker">Support Center</p>
+                        <h1 class="hero-title">How Can We Assist You Today?</h1>
+                        <p class="hero-desc">
+                            This public knowledge page helps students quickly understand best practices for reporting concerns and discover trusted answers to common questions.
+                        </p>
+                        <div class="hero-badges">
+                            <span>Public Knowledge Base</span>
+                            <span>Clear Response Guidance</span>
+                            <span>Student-Friendly Support</span>
                         </div>
-                        <div class="faq-answer" th:text="${faq.answer}"></div>
                     </div>
 
-                    <div th:if="${faqs == null or #lists.isEmpty(faqs)}" style="text-align: center; padding: 40px; color: #888;">
-                        <i class="fas fa-folder-open" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
-                        <p>No frequently asked questions have been posted yet.</p>
+                    <div class="hero-stats">
+                        <article class="hero-stat">
+                            <span>Active Tips</span>
+                            <strong th:text="${tips != null ? #lists.size(tips) : 0}">0</strong>
+                            <p>Practical guidance cards from your institute team.</p>
+                        </article>
+                        <article class="hero-stat">
+                            <span>Published FAQs</span>
+                            <strong th:text="${faqs != null ? #lists.size(faqs) : 0}">0</strong>
+                            <p>Frequently asked questions with official answers.</p>
+                        </article>
+                        <article class="hero-stat">
+                            <span>Access Type</span>
+                            <strong>Public</strong>
+                            <p>Visible to all visitors before and after login.</p>
+                        </article>
                     </div>
-
                 </div>
-            </div>
+            </section>
+
+            <section class="info-strip animate-in delay-1">
+                <article class="info-card">
+                    <i class="fas fa-list-check"></i>
+                    <div>
+                        <h3>Before You Submit</h3>
+                        <p>Review tips first to write clearer and faster-resolved concerns.</p>
+                    </div>
+                </article>
+                <article class="info-card">
+                    <i class="fas fa-shield-halved"></i>
+                    <div>
+                        <h3>Safe and Respectful</h3>
+                        <p>Use respectful language and include only relevant details.</p>
+                    </div>
+                </article>
+                <article class="info-card">
+                    <i class="fas fa-circle-question"></i>
+                    <div>
+                        <h3>Quick Answers</h3>
+                        <p>Check FAQs before opening a new concern to save time.</p>
+                    </div>
+                </article>
+            </section>
+
+            <section class="faq-content-grid animate-in delay-2">
+                <article class="content-panel">
+                    <header class="panel-head">
+                        <p class="panel-kicker">Guidance</p>
+                        <h2 class="panel-title"><i class="fas fa-lightbulb"></i> Tips for Better Reports</h2>
+                        <p class="panel-text">Use these recommendations to help admins understand and resolve your concern quickly.</p>
+                    </header>
+                    <div class="panel-body">
+                        <div class="tips-grid">
+                            <div th:each="tip : ${tips}" class="tip-tile">
+                                <h3>
+                                    <span class="tip-icon"><i th:class="'fas ' + ${tip.iconClass}"></i></span>
+                                    <span th:text="${tip.title}"></span>
+                                </h3>
+                                <p th:text="${tip.description}"></p>
+                            </div>
+
+                            <div th:if="${tips == null or #lists.isEmpty(tips)}" class="tips-empty">
+                                <i class="fas fa-ghost"></i>
+                                <p>No tips available at this time.</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="content-panel">
+                    <header class="panel-head">
+                        <p class="panel-kicker">Knowledge</p>
+                        <h2 class="panel-title"><i class="fas fa-circle-question"></i> Frequently Asked Questions</h2>
+                        <p class="panel-text">Expand each question to view complete answers from the support team.</p>
+                    </header>
+                    <div class="panel-body">
+                        <div class="faq-accordion">
+                            <div th:each="faq : ${faqs}" class="faq-item">
+                                <div class="faq-question">
+                                    <span th:text="${faq.question}"></span>
+                                    <i class="fas fa-chevron-down"></i>
+                                </div>
+                                <div class="faq-answer" th:text="${faq.answer}"></div>
+                            </div>
+
+                            <div th:if="${faqs == null or #lists.isEmpty(faqs)}" class="faq-empty">
+                                <i class="fas fa-folder-open"></i>
+                                <p>No frequently asked questions have been posted yet.</p>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            </section>
 
         </div>
     </main>
@@ -267,7 +638,7 @@
                 <p>No notifications yet.</p>
             </div>
             <div th:each="notif : ${notifications}" class="notif-item"
-                 th:classappend="${!notif.isRead} ? 'unread' : ''"
+                  th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
                  th:attr="data-id=${notif.notificationId}">
                 <div class="notif-icon-wrap"
                      th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
@@ -302,32 +673,31 @@
             });
         });
 
-        // Notifications Modal
+        // Notifications Drawer
         function toggleNotifPanel() {
             const panel = document.getElementById('notifPanel');
             const overlay = document.getElementById('notifOverlay');
-            if(panel.style.transform === 'translateX(0px)') {
-                panel.style.transform = 'translateX(100%)';
-                overlay.style.opacity = '0';
-                setTimeout(() => { overlay.style.visibility = 'hidden'; }, 300);
-            } else {
-                panel.style.transform = 'translateX(0)';
-                overlay.style.visibility = 'visible';
-                overlay.style.opacity = '1';
-                
-                // Reset Bell Badge
+            if (!panel || !overlay) return;
+
+            const shouldOpen = !panel.classList.contains('active');
+            panel.classList.toggle('active', shouldOpen);
+            overlay.classList.toggle('active', shouldOpen);
+            document.body.style.overflow = shouldOpen ? 'hidden' : '';
+
+            // Mark all notifications as read when opening the drawer.
+            if (shouldOpen) {
                 const bellBadge = document.getElementById('bellBadge');
                 if (bellBadge && !bellBadge.classList.contains('hidden')) {
                     bellBadge.classList.add('hidden');
-                    
-                    fetch('/notifications/mark-all-read', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
+
+                    fetch('/api/notifications/mark-all-read', {
+                        method: 'POST'
                     })
                     .then(response => response.json())
-                    .then(data => {
-                        const items = document.querySelectorAll('.notif-item.unread');
-                        items.forEach(item => item.classList.remove('unread'));
+                    .then(() => {
+                        document.querySelectorAll('.notif-item.unread').forEach(item => {
+                            item.classList.remove('unread');
+                        });
                     })
                     .catch(err => console.error(err));
                 }

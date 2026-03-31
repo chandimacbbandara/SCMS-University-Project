@@ -325,7 +325,7 @@ public class StudentRegistrationController {
         List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
         allNotifications.addAll(broadcastNotifications);
         allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
-        long unreadCount = notificationService.getUnreadCount(userId) + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+        long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
 
@@ -371,8 +371,7 @@ public class StudentRegistrationController {
         List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
         allNotifications.addAll(broadcastNotifications);
         allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
-        long unreadCount = notificationService.getUnreadCount(userId)
-            + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+        long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
 
@@ -466,8 +465,7 @@ public class StudentRegistrationController {
             List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
             allNotifications.addAll(broadcastNotifications);
             allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
-            long unreadCount = notificationService.getUnreadCount(userId)
-                + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+            long unreadCount = notificationService.getUnreadCount(userId);
             model.addAttribute("notifications", allNotifications);
             model.addAttribute("unreadCount", unreadCount);
         }

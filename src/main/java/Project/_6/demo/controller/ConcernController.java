@@ -45,8 +45,49 @@ public class ConcernController {
         var student = concernService.getStudentByUserId(userId);
         model.addAttribute("concernDTO", new ConcernSubmissionDTO());
         model.addAttribute("loggedStudent", student);
+        model.addAttribute("isEdit", false);
         addNotificationAttributes(model, userId);
         return "submit-concern";
+    }
+
+    @GetMapping("/student/concern/{id}/edit")
+    public String showConcernEditForm(@PathVariable("id") Integer concernId,
+                                      HttpSession session,
+                                      Model model,
+                                      RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            var student = concernService.getStudentByUserId(userId);
+            Concern concern = concernService.getPendingConcernForStudent(concernId, userId);
+
+            ConcernSubmissionDTO concernDTO = new ConcernSubmissionDTO();
+            concernDTO.setStudentId(student.getStudentId());
+            concernDTO.setFirstName(student.getUser().getFirstName());
+            concernDTO.setLastName(student.getUser().getLastName());
+            concernDTO.setEmail(student.getUser().getEmail());
+            concernDTO.setCategory(concern.getCategory());
+            concernDTO.setSubject(concern.getSubject());
+            concernDTO.setMessage(concern.getMessage());
+
+            model.addAttribute("concernDTO", concernDTO);
+            model.addAttribute("loggedStudent", student);
+            model.addAttribute("isEdit", true);
+            model.addAttribute("editingConcernId", concern.getConcernId());
+            model.addAttribute("existingEvidencePath", concern.getEvidencePath());
+            addNotificationAttributes(model, userId);
+            return "submit-concern";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/student/concern-history";
+        }
     }
 
     // Handle concern form submission
@@ -92,6 +133,33 @@ public class ConcernController {
         return "redirect:/student/concern-history";
     }
 
+    @PostMapping("/student/concern/update")
+    public String updateConcern(
+            @RequestParam("concernId") Integer concernId,
+            @ModelAttribute ConcernSubmissionDTO concernDTO,
+            @RequestParam(value = "evidence", required = false) MultipartFile evidence,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            concernService.updateConcernByStudentIfPending(concernId, userId, concernDTO, evidence);
+            redirectAttributes.addFlashAttribute("successMessage", "Concern updated successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
     // Concern History page
     @GetMapping("/student/concern-history")
     public String showConcernHistory(HttpSession session, Model model) {
@@ -120,8 +188,7 @@ public class ConcernController {
         allNotifications.addAll(broadcastNotifications);
         allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
 
-        long unreadCount = notificationService.getUnreadCount(userId)
-                + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+        long unreadCount = notificationService.getUnreadCount(userId);
 
         model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
@@ -180,6 +247,25 @@ public class ConcernController {
             redirectAttributes.addFlashAttribute("feedbackSuccess", "Your feedback has been deleted.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/concern/delete")
+    public String deleteStudentConcern(@RequestParam("concernId") Integer concernId,
+                                       HttpSession session,
+                                       RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        try {
+            concernService.deleteConcernByStudentIfPending(concernId, studentUserId);
+            redirectAttributes.addFlashAttribute("successMessage", "Concern deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
         return "redirect:/student/concern-history";

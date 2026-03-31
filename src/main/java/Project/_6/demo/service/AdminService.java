@@ -157,6 +157,8 @@ public class AdminService {
 
         concernRepository.deleteById(concern.getConcernId());
         concernRepository.flush();
+
+        notificationService.sendConcernDeletedEmail(concern);
     }
 
     /**
@@ -290,8 +292,17 @@ public class AdminService {
         }
 
         Concern concern = getConcernById(concernId);
+        String previousCategory = concern.getCategory();
         concern.setCategory(normalizedCategory);
-        return concernRepository.save(concern);
+        Concern savedConcern = concernRepository.save(concern);
+
+        String oldCategoryNormalized = previousCategory == null ? "" : previousCategory.trim();
+        String newCategoryNormalized = normalizedCategory.trim();
+        if (!oldCategoryNormalized.equalsIgnoreCase(newCategoryNormalized)) {
+            notificationService.sendConcernDepartmentChangedEmail(savedConcern, previousCategory, normalizedCategory);
+        }
+
+        return savedConcern;
     }
 
     /**
