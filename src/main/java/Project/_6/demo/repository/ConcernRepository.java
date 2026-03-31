@@ -7,11 +7,13 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     List<Concern> findByStudent_StudentId(String studentId);
     List<Concern> findByStudent_UserId(Integer userId);
+    Optional<Concern> findByConcernIdAndStudent_UserId(Integer concernId, Integer userId);
     List<Concern> findAllByOrderByCreatedTimeDesc();
     List<Concern> findByStatusOrderByCreatedTimeDesc(String status);
     long countByStatus(String status);

@@ -313,6 +313,14 @@ public class EmailVerificationService {
                     detailsText = "Your concern regarding \"" + concern.getSubject() + "\" has received a response. Please log in to the Student Concern Management System to view the reply.";
                     color = "#16a34a"; // Green
                     break;
+                case "DELETED":
+                    subject = "Concern Removed by Administration - " + concernRef;
+                    statusText = "Your concern has been removed by an administrator.";
+                    detailsText = "Your concern regarding \"" + concern.getSubject() + "\" has been deleted by the administration team. If you need further help, please submit a new concern with updated details.";
+                    color = "#b91c1c"; // Red
+                    break;
+                default:
+                    return;
             }
 
             String html = """
@@ -356,6 +364,71 @@ public class EmailVerificationService {
             mailSender.send(message);
         } catch (Exception ex) {
             System.err.println("Failed to send concern status email: " + ex.getMessage());
+        }
+    }
+
+    public void sendConcernDepartmentChangedEmail(Concern concern, String previousDepartment, String newDepartment) {
+        try {
+            if (concern == null || concern.getStudent() == null || concern.getStudent().getUser() == null || concern.getStudent().getUser().getEmail() == null) {
+                return;
+            }
+
+            String toEmail = concern.getStudent().getUser().getEmail();
+            String firstName = concern.getStudent().getUser().getFirstName();
+            String displayName = firstName == null || firstName.isBlank() ? "Student" : firstName.trim();
+
+            String oldDept = previousDepartment == null || previousDepartment.isBlank() ? "Not Assigned" : previousDepartment.trim();
+            String newDept = newDepartment == null || newDepartment.isBlank() ? "Not Assigned" : newDepartment.trim();
+
+            String concernRef = "CON-" + concern.getConcernId();
+            String subject = "Concern Department Updated - " + concernRef;
+            String statusText = "Your concern has been reassigned to another department.";
+            String detailsText = "Your concern regarding \"" + concern.getSubject() + "\" has been moved from \"" + oldDept + "\" to \"" + newDept + "\" by the administration team.";
+
+            String html = """
+                    <div style=\"font-family: Arial, sans-serif; max-width: 640px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;\">
+                        <div style=\"background: #b91c1c; color: #ffffff; padding: 18px 24px;\">
+                            <h2 style=\"margin: 0; font-size: 22px;\">Academy of Knowledge Bridge</h2>
+                            <p style=\"margin: 6px 0 0 0; font-size: 13px; opacity: 0.95;\">Student Concern Management System</p>
+                        </div>
+                        <div style=\"padding: 22px 24px; color: #111827;\">
+                            <img src=\"cid:brandLogo\" alt=\"Institute Logo\" style=\"width: 84px; height: 84px; object-fit: cover; border-radius: 10px; margin-bottom: 14px;\" />
+                            <p style=\"margin: 0 0 12px 0;\">Hello %s,</p>
+                            <p style=\"margin: 0 0 12px 0; font-weight: 700; color: #2563eb;\">%s</p>
+                            <p style=\"margin: 0 0 12px 0;\">Reference ID: <strong>%s</strong></p>
+                            <p style=\"margin: 0 0 8px 0;\">Previous Department: <strong>%s</strong></p>
+                            <p style=\"margin: 0 0 12px 0;\">New Department: <strong>%s</strong></p>
+                            <p style=\"margin: 0 0 16px 0;\">%s</p>
+                            <p style=\"margin: 0;\">Regards,<br/><strong>Academy of Knowledge Bridge Administration</strong></p>
+                        </div>
+                        <div style=\"background: #f9fafb; padding: 12px 24px; color: #6b7280; font-size: 12px;\">
+                            This is an automated concern update notification from SCMS. Please do not reply directly to this email.
+                        </div>
+                    </div>
+                    """.formatted(
+                    escapeHtml(displayName),
+                    escapeHtml(statusText),
+                    escapeHtml(concernRef),
+                    escapeHtml(oldDept),
+                    escapeHtml(newDept),
+                    escapeHtml(detailsText)
+            );
+
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            ClassPathResource logo = new ClassPathResource("static/images/img1.jpeg");
+            if (logo.exists()) {
+                helper.addInline("brandLogo", logo);
+            }
+
+            mailSender.send(message);
+        } catch (Exception ex) {
+            System.err.println("Failed to send concern department changed email: " + ex.getMessage());
         }
     }
 

@@ -671,7 +671,7 @@
         </div>
 
         <div th:each="notif : ${notifications}" class="notif-item"
-             th:classappend="${!notif.isRead} ? 'unread' : ''"
+               th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
              th:attr="data-id=${notif.notificationId}"
              onclick="markNotifRead(this)">
             <div class="notif-icon-wrap"

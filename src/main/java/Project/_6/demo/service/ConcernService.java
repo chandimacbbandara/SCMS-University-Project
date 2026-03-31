@@ -110,6 +110,71 @@ public class ConcernService {
         return map;
     }
 
+    /**
+     * Get a pending concern for editing by its owner student.
+     */
+    @Transactional(readOnly = true)
+    public Concern getPendingConcernForStudent(Integer concernId, Integer studentUserId) {
+        Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (!"Pending".equalsIgnoreCase(status)) {
+            throw new RuntimeException("You can only update concerns before admin review begins.");
+        }
+
+        return concern;
+    }
+
+    /**
+     * Allow students to update only their own pending concerns.
+     */
+    @Transactional
+    public Concern updateConcernByStudentIfPending(Integer concernId,
+                                                   Integer studentUserId,
+                                                   ConcernSubmissionDTO dto,
+                                                   MultipartFile evidence) throws IOException {
+        Concern concern = getPendingConcernForStudent(concernId, studentUserId);
+
+        if (dto == null
+                || dto.getSubject() == null || dto.getSubject().trim().isEmpty()
+                || dto.getMessage() == null || dto.getMessage().trim().isEmpty()
+                || dto.getCategory() == null || dto.getCategory().trim().isEmpty()) {
+            throw new RuntimeException("Subject, Category, and Message are required.");
+        }
+
+        concern.setSubject(dto.getSubject().trim());
+        concern.setMessage(dto.getMessage().trim());
+        concern.setCategory(dto.getCategory().trim());
+
+        if (evidence != null && !evidence.isEmpty()) {
+            concern.setEvidencePath(saveEvidence(evidence));
+        }
+
+        return concernRepository.save(concern);
+    }
+
+    /**
+     * Allow students to delete only their own pending concerns.
+     */
+    @Transactional
+    public void deleteConcernByStudentIfPending(Integer concernId, Integer studentUserId) {
+        if (concernId == null) {
+            throw new RuntimeException("Invalid concern request.");
+        }
+
+        Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (!"Pending".equalsIgnoreCase(status)) {
+            throw new RuntimeException("You can only delete concerns before admin review begins.");
+        }
+
+        notificationService.deleteByConcernId(concernId);
+        concernRepository.delete(concern);
+    }
+
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {
         Optional<Student> existingStudent = studentRepository.findByStudentId(dto.getStudentId());
 
