@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 Project/_6/demo/service/NotificationService.class
 Project/_6/demo/repository/StudentCommunityModerationLogRepository.class
 Project/_6/demo/dto/CommunityModerationResultDTO.class
@@ -52,3 +53,12 @@ Project/_6/demo/entity/StudentCommunityReply.class
 Project/_6/demo/dto/CommunityReplyDTO.class
 Project/_6/demo/repository/StudentCommunityRulesAcceptanceRepository.class
 Project/_6/demo/entity/StudentCommunityModerationLog.class
+=======
+Project/_6/demo/config/userconfig.class
+Project/_6/demo/service/userservice.class
+Project/_6/demo/repository/userrepository.class
+Project/_6/demo/controller/usercontroller.class
+Project/_6/demo/StudentConcernManagementSystemApplication.class
+Project/_6/demo/dto/userdto.class
+Project/_6/demo/entity/user.class
+>>>>>>> Stashed changes

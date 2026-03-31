@@ -134,9 +134,16 @@ public class NotificationService {
      */
     @Transactional
     public Notification createBroadcastNotification(String title, String message, String targetAudience, Integer adminIdFk) {
+        if (title == null || title.trim().isEmpty()) {
+            throw new RuntimeException("Notification title is required.");
+        }
+        if (message == null || message.trim().isEmpty()) {
+            throw new RuntimeException("Notification message is required.");
+        }
+
         Notification notification = newNotification();
-        notification.setTitle(title);
-        notification.setMessage(message);
+        notification.setTitle(title.trim());
+        notification.setMessage(message.trim());
         notification.setType("BROADCAST");
         notification.setTargetAudience(targetAudience != null ? targetAudience : "ALL_STUDENTS");
         notification.setAdminIdFk(adminIdFk);
@@ -150,5 +157,54 @@ public class NotificationService {
      */
     public List<Notification> getAllBroadcastNotifications() {
         return notificationRepository.findByTypeOrderBySentTimeDesc("BROADCAST");
+    }
+
+    /**
+     * Get a specific notification by its ID
+     */
+    public Notification getNotificationById(Integer id) {
+        return notificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notification not found with ID: " + id));
+    }
+
+    /**
+     * Delete a notification
+     */
+    @Transactional
+    public void deleteNotification(Integer id) {
+        if (!notificationRepository.existsById(id)) {
+            throw new RuntimeException("Notification not found.");
+        }
+        notificationRepository.deleteById(id);
+    }
+
+    /**
+     * Update an existing broadcast notification (only allowed within 24 hours of creation)
+     */
+    @Transactional
+    public Notification updateBroadcastNotification(Integer id, String title, String message, String targetAudience) {
+        Notification notification = getNotificationById(id);
+
+        if (notification.getSentTime() != null) {
+            java.time.Duration duration = java.time.Duration.between(notification.getSentTime(), java.time.LocalDateTime.now());
+            if (duration.toHours() >= 24) {
+                throw new RuntimeException("Warning: Notifications older than 24 hours cannot be modified.");
+            }
+        }
+
+        if (title == null || title.trim().isEmpty()) {
+            throw new RuntimeException("Notification title is required.");
+        }
+        if (message == null || message.trim().isEmpty()) {
+            throw new RuntimeException("Notification message is required.");
+        }
+
+        notification.setTitle(title.trim());
+        notification.setMessage(message.trim());
+        if (targetAudience != null && !targetAudience.trim().isEmpty()) {
+            notification.setTargetAudience(targetAudience);
+        }
+
+        return notificationRepository.save(notification);
     }
 }

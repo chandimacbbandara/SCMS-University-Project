@@ -833,6 +833,60 @@ public class OwnerController {
         return "redirect:/owner/notifications";
     }
 
+    @GetMapping("/notifications/delete/{id}")
+    public String deleteNotification(@PathVariable("id") Integer id,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            notificationService.deleteNotification(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Notification deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete notification: " + e.getMessage());
+        }
+        return "redirect:/owner/notifications";
+    }
+
+    @GetMapping("/notifications/update/{id}")
+    public String showUpdateNotificationPage(@PathVariable("id") Integer id,
+                                             HttpSession session,
+                                             Model model,
+                                             RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            Notification notification = notificationService.getNotificationById(id);
+            model.addAttribute("notification", notification);
+            return "owner-notification-update";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+            return "redirect:/owner/notifications";
+        }
+    }
+
+    @PostMapping("/notifications/update/{id}")
+    public String updateBroadcastNotification(@PathVariable("id") Integer id,
+                                              @RequestParam("title") String title,
+                                              @RequestParam("message") String message,
+                                              @RequestParam("targetAudience") String targetAudience,
+                                              HttpSession session,
+                                              RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        try {
+            notificationService.updateBroadcastNotification(id, title, message, targetAudience);
+            redirectAttributes.addFlashAttribute("successMessage", "Notification updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/owner/notifications/update/" + id;
+        }
+        return "redirect:/owner/notifications";
+    }
+
     private boolean isOwnerLoggedIn(HttpSession session) {
         return Boolean.TRUE.equals(session.getAttribute("ownerLoggedIn"));
     }

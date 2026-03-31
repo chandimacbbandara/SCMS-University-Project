@@ -20,62 +20,76 @@ import java.util.Optional;
 @SpringBootApplication
 public class StudentConcernManagementSystemApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(StudentConcernManagementSystemApplication.class, args);
-    }
+	public static void main(String[] args) {
+		SpringApplication.run(StudentConcernManagementSystemApplication.class, args);
+	}
 
-    @Bean
-    public CommandLineRunner ensureFeedbackReplyColumn(JdbcTemplate jdbcTemplate) {
-        return args -> {
-            Integer columnCount = jdbcTemplate.queryForObject(
-                    "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Feedback' AND COLUMN_NAME = 'ReplyID_FK'",
-                    Integer.class
-            );
+	@Bean
+	public CommandLineRunner ensureFeedbackReplyColumn(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			// First, ensure the table actually exists before trying to alter it
+			Integer tableCount = jdbcTemplate.queryForObject(
+					"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Feedback'",
+					Integer.class);
 
-            if (columnCount == null || columnCount == 0) {
-                jdbcTemplate.execute("ALTER TABLE Feedback ADD ReplyID_FK INT NULL");
-            }
-        };
-    }
+			if (tableCount != null && tableCount > 0) {
+				Integer columnCount = jdbcTemplate.queryForObject(
+						"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Feedback' AND COLUMN_NAME = 'ReplyID_FK'",
+						Integer.class);
 
-    @Bean
-    public CommandLineRunner removePredefinedAdmin(UserRepository userRepository,
-                                                   AdminRepository adminRepository,
-                                                   AdminReplyRepository adminReplyRepository,
-                                                   ConcernRepository concernRepository) {
-        return args -> {
-            Optional<Admin> legacyAdmin = adminRepository.findByStaffId("ADMIN001");
-            if (legacyAdmin.isEmpty() || legacyAdmin.get().getUser() == null) {
-                return;
-            }
+				if (columnCount == null || columnCount == 0) {
+					try {
+						jdbcTemplate.execute("ALTER TABLE Feedback ADD ReplyID_FK INT NULL");
+					} catch (Exception e) {
+						System.out.println("Warning: Could not alter Feedback table: " + e.getMessage());
+					}
+				}
+			}
+		};
+	}
 
-            User user = legacyAdmin.get().getUser();
-            if (user.getEmail() == null || !"admin@akb.edu".equalsIgnoreCase(user.getEmail())) {
-                return;
-            }
+	@Bean
+	public CommandLineRunner removePredefinedAdmin(UserRepository userRepository,
+			AdminRepository adminRepository,
+			AdminReplyRepository adminReplyRepository,
+			ConcernRepository concernRepository) {
+		return args -> {
+			try {
+				Optional<Admin> legacyAdmin = adminRepository.findByStaffId("ADMIN001");
+				if (legacyAdmin.isEmpty() || legacyAdmin.get().getUser() == null) {
+					return;
+				}
 
-            Integer userId = user.getUserId();
+				User user = legacyAdmin.get().getUser();
+				if (user.getEmail() == null || !"admin@akb.edu".equalsIgnoreCase(user.getEmail())) {
+					return;
+				}
 
-            List<Concern> assignedConcerns = concernRepository.findByAdmin_UserId(userId);
-            if (!assignedConcerns.isEmpty()) {
-                for (Concern concern : assignedConcerns) {
-                    concern.setAdmin(null);
-                }
-                concernRepository.saveAll(assignedConcerns);
-            }
+				Integer userId = user.getUserId();
 
-            List<AdminReply> adminReplies = adminReplyRepository.findByAdmin_UserId(userId);
-            if (!adminReplies.isEmpty()) {
-                for (AdminReply reply : adminReplies) {
-                    reply.setAdmin(null);
-                }
-                adminReplyRepository.saveAll(adminReplies);
-            }
+				List<Concern> assignedConcerns = concernRepository.findByAdmin_UserId(userId);
+				if (!assignedConcerns.isEmpty()) {
+					for (Concern concern : assignedConcerns) {
+						concern.setAdmin(null);
+					}
+					concernRepository.saveAll(assignedConcerns);
+				}
 
-            if (adminRepository.existsByUser_UserId(userId)) {
-                adminRepository.deleteById(userId);
-            }
-            userRepository.deleteById(userId);
-        };
-    }
+				List<AdminReply> adminReplies = adminReplyRepository.findByAdmin_UserId(userId);
+				if (!adminReplies.isEmpty()) {
+					for (AdminReply reply : adminReplies) {
+						reply.setAdmin(null);
+					}
+					adminReplyRepository.saveAll(adminReplies);
+				}
+
+				if (adminRepository.existsByUser_UserId(userId)) {
+					adminRepository.deleteById(userId);
+				}
+				userRepository.deleteById(userId);
+			} catch (Exception e) {
+				System.out.println("Warning: Skipped removing predefined admin. Tables may not exist yet: " + e.getMessage());
+			}
+		};
+	}
 }
