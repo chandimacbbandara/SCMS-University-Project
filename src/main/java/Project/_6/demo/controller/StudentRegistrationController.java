@@ -15,6 +15,7 @@ import Project._6.demo.service.EmailVerificationService;
 import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentRegistrationService;
+import Project._6.demo.service.FaqManagementService;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -43,6 +44,7 @@ public class StudentRegistrationController {
     private final NotificationService notificationService;
     private final ConcernService concernService;
     private final FeedbackService feedbackService;
+    private final FaqManagementService faqManagementService;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final String REG_VERIFY_EMAIL = "regVerifyEmail";
@@ -58,12 +60,14 @@ public class StudentRegistrationController {
                                          EmailVerificationService emailVerificationService,
                                          NotificationService notificationService,
                                          ConcernService concernService,
-                                         FeedbackService feedbackService) {
+                                         FeedbackService feedbackService,
+                                         FaqManagementService faqManagementService) {
         this.registrationService = registrationService;
         this.emailVerificationService = emailVerificationService;
         this.notificationService = notificationService;
         this.concernService = concernService;
         this.feedbackService = feedbackService;
+        this.faqManagementService = faqManagementService;
     }
 
     /**
@@ -447,6 +451,32 @@ public class StudentRegistrationController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
+
+    // ========================
+    // STUDENT FAQ & TIPS
+    // ========================
+
+    @GetMapping("/faq")
+    public String showStudentFaq(HttpSession session, Model model) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId != null) {
+            List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
+            List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
+            List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
+            allNotifications.addAll(broadcastNotifications);
+            allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+            long unreadCount = notificationService.getUnreadCount(userId)
+                + broadcastNotifications.stream().filter(n -> !Boolean.TRUE.equals(n.getIsRead())).count();
+            model.addAttribute("notifications", allNotifications);
+            model.addAttribute("unreadCount", unreadCount);
+        }
+
+        // Fetch Dynamic Data from Admin settings
+        model.addAttribute("tips", faqManagementService.getAllTips());
+        model.addAttribute("faqs", faqManagementService.getAllFaqs());
+
+        return "faq";
     }
 
     // ========================

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAQ & Tips - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        body { background: #f4f6fb; }
+        .faq-wrapper {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: calc(100vh - 160px);
+        }
+
+        /* Hero Section */
+        .faq-hero {
+            background: linear-gradient(135deg, #e53935 0%, #c62828 100%);
+            border-radius: 20px;
+            padding: 40px;
+            color: #fff;
+            text-align: center;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(229,57,53,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .faq-hero h1 {
+            font-size: 32px;
+            font-weight: 800;
+            margin: 0 0 10px;
+        }
+        .faq-hero p {
+            font-size: 16px;
+            opacity: 0.9;
+            margin: 0;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Tips Section */
+        .tips-section {
+            margin-bottom: 50px;
+        }
+        .section-header {
+            font-size: 24px;
+            font-weight: 800;
+            color: #222;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-header i {
+            color: #e53935;
+        }
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .tip-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-top: 4px solid #43a047;
+            transition: transform 0.3s;
+        }
+        .tip-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+        .tip-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #333;
+            margin: 0 0 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tip-card h3 i { color: #43a047; }
+        .tip-card p {
+            font-size: 14px;
+            color: #666;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        /* FAQ Section (Accordion) */
+        .faq-accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .faq-item {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+            border: 1px solid #eee;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .faq-item:hover {
+            border-color: #ddd;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+        }
+        .faq-question {
+            padding: 20px 24px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 15px;
+            color: #333;
+            user-select: none;
+            background: #fff;
+        }
+        .faq-question i {
+            color: #bbb;
+            transition: transform 0.3s;
+        }
+        .faq-answer {
+            padding: 0 24px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease, padding 0.4s ease;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+            background: #fafbfc;
+        }
+        .faq-item.active .faq-question i {
+            transform: rotate(180deg);
+            color: #e53935;
+        }
+        .faq-item.active .faq-answer {
+            padding: 20px 24px;
+            max-height: 500px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Animations */
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeSlideUp 0.6s cubic-bezier(.22,1,.36,1) both; }
+        .delay-1 { animation-delay: .1s; }
+        .delay-2 { animation-delay: .2s; }
+        .delay-3 { animation-delay: .3s; }
+
+    </style>
+</head>
+
+<body class="student-theme">
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul th:if="${session.studentUserId != null}">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                    <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/community" class="nav-link">Community Talk</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                    <li><a href="/faq" class="nav-link active">FAQ</a></li>
+                    <li>
+                        <a href="/student/profile" class="nav-profile-btn" aria-label="Student Profile" title="Student Profile">
+                            <img th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                                 src="/images/img1.jpeg"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                            <span class="nav-profile-fallback">S</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                            <i class="fas fa-bell"></i>
+                            <span class="bell-badge" id="bellBadge"
+                                  th:text="${unreadCount != null ? unreadCount : 0}"
+                                  th:classappend="${unreadCount == null or unreadCount == 0} ? 'hidden' : ''">0</span>
+                        </div>
+                    </li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+                <ul th:unless="${session.studentUserId != null}">
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/faq" class="nav-link active">FAQ</a></li>
+                    <li><a th:href="@{/login}" href="/login" class="nav-link">Login</a></li>
+                    <li><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="faq-wrapper">
+            
+            <div class="faq-hero animate-in">
+                <h1>How can we assist you?</h1>
+                <p>Welcome to the support center. Browse through our tips for submitting concerns and find answers to common questions.</p>
+            </div>
+
+            <div class="tips-section animate-in delay-1">
+                <h2 class="section-header"><i class="fas fa-lightbulb"></i> Guidelines & Tips</h2>
+                <div class="tips-grid">
+                    <div th:each="tip : ${tips}" class="tip-card">
+                        <h3><i th:class="'fas ' + ${tip.iconClass}"></i> <span th:text="${tip.title}"></span></h3>
+                        <p th:text="${tip.description}"></p>
+                    </div>
+                    <div th:if="${tips == null or #lists.isEmpty(tips)}" class="tip-card" style="grid-column: 1 / -1; text-align: center; background: transparent; border: 2px dashed #ddd; box-shadow: none;">
+                        <i class="fas fa-ghost" style="font-size: 24px; color: #ccc; margin-bottom: 8px;"></i>
+                        <p>No tips available at this time.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="faq-section animate-in delay-2">
+                <h2 class="section-header"><i class="fas fa-circle-question"></i> Frequently Asked Questions</h2>
+                
+                <div class="faq-accordion">
+                    
+                    <div th:each="faq : ${faqs}" class="faq-item">
+                        <div class="faq-question">
+                            <span th:text="${faq.question}"></span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" th:text="${faq.answer}"></div>
+                    </div>
+
+                    <div th:if="${faqs == null or #lists.isEmpty(faqs)}" style="text-align: center; padding: 40px; color: #888;">
+                        <i class="fas fa-folder-open" style="font-size: 32px; margin-bottom: 12px; color: #cbd5e1;"></i>
+                        <p>No frequently asked questions have been posted yet.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Notifications Drawer -->
+    <div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
+    <div class="notif-panel" id="notifPanel">
+        <div class="notif-panel-header">
+            <h3><i class="fas fa-bell"></i> Notifications</h3>
+            <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="notif-panel-actions">
+            <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>
+        </div>
+        <div class="notif-list" id="notifList">
+            <div th:if="${notifications == null or #lists.isEmpty(notifications)}" class="notif-empty">
+                <i class="fas fa-bell-slash"></i>
+                <p>No notifications yet.</p>
+            </div>
+            <div th:each="notif : ${notifications}" class="notif-item"
+                 th:classappend="${!notif.isRead} ? 'unread' : ''"
+                 th:attr="data-id=${notif.notificationId}">
+                <div class="notif-icon-wrap"
+                     th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
+                    <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : (${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check'))"></i>
+                </div>
+                <div class="notif-content">
+                    <div class="notif-title" th:text="${notif.title}">Notification Title</div>
+                    <div class="notif-message" th:text="${notif.message}">Notification message</div>
+                    <div class="notif-time">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS for Accordion and Notifications -->
+    <script>
+        // Accordion Logic
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const item = question.parentElement;
+                // Close all others
+                document.querySelectorAll('.faq-item').forEach(otherItem => {
+                    if (otherItem !== item) {
+                        otherItem.classList.remove('active');
+                    }
+                });
+                // Toggle current
+                item.classList.toggle('active');
+            });
+        });
+
+        // Notifications Modal
+        function toggleNotifPanel() {
+            const panel = document.getElementById('notifPanel');
+            const overlay = document.getElementById('notifOverlay');
+            if(panel.style.transform === 'translateX(0px)') {
+                panel.style.transform = 'translateX(100%)';
+                overlay.style.opacity = '0';
+                setTimeout(() => { overlay.style.visibility = 'hidden'; }, 300);
+            } else {
+                panel.style.transform = 'translateX(0)';
+                overlay.style.visibility = 'visible';
+                overlay.style.opacity = '1';
+                
+                // Reset Bell Badge
+                const bellBadge = document.getElementById('bellBadge');
+                if (bellBadge && !bellBadge.classList.contains('hidden')) {
+                    bellBadge.classList.add('hidden');
+                    
+                    fetch('/notifications/mark-all-read', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        const items = document.querySelectorAll('.notif-item.unread');
+                        items.forEach(item => item.classList.remove('unread'));
+                    })
+                    .catch(err => console.error(err));
+                }
+            }
+        }
+    </script>
+</body>
+</html>
