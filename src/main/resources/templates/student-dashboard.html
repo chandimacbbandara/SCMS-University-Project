@@ -1252,6 +1252,11 @@
             color: #1565c0;
             border: 1px solid rgba(21,101,192,0.2);
         }
+        .track-status-badge.meeting-scheduled {
+            background: rgba(126,34,206,0.1);
+            color: #7e22ce;
+            border: 1px solid rgba(126,34,206,0.25);
+        }
         .track-status-badge.complete {
             background: rgba(46,125,50,0.08);
             color: #2e7d32;
@@ -1518,6 +1523,7 @@
                         <button class="status-filter-btn active" data-filter="all" type="button">All</button>
                         <button class="status-filter-btn" data-filter="Pending" type="button">Pending</button>
                         <button class="status-filter-btn" data-filter="In Progress" type="button">In Progress</button>
+                        <button class="status-filter-btn" data-filter="Meeting Scheduled" type="button">Meeting Scheduled</button>
                     </div>
                     <button type="button" class="compact-toggle" id="compactToggleBtn">
                         <i class="fas fa-compress"></i>
@@ -1580,16 +1586,16 @@
                     <div class="card-title"><i class="fas fa-route"></i> My Concerns - Live Tracking</div>
                 </div>
 
-                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress'])}" class="tracking-empty">
+                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled'])}" class="tracking-empty">
                     <i class="fas fa-inbox"></i>
-                    <p>No active concerns in live tracking. Pending and In Progress concerns will appear here.</p>
+                    <p>No active concerns in live tracking. Pending, In Progress, and Meeting Scheduled concerns will appear here.</p>
                 </div>
 
                 <div class="status-empty-note" id="trackingEmptyState">
                     No concern cards match your current filter/search.
                 </div>
 
-                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress']}" class="concern-track-card"
+                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']}" class="concern-track-card"
                      th:attr="data-status=${concern.status},data-search=${concern.subject}">
                     <div class="track-card-header">
                         <div>
@@ -1597,7 +1603,7 @@
                             <div class="track-subject" th:text="${concern.subject}">Subject</div>
                         </div>
                         <span class="track-status-badge"
-                              th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : 'complete')"
+                            th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : (${concern.status == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
                               th:text="${concern.status}">Status</span>
                     </div>
 
@@ -1605,7 +1611,7 @@
                     <div class="step-tracker">
                         <!-- Progress line fill -->
                         <div class="progress-line"
-                             th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : '100%'))"></div>
+                                th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : (${concern.status == 'Meeting Scheduled'} ? '75%' : '100%')))"></div>
 
                         <!-- Step 1: Submitted -->
                         <div class="tracker-step done">
@@ -1616,11 +1622,11 @@
 
                         <!-- Step 2: Under Review -->
                         <div class="tracker-step"
-                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Complete'} ? 'done' : '')">
+                                th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? 'done' : '')">
                             <div class="tracker-step-dot"><i class="fas fa-eye"></i></div>
-                            <div class="tracker-step-label">Under Review</div>
+                               <div class="tracker-step-label" th:text="${concern.status == 'Meeting Scheduled'} ? 'Meeting Scheduled' : 'Under Review'">Under Review</div>
                             <div class="tracker-step-time"
-                                 th:text="${concern.status == 'Pending'} ? 'Waiting...' : 'Reviewed'">Waiting...</div>
+                                   th:text="${concern.status == 'Pending'} ? 'Waiting...' : (${concern.status == 'Meeting Scheduled'} ? 'Scheduled' : 'Reviewed')">Waiting...</div>
                         </div>
 
                         <!-- Step 3: Resolved -->
@@ -1971,7 +1977,7 @@
                 {
                     selector: '.tracking-section',
                     title: 'Live Concern Tracking',
-                    content: 'Monitor Pending and In Progress concerns with real-time status progression.'
+                    content: 'Monitor Pending, In Progress, and Meeting Scheduled concerns with real-time status progression.'
                 },
                 {
                     selector: '.tips-section',

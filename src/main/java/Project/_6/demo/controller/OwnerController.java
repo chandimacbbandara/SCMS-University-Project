@@ -1128,7 +1128,9 @@ public class OwnerController {
             return true;
         }
         String normalized = status.trim();
-        return "Pending".equalsIgnoreCase(normalized) || "In Progress".equalsIgnoreCase(normalized);
+        return "Pending".equalsIgnoreCase(normalized)
+                || "In Progress".equalsIgnoreCase(normalized)
+                || "Meeting Scheduled".equalsIgnoreCase(normalized);
     }
 
     private boolean isRejectedStatus(String status) {

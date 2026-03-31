@@ -4,8 +4,11 @@ import Project._6.demo.dto.ConcernSubmissionDTO;
 import Project._6.demo.dto.FeedbackDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.ConcernMeetingProposal;
+import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Notification;
+import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
@@ -24,13 +27,16 @@ import java.util.Map;
 public class ConcernController {
 
     private final ConcernService concernService;
+    private final ConcernMeetingService concernMeetingService;
     private final FeedbackService feedbackService;
     private final NotificationService notificationService;
 
     public ConcernController(ConcernService concernService,
+                             ConcernMeetingService concernMeetingService,
                              FeedbackService feedbackService,
                              NotificationService notificationService) {
         this.concernService = concernService;
+        this.concernMeetingService = concernMeetingService;
         this.feedbackService = feedbackService;
         this.notificationService = notificationService;
     }
@@ -172,13 +178,74 @@ public class ConcernController {
         Map<Integer, Feedback> feedbackMap = feedbackService.getFeedbackMap(concerns);
         Map<Integer, Boolean> feedbackActionAllowedMap = feedbackService.getFeedbackActionAllowedMap(concerns);
         Map<Integer, Boolean> feedbackUpdateAllowedMap = feedbackService.getFeedbackUpdateAllowedMap(concerns);
+        Map<Integer, ConcernMeetingProposal> latestMeetingProposalMap = concernMeetingService.getLatestProposalMap(concerns);
+        List<Integer> latestProposalIds = latestMeetingProposalMap.values().stream()
+                .map(ConcernMeetingProposal::getProposalId)
+                .toList();
+        Map<Integer, List<ConcernMeetingSlot>> meetingSlotsMapByProposalId = concernMeetingService
+                .getSlotsMapByProposalIds(latestProposalIds);
+
         model.addAttribute("concerns", concerns);
         model.addAttribute("repliesMap", repliesMap);
         model.addAttribute("feedbackMap", feedbackMap);
         model.addAttribute("feedbackActionAllowedMap", feedbackActionAllowedMap);
         model.addAttribute("feedbackUpdateAllowedMap", feedbackUpdateAllowedMap);
+        model.addAttribute("latestMeetingProposalMap", latestMeetingProposalMap);
+        model.addAttribute("meetingSlotsMapByProposalId", meetingSlotsMapByProposalId);
         addNotificationAttributes(model, userId);
         return "concern-history";
+    }
+
+    @PostMapping("/student/concern/{id}/meeting/book")
+    public String bookMeetingSlot(@PathVariable("id") Integer concernId,
+                                  @RequestParam("proposalId") Integer proposalId,
+                                  @RequestParam("slotId") Integer slotId,
+                                  HttpSession session,
+                                  RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        if (studentUserId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            concernMeetingService.bookMeetingSlot(concernId, proposalId, slotId, studentUserId);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Meeting slot booked successfully. Your concern status is now Meeting Scheduled.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/concern/{id}/meeting/decline")
+    public String declineMeetingSlotOptions(@PathVariable("id") Integer concernId,
+                                            @RequestParam("proposalId") Integer proposalId,
+                                            @RequestParam(value = "reason", required = false) String reason,
+                                            HttpSession session,
+                                            RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        if (studentUserId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            concernMeetingService.declineMeetingSlots(concernId, proposalId, studentUserId, reason);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "You requested new meeting slots. Concern status moved back to Pending until admin shares another schedule.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
     }
 
     private void addNotificationAttributes(Model model, Integer userId) {

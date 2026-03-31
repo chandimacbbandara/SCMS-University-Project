@@ -195,3 +195,41 @@ SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
 SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
 
+
+/* ========================================
+   Concern Physical Meeting Scheduling Flow
+   ======================================== */
+
+ALTER TABLE Concern ADD Meeting_Status VARCHAR(60);
+ALTER TABLE Concern ADD Meeting_Booked_Start_Time DATETIME;
+ALTER TABLE Concern ADD Meeting_Booked_End_Time DATETIME;
+ALTER TABLE Concern ADD Meeting_Booked_At DATETIME;
+
+CREATE TABLE Concern_Meeting_Proposal (
+    ProposalID INT IDENTITY(1,1) PRIMARY KEY,
+    ConcernID_FK INT NOT NULL,
+    AdminID_FK INT NOT NULL,
+    Proposal_Status VARCHAR(60) NOT NULL DEFAULT 'PENDING_STUDENT_SELECTION',
+    Admin_Note VARCHAR(MAX),
+    Student_Response_Note VARCHAR(MAX),
+    Created_Time DATETIME NOT NULL DEFAULT GETDATE(),
+    Responded_Time DATETIME NULL,
+    CONSTRAINT FK_MeetingProposal_Concern FOREIGN KEY (ConcernID_FK) REFERENCES Concern(ConcernID),
+    CONSTRAINT FK_MeetingProposal_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID)
+);
+
+CREATE TABLE Concern_Meeting_Slot (
+    SlotID INT IDENTITY(1,1) PRIMARY KEY,
+    ProposalID_FK INT NOT NULL,
+    Start_Time DATETIME NOT NULL,
+    End_Time DATETIME NOT NULL,
+    Slot_Status VARCHAR(40) NOT NULL DEFAULT 'AVAILABLE',
+    CONSTRAINT FK_MeetingSlot_Proposal FOREIGN KEY (ProposalID_FK) REFERENCES Concern_Meeting_Proposal(ProposalID)
+);
+
+CREATE INDEX IDX_MeetingProposal_Concern ON Concern_Meeting_Proposal(ConcernID_FK, Created_Time DESC);
+CREATE INDEX IDX_MeetingSlot_Proposal ON Concern_Meeting_Slot(ProposalID_FK, Start_Time ASC);
+
+SELECT * FROM Concern_Meeting_Proposal ORDER BY Created_Time DESC;
+SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
+

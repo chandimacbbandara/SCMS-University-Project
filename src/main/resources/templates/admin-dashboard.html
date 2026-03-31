@@ -663,6 +663,8 @@
         .st-pending .status-dot { background: #f59e0b; animation: pulseRing 2s infinite; }
         .st-progress { background: rgba(37, 99, 235, 0.14); color: #1d4ed8; border: 1px solid rgba(37, 99, 235, 0.3); }
         .st-progress .status-dot { background: #2563eb; }
+        .st-scheduled { background: rgba(139, 92, 246, 0.16); color: #6d28d9; border: 1px solid rgba(139, 92, 246, 0.3); }
+        .st-scheduled .status-dot { background: #8b5cf6; }
         .st-complete { background: rgba(22, 163, 74, 0.14); color: #15803d; border: 1px solid rgba(22, 163, 74, 0.3); }
         .st-complete .status-dot { background: #16a34a; }
 
@@ -842,7 +844,7 @@
                 <div class="stat-icon-wrap"><i class="fas fa-spinner"></i></div>
                 <div class="stat-info">
                     <div class="stat-number" data-count th:text="${inProgressCount}">0</div>
-                    <div class="stat-label">In Progress</div>
+                    <div class="stat-label">Active Cases</div>
                 </div>
             </div>
             <div class="stat-card sc-resolved anim-scale d4">
@@ -941,6 +943,7 @@
                             <option value="All" th:selected="${selectedStatus == 'All'}">All Status</option>
                             <option value="Pending" th:selected="${selectedStatus == 'Pending'}">Pending</option>
                             <option value="In Progress" th:selected="${selectedStatus == 'In Progress'}">In Progress</option>
+                            <option value="Meeting Scheduled" th:selected="${selectedStatus == 'Meeting Scheduled'}">Meeting Scheduled</option>
                             <option value="Complete" th:selected="${selectedStatus == 'Complete'}">Complete</option>
                         </select>
                     </div>
@@ -981,6 +984,7 @@
                 <button type="button" class="status-chip-btn active" data-quick-status="All">All</button>
                 <button type="button" class="status-chip-btn" data-quick-status="Pending">Pending</button>
                 <button type="button" class="status-chip-btn" data-quick-status="In Progress">In Progress</button>
+                <button type="button" class="status-chip-btn" data-quick-status="Meeting Scheduled">Meeting Scheduled</button>
                 <button type="button" class="status-chip-btn" data-quick-status="Complete">Complete</button>
             </div>
         </section>
@@ -1052,7 +1056,7 @@
                                 </td>
                                 <td>
                                     <span class="status-pill"
-                                          th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : 'st-complete')">
+                                        th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : (${concern.status == 'Meeting Scheduled'} ? 'st-scheduled' : 'st-complete'))">
                                         <span class="status-dot"></span>
                                         <span th:text="${concern.status}">Status</span>
                                     </span>
@@ -1209,7 +1213,7 @@
                 {
                     selector: '.stats-row',
                     title: 'Key Metrics',
-                    content: 'Track key concern counts like Pending, In Progress, and Complete in real time.'
+                    content: 'Track key concern counts like Pending, Active (In Progress + Meeting Scheduled), and Complete in real time.'
                 },
                 {
                     selector: '.filter-card',

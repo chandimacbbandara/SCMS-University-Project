@@ -446,6 +446,8 @@
         .st-pending .status-dot { background: #f59e0b; animation: pulseRing 2s infinite; }
         .st-progress { background: rgba(37,99,235,0.14); color: #1d4ed8; border: 1px solid rgba(37,99,235,0.28); }
         .st-progress .status-dot { background: #2563eb; }
+        .st-scheduled { background: rgba(139,92,246,0.16); color: #6d28d9; border: 1px solid rgba(139,92,246,0.30); }
+        .st-scheduled .status-dot { background: #8b5cf6; }
         .st-complete { background: rgba(22,163,74,0.14); color: #15803d; border: 1px solid rgba(22,163,74,0.28); }
         .st-complete .status-dot { background: #16a34a; }
 
@@ -690,7 +692,7 @@
                                 </td>
                                 <td>
                                     <span class="status-pill"
-                                          th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : 'st-complete')">
+                                        th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : (${concern.status == 'Meeting Scheduled'} ? 'st-scheduled' : 'st-complete'))">
                                         <span class="status-dot"></span>
                                         <span th:text="${concern.status}">Status</span>
                                     </span>

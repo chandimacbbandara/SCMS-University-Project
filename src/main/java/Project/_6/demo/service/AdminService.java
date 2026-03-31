@@ -40,17 +40,20 @@ public class AdminService {
     private final AdminReplyRepository adminReplyRepository;
     private final FeedbackRepository feedbackRepository;
     private final NotificationService notificationService;
+    private final ConcernMeetingService concernMeetingService;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
                         FeedbackRepository feedbackRepository,
-                        NotificationService notificationService) {
+                        NotificationService notificationService,
+                        ConcernMeetingService concernMeetingService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.feedbackRepository = feedbackRepository;
         this.notificationService = notificationService;
+        this.concernMeetingService = concernMeetingService;
     }
 
     /**
@@ -64,6 +67,11 @@ public class AdminService {
      * Get concerns by status
      */
     public List<Concern> getConcernsByStatus(String status) {
+        if (isInProgressBucket(status)) {
+            List<Concern> active = concernRepository.findByStatusOrderByCreatedTimeDesc("In Progress");
+            active.addAll(concernRepository.findByStatusOrderByCreatedTimeDesc("Meeting Scheduled"));
+            return sortCompleteLast(active);
+        }
         return sortCompleteLast(concernRepository.findByStatusOrderByCreatedTimeDesc(status));
     }
 
@@ -77,9 +85,19 @@ public class AdminService {
 
         List<Concern> concerns;
         if (hasStatus && hasTime) {
-            concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
+            if (isInProgressBucket(status)) {
+                concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc("In Progress", from, to);
+                concerns.addAll(concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc("Meeting Scheduled", from, to));
+            } else {
+                concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
+            }
         } else if (hasStatus) {
-            concerns = concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+            if (isInProgressBucket(status)) {
+                concerns = concernRepository.findByStatusOrderByCreatedTimeDesc("In Progress");
+                concerns.addAll(concernRepository.findByStatusOrderByCreatedTimeDesc("Meeting Scheduled"));
+            } else {
+                concerns = concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+            }
         } else if (hasTime) {
             concerns = concernRepository.findByCreatedTimeBetweenOrderByCreatedTimeDesc(from, to);
         } else {
@@ -152,6 +170,8 @@ public class AdminService {
         if (!replies.isEmpty()) {
             adminReplyRepository.deleteAll(replies);
         }
+
+        concernMeetingService.deleteByConcernId(concernId);
 
         notificationService.deleteByConcernId(concernId);
 
@@ -258,11 +278,20 @@ public class AdminService {
     public Concern updateConcernStatus(Integer concernId, String status) {
         Concern concern = getConcernById(concernId);
         concern.setStatus(status);
+
+        if ("Complete".equalsIgnoreCase(status)) {
+            if ("BOOKED".equalsIgnoreCase(concern.getMeetingStatus())) {
+                concern.setMeetingStatus("MEETING_COMPLETED");
+            }
+        }
+
         Concern saved = concernRepository.save(concern);
 
         // Trigger notification: Step 2 - Concern In Progress (Mark as Read)
         if ("In Progress".equals(status)) {
             notificationService.notifyConcernInProgress(saved);
+        } else if ("Complete".equals(status)) {
+            notificationService.notifyConcernComplete(saved);
         }
 
         return saved;
@@ -317,7 +346,7 @@ public class AdminService {
     }
 
     public long getInProgressCount() {
-        return concernRepository.countByStatus("In Progress");
+        return concernRepository.countByStatus("In Progress") + concernRepository.countByStatus("Meeting Scheduled");
     }
 
     public long getCompleteCount() {
@@ -388,5 +417,9 @@ public class AdminService {
                 .sorted(Comparator.comparing((Concern c) -> "Complete".equals(c.getStatus()) ? 1 : 0)
                         .thenComparing(Comparator.comparing(Concern::getCreatedTime).reversed()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isInProgressBucket(String status) {
+        return "In Progress".equalsIgnoreCase(status);
     }
 }
