@@ -21,11 +21,12 @@ public class AnalyticsReportService {
     @Transactional
     public AnalyticsReport createReport(AnalyticsReportDTO dto) {
         AnalyticsReport report = new AnalyticsReport();
-        report.setTimePeriod(dto.getTimePeriod());
+        report.setTimePeriod(dto.getTimePeriod() == null || dto.getTimePeriod().isBlank() ? "All Time" : dto.getTimePeriod());
         report.setTotalConcerns(dto.getTotalConcerns());
         report.setAvgResolutionTime(dto.getAvgResolutionTime());
         report.setMostFrequentCategory(dto.getMostFrequentCategory());
         report.setSentimentTrendScore(dto.getSentimentTrendScore());
+        report.setEvidenceImageCount(dto.getEvidenceImageCount());
         report.setAdminIdFk(dto.getAdminIdFk());
         return analyticsReportRepository.save(report);
     }

@@ -49,6 +49,29 @@ public class StudentConcernManagementSystemApplication {
 	}
 
 	@Bean
+	public CommandLineRunner ensureAnalyticsReportImageColumn(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			Integer tableCount = jdbcTemplate.queryForObject(
+					"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Analytics_Report'",
+					Integer.class);
+
+			if (tableCount != null && tableCount > 0) {
+				Integer columnCount = jdbcTemplate.queryForObject(
+						"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Analytics_Report' AND COLUMN_NAME = 'EvidenceImageCount'",
+						Integer.class);
+
+				if (columnCount == null || columnCount == 0) {
+					try {
+						jdbcTemplate.execute("ALTER TABLE Analytics_Report ADD EvidenceImageCount INT NULL");
+					} catch (Exception e) {
+						System.out.println("Warning: Could not alter Analytics_Report table: " + e.getMessage());
+					}
+				}
+			}
+		};
+	}
+
+	@Bean
 	public CommandLineRunner removePredefinedAdmin(UserRepository userRepository,
 			AdminRepository adminRepository,
 			AdminReplyRepository adminReplyRepository,

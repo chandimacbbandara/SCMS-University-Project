@@ -12,6 +12,7 @@ public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer>
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
     List<AdminReply> findByConcern_Category(String category);
     List<AdminReply> findByAdmin_UserId(Integer adminUserId);
+    List<AdminReply> findByAdmin_UserIdAndConcern_Category(Integer adminUserId, String category);
     Optional<AdminReply> findFirstByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
     void deleteByConcern_ConcernId(Integer concernId);
 }

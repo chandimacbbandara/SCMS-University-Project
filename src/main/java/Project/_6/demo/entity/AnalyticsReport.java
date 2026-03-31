@@ -34,6 +34,9 @@ public class AnalyticsReport {
     @Column(name = "SentimentTrendScore", precision = 5, scale = 2)
     private BigDecimal sentimentTrendScore;
 
+    @Column(name = "EvidenceImageCount")
+    private Integer evidenceImageCount;
+
     @Column(name = "AdminID_FK")
     private Integer adminIdFk;
 

@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.StringUtils;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -33,7 +34,11 @@ import jakarta.servlet.http.HttpSession;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.regex.Pattern;
@@ -66,6 +71,9 @@ public class OwnerController {
     private static final String OWNER_ADMIN_UPDATE_VERIFY_CODE = "ownerAdminUpdateVerifyCode";
     private static final String OWNER_ADMIN_UPDATE_VERIFY_EXPIRY = "ownerAdminUpdateVerifyExpiry";
     private static final String OWNER_ADMIN_UPDATE_VERIFY_CONFIRMED = "ownerAdminUpdateVerifyConfirmed";
+    private static final String ALL_CATEGORIES = "All Categories";
+    private static final String ALL_PRIORITIES = "All Priorities";
+    private static final String ALL_TIME = "All Time";
 
     public OwnerController(AnalyticsReportService analyticsReportService,
                            AnalyticsReportRepository analyticsReportRepository,
@@ -378,12 +386,47 @@ public class OwnerController {
         }
 
         try {
+            if (reportDTO.getAdminIdFk() == null) {
+                throw new RuntimeException("Please select an admin before creating the report.");
+            }
+
+            String selectedCategory = normalizeReportCategory(reportDTO.getMostFrequentCategory());
+            ReportMetrics metrics = calculateReportMetrics(reportDTO.getAdminIdFk(), selectedCategory);
+
+            reportDTO.setTimePeriod(ALL_TIME);
+            reportDTO.setMostFrequentCategory(selectedCategory);
+            reportDTO.setTotalConcerns(metrics.totalConcerns());
+            reportDTO.setAvgResolutionTime(metrics.avgResolutionHours());
+            reportDTO.setSentimentTrendScore(metrics.sentimentScore());
+            reportDTO.setEvidenceImageCount(metrics.evidenceImageCount());
+
             AnalyticsReport report = analyticsReportService.createReport(reportDTO);
             redirectAttributes.addFlashAttribute("successMessage",
                     "Analytics Report #" + report.getReportId() + " created successfully!");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage",
                     "Failed to create report: " + e.getMessage());
+        }
+
+        return "redirect:/owner/dashboard";
+    }
+
+    @PostMapping("/report/delete/{id}")
+    public String deleteReport(@PathVariable("id") Integer reportId,
+                               HttpSession session,
+                               RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        try {
+            if (!analyticsReportRepository.existsById(reportId)) {
+                throw new RuntimeException("Report not found.");
+            }
+            analyticsReportRepository.deleteById(reportId);
+            redirectAttributes.addFlashAttribute("successMessage", "Analytics Report #" + reportId + " deleted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete report: " + e.getMessage());
         }
 
         return "redirect:/owner/dashboard";
@@ -571,79 +614,235 @@ public class OwnerController {
     // REST API Endpoints
     // ========================
 
-    /**
-     * Get total concern count for a given category
-     */
-    @GetMapping("/api/concerns/count")
+    @GetMapping("/api/report/metrics")
     @ResponseBody
-    public Map<String, Object> getConcernCountByCategory(@RequestParam("category") String category,
-                                                          HttpSession session) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Object> getReportMetrics(@RequestParam("adminId") Integer adminId,
+                                                @RequestParam(value = "category", required = false) String category,
+                                                HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
         if (!isOwnerLoggedIn(session)) {
             result.put("error", "Unauthorized");
             return result;
         }
-        long count = concernRepository.countByCategory(category);
-        result.put("count", count);
-        result.put("category", category);
+        if (adminId == null || !adminRepository.existsById(adminId)) {
+            result.put("error", "Please select a valid admin.");
+            return result;
+        }
+
+        ReportMetrics metrics = calculateReportMetrics(adminId, category);
+        result.put("adminId", adminId);
+        result.put("selectedCategory", metrics.selectedCategory());
+        result.put("topCategory", metrics.topCategory());
+        result.put("totalConcerns", metrics.totalConcerns());
+        result.put("avgHours", metrics.avgResolutionHours());
+        result.put("resolvedCount", metrics.resolvedConcerns());
+        result.put("sentimentScore", metrics.sentimentScore());
+        result.put("sentimentCount", metrics.sentimentCount());
+        result.put("evidenceImageCount", metrics.evidenceImageCount());
+        if (metrics.totalConcerns() == 0) {
+            result.put("message", "No concerns found for the selected admin and category.");
+        }
+        return result;
+    }
+
+    @GetMapping("/api/analytics/charts")
+    @ResponseBody
+    public Map<String, Object> getOwnerAnalyticsCharts(HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("error", "Unauthorized");
+            return result;
+        }
+
+        List<Concern> concerns = concernRepository.findAllByOrderByCreatedTimeDesc();
+
+        Map<String, Long> categoryDistribution = concerns.stream()
+                .map(Concern::getCategory)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.groupingBy(cat -> cat, Collectors.counting()));
+
+        List<Map.Entry<String, Long>> sortedCategoryEntries = categoryDistribution.entrySet().stream()
+                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
+                .collect(Collectors.toList());
+
+        List<String> categoryLabels = sortedCategoryEntries.stream()
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+        List<Long> categoryCounts = sortedCategoryEntries.stream()
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+
+        long resolvedCount = concerns.stream().filter(c -> isResolvedStatus(c.getStatus())).count();
+        long pendingCount = concerns.stream().filter(c -> isPendingStatus(c.getStatus())).count();
+        long rejectedCount = concerns.stream().filter(c -> isRejectedStatus(c.getStatus())).count();
+
+        result.put("categoryLabels", categoryLabels);
+        result.put("categoryCounts", categoryCounts);
+
+        Map<String, Long> statusDistribution = new LinkedHashMap<>();
+        statusDistribution.put("resolved", resolvedCount);
+        statusDistribution.put("pending", pendingCount);
+        statusDistribution.put("rejected", rejectedCount);
+        result.put("statusDistribution", statusDistribution);
+        result.put("totalConcerns", concerns.size());
+
+        return result;
+    }
+
+    @GetMapping("/api/reports/monthly")
+    @ResponseBody
+    public Map<String, Object> getMonthlyReportData(@RequestParam(value = "month", required = false) String month,
+                                                    @RequestParam(value = "category", required = false) String category,
+                                                    @RequestParam(value = "priority", required = false) String priority,
+                                                    HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("error", "Unauthorized");
+            return result;
+        }
+
+        YearMonth parsedMonth = YearMonth.now();
+        if (StringUtils.hasText(month)) {
+            try {
+                parsedMonth = YearMonth.parse(month.trim());
+            } catch (DateTimeParseException ignored) {
+                parsedMonth = YearMonth.now();
+            }
+        }
+        final YearMonth selectedMonth = parsedMonth;
+
+        String selectedCategory = normalizeReportCategory(category);
+        String selectedPriority = normalizePriorityFilter(priority);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        List<Concern> filteredConcerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                .filter(concern -> concern.getCreatedTime() != null)
+                .filter(concern -> YearMonth.from(concern.getCreatedTime()).equals(selectedMonth))
+                .filter(concern -> isAllCategories(selectedCategory)
+                        || selectedCategory.equalsIgnoreCase(defaultText(concern.getCategory(), ALL_CATEGORIES)))
+                .filter(concern -> isAllPriorities(selectedPriority)
+                        || selectedPriority.equalsIgnoreCase(defaultText(concern.getAiPriorityLevel(), "—")))
+                .sorted(Comparator.comparing(Concern::getCreatedTime).reversed())
+                .collect(Collectors.toList());
+
+        List<Map<String, Object>> rows = new ArrayList<>();
+        int rowNo = 1;
+        for (Concern concern : filteredConcerns) {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("rowNo", rowNo++);
+            row.put("concernId", concern.getConcernId());
+            row.put("category", defaultText(concern.getCategory(), "N/A"));
+            row.put("priority", defaultText(concern.getAiPriorityLevel(), "—"));
+            row.put("status", normalizeStatusLabel(concern.getStatus()));
+            row.put("date", concern.getCreatedTime().format(dateFormatter));
+            rows.add(row);
+        }
+
+        result.put("month", selectedMonth.toString());
+        result.put("selectedCategory", selectedCategory);
+        result.put("selectedPriority", selectedPriority);
+        result.put("count", rows.size());
+        result.put("rows", rows);
         return result;
     }
 
     /**
-     * Get average resolution time for a given category (in hours)
-     * Resolution time = AdminReply.replyTime - Concern.createdTime
+     * Backward-compatible count endpoint.
      */
-    @GetMapping("/api/resolution-time")
+    @GetMapping("/api/concerns/count")
     @ResponseBody
-    public Map<String, Object> getAvgResolutionTime(@RequestParam("category") String category,
-                                                     HttpSession session) {
-        Map<String, Object> result = new HashMap<>();
+    public Map<String, Object> getConcernCountByCategory(@RequestParam(value = "category", required = false) String category,
+                                                          @RequestParam(value = "adminId", required = false) Integer adminId,
+                                                          HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
         if (!isOwnerLoggedIn(session)) {
             result.put("error", "Unauthorized");
             return result;
         }
 
-        List<AdminReply> replies = adminReplyRepository.findByConcern_Category(category);
+        String normalizedCategory = normalizeReportCategory(category);
+        if (adminId != null) {
+            ReportMetrics metrics = calculateReportMetrics(adminId, normalizedCategory);
+            result.put("count", metrics.totalConcerns());
+            result.put("category", metrics.selectedCategory());
+            result.put("adminId", adminId);
+            return result;
+        }
 
-        if (replies.isEmpty()) {
-            result.put("avgHours", 0);
-            result.put("count", 0);
-            result.put("message", "No resolved concerns in this category");
-        } else {
-            // Group replies by concern, take the earliest reply per concern
-            Map<Integer, AdminReply> earliestReplyPerConcern = new LinkedHashMap<>();
-            for (AdminReply reply : replies) {
-                int cid = reply.getConcern().getConcernId();
-                if (!earliestReplyPerConcern.containsKey(cid) ||
-                    reply.getReplyTime().isBefore(earliestReplyPerConcern.get(cid).getReplyTime())) {
-                    earliestReplyPerConcern.put(cid, reply);
-                }
+        long count = isAllCategories(normalizedCategory)
+                ? concernRepository.count()
+                : concernRepository.countByCategory(normalizedCategory);
+        result.put("count", count);
+        result.put("category", normalizedCategory);
+        return result;
+    }
+
+    /**
+     * Backward-compatible avg-resolution endpoint.
+     */
+    @GetMapping("/api/resolution-time")
+    @ResponseBody
+    public Map<String, Object> getAvgResolutionTime(@RequestParam(value = "category", required = false) String category,
+                                                    @RequestParam(value = "adminId", required = false) Integer adminId,
+                                                    HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("error", "Unauthorized");
+            return result;
+        }
+
+        if (adminId != null) {
+            ReportMetrics metrics = calculateReportMetrics(adminId, category);
+            result.put("avgHours", metrics.avgResolutionHours());
+            result.put("count", metrics.resolvedConcerns());
+            result.put("category", metrics.selectedCategory());
+            result.put("adminId", adminId);
+            if (metrics.resolvedConcerns() == 0) {
+                result.put("message", "No resolved concerns found.");
             }
+            return result;
+        }
 
-            double totalHours = 0;
-            int validCount = 0;
-            for (AdminReply reply : earliestReplyPerConcern.values()) {
-                if (reply.getConcern().getCreatedTime() != null && reply.getReplyTime() != null) {
-                    long minutes = java.time.Duration.between(
-                            reply.getConcern().getCreatedTime(), reply.getReplyTime()).toMinutes();
-                    totalHours += minutes / 60.0;
-                    validCount++;
-                }
+        String normalizedCategory = normalizeReportCategory(category);
+        List<AdminReply> replies = isAllCategories(normalizedCategory)
+                ? adminReplyRepository.findAll()
+                : adminReplyRepository.findByConcern_Category(normalizedCategory);
+
+        Map<Integer, AdminReply> earliestReplyPerConcern = new LinkedHashMap<>();
+        for (AdminReply reply : replies) {
+            if (reply.getConcern() == null || reply.getConcern().getConcernId() == null || reply.getReplyTime() == null) {
+                continue;
             }
-
-            if (validCount > 0) {
-                double avg = totalHours / validCount;
-                BigDecimal avgRounded = BigDecimal.valueOf(avg).setScale(2, RoundingMode.HALF_UP);
-                result.put("avgHours", avgRounded);
-                result.put("count", validCount);
-            } else {
-                result.put("avgHours", 0);
-                result.put("count", 0);
-                result.put("message", "No timing data available");
+            int concernId = reply.getConcern().getConcernId();
+            if (!earliestReplyPerConcern.containsKey(concernId)
+                    || reply.getReplyTime().isBefore(earliestReplyPerConcern.get(concernId).getReplyTime())) {
+                earliestReplyPerConcern.put(concernId, reply);
             }
         }
 
-        result.put("category", category);
+        double totalHours = 0;
+        int validCount = 0;
+        for (AdminReply reply : earliestReplyPerConcern.values()) {
+            if (reply.getConcern().getCreatedTime() == null) {
+                continue;
+            }
+            long minutes = Duration.between(reply.getConcern().getCreatedTime(), reply.getReplyTime()).toMinutes();
+            if (minutes < 0) {
+                continue;
+            }
+            totalHours += minutes / 60.0;
+            validCount++;
+        }
+
+        BigDecimal avg = validCount > 0
+                ? BigDecimal.valueOf(totalHours / validCount).setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+        result.put("avgHours", avg);
+        result.put("count", validCount);
+        result.put("category", normalizedCategory);
+        if (validCount == 0) {
+            result.put("message", "No resolved concerns in this selection");
+        }
         return result;
     }
 
@@ -656,7 +855,9 @@ public class OwnerController {
         if (!isOwnerLoggedIn(session)) {
             return Collections.emptyList();
         }
-        List<Admin> admins = adminRepository.findAll();
+        List<Admin> admins = adminRepository.findAll().stream()
+                .sorted(Comparator.comparing(Admin::getUserId))
+                .collect(Collectors.toList());
         return admins.stream().map(admin -> {
             Map<String, Object> map = new LinkedHashMap<>();
             map.put("userId", admin.getUserId());
@@ -675,25 +876,17 @@ public class OwnerController {
     @ResponseBody
     public Map<String, Object> getSentimentForAdmin(@RequestParam("adminId") Integer adminId,
                                                      HttpSession session) {
-        Map<String, Object> result = new HashMap<>();
+        Map<String, Object> result = new LinkedHashMap<>();
         if (!isOwnerLoggedIn(session)) {
             result.put("error", "Unauthorized");
             return result;
         }
 
-        List<Feedback> feedbacks = feedbackRepository.findByRatedAdminUserId(adminId);
-        if (feedbacks.isEmpty()) {
-            result.put("score", 0);
-            result.put("count", 0);
+        ReportMetrics metrics = calculateReportMetrics(adminId, ALL_CATEGORIES);
+        result.put("score", metrics.sentimentScore());
+        result.put("count", metrics.sentimentCount());
+        if (metrics.sentimentCount() == 0) {
             result.put("message", "No feedback received for this admin");
-        } else {
-            double avg = feedbacks.stream()
-                    .mapToInt(Feedback::getRating)
-                    .average()
-                    .orElse(0.0);
-            BigDecimal score = BigDecimal.valueOf(avg).setScale(2, RoundingMode.HALF_UP);
-            result.put("score", score);
-            result.put("count", feedbacks.size());
         }
         result.put("adminId", adminId);
         return result;
@@ -728,6 +921,7 @@ public class OwnerController {
         result.put("avgResolutionTime", report.getAvgResolutionTime());
         result.put("sentimentTrendScore", report.getSentimentTrendScore());
         result.put("mostFrequentCategory", report.getMostFrequentCategory());
+        result.put("evidenceImageCount", report.getEvidenceImageCount());
         return result;
     }
 
@@ -755,55 +949,180 @@ public class OwnerController {
     }
 
     /**
-     * Recalculate a report's totalConcerns, avgResolutionTime, and sentimentTrendScore
-     * from live data based on its category and adminIdFk.
+     * Recalculate a report's metrics from live data based on its category selection and admin.
      */
     private void recalculateReport(AnalyticsReport report) {
-        String category = report.getMostFrequentCategory();
-
-        // 1. Total Concerns
-        if (category != null) {
-            long count = concernRepository.countByCategory(category);
-            report.setTotalConcerns((int) count);
+        if (report.getAdminIdFk() == null) {
+            report.setTotalConcerns(0);
+            report.setAvgResolutionTime(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+            report.setSentimentTrendScore(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
+            report.setEvidenceImageCount(0);
+            report.setTimePeriod(ALL_TIME);
+            if (!StringUtils.hasText(report.getMostFrequentCategory())) {
+                report.setMostFrequentCategory(ALL_CATEGORIES);
+            }
+            return;
         }
 
-        // 2. Avg Resolution Time
-        if (category != null) {
-            List<AdminReply> replies = adminReplyRepository.findByConcern_Category(category);
-            Map<Integer, AdminReply> earliest = new LinkedHashMap<>();
-            for (AdminReply reply : replies) {
-                int cid = reply.getConcern().getConcernId();
-                if (!earliest.containsKey(cid) ||
-                    reply.getReplyTime().isBefore(earliest.get(cid).getReplyTime())) {
-                    earliest.put(cid, reply);
-                }
-            }
-            double totalHours = 0;
-            int validCount = 0;
-            for (AdminReply reply : earliest.values()) {
-                if (reply.getConcern().getCreatedTime() != null && reply.getReplyTime() != null) {
-                    long minutes = java.time.Duration.between(
-                            reply.getConcern().getCreatedTime(), reply.getReplyTime()).toMinutes();
-                    totalHours += minutes / 60.0;
-                    validCount++;
-                }
-            }
-            if (validCount > 0) {
-                report.setAvgResolutionTime(
-                        BigDecimal.valueOf(totalHours / validCount).setScale(2, RoundingMode.HALF_UP));
-            }
-        }
+        String selectedCategory = normalizeReportCategory(report.getMostFrequentCategory());
+        ReportMetrics metrics = calculateReportMetrics(report.getAdminIdFk(), selectedCategory);
 
-        // 3. Sentiment Score
-        if (report.getAdminIdFk() != null) {
-            List<Feedback> feedbacks = feedbackRepository.findByRatedAdminUserId(report.getAdminIdFk());
-            if (!feedbacks.isEmpty()) {
-                double avg = feedbacks.stream().mapToInt(Feedback::getRating).average().orElse(0.0);
-                report.setSentimentTrendScore(
-                        BigDecimal.valueOf(avg).setScale(2, RoundingMode.HALF_UP));
-            }
-        }
+        report.setTimePeriod(ALL_TIME);
+        report.setMostFrequentCategory(selectedCategory);
+        report.setTotalConcerns(metrics.totalConcerns());
+        report.setAvgResolutionTime(metrics.avgResolutionHours());
+        report.setSentimentTrendScore(metrics.sentimentScore());
+        report.setEvidenceImageCount(metrics.evidenceImageCount());
     }
+
+    private ReportMetrics calculateReportMetrics(Integer adminId, String category) {
+        String selectedCategory = normalizeReportCategory(category);
+        boolean allCategoriesSelected = isAllCategories(selectedCategory);
+
+        List<Concern> concerns = allCategoriesSelected
+                ? concernRepository.findByAdmin_UserId(adminId)
+                : concernRepository.findByAdmin_UserIdAndCategory(adminId, selectedCategory);
+
+        int totalConcerns = concerns.size();
+        int evidenceImageCount = (int) concerns.stream()
+                .filter(concern -> StringUtils.hasText(concern.getEvidencePath()))
+                .count();
+
+        String topCategory = concerns.stream()
+                .map(Concern::getCategory)
+                .filter(StringUtils::hasText)
+                .collect(Collectors.groupingBy(cat -> cat, Collectors.counting()))
+                .entrySet()
+                .stream()
+                .max(Map.Entry.<String, Long>comparingByValue().thenComparing(Map.Entry.comparingByKey()))
+                .map(Map.Entry::getKey)
+                .orElse("N/A");
+
+        List<AdminReply> replies = allCategoriesSelected
+                ? adminReplyRepository.findByAdmin_UserId(adminId)
+                : adminReplyRepository.findByAdmin_UserIdAndConcern_Category(adminId, selectedCategory);
+
+        Map<Integer, AdminReply> earliestReplyPerConcern = new LinkedHashMap<>();
+        for (AdminReply reply : replies) {
+            if (reply.getConcern() == null || reply.getConcern().getConcernId() == null || reply.getReplyTime() == null) {
+                continue;
+            }
+            Integer concernId = reply.getConcern().getConcernId();
+            if (!earliestReplyPerConcern.containsKey(concernId)
+                    || reply.getReplyTime().isBefore(earliestReplyPerConcern.get(concernId).getReplyTime())) {
+                earliestReplyPerConcern.put(concernId, reply);
+            }
+        }
+
+        double totalResolutionHours = 0;
+        int resolvedConcerns = 0;
+        for (AdminReply earliestReply : earliestReplyPerConcern.values()) {
+            LocalDateTime createdTime = earliestReply.getConcern().getCreatedTime();
+            LocalDateTime replyTime = earliestReply.getReplyTime();
+            if (createdTime == null || replyTime == null || replyTime.isBefore(createdTime)) {
+                continue;
+            }
+            long minutes = Duration.between(createdTime, replyTime).toMinutes();
+            totalResolutionHours += minutes / 60.0;
+            resolvedConcerns++;
+        }
+
+        BigDecimal avgResolutionHours = resolvedConcerns > 0
+                ? BigDecimal.valueOf(totalResolutionHours / resolvedConcerns).setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+
+        List<Feedback> feedbacks = feedbackRepository.findByRatedAdminUserId(adminId);
+        int sentimentCount = feedbacks.size();
+        BigDecimal sentimentScore = sentimentCount > 0
+                ? BigDecimal.valueOf(feedbacks.stream().mapToInt(Feedback::getRating).average().orElse(0.0))
+                        .setScale(2, RoundingMode.HALF_UP)
+                : BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
+
+        return new ReportMetrics(
+                totalConcerns,
+                avgResolutionHours,
+                resolvedConcerns,
+                sentimentScore,
+                sentimentCount,
+                evidenceImageCount,
+                selectedCategory,
+                topCategory
+        );
+    }
+
+    private String normalizeReportCategory(String category) {
+        if (!StringUtils.hasText(category)) {
+            return ALL_CATEGORIES;
+        }
+        return category.trim();
+    }
+
+    private String normalizePriorityFilter(String priority) {
+        if (!StringUtils.hasText(priority)) {
+            return ALL_PRIORITIES;
+        }
+        return priority.trim();
+    }
+
+    private boolean isAllCategories(String category) {
+        return !StringUtils.hasText(category) || ALL_CATEGORIES.equalsIgnoreCase(category.trim());
+    }
+
+    private boolean isAllPriorities(String priority) {
+        return !StringUtils.hasText(priority) || ALL_PRIORITIES.equalsIgnoreCase(priority.trim());
+    }
+
+    private boolean isResolvedStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return false;
+        }
+        String normalized = status.trim();
+        return "Complete".equalsIgnoreCase(normalized) || "Resolved".equalsIgnoreCase(normalized);
+    }
+
+    private boolean isPendingStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return true;
+        }
+        String normalized = status.trim();
+        return "Pending".equalsIgnoreCase(normalized) || "In Progress".equalsIgnoreCase(normalized);
+    }
+
+    private boolean isRejectedStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return false;
+        }
+        String normalized = status.trim();
+        return "Rejected".equalsIgnoreCase(normalized) || "Deleted".equalsIgnoreCase(normalized);
+    }
+
+    private String normalizeStatusLabel(String status) {
+        if (isResolvedStatus(status)) {
+            return "Resolved";
+        }
+        if (isRejectedStatus(status)) {
+            return "Rejected";
+        }
+        if (isPendingStatus(status)) {
+            return "Pending";
+        }
+        return defaultText(status, "Pending");
+    }
+
+    private String defaultText(String value, String fallback) {
+        return StringUtils.hasText(value) ? value.trim() : fallback;
+    }
+
+    private record ReportMetrics(
+            int totalConcerns,
+            BigDecimal avgResolutionHours,
+            int resolvedConcerns,
+            BigDecimal sentimentScore,
+            int sentimentCount,
+            int evidenceImageCount,
+            String selectedCategory,
+            String topCategory
+    ) {}
 
     // ========================
     // Broadcast Notifications
