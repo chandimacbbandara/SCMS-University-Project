@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/StudentConcernManagementSystemApplication.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/config/useerconfig.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/controller/AdminController.java
@@ -23,6 +22,7 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/AdminReply.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/AnalyticsReport.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Concern.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Faq.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Feedback.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Notification.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Student.java
@@ -30,11 +30,13 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/StudentCommunityPost.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/StudentCommunityReply.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/StudentCommunityRulesAcceptance.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/Tip.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/entity/User.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/AdminReplyRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/AdminRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/AnalyticsReportRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/ConcernRepository.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/FaqRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/FeedbackRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/NotificationRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/StudentCommunityModerationLogRepository.java
@@ -42,23 +44,16 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/StudentCommunityReplyRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/StudentCommunityRulesAcceptanceRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/StudentRepository.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/TipRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/repository/UserRepository.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/AdminService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/AnalyticsReportService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/CommunityModerationService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/ConcernService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/EmailVerificationService.java
+/home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/FaqManagementService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/FeedbackModerationService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/FeedbackService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/NotificationService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentCommunityService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentRegistrationService.java
-=======
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/StudentConcernManagementSystemApplication.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/config/userconfig.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/controller/usercontroller.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/dto/userdto.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/entity/user.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/repository/userrepository.java
-/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/service/userservice.java
->>>>>>> Stashed changes

@@ -128,6 +128,11 @@ from Notification
 SELECT *
 FROM Analytics_Report
 
+select *  
+FROM faqs
+
+select *
+from tips
 
 
 /* =============================

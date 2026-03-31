@@ -15,5 +15,6 @@ public class AnalyticsReportDTO {
     private BigDecimal avgResolutionTime;
     private String mostFrequentCategory;
     private BigDecimal sentimentTrendScore;
+    private Integer evidenceImageCount;
     private Integer adminIdFk;
 }

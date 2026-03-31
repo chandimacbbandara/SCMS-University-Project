@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Tip - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/owner-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #e53935;
@@ -22,10 +23,64 @@
             --radius-lg: 24px;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg-body); font-family: 'Inter', sans-serif; color: var(--text-dark); }
-        .owner-container { max-width: 600px; margin: 50px auto; padding: 0 24px; }
+        body { background: var(--bg-body); font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-dark); }
+        .owner-container { max-width: 760px; margin: 32px auto; padding: 0 24px; }
+
+        .page-hero {
+            border-radius: var(--radius-lg);
+            padding: 30px 32px;
+            margin-bottom: 18px;
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+            padding: 8px 14px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .hero-title { font-size: 28px; font-weight: 900; margin-bottom: 8px; }
+        .hero-sub { font-size: 13px; color: rgba(255,255,255,0.8); }
+
+        .hero-side {
+            min-width: 170px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.22);
+            background: rgba(255,255,255,0.08);
+            padding: 10px 12px;
+            display: grid;
+            gap: 3px;
+        }
+
+        .hero-side span {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.9px;
+            color: rgba(255,255,255,0.68);
+            font-weight: 700;
+        }
+
+        .hero-side strong {
+            font-size: 14px;
+            color: #fff;
+            font-weight: 800;
+        }
         
-        .update-card { background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: var(--card-shadow); border: 1px solid var(--border); overflow: hidden; }
+        .update-card { background: var(--bg-white); border-radius: var(--radius-lg); box-shadow: 0 16px 30px rgba(15,23,42,0.08); border: 1px solid #dce5ef; overflow: hidden; }
         .card-header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); padding: 22px 28px; display: flex; align-items: center; gap: 14px; color: #fff; }
         .card-header-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 18px; color: #fff; }
         .card-header-text h2 { font-size: 16px; font-weight: 800; }
@@ -33,7 +88,7 @@
         .card-body { padding: 28px; }
         .form-group { margin-bottom: 18px; }
         .form-label { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--text-mid); margin-bottom: 7px; }
-        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #eee; border-radius: 12px; font-size: 13px; font-family: 'Inter', sans-serif; outline: none; transition: 0.3s; }
+        .form-control { width: 100%; padding: 12px 16px; border: 2px solid #e3e8f0; border-radius: 12px; font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; outline: none; transition: 0.3s; background: #fbfcff; }
         .form-control:focus { border-color: #10b981; }
         textarea.form-control { resize: vertical; min-height: 100px; }
         
@@ -41,10 +96,58 @@
         .btn-update:hover { transform: translateY(-2px); }
         .btn-cancel { display: block; text-align: center; margin-top: 16px; color: var(--text-mid); text-decoration: none; font-size: 13px; font-weight: 600; }
         .btn-cancel:hover { color: var(--text-dark); }
+
+        @media (max-width: 768px) {
+            .page-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .hero-side {
+                width: 100%;
+                min-width: 0;
+            }
+        }
     </style>
 </head>
-<body>
-    <div class="owner-container">
+<body class="owner-theme">
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                    <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
+                    <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
+                    <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
+                    <li><a href="/owner/faq" class="nav-link active">FAQ & Tips</a></li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="owner-container narrow">
+            <div class="page-hero">
+                <div>
+                    <a href="/owner/faq" class="btn-back"><i class="fas fa-arrow-left"></i> Back to FAQ Center</a>
+                    <h1 class="hero-title">Update Tip Details</h1>
+                    <p class="hero-sub">Improve tip clarity so students can submit concerns faster and with better quality.</p>
+                </div>
+                <div class="hero-side">
+                    <span>Content Type</span>
+                    <strong>Student Guidance Tip</strong>
+                </div>
+            </div>
+
         <div class="update-card">
             <div class="card-header">
                 <div class="card-header-icon"><i class="fas fa-edit"></i></div>
@@ -56,15 +159,15 @@
                 <form th:action="@{/owner/faq/tip/update/{id}(id=${tip.tipId})}" method="post">
                     <div class="form-group">
                         <label class="form-label">Tip Title</label>
-                        <input type="text" name="title" class="form-control" th:value="${tip.title}" required maxlength="100">
+                        <input type="text" name="title" class="form-control" th:value="${tip.title}" required maxlength="100" title="Tip title" placeholder="Enter tip title">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Description</label>
-                        <textarea name="description" class="form-control" required maxlength="400" th:text="${tip.description}"></textarea>
+                        <textarea name="description" class="form-control" required maxlength="400" th:text="${tip.description}" title="Tip description" placeholder="Enter tip description"></textarea>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Select Icon</label>
-                        <select name="iconClass" class="form-control" required>
+                        <select name="iconClass" class="form-control" required title="Select tip icon">
                             <option value="fa-check-circle" th:selected="${tip.iconClass == 'fa-check-circle'}">Check Circle</option>
                             <option value="fa-paperclip" th:selected="${tip.iconClass == 'fa-paperclip'}">Paperclip (Attachment)</option>
                             <option value="fa-comments" th:selected="${tip.iconClass == 'fa-comments'}">Comments</option>
@@ -77,6 +180,7 @@
                 </form>
             </div>
         </div>
-    </div>
+        </div>
+    </main>
 </body>
 </html>

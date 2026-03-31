@@ -6,684 +6,1058 @@
     <title>Owner Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
-            --primary: #e53935;
-            --primary-dark: #c62828;
-            --primary-deeper: #b71c1c;
-            --primary-light: #ff6f60;
-            --primary-bg: rgba(229, 57, 53, 0.08);
-            --accent-green: #16a34a;
-            --accent-blue: #2563eb;
-            --accent-orange: #f97316;
-            --accent-purple: #7c3aed;
-            --accent-teal: #0d9488;
-            --bg-body: #f0f2f5;
-            --bg-white: #ffffff;
-            --card-shadow: 0 2px 16px rgba(0,0,0,0.06);
-            --card-shadow-hover: 0 12px 40px rgba(0,0,0,0.12);
-            --text-dark: #1a1a2e;
-            --text-mid: #555;
-            --text-light: #888;
-            --border: #e8e8e8;
-            --radius-sm: 12px;
-            --radius-md: 18px;
-            --radius-lg: 24px;
+            --owner-primary: #c53030;
+            --owner-primary-dark: #9b2c2c;
+            --owner-secondary: #1f2937;
+            --owner-sky: #0284c7;
+            --owner-green: #15803d;
+            --owner-orange: #c2410c;
+            --owner-bg: #eef2f7;
+            --owner-surface: #ffffff;
+            --owner-surface-soft: #f8fafc;
+            --owner-border: #dde5ef;
+            --owner-text: #0f172a;
+            --owner-muted: #64748b;
+            --owner-shadow: 0 12px 38px rgba(15, 23, 42, 0.08);
+            --owner-radius-lg: 26px;
+            --owner-radius-md: 16px;
+            --owner-radius-sm: 12px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background: var(--bg-body);
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
-            color: var(--text-dark);
+            margin: 0;
             min-height: 100vh;
+            color: var(--owner-text);
+            font-family: "Plus Jakarta Sans", sans-serif;
+            background:
+                radial-gradient(circle at 8% 8%, rgba(197, 48, 48, 0.12), transparent 32%),
+                radial-gradient(circle at 95% 92%, rgba(2, 132, 199, 0.09), transparent 30%),
+                linear-gradient(180deg, #f6f9fc 0%, #e9eef5 100%);
         }
 
-        /* ===== Scrollbar ===== */
-        ::-webkit-scrollbar { width: 7px; }
-        ::-webkit-scrollbar-track { background: #f0f0f0; }
-        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: "Sora", sans-serif;
+            margin: 0;
+        }
 
-        /* ===== Animations ===== */
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes float {
-            0%,100% { transform: translateY(0); }
-            50%     { transform: translateY(-8px); }
-        }
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        @keyframes pulseRing {
-            0%   { box-shadow: 0 0 0 0 rgba(229,57,53,0.35); }
-            70%  { box-shadow: 0 0 0 10px rgba(229,57,53,0); }
-            100% { box-shadow: 0 0 0 0 rgba(229,57,53,0); }
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes bounceIn {
-            0%   { transform: scale(0.3); opacity: 0; }
-            50%  { transform: scale(1.05); }
-            70%  { transform: scale(0.9); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes shimmer {
-            0%   { background-position: -200% 0; }
-            100% { background-position: 200% 0; }
-        }
-        @keyframes countUp {
-            from { opacity: 0; transform: translateY(12px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-        .animate-in  { animation: fadeSlideUp 0.7s cubic-bezier(.22,1,.36,1) both; }
-        .delay-1 { animation-delay: .1s; }
-        .delay-2 { animation-delay: .18s; }
-        .delay-3 { animation-delay: .26s; }
-        .delay-4 { animation-delay: .34s; }
-
-        /* ===== Page Layout ===== */
-        .owner-container {
-            max-width: 1100px;
-            margin: 32px auto;
+        .owner-shell {
+            max-width: 1250px;
+            margin: 30px auto 46px;
             padding: 0 24px;
         }
 
-        /* ===== Page Hero ===== */
-        .page-hero {
-            background: linear-gradient(135deg, #1e293b 0%, #0f172a 40%, #020617 100%);
-            background-size: 200% 200%;
-            animation: gradientShift 8s ease infinite;
-            border-radius: var(--radius-lg);
-            padding: 40px 42px;
-            margin-bottom: 28px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 16px 50px rgba(15,23,42,0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .page-hero .hero-pattern {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M20 20h20v20H20z'/%3E%3Cpath d='M0 0h20v20H0z'/%3E%3C/g%3E%3C/svg%3E");
-            pointer-events: none;
-        }
-        .page-hero::before {
-            content: '';
-            position: absolute;
-            top: -80px; right: -80px;
-            width: 280px; height: 280px;
-            background: radial-gradient(circle, rgba(229,57,53,0.15) 0%, transparent 65%);
-            border-radius: 50%;
-            animation: float 6s ease-in-out infinite;
-        }
-        .hero-left { position: relative; z-index: 1; }
-        .hero-eyebrow {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(229,57,53,0.2);
-            -webkit-backdrop-filter: blur(8px);
-            backdrop-filter: blur(8px);
-            padding: 5px 16px;
-            border-radius: 100px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: #ff6f60;
+        .flash-stack {
+            display: grid;
+            gap: 10px;
             margin-bottom: 14px;
         }
-        .hero-eyebrow .eyebrow-dot {
-            width: 6px; height: 6px;
-            background: #ff6f60;
-            border-radius: 50%;
-            animation: pulseRing 2s infinite;
-        }
-        .hero-title {
-            font-size: 32px;
-            font-weight: 900;
-            color: #fff;
-            margin-bottom: 10px;
-            letter-spacing: -0.5px;
-        }
-        .hero-sub {
+
+        .flash-item {
+            border-radius: var(--owner-radius-sm);
+            padding: 13px 16px;
             font-size: 13px;
-            color: rgba(255,255,255,0.6);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .hero-right {
-            position: relative; z-index: 1;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        .hero-icon-wrap {
-            width: 88px; height: 88px;
-            border-radius: 50%;
-            background: rgba(229,57,53,0.15);
-            border: 3px solid rgba(229,57,53,0.3);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 36px; color: #ff6f60;
-            animation: float 4s ease-in-out infinite;
-        }
-        .hero-icon-wrap::after {
-            content: '';
-            position: absolute;
-            inset: -5px;
-            border-radius: 50%;
-            border: 2px dashed rgba(255,255,255,0.1);
-            animation: spin 15s linear infinite;
-        }
-
-        /* ===== Stats Bar ===== */
-        .stats-bar {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .stat-pill {
-            background: var(--bg-white);
-            border-radius: var(--radius-md);
-            padding: 20px;
-            display: flex; align-items: center; gap: 14px;
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border);
-            transition: all 0.35s cubic-bezier(.22,1,.36,1);
-            cursor: default;
-            position: relative;
-            overflow: hidden;
-        }
-        .stat-pill::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 4px; height: 100%;
-            border-radius: 4px 0 0 4px;
-        }
-        .stat-pill:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--card-shadow-hover);
-        }
-        .stat-pill.total::before   { background: linear-gradient(180deg, var(--accent-purple), #a78bfa); }
-        .stat-pill.created::before  { background: linear-gradient(180deg, var(--accent-green), #4ade80); }
-        .stat-pill.avg::before      { background: linear-gradient(180deg, var(--accent-blue), #60a5fa); }
-        .stat-pill-icon {
-            width: 48px; height: 48px; border-radius: var(--radius-sm);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; flex-shrink: 0;
-        }
-        .stat-pill.total   .stat-pill-icon { background: #ede9fe; color: var(--accent-purple); }
-        .stat-pill.created .stat-pill-icon { background: #f0fdf4; color: var(--accent-green); }
-        .stat-pill.avg     .stat-pill-icon { background: #eff6ff; color: var(--accent-blue); }
-        .stat-pill-info .stat-pill-label {
-            font-size: 10px; font-weight: 700; letter-spacing: 1px;
-            text-transform: uppercase; color: var(--text-light);
-        }
-        .stat-pill-info .stat-pill-val {
-            font-size: 24px; font-weight: 900; color: var(--text-dark);
-            animation: countUp 0.6s ease both;
-        }
-        .stat-pill-info .stat-pill-val.period-size { font-size: 16px; }
-
-        /* ===== Alert Toasts ===== */
-        .alert-toast {
-            padding: 16px 22px; border-radius: var(--radius-sm);
-            margin-bottom: 18px; font-weight: 700; font-size: 13px;
-            display: flex; align-items: center; gap: 12px;
-            animation: bounceIn 0.5s cubic-bezier(.22,1,.36,1) both;
-        }
-        .alert-toast.success {
-            background: linear-gradient(135deg, rgba(240,253,244,0.95), rgba(220,252,231,0.95));
-            color: #15803d; border: 1px solid #bbf7d0;
-        }
-        .alert-toast.error {
-            background: linear-gradient(135deg, rgba(254,242,242,0.95), rgba(254,226,226,0.95));
-            color: #dc2626; border: 1px solid #fecaca;
-        }
-
-        /* ===== Two Column Layout ===== */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 24px;
-            align-items: start;
-        }
-
-        /* ===== Create Report Card ===== */
-        .create-card {
-            background: var(--bg-white);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        .create-card-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            padding: 22px 28px;
-            display: flex; align-items: center; gap: 14px;
-            position: relative;
-            overflow: hidden;
-        }
-        .create-card-header::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            animation: shimmer 4s infinite;
-        }
-        .create-card-header-icon {
-            width: 44px; height: 44px;
-            border-radius: var(--radius-sm);
-            background: rgba(255,255,255,0.15);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #fff;
-        }
-        .create-card-header-text h2 {
-            font-size: 16px; font-weight: 800; color: #fff;
-        }
-        .create-card-header-text p {
-            font-size: 11px; color: rgba(255,255,255,0.7); margin-top: 2px;
-        }
-        .create-card-body {
-            padding: 28px;
-        }
-
-        /* ===== Form Styles ===== */
-        .form-group {
-            margin-bottom: 18px;
-        }
-        .form-label {
-            display: block;
-            font-size: 11px; font-weight: 800;
-            text-transform: uppercase; letter-spacing: 1px;
-            color: var(--text-mid);
-            margin-bottom: 7px;
-        }
-        .form-label i {
-            margin-right: 5px;
-            color: var(--primary);
-        }
-        .form-control {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #eee;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-family: 'Inter', sans-serif;
-            color: var(--text-dark);
-            background: #fafafa;
-            transition: all 0.3s;
-            outline: none;
-        }
-        .form-control.readonly-field {
-            background: #f0f0f0;
-            cursor: not-allowed;
-        }
-        .form-control:focus {
-            border-color: var(--primary);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(229,57,53,0.08);
-        }
-        .form-control::placeholder { color: #bbb; }
-        select.form-control {
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 14px center;
-            padding-right: 36px;
-        }
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-        }
-        .form-hint {
-            font-size: 10px; color: #aaa; margin-top: 4px;
-            display: flex; align-items: center; gap: 4px;
-        }
-
-        .btn-create {
-            display: inline-flex; align-items: center; gap: 8px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: #fff; border: none;
-            padding: 14px 32px; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(.22,1,.36,1);
-            box-shadow: 0 6px 24px rgba(229,57,53,0.3);
-            width: 100%;
-            justify-content: center;
-            margin-top: 6px;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-create::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 100%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s;
-        }
-        .btn-create:hover::before { left: 100%; }
-        .btn-create:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 36px rgba(229,57,53,0.4);
-        }
-        .create-admin-link {
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ===== Reports List Card ===== */
-        .reports-card {
-            background: var(--bg-white);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--card-shadow);
-            border: 1px solid var(--border);
-            overflow: hidden;
-        }
-        .reports-card-header {
-            background: linear-gradient(135deg, #1e293b, #334155);
-            padding: 22px 28px;
-            display: flex; align-items: center; gap: 14px;
-            position: relative;
-            overflow: hidden;
-        }
-        .reports-card-header::after {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%;
-            width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
-            animation: shimmer 4s infinite;
-        }
-        .reports-card-header-icon {
-            width: 44px; height: 44px;
-            border-radius: var(--radius-sm);
-            background: rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 18px; color: #94a3b8;
-        }
-        .reports-card-header-text h2 {
-            font-size: 16px; font-weight: 800; color: #fff;
-        }
-        .reports-card-header-text p {
-            font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px;
-        }
-        .reports-card-body {
-            padding: 20px 24px;
-            max-height: 600px;
-            overflow-y: auto;
-        }
-
-        /* ===== Report Row ===== */
-        .report-item {
-            background: #fafbfc;
-            border: 1px solid #f0f0f0;
-            border-radius: var(--radius-sm);
-            padding: 16px 20px;
-            margin-bottom: 12px;
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-        }
-        .report-item::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 4px; height: 100%;
-            background: linear-gradient(180deg, var(--accent-purple), var(--accent-blue));
-            border-radius: 4px 0 0 4px;
-        }
-        .report-item:hover {
-            border-color: #ddd;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-            transform: translateX(4px);
-        }
-        .report-item-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
-        }
-        .report-id {
-            font-size: 11px; font-weight: 800;
-            color: var(--accent-purple);
-            background: #ede9fe;
-            padding: 3px 12px;
-            border-radius: 6px;
-            letter-spacing: 0.5px;
-        }
-        .report-time {
-            font-size: 11px; color: #999;
-            display: flex; align-items: center; gap: 5px;
-        }
-        .report-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .report-field {
-            display: flex; flex-direction: column; gap: 2px;
-        }
-        .report-field-label {
-            font-size: 9px; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 0.8px;
-            color: #aaa;
-        }
-        .report-field-value {
-            font-size: 13px; font-weight: 700; color: var(--text-dark);
-        }
-        .report-field-value.highlight {
-            color: var(--accent-blue);
-        }
-
-        /* ===== Empty State ===== */
-        .empty-reports {
-            text-align: center;
-            padding: 50px 20px;
-        }
-        .empty-reports-icon {
-            width: 70px; height: 70px; border-radius: 50%;
-            background: #f5f5f5;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; color: #ccc;
-            margin: 0 auto 16px;
-        }
-        .empty-reports h4 {
-            font-size: 15px; font-weight: 800; color: var(--text-dark);
-            margin-bottom: 6px;
-        }
-        .empty-reports p {
-            font-size: 12px; color: var(--text-light); line-height: 1.6;
-        }
-
-        /* ===== Auto-fill badge ===== */
-        .auto-fill-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-weight: 800;
-            transition: all 0.4s cubic-bezier(.22,1,.36,1);
-        }
-        .auto-fill-badge.loading {
-            background: #f5f5f5;
-            color: #aaa;
-        }
-        .auto-fill-badge.loaded {
-            background: linear-gradient(135deg, #eff6ff, #dbeafe);
-            color: var(--accent-blue);
-            border: 1px solid #bfdbfe;
-        }
-        .auto-fill-badge .badge-icon {
-            width: 28px; height: 28px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px;
-        }
-        .auto-fill-badge.loaded .badge-icon {
-            background: var(--accent-blue);
-            color: #fff;
-        }
-        .auto-fill-badge .badge-number {
-            font-size: 22px;
-            letter-spacing: -0.5px;
-        }
-        .auto-fill-badge .badge-label {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--text-light);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .auto-fill-info {
-            margin-top: 6px;
-            font-size: 10px;
-            color: #aaa;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .auto-fill-info.has-data {
-            color: var(--accent-green);
-        }
-
-        /* Sentiment display */
-        .sentiment-display {
+            font-weight: 700;
             display: flex;
             align-items: center;
             gap: 10px;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            transition: all 0.4s;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
         }
-        .sentiment-display.positive {
+
+        .flash-item.success {
             background: linear-gradient(135deg, #f0fdf4, #dcfce7);
             border: 1px solid #bbf7d0;
+            color: #166534;
         }
-        .sentiment-display.neutral {
-            background: #f5f5f5;
-            border: 1px solid #e8e8e8;
-        }
-        .sentiment-display.low {
-            background: linear-gradient(135deg, #fef2f2, #fecaca);
-            border: 1px solid #fecaca;
-        }
-        .sentiment-score-val {
-            font-size: 26px;
-            font-weight: 900;
-            letter-spacing: -0.5px;
-        }
-        .sentiment-display.positive .sentiment-score-val { color: var(--accent-green); }
-        .sentiment-display.neutral .sentiment-score-val { color: #aaa; }
-        .sentiment-display.low .sentiment-score-val { color: #dc2626; }
-        .sentiment-meta {
-            display: flex;
-            flex-direction: column;
-            gap: 1px;
-        }
-        .sentiment-meta .meta-label {
-            font-size: 9px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
-            color: #aaa;
-        }
-        .sentiment-meta .meta-info {
-            font-size: 11px;
-            color: var(--text-mid);
-        }
-        .sentiment-stars {
-            display: flex; gap: 2px;
-        }
-        .sentiment-stars i {
-            font-size: 14px;
-        }
-        .sentiment-stars i.filled { color: #facc15; }
-        .sentiment-stars i.empty { color: #e0e0e0; }
 
-        /* Admin select styling */
-        .admin-select-wrapper {
+        .flash-item.error {
+            background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+            border: 1px solid #fecdd3;
+            color: #be123c;
+        }
+
+        .owner-hero {
             position: relative;
+            border-radius: var(--owner-radius-lg);
+            padding: 28px 30px;
+            display: grid;
+            grid-template-columns: 1.35fr .8fr;
+            gap: 16px;
+            color: #ffffff;
+            background:
+                linear-gradient(130deg, #0f172a 0%, #1e293b 56%, #7f1d1d 100%);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
+            overflow: hidden;
+            margin-bottom: 18px;
         }
 
-        /* ===== Refresh Buttons ===== */
-        .btn-refresh-all {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(255,255,255,0.12);
-            border: 1px solid rgba(255,255,255,0.2);
-            color: #94a3b8;
-            padding: 6px 14px; border-radius: 8px;
-            font-size: 11px; font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-left: auto;
+        .owner-hero::before,
+        .owner-hero::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
         }
-        .btn-refresh-all:hover {
-            background: rgba(255,255,255,0.2);
+
+        .owner-hero::before {
+            width: 240px;
+            height: 240px;
+            right: -90px;
+            top: -80px;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.25), transparent 65%);
+        }
+
+        .owner-hero::after {
+            width: 250px;
+            height: 250px;
+            left: -95px;
+            bottom: -155px;
+            background: radial-gradient(circle, rgba(2, 132, 199, 0.28), transparent 68%);
+        }
+
+        .hero-left,
+        .hero-right {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .hero-title {
+            font-size: 30px;
+            line-height: 1.2;
+            margin-bottom: 9px;
+        }
+
+        .hero-sub {
+            margin: 0;
+            max-width: 640px;
+            color: rgba(255, 255, 255, 0.82);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            margin-top: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .hero-action {
+            text-decoration: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: transform .2s ease, box-shadow .2s ease;
+        }
+
+        .hero-action.primary {
+            color: #7f1d1d;
+            background: #fff;
+        }
+
+        .hero-action.ghost {
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .hero-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.22);
+        }
+
+        .hero-right {
+            display: grid;
+            align-content: space-between;
+            gap: 10px;
+        }
+
+        .hero-info-card {
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 14px;
+            display: grid;
+            gap: 5px;
+        }
+
+        .hero-info-card span {
+            font-size: 10px;
+            letter-spacing: .7px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.65);
+            font-weight: 700;
+        }
+
+        .hero-info-card strong {
+            font-size: 17px;
+            font-weight: 800;
             color: #fff;
         }
-        .btn-refresh-all.refreshing {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .btn-refresh-all.refreshing i {
-            animation: spin 1s linear infinite;
-        }
-        .btn-refresh-single {
-            display: inline-flex; align-items: center; gap: 4px;
-            background: #f0f0f0;
-            border: 1px solid #e0e0e0;
-            color: #888;
-            padding: 4px 10px; border-radius: 6px;
-            font-size: 10px; font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .btn-refresh-single:hover {
-            background: #e8e8e8;
-            color: var(--accent-blue);
-            border-color: #bfdbfe;
-        }
-        .btn-refresh-single.refreshing {
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .btn-refresh-single.refreshing i {
-            animation: spin 1s linear infinite;
-        }
-        .report-item-header {
-            display: flex; justify-content: space-between; align-items: center;
-            margin-bottom: 10px;
-            gap: 8px;
-        }
-        .report-header-left {
-            display: flex; align-items: center; gap: 8px;
+
+        .quick-actions {
+            margin: 0 0 18px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
         }
 
-        /* ===== Responsive ===== */
-        @media (max-width: 900px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
+        .quick-action-card {
+            text-decoration: none;
+            border-radius: var(--owner-radius-md);
+            border: 1px solid var(--owner-border);
+            background: linear-gradient(140deg, #ffffff 0%, #f8fbff 100%);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+            padding: 14px;
+            color: inherit;
+            display: grid;
+            gap: 8px;
+            min-height: 120px;
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
         }
+
+        .quick-action-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--owner-shadow);
+            border-color: #fca5a5;
+        }
+
+        .quick-action-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .quick-action-card:nth-child(1) .quick-action-icon { background: linear-gradient(135deg, #dc2626, #b91c1c); }
+        .quick-action-card:nth-child(2) .quick-action-icon { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
+        .quick-action-card:nth-child(3) .quick-action-icon { background: linear-gradient(135deg, #0d9488, #0f766e); }
+        .quick-action-card:nth-child(4) .quick-action-icon { background: linear-gradient(135deg, #ea580c, #c2410c); }
+
+        .quick-action-card h3 {
+            font-size: 14px;
+            line-height: 1.3;
+        }
+
+        .quick-action-card p {
+            margin: 0;
+            font-size: 12px;
+            color: var(--owner-muted);
+            line-height: 1.45;
+        }
+
+        .owner-stats {
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .stat-card {
+            border-radius: var(--owner-radius-md);
+            border: 1px solid var(--owner-border);
+            background: var(--owner-surface);
+            box-shadow: 0 8px 22px rgba(15, 23, 42, 0.05);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 11px;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 17px;
+            background: linear-gradient(135deg, #334155, #0f172a);
+        }
+
+        .stat-card:nth-child(1) .stat-icon { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
+        .stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, #c53030, #9b2c2c); }
+        .stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, #15803d, #166534); }
+        .stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #0891b2, #0e7490); }
+
+        .stat-label {
+            display: block;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 27px;
+            line-height: 1;
+            font-weight: 800;
+        }
+
+        .stat-value.small {
+            font-size: 16px;
+            line-height: 1.35;
+            color: #0f172a;
+        }
+
+        .analytics-grid {
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .panel {
+            border: 1px solid var(--owner-border);
+            border-radius: var(--owner-radius-md);
+            background: var(--owner-surface);
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            overflow: hidden;
+        }
+
+        .panel-head {
+            padding: 13px 15px;
+            border-bottom: 1px solid #e9eff7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .panel-title h3 {
+            font-size: 15px;
+            margin-bottom: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title p {
+            margin: 0;
+            font-size: 11px;
+            color: var(--owner-muted);
+        }
+
+        .btn-surface {
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #334155;
+            border-radius: 9px;
+            padding: 8px 11px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .2s ease;
+        }
+
+        .btn-surface:hover {
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        .chart-wrap {
+            height: 300px;
+            padding: 14px;
+        }
+
+        .status-summary {
+            padding: 0 14px 14px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .status-pill {
+            border-radius: 11px;
+            border: 1px solid #e2e8f0;
+            padding: 10px;
+            text-align: center;
+            background: #f8fafc;
+        }
+
+        .status-pill strong {
+            display: block;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .status-pill span {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .status-pill.resolved strong { color: #15803d; }
+        .status-pill.pending strong { color: #c2410c; }
+        .status-pill.rejected strong { color: #be123c; }
+
+        .operations-grid {
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+
+        .export-bottom-section {
+            margin-top: 16px;
+            margin-bottom: 18px;
+        }
+
+        .export-bottom-panel .panel-body {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .export-bottom-panel .export-help {
+            margin-bottom: 0;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .export-actions-wrap {
+            border: 1px solid #dbe5ef;
+            background: linear-gradient(140deg, #f8fbff, #ffffff);
+            border-radius: 14px;
+            padding: 12px;
+        }
+
+        .panel-body {
+            padding: 14px;
+        }
+
+        .monthly-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 9px;
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-group.tight {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #475569;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 10px 11px;
+            font-size: 13px;
+            font-family: "Plus Jakarta Sans", sans-serif;
+            color: #0f172a;
+            background: #fff;
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .form-control:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        .readonly-field {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 700;
+        }
+
+        .metric-highlight {
+            border: 1px solid #fecaca;
+            background: linear-gradient(135deg, #fff5f5, #fffefe);
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        .metric-highlight .form-label {
+            color: #9f1239;
+        }
+
+        .metric-highlight .readonly-field {
+            background: #fff;
+            border-color: #fca5a5;
+            color: #7f1d1d;
+            font-weight: 800;
+            font-size: 15px;
+            box-shadow: inset 0 0 0 1px rgba(252, 165, 165, 0.25);
+        }
+
+        .metric-highlight .form-hint {
+            color: #7f1d1d;
+        }
+
+        .form-hint {
+            margin-top: 5px;
+            font-size: 10px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+            transition: transform .2s ease, box-shadow .2s ease;
+            box-shadow: 0 10px 20px rgba(185, 28, 28, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 13px 22px rgba(185, 28, 28, 0.32);
+        }
+
+        .btn-block {
+            width: 100%;
+        }
+
+        .monthly-table-wrap {
+            margin-top: 10px;
+            border: 1px solid #dbe5f0;
+            border-radius: 12px;
+            max-height: 360px;
+            overflow: auto;
+            background: #fff;
+        }
+
+        .monthly-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 920px;
+        }
+
+        .monthly-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            background: #f8fbff;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            font-size: 10px;
+            font-weight: 800;
+            border-bottom: 1px solid #dde5ef;
+            padding: 9px 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .monthly-table tbody td {
+            border-bottom: 1px solid #edf2f7;
+            padding: 9px 10px;
+            font-size: 12px;
+            color: #1e293b;
+            vertical-align: top;
+            line-height: 1.45;
+        }
+
+        .monthly-table .empty-row td {
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 17px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .4px;
+            text-transform: uppercase;
+        }
+
+        .status-badge.resolved {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-badge.pending {
+            background: #ffedd5;
+            color: #9a3412;
+            border: 1px solid #fed7aa;
+        }
+
+        .status-badge.rejected {
+            background: #ffe4e6;
+            color: #9f1239;
+            border: 1px solid #fecdd3;
+        }
+
+        .export-help {
+            margin: 0 0 11px;
+            font-size: 12px;
+            line-height: 1.55;
+            color: #64748b;
+        }
+
+        .export-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 9px;
+        }
+
+        .btn-export {
+            border-radius: 10px;
+            padding: 10px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: filter .2s ease;
+        }
+
+        .btn-export.pdf {
+            background: #ffe4e6;
+            border-color: #fecdd3;
+            color: #9f1239;
+        }
+
+        .btn-export.excel {
+            background: #dcfce7;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .btn-export:hover {
+            filter: brightness(0.96);
+        }
+
+        .export-status {
+            min-height: 18px;
+            font-size: 12px;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .card-header {
+            padding: 15px;
+            border-bottom: 1px solid #e8eef6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header h2 {
+            font-size: 17px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-header p {
+            margin: 2px 0 0;
+            font-size: 11px;
+            color: #64748b;
+        }
+
+        .card-body {
+            padding: 15px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 9px;
+        }
+
+        .sentiment-panel {
+            border: 1px solid #dbe5ef;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 11px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sentiment-panel.spotlight {
+            border-color: #fda4af;
+            background: linear-gradient(135deg, #fff1f2, #fff);
+            box-shadow: 0 10px 22px rgba(244, 63, 94, 0.12);
+        }
+
+        .sentiment-panel.spotlight .sentiment-value {
+            font-size: 32px;
+            color: #be123c;
+        }
+
+        .sentiment-panel.spotlight .label {
+            color: #881337;
+        }
+
+        .sentiment-value {
+            font-size: 26px;
+            font-weight: 800;
+            line-height: 1;
+            min-width: 54px;
+        }
+
+        .sentiment-meta {
+            display: grid;
+            gap: 3px;
+        }
+
+        .sentiment-meta .label {
+            font-size: 10px;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+        }
+
+        .sentiment-stars {
+            display: inline-flex;
+            gap: 2px;
+            font-size: 13px;
+        }
+
+        .sentiment-stars .filled { color: #f59e0b; }
+        .sentiment-stars .empty { color: #cbd5e1; }
+
+        .sentiment-info {
+            font-size: 11px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .reports-list {
+            max-height: 640px;
+            overflow-y: auto;
+            display: grid;
+            gap: 10px;
+        }
+
+        .reports-panel .card-body {
+            height: 620px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .reports-panel .reports-list {
+            max-height: none;
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .reports-panel .empty-reports {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .report-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 13px;
+            padding: 12px;
+            background: linear-gradient(145deg, #fff, #f8fbff);
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .report-item:hover {
+            border-color: #fca5a5;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        }
+
+        .report-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 9px;
+        }
+
+        .report-id {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 800;
+            padding: 4px 9px;
+            border-radius: 999px;
+            background: #e0f2fe;
+            color: #0c4a6e;
+            border: 1px solid #bae6fd;
+        }
+
+        .report-time {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .report-actions {
+            display: inline-flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-mini {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            background: #fff;
+            color: #334155;
+            padding: 5px 9px;
+            font-size: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all .2s ease;
+        }
+
+        .btn-mini:hover {
+            border-color: #94a3b8;
+        }
+
+        .btn-mini.danger {
+            background: #fff1f2;
+            border-color: #fecdd3;
+            color: #be123c;
+        }
+
+        .btn-mini.loading {
+            opacity: .65;
+            pointer-events: none;
+        }
+
+        .report-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 7px;
+        }
+
+        .report-field {
+            border: 1px dashed #d8e0ea;
+            border-radius: 10px;
+            padding: 8px;
+            background: #ffffff;
+            display: grid;
+            gap: 2px;
+        }
+
+        .report-field span {
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .report-field strong {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1.35;
+            word-break: break-word;
+        }
+
+        .empty-reports {
+            border: 1px dashed #cbd5e1;
+            background: #f8fafc;
+            border-radius: 12px;
+            text-align: center;
+            padding: 30px 14px;
+        }
+
+        .empty-reports i {
+            font-size: 28px;
+            color: #94a3b8;
+            margin-bottom: 10px;
+        }
+
+        .empty-reports h4 {
+            font-size: 16px;
+            margin-bottom: 5px;
+            color: #1e293b;
+        }
+
+        .empty-reports p {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        .footer-wrap {
+            margin-top: 22px;
+            border-top: 1px solid #dbe5ef;
+            padding-top: 12px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            color: #64748b;
+            font-size: 12px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 1120px) {
+            .owner-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-actions,
+            .owner-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .operations-grid,
+            .dashboard-grid,
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-bottom-panel .panel-body {
+                grid-template-columns: 1fr;
+            }
+
+            .reports-panel .card-body {
+                height: 540px;
+            }
+        }
+
         @media (max-width: 768px) {
-            .stats-bar { grid-template-columns: 1fr; }
-            .page-hero { flex-direction: column; gap: 18px; align-items: flex-start; padding: 28px 24px; }
-            .hero-right { display: none; }
-            .form-row { grid-template-columns: 1fr; }
+            .owner-shell {
+                padding: 0 14px;
+                margin-top: 16px;
+            }
+
+            .hero-title {
+                font-size: 24px;
+            }
+
+            .quick-actions,
+            .owner-stats,
+            .monthly-filter-grid,
+            .metrics-grid,
+            .report-grid,
+            .status-summary,
+            .export-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-head,
+            .card-header,
+            .report-top {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .chart-wrap {
+                height: 250px;
+            }
+
+            .monthly-table {
+                min-width: 780px;
+            }
+
+            .reports-panel .card-body {
+                height: auto;
+            }
+
+            .reports-panel .reports-list {
+                max-height: 430px;
+            }
         }
     </style>
 </head>
@@ -712,94 +1086,255 @@
 </header>
 
 <main>
-    <div class="owner-container">
+    <div class="owner-shell">
 
-        <!-- Flash Messages -->
-        <div th:if="${successMessage}" class="alert-toast success animate-in">
-            <i class="fas fa-circle-check"></i>
-            <span th:text="${successMessage}"></span>
-        </div>
-        <div th:if="${errorMessage}" class="alert-toast error animate-in">
-            <i class="fas fa-circle-exclamation"></i>
-            <span th:text="${errorMessage}"></span>
+        <div class="flash-stack">
+            <div th:if="${successMessage}" class="flash-item success" role="status">
+                <i class="fas fa-circle-check"></i>
+                <span th:text="${successMessage}">Report created.</span>
+            </div>
+            <div th:if="${errorMessage}" class="flash-item error" role="alert">
+                <i class="fas fa-circle-exclamation"></i>
+                <span th:text="${errorMessage}">An error occurred.</span>
+            </div>
         </div>
 
-        <!-- Page Hero -->
-        <div class="page-hero animate-in">
-            <div class="hero-pattern"></div>
+        <section class="owner-hero">
             <div class="hero-left">
-                <p class="hero-eyebrow"><span class="eyebrow-dot"></span> Owner Portal</p>
-                <h1 class="hero-title">Analytics Dashboard</h1>
+                <span class="hero-kicker"><i class="fas fa-crown"></i> Institute Owner Command Center</span>
+                <h1 class="hero-title">Strategic Overview and Analytics Governance</h1>
                 <p class="hero-sub">
-                    <i class="fas fa-chart-line"></i>
-                    Create and manage analytics reports
+                    Review concern performance, observe trends by category and status, create analytics snapshots, and export evidence-backed monthly insights for leadership reporting.
                 </p>
+                <div class="hero-actions">
+                    <a href="/owner/admin/create-page" class="hero-action primary"><i class="fas fa-user-plus"></i> Create Admin Account</a>
+                    <a href="/owner/admin/manage" class="hero-action ghost"><i class="fas fa-user-gear"></i> Manage Admin Team</a>
+                </div>
             </div>
             <div class="hero-right">
-                <a href="/owner/admin/create-page" class="btn-red create-admin-link">
-                    <i class="fas fa-user-shield"></i> Create Admin Account
-                </a>
-            </div>
-        </div>
-
-        <!-- Stats Bar -->
-        <div class="stats-bar animate-in delay-1">
-            <div class="stat-pill total">
-                <div class="stat-pill-icon"><i class="fas fa-file-lines"></i></div>
-                <div class="stat-pill-info">
-                    <div class="stat-pill-label">Total Reports</div>
-                    <div class="stat-pill-val" th:text="${reports != null ? #lists.size(reports) : 0}">0</div>
+                <div class="hero-info-card">
+                    <span>Reports In System</span>
+                    <strong th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
+                </div>
+                <div class="hero-info-card">
+                    <span>Current Report Scope</span>
+                    <strong>All Time</strong>
                 </div>
             </div>
-            <div class="stat-pill created">
-                <div class="stat-pill-icon"><i class="fas fa-circle-plus"></i></div>
-                <div class="stat-pill-info">
-                    <div class="stat-pill-label">This Month</div>
-                    <div class="stat-pill-val" id="thisMonthCount">0</div>
-                </div>
-            </div>
-            <div class="stat-pill avg">
-                <div class="stat-pill-icon"><i class="fas fa-chart-bar"></i></div>
-                <div class="stat-pill-info">
-                    <div class="stat-pill-label">Active Period</div>
-                    <div class="stat-pill-val period-size" id="activePeriod">—</div>
-                </div>
-            </div>
-        </div>
+        </section>
 
-        <!-- Main Grid -->
-        <div class="dashboard-grid">
+        <section class="quick-actions">
+            <a class="quick-action-card" href="/owner/admin/create-page">
+                <span class="quick-action-icon"><i class="fas fa-user-shield"></i></span>
+                <h3>Admin Provisioning</h3>
+                <p>Create verified admin accounts and expand operations safely.</p>
+            </a>
+            <a class="quick-action-card" href="/owner/admin/manage">
+                <span class="quick-action-icon"><i class="fas fa-users-gear"></i></span>
+                <h3>Admin Governance</h3>
+                <p>Review existing admin accounts and apply account-level updates.</p>
+            </a>
+            <a class="quick-action-card" href="/owner/notifications">
+                <span class="quick-action-icon"><i class="fas fa-bullhorn"></i></span>
+                <h3>Broadcast Center</h3>
+                <p>Publish messages to students quickly from one central place.</p>
+            </a>
+            <a class="quick-action-card" href="/owner/faq">
+                <span class="quick-action-icon"><i class="fas fa-circle-question"></i></span>
+                <h3>Knowledge Management</h3>
+                <p>Maintain FAQs and tips to reduce recurring concerns.</p>
+            </a>
+        </section>
 
-            <!-- LEFT: Create Report Form -->
-            <div class="create-card animate-in delay-2">
-                <div class="create-card-header">
-                    <div class="create-card-header-icon"><i class="fas fa-plus"></i></div>
-                    <div class="create-card-header-text">
-                        <h2>Create Analytics Report</h2>
-                        <p>Generate a new analytics report entry</p>
+        <section class="owner-stats">
+            <article class="stat-card">
+                <span class="stat-icon"><i class="fas fa-file-lines"></i></span>
+                <div>
+                    <span class="stat-label">Reports Created</span>
+                    <strong class="stat-value" th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
+                </div>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon"><i class="fas fa-calendar-check"></i></span>
+                <div>
+                    <span class="stat-label">This Month</span>
+                    <strong class="stat-value" id="thisMonthCount">0</strong>
+                </div>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                <div>
+                    <span class="stat-label">Live Concern Volume</span>
+                    <strong class="stat-value" id="liveConcernCount">0</strong>
+                </div>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon"><i class="fas fa-filter"></i></span>
+                <div>
+                    <span class="stat-label">Monthly Filter Scope</span>
+                    <strong class="stat-value small" id="monthlyFilterScope">All Categories</strong>
+                </div>
+            </article>
+        </section>
+
+        <section class="analytics-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">
+                        <h3><i class="fas fa-chart-column"></i> Category Distribution</h3>
+                        <p>How submitted concerns are currently spread across categories</p>
+                    </div>
+                    <button type="button" class="btn-surface" id="refreshAnalyticsBtn"><i class="fas fa-rotate"></i> Refresh Data</button>
+                </div>
+                <div class="chart-wrap">
+                    <canvas id="ownerCategoryChart"></canvas>
+                </div>
+            </article>
+
+            <article class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">
+                        <h3><i class="fas fa-chart-pie"></i> Status Mix</h3>
+                        <p>Resolved vs pending vs rejected concerns across the institute</p>
                     </div>
                 </div>
-                <div class="create-card-body">
-                    <form th:action="@{/owner/report/create}" method="post" id="reportForm">
+                <div class="chart-wrap">
+                    <canvas id="ownerStatusChart"></canvas>
+                </div>
+                <div class="status-summary">
+                    <div class="status-pill resolved">
+                        <strong id="statusResolvedCount">0</strong>
+                        <span>Resolved</span>
+                    </div>
+                    <div class="status-pill pending">
+                        <strong id="statusPendingCount">0</strong>
+                        <span>Pending</span>
+                    </div>
+                    <div class="status-pill rejected">
+                        <strong id="statusRejectedCount">0</strong>
+                        <span>Rejected</span>
+                    </div>
+                </div>
+            </article>
+        </section>
 
-                        <!-- Time Period -->
-                        <div class="form-group">
-                            <label class="form-label"><i class="fas fa-calendar-days"></i> Time Period</label>
-                            <select name="timePeriod" class="form-control" title="Report time period" required>
-                                <option value="" disabled selected>Select time period</option>
-                                <option value="Daily">Daily</option>
-                                <option value="Weekly">Weekly</option>
-                                <option value="Monthly">Monthly</option>
-                                <option value="Quarterly">Quarterly</option>
-                                <option value="Yearly">Yearly</option>
+        <section class="operations-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div class="panel-title">
+                        <h3><i class="fas fa-table-list"></i> Monthly Concern Intelligence</h3>
+                        <p>Filter by month, category, and AI priority to inspect detailed concern records</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <div class="monthly-filter-grid">
+                        <div class="form-group tight">
+                            <label class="form-label" for="monthlyReportMonth">Select Date (Monthly)</label>
+                            <input type="date" id="monthlyReportMonth" class="form-control" title="Pick a date for monthly report">
+                        </div>
+                        <div class="form-group tight">
+                            <label class="form-label" for="monthlyReportCategory">Category</label>
+                            <select id="monthlyReportCategory" class="form-control" title="Select monthly report category">
+                                <option value="All Categories" selected>All Categories</option>
+                                <option value="Education (Creative and IT)">Education (Creative and IT)</option>
+                                <option value="Institute Problem">Institute Related Problem</option>
+                                <option value="Registration">Registration &amp; Enrollment</option>
+                                <option value="Administrative">Administrative Services</option>
+                                <option value="Financial">Financial &amp; Payments</option>
+                                <option value="Other">Other General Concern</option>
                             </select>
                         </div>
+                        <div class="form-group tight">
+                            <label class="form-label" for="monthlyReportPriority">Priority</label>
+                            <select id="monthlyReportPriority" class="form-control" title="Select monthly report priority">
+                                <option value="All Priorities" selected>All Priorities</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                                <option value="—">Unspecified</option>
+                            </select>
+                        </div>
+                    </div>
 
-                        <!-- Most Frequent Category -->
+                    <button type="button" class="btn-primary" id="generateMonthlyReportBtn">
+                        <i class="fas fa-filter-circle-xmark"></i> Generate Monthly Report
+                    </button>
+
+                    <div class="monthly-table-wrap">
+                        <table class="monthly-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Concern ID</th>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Category</th>
+                                    <th>Priority</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th>Concern</th>
+                                    <th>Latest Reply</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlyReportTbody">
+                                <tr class="empty-row">
+                                    <td colspan="10">Generate a monthly report to view records.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="export-bottom-section">
+            <article class="panel export-bottom-panel">
+                <div class="panel-head">
+                    <div class="panel-title">
+                        <h3><i class="fas fa-file-arrow-down"></i> Export Package</h3>
+                        <p>Download generated monthly records as PDF or Excel files</p>
+                    </div>
+                </div>
+                <div class="panel-body">
+                    <p class="export-help">
+                        Generate monthly records first. Then export polished reports for meetings and documentation. The file output includes selected month, category, and priority filters with institute branding.
+                    </p>
+                    <div class="export-actions-wrap">
+                        <div class="export-actions">
+                            <button type="button" class="btn-export pdf" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
+                            <button type="button" class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
+                        </div>
+                        <div class="export-status" id="exportStatusText">Select filters and generate report to enable export.</div>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-grid">
+            <article class="panel">
+                <div class="card-header">
+                    <div>
+                        <h2><i class="fas fa-screwdriver-wrench"></i> Create Analytics Report</h2>
+                        <p>Select admin and category. Metrics auto-calculate from live concern and feedback data.</p>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <form th:action="@{/owner/report/create}" method="post" id="reportForm">
+                        <input type="hidden" name="timePeriod" value="All Time">
+
                         <div class="form-group">
-                            <label class="form-label"><i class="fas fa-tag"></i> Most Frequent Category</label>
-                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" title="Most frequent category" required>
-                                <option value="" disabled selected>Select a category</option>
+                            <label class="form-label" for="adminSelect">Select Admin</label>
+                            <select name="adminIdFk" id="adminSelect" class="form-control" required title="Select admin">
+                                <option value="" selected>Loading admins...</option>
+                            </select>
+                            <div class="form-hint"><i class="fas fa-circle-info"></i> Metrics are linked to selected admin and category.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="categorySelect">Most Frequent Category</label>
+                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" required title="Select category">
+                                <option value="All Categories" selected>All Categories</option>
                                 <option value="Education (Creative and IT)">Education (Creative and IT)</option>
                                 <option value="Institute Problem">Institute Related Problem</option>
                                 <option value="Registration">Registration &amp; Enrollment</option>
@@ -809,412 +1344,1087 @@
                             </select>
                         </div>
 
-                        <!-- Total Concerns (auto-filled) & Avg Resolution Time -->
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label"><i class="fas fa-hashtag"></i> Total Concerns</label>
-                                    <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control readonly-field"
-                                       placeholder="Select a category first" min="0" required readonly
-                                        >
-                                <div class="auto-fill-info" id="totalConcernsInfo">
-                                    <i class="fas fa-info-circle"></i> Auto-filled when category is selected
-                                </div>
+                        <div class="metrics-grid">
+                            <div class="form-group metric-highlight">
+                                <label class="form-label" for="totalConcernsInput">Total Concerns</label>
+                                <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control readonly-field" readonly min="0" required placeholder="Select admin first">
+                                <div class="form-hint" id="totalConcernsInfo"><i class="fas fa-circle-info"></i> Auto-filled from concern data.</div>
                             </div>
-                            <div class="form-group">
-                                <label class="form-label"><i class="fas fa-clock"></i> Avg Resolution Time</label>
-                                    <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control readonly-field"
-                                       placeholder="Select a category first" step="0.01" min="0" required readonly
-                                        >
-                                <div class="auto-fill-info" id="avgResolutionInfo">
-                                    <i class="fas fa-info-circle"></i> Auto-filled in hours (decimal)
-                                </div>
+                            <div class="form-group metric-highlight">
+                                <label class="form-label" for="avgResolutionInput">Avg Resolution Time (hrs)</label>
+                                <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control readonly-field" readonly min="0" step="0.01" required placeholder="Select admin first">
+                                <div class="form-hint" id="avgResolutionInfo"><i class="fas fa-circle-info"></i> Based on first admin reply time.</div>
                             </div>
                         </div>
 
-                        <!-- Admin Selection -->
                         <div class="form-group">
-                            <label class="form-label"><i class="fas fa-user-shield"></i> Select Admin</label>
-                            <div class="admin-select-wrapper">
-                                <select name="adminIdFk" id="adminSelect" class="form-control" title="Assign report to admin">
-                                    <option value="" selected>Loading admins...</option>
-                                </select>
-                            </div>
-                            <div class="form-hint"><i class="fas fa-info-circle"></i> Sentiment score auto-fills based on feedback</div>
+                            <label class="form-label" for="evidenceImageInput">Concern Images</label>
+                            <input type="number" name="evidenceImageCount" id="evidenceImageInput" class="form-control readonly-field" readonly min="0" required placeholder="Select admin first">
+                            <div class="form-hint" id="evidenceImageInfo"><i class="fas fa-circle-info"></i> Includes concerns that contain evidence images.</div>
                         </div>
 
-                        <!-- Sentiment Trend Score (auto-filled) -->
-                        <div class="form-group">
-                            <label class="form-label"><i class="fas fa-face-smile"></i> Sentiment Score</label>
-                            <input type="hidden" name="sentimentTrendScore" id="sentimentInput" value="0">
-                            <div id="sentimentDisplay" class="sentiment-display neutral">
-                                <span class="sentiment-score-val" id="sentimentVal">—</span>
+                        <div class="form-group metric-highlight">
+                            <label class="form-label">Sentiment Score</label>
+                            <input type="hidden" name="sentimentTrendScore" id="sentimentInput" value="0.00">
+                            <div class="sentiment-panel spotlight" id="sentimentPanel">
+                                <strong class="sentiment-value" id="sentimentVal">-</strong>
                                 <div class="sentiment-meta">
-                                    <span class="meta-label">Avg Feedback Rating</span>
+                                    <span class="label">Average Feedback Rating</span>
                                     <div class="sentiment-stars" id="sentimentStars"></div>
-                                    <span class="meta-info" id="sentimentInfo">Select an admin to view</span>
+                                    <span class="sentiment-info" id="sentimentInfo">Select an admin to calculate sentiment.</span>
                                 </div>
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-create">
-                            <i class="fas fa-paper-plane"></i> Create Report
-                        </button>
+                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-paper-plane"></i> Create Report</button>
                     </form>
                 </div>
-            </div>
+            </article>
 
-            <!-- RIGHT: Recent Reports List -->
-            <div class="reports-card animate-in delay-3">
-                <div class="reports-card-header">
-                    <div class="reports-card-header-icon"><i class="fas fa-list-ul"></i></div>
-                    <div class="reports-card-header-text">
-                        <h2>Recent Reports</h2>
-                        <p>Previously created analytics reports</p>
+            <article class="panel reports-panel">
+                <div class="card-header">
+                    <div>
+                        <h2><i class="fas fa-clock-rotate-left"></i> Recent Reports</h2>
+                        <p>Refresh or remove analytics snapshots from the report timeline.</p>
                     </div>
-                    <button type="button" class="btn-refresh-all" id="refreshAllBtn" onclick="refreshAllReports(this)">
-                        <i class="fas fa-rotate"></i> Refresh All
-                    </button>
+                    <button type="button" class="btn-surface" id="refreshAllBtn"><i class="fas fa-arrows-rotate"></i> Refresh All</button>
                 </div>
-                <div class="reports-card-body">
 
-                    <!-- Empty State -->
+                <div class="card-body">
                     <div th:if="${reports == null or #lists.isEmpty(reports)}" class="empty-reports">
-                        <div class="empty-reports-icon"><i class="fas fa-chart-pie"></i></div>
-                        <h4>No Reports Yet</h4>
-                        <p>Create your first analytics report using the form on the left.</p>
+                        <i class="fas fa-folder-open"></i>
+                        <h4>No Reports Available</h4>
+                        <p>Create your first report from the left panel to start analytics tracking.</p>
                     </div>
 
-                    <!-- Report Items -->
-                    <div th:each="report, iterStat : ${reports}" class="report-item"
-                         th:attr="data-report-id=${report.reportId}"
-                         th:style="'animation: fadeSlideUp 0.5s ease both; animation-delay: ' + ${0.06 * iterStat.index} + 's'">
-                        <div class="report-item-header">
-                            <div class="report-header-left">
-                                <span class="report-id" th:text="'RPT-' + ${report.reportId}">RPT-1</span>
-                                <button type="button" class="btn-refresh-single" th:attr="onclick='refreshSingleReport(this, ' + ${report.reportId} + ')'">
-                                    <i class="fas fa-rotate"></i> Refresh
-                                </button>
+                    <div th:if="${reports != null and !#lists.isEmpty(reports)}" class="reports-list">
+                        <article th:each="report : ${reports}" class="report-item"
+                                 th:attr="data-report-id=${report.reportId},data-created=${report.createdTime != null ? #temporals.format(report.createdTime, 'yyyy-MM-dd') : ''}">
+                            <div class="report-top">
+                                <div>
+                                    <span class="report-id"><i class="fas fa-hashtag"></i><span th:text="${report.reportId}">1</span></span>
+                                    <div class="report-time">
+                                        <i class="fas fa-calendar-days"></i>
+                                        <span th:text="${report.createdTime != null ? #temporals.format(report.createdTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01 Jan 2026, 11:20 AM</span>
+                                    </div>
+                                </div>
+
+                                <div class="report-actions">
+                                    <button type="button" class="btn-mini" th:onclick="|refreshSingleReport(this, ${report.reportId})|">
+                                        <i class="fas fa-rotate"></i> Refresh
+                                    </button>
+                                    <form th:action="@{/owner/report/delete/{id}(id=${report.reportId})}" method="post" onsubmit="return confirm('Delete this analytics report?');">
+                                        <button type="submit" class="btn-mini danger"><i class="fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
                             </div>
-                            <span class="report-time">
-                                <i class="fas fa-clock"></i>
-                                <span th:text="${report.createdTime != null ? #temporals.format(report.createdTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01 Jan 2026</span>
-                            </span>
-                        </div>
-                        <div class="report-grid">
-                            <div class="report-field">
-                                <span class="report-field-label">Time Period</span>
-                                <span class="report-field-value" th:text="${report.timePeriod}">Monthly</span>
+
+                            <div class="report-grid">
+                                <div class="report-field">
+                                    <span>Total Concerns</span>
+                                    <strong class="report-total-concerns" th:text="${report.totalConcerns != null ? report.totalConcerns : 0}">0</strong>
+                                </div>
+                                <div class="report-field">
+                                    <span>Avg Resolution</span>
+                                    <strong class="report-avg-resolution" th:text="${report.avgResolutionTime != null ? report.avgResolutionTime + ' hrs' : '0.00 hrs'}">0.00 hrs</strong>
+                                </div>
+                                <div class="report-field">
+                                    <span>Most Frequent Category</span>
+                                    <strong class="report-category" th:text="${report.mostFrequentCategory != null ? report.mostFrequentCategory : 'All Categories'}">All Categories</strong>
+                                </div>
+                                <div class="report-field">
+                                    <span>Sentiment Score</span>
+                                    <strong class="report-sentiment" th:text="${report.sentimentTrendScore != null ? report.sentimentTrendScore : '0.00'}">0.00</strong>
+                                </div>
+                                <div class="report-field">
+                                    <span>Concern Images</span>
+                                    <strong class="report-evidence-images" th:text="${report.evidenceImageCount != null ? report.evidenceImageCount : 0}">0</strong>
+                                </div>
+                                <div class="report-field">
+                                    <span>Admin</span>
+                                    <strong class="report-admin-name"
+                                            th:attr="data-admin-id=${report.adminIdFk}"
+                                            th:text="${report.adminIdFk != null ? report.adminIdFk : '-'}">-</strong>
+                                </div>
                             </div>
-                            <div class="report-field">
-                                <span class="report-field-label">Total Concerns</span>
-                                <span class="report-field-value highlight" th:text="${report.totalConcerns}">0</span>
-                            </div>
-                            <div class="report-field">
-                                <span class="report-field-label">Avg Resolution</span>
-                                <span class="report-field-value" th:text="${report.avgResolutionTime + ' hrs'}">0 hrs</span>
-                            </div>
-                            <div class="report-field">
-                                <span class="report-field-label">Top Category</span>
-                                <span class="report-field-value" th:text="${report.mostFrequentCategory}">—</span>
-                            </div>
-                            <div class="report-field">
-                                <span class="report-field-label">Sentiment Score</span>
-                                <span class="report-field-value" th:text="${report.sentimentTrendScore}">0</span>
-                            </div>
-                            <div class="report-field">
-                                <span class="report-field-label">Admin ID</span>
-                                <span class="report-field-value" th:text="${report.adminIdFk != null ? report.adminIdFk : '—'}">—</span>
-                            </div>
-                        </div>
+                        </article>
                     </div>
                 </div>
-            </div>
+            </article>
+        </section>
 
-        </div><!-- /.dashboard-grid -->
-
+        <div class="footer-wrap">
+            <span>Owner Dashboard - Academy of Knowledge Bridge</span>
+            <span>Operational intelligence for institute-level decisions</span>
+        </div>
     </div>
 </main>
 
-<footer>
-    <div class="footer-content">
-        <div class="footer-left">
-            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
-            <div class="footer-text-area">
-                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
-                <p class="footer-sub">Academy of Knowledge Bridge</p>
-            </div>
-        </div>
-        <div class="footer-right">
-            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
-        </div>
-    </div>
-</footer>
-
 <script>
-    // ===== Auto-dismiss alert toasts =====
-    document.querySelectorAll('.alert-toast').forEach(toast => {
-        setTimeout(() => {
-            toast.style.transition = 'all 0.5s ease';
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px)';
-            setTimeout(() => toast.remove(), 500);
-        }, 5000);
-    });
+    const adminSelect = document.getElementById("adminSelect");
+    const categorySelect = document.getElementById("categorySelect");
+    const totalConcernsInput = document.getElementById("totalConcernsInput");
+    const avgResolutionInput = document.getElementById("avgResolutionInput");
+    const evidenceImageInput = document.getElementById("evidenceImageInput");
+    const sentimentInput = document.getElementById("sentimentInput");
+    const sentimentVal = document.getElementById("sentimentVal");
+    const sentimentStars = document.getElementById("sentimentStars");
+    const sentimentInfo = document.getElementById("sentimentInfo");
 
-    // ===== Staggered stat pill entrance =====
-    document.querySelectorAll('.stat-pill').forEach((pill, i) => {
-        pill.style.opacity = '0';
-        pill.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            pill.style.transition = 'all 0.5s cubic-bezier(.22,1,.36,1)';
-            pill.style.opacity = '1';
-            pill.style.transform = 'translateY(0)';
-        }, 300 + i * 100);
-    });
+    const totalConcernsInfo = document.getElementById("totalConcernsInfo");
+    const avgResolutionInfo = document.getElementById("avgResolutionInfo");
+    const evidenceImageInfo = document.getElementById("evidenceImageInfo");
 
-    // ===== Auto-fill Total Concerns on category change =====
-    const categorySelect = document.getElementById('categorySelect');
-    const totalConcernsInput = document.getElementById('totalConcernsInput');
-    const totalConcernsInfo = document.getElementById('totalConcernsInfo');
+    const ownerCategoryChartCanvas = document.getElementById("ownerCategoryChart");
+    const ownerStatusChartCanvas = document.getElementById("ownerStatusChart");
+    const statusResolvedCount = document.getElementById("statusResolvedCount");
+    const statusPendingCount = document.getElementById("statusPendingCount");
+    const statusRejectedCount = document.getElementById("statusRejectedCount");
+    const liveConcernCount = document.getElementById("liveConcernCount");
 
-    categorySelect.addEventListener('change', function() {
-        const category = this.value;
-        if (!category) return;
+    const monthlyReportMonth = document.getElementById("monthlyReportMonth");
+    const monthlyReportCategory = document.getElementById("monthlyReportCategory");
+    const monthlyReportPriority = document.getElementById("monthlyReportPriority");
+    const monthlyFilterScope = document.getElementById("monthlyFilterScope");
+    const generateMonthlyReportBtn = document.getElementById("generateMonthlyReportBtn");
+    const monthlyReportTbody = document.getElementById("monthlyReportTbody");
 
-        totalConcernsInput.value = '';
-        totalConcernsInput.placeholder = 'Loading...';
-        totalConcernsInfo.className = 'auto-fill-info';
-        totalConcernsInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Fetching count...';
+    const refreshAnalyticsBtn = document.getElementById("refreshAnalyticsBtn");
+    const refreshAllBtn = document.getElementById("refreshAllBtn");
 
-        fetch('/owner/api/concerns/count?category=' + encodeURIComponent(category))
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
-            .then(data => {
-                console.log('Category count result:', data);
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                const count = (data.count !== undefined) ? data.count : 0;
-                totalConcernsInput.value = count;
-                totalConcernsInput.style.background = '#eff6ff';
-                totalConcernsInput.style.borderColor = '#bfdbfe';
-                totalConcernsInput.style.color = '#2563eb';
-                totalConcernsInput.style.fontWeight = '800';
-                totalConcernsInput.style.fontSize = '16px';
-                totalConcernsInfo.className = 'auto-fill-info has-data';
-                totalConcernsInfo.innerHTML = '<i class="fas fa-circle-check"></i> ' + count + ' concerns found in "' + category + '"';
-            })
-            .catch((err) => {
-                console.error('Error fetching count:', err);
-                totalConcernsInput.placeholder = 'Error loading';
-                totalConcernsInfo.className = 'auto-fill-info';
-                totalConcernsInfo.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed to load count: ' + err.message;
-            });
+    const exportPdfBtn = document.getElementById("exportPdfBtn");
+    const exportExcelBtn = document.getElementById("exportExcelBtn");
+    const exportStatusText = document.getElementById("exportStatusText");
 
-        // Also fetch avg resolution time for this category
-        const avgResolutionInput = document.getElementById('avgResolutionInput');
-        const avgResolutionInfo = document.getElementById('avgResolutionInfo');
+    let ownerCategoryChart = null;
+    let ownerStatusChart = null;
+    let monthlyReportRows = [];
+    let adminDirectory = new Map();
+    const ownerLogoPath = "/images/img1.jpeg";
+    let ownerLogoDataUrl = null;
 
-        avgResolutionInput.value = '';
-        avgResolutionInput.placeholder = 'Loading...';
-        avgResolutionInfo.className = 'auto-fill-info';
-        avgResolutionInfo.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+    function setExportStatus(text, isError) {
+        if (!exportStatusText) {
+            return;
+        }
+        exportStatusText.textContent = text;
+        exportStatusText.style.color = isError ? "#be123c" : "#334155";
+    }
 
-        fetch('/owner/api/resolution-time?category=' + encodeURIComponent(category))
-            .then(res => {
-                if (!res.ok) throw new Error('Network error');
-                return res.json();
-            })
-            .then(data => {
-                if (data.error) throw new Error(data.error);
-                const avg = (data.avgHours !== undefined) ? data.avgHours : 0;
-                avgResolutionInput.value = avg;
-                avgResolutionInput.style.background = '#eff6ff';
-                avgResolutionInput.style.borderColor = '#bfdbfe';
-                avgResolutionInput.style.color = '#2563eb';
-                avgResolutionInput.style.fontWeight = '800';
-                avgResolutionInput.style.fontSize = '16px';
-                avgResolutionInfo.className = 'auto-fill-info has-data';
-                if (data.count > 0) {
-                    avgResolutionInfo.innerHTML = '<i class="fas fa-circle-check"></i> ' + avg + ' hrs avg across ' + data.count + ' resolved concern(s)';
-                } else {
-                    avgResolutionInfo.innerHTML = '<i class="fas fa-info-circle"></i> ' + (data.message || 'No resolved concerns');
-                }
-            })
-            .catch((err) => {
-                avgResolutionInput.placeholder = 'Error loading';
-                avgResolutionInfo.className = 'auto-fill-info';
-                avgResolutionInfo.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed: ' + err.message;
-            });
-    });
+    function getSelectedMonthValue() {
+        const rawValue = monthlyReportMonth && typeof monthlyReportMonth.value === "string"
+            ? monthlyReportMonth.value.trim()
+            : "";
+        if (!rawValue) {
+            return "";
+        }
+        if (/^\d{4}-\d{2}$/.test(rawValue)) {
+            return rawValue;
+        }
+        if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
+            return rawValue.slice(0, 7);
+        }
+        return "";
+    }
 
-    // ===== Load Admins on page load =====
-    const adminSelect = document.getElementById('adminSelect');
+    function getSelectedMonthLabel(monthValue) {
+        if (!monthValue || !/^\d{4}-\d{2}$/.test(monthValue)) {
+            return "Not Selected";
+        }
+        const parts = monthValue.split("-");
+        const monthDate = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+        return monthDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+    }
 
-    fetch('/owner/api/admins')
-        .then(res => res.json())
-        .then(admins => {
-            adminSelect.innerHTML = '<option value="" selected>-- Select an Admin --</option>';
-            admins.forEach(admin => {
-                const opt = document.createElement('option');
-                opt.value = admin.userId;
-                opt.textContent = admin.fullName + ' (' + admin.staffId + ')';
-                adminSelect.appendChild(opt);
-            });
-            if (admins.length === 0) {
-                adminSelect.innerHTML = '<option value="" disabled selected>No admins found</option>';
-            }
-        })
-        .catch(() => {
-            adminSelect.innerHTML = '<option value="" disabled selected>Error loading admins</option>';
+    function sanitizeFileValue(value) {
+        return String(value || "current-month").replace(/[^a-zA-Z0-9-_]/g, "-");
+    }
+
+    async function ensureLogoDataUrl() {
+        if (ownerLogoDataUrl) {
+            return ownerLogoDataUrl;
+        }
+        const response = await fetch(ownerLogoPath);
+        if (!response.ok) {
+            throw new Error("Institute logo could not be loaded.");
+        }
+        const blob = await response.blob();
+        ownerLogoDataUrl = await new Promise(function(resolve, reject) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                resolve(reader.result);
+            };
+            reader.onerror = function() {
+                reject(new Error("Failed to read institute logo."));
+            };
+            reader.readAsDataURL(blob);
         });
+        return ownerLogoDataUrl;
+    }
 
-    // ===== Auto-fill Sentiment Score on admin selection =====
-    const sentimentInput = document.getElementById('sentimentInput');
-    const sentimentVal = document.getElementById('sentimentVal');
-    const sentimentDisplay = document.getElementById('sentimentDisplay');
-    const sentimentStars = document.getElementById('sentimentStars');
-    const sentimentInfo = document.getElementById('sentimentInfo');
+    function escapeHtml(value) {
+        const text = value == null ? "" : String(value);
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
-    adminSelect.addEventListener('change', function() {
-        const adminId = this.value;
+    function getStatusClass(status) {
+        const normalized = String(status || "").toLowerCase();
+        if (normalized.includes("resolv") || normalized.includes("complete")) {
+            return "resolved";
+        }
+        if (normalized.includes("reject") || normalized.includes("delete")) {
+            return "rejected";
+        }
+        return "pending";
+    }
+
+    function dismissFlashMessages() {
+        document.querySelectorAll(".flash-item").forEach(function(toast) {
+            setTimeout(function() {
+                toast.style.transition = "opacity .45s ease, transform .45s ease";
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(-8px)";
+                setTimeout(function() {
+                    toast.remove();
+                }, 450);
+            }, 5200);
+        });
+    }
+
+    function countThisMonthReports() {
+        const now = new Date();
+        let count = 0;
+        document.querySelectorAll(".report-item").forEach(function(item) {
+            const created = item.dataset.created;
+            if (!created) {
+                return;
+            }
+            const date = new Date(created + "T00:00:00");
+            if (!Number.isNaN(date.getTime())
+                    && date.getMonth() === now.getMonth()
+                    && date.getFullYear() === now.getFullYear()) {
+                count += 1;
+            }
+        });
+        const target = document.getElementById("thisMonthCount");
+        if (target) {
+            target.textContent = String(count);
+        }
+    }
+
+    function resetMetrics() {
+        totalConcernsInput.value = "";
+        totalConcernsInput.placeholder = "Select admin first";
+        avgResolutionInput.value = "";
+        avgResolutionInput.placeholder = "Select admin first";
+        evidenceImageInput.value = "";
+        evidenceImageInput.placeholder = "Select admin first";
+        sentimentInput.value = "0.00";
+        sentimentVal.textContent = "-";
+        sentimentStars.innerHTML = "";
+        sentimentInfo.textContent = "Select an admin to calculate sentiment.";
+        totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Auto-filled from concern data.";
+        avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Based on first admin reply time.";
+        evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Includes concerns that contain evidence images.";
+    }
+
+    function setMetricsLoading() {
+        totalConcernsInput.placeholder = "Loading...";
+        avgResolutionInput.placeholder = "Loading...";
+        evidenceImageInput.placeholder = "Loading...";
+        totalConcernsInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating concern volume...";
+        avgResolutionInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating resolution speed...";
+        evidenceImageInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Counting evidence images...";
+        sentimentVal.textContent = "...";
+        sentimentStars.innerHTML = "";
+        sentimentInfo.textContent = "Loading sentiment...";
+    }
+
+    function renderSentiment(score, count, message) {
+        const safeScore = Number.isFinite(score) ? score : 0;
+        const safeCount = Number.isFinite(count) ? count : 0;
+        sentimentInput.value = safeScore.toFixed(2);
+        sentimentVal.textContent = safeScore.toFixed(2);
+
+        const rounded = Math.max(0, Math.min(5, Math.round(safeScore)));
+        let stars = "";
+        for (let i = 1; i <= 5; i += 1) {
+            stars += '<i class="fas fa-star ' + (i <= rounded ? "filled" : "empty") + '"></i>';
+        }
+        sentimentStars.innerHTML = stars;
+
+        if (!safeCount) {
+            sentimentInfo.textContent = message || "No feedback available for this admin.";
+            return;
+        }
+        sentimentInfo.textContent = "Based on " + safeCount + " feedback rating(s).";
+    }
+
+    function hydrateReportAdminNames() {
+        document.querySelectorAll(".report-admin-name").forEach(function(nameNode) {
+            const adminId = (nameNode.dataset.adminId || "").trim();
+            if (!adminId) {
+                nameNode.textContent = "-";
+                return;
+            }
+            if (adminDirectory.has(adminId)) {
+                nameNode.textContent = adminDirectory.get(adminId);
+            } else {
+                nameNode.textContent = "Admin #" + adminId;
+            }
+        });
+    }
+
+    function loadAdmins() {
+        fetch("/owner/api/admins")
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to load admins");
+                }
+                return response.json();
+            })
+            .then(function(admins) {
+                adminDirectory = new Map();
+                if (!Array.isArray(admins) || admins.length === 0) {
+                    adminSelect.innerHTML = "<option value=\"\" disabled selected>No admins found</option>";
+                    hydrateReportAdminNames();
+                    resetMetrics();
+                    return;
+                }
+
+                adminSelect.innerHTML = "<option value=\"\" selected>-- Select an Admin --</option>";
+                admins.forEach(function(admin) {
+                    const adminId = String(admin.userId || "");
+                    const fullName = admin.fullName || "Unnamed Admin";
+                    const staffId = admin.staffId || "N/A";
+                    const displayName = fullName + " (" + staffId + ")";
+                    adminDirectory.set(adminId, displayName);
+
+                    const option = document.createElement("option");
+                    option.value = admin.userId;
+                    option.textContent = displayName;
+                    adminSelect.appendChild(option);
+                });
+                hydrateReportAdminNames();
+                resetMetrics();
+            })
+            .catch(function() {
+                adminSelect.innerHTML = "<option value=\"\" disabled selected>Error loading admins</option>";
+                hydrateReportAdminNames();
+                resetMetrics();
+            });
+    }
+
+    function loadReportMetrics() {
+        const adminId = adminSelect.value;
+        const category = categorySelect.value || "All Categories";
         if (!adminId) {
-            sentimentDisplay.className = 'sentiment-display neutral';
-            sentimentVal.textContent = '—';
-            sentimentStars.innerHTML = '';
-            sentimentInfo.textContent = 'Select an admin to view';
-            sentimentInput.value = '0';
+            resetMetrics();
             return;
         }
 
-        sentimentVal.textContent = '...';
-        sentimentInfo.textContent = 'Loading...';
-        sentimentStars.innerHTML = '';
+        setMetricsLoading();
 
-        fetch('/owner/api/sentiment?adminId=' + adminId)
-            .then(res => res.json())
-            .then(data => {
-                const score = parseFloat(data.score) || 0;
-                sentimentInput.value = score;
-                sentimentVal.textContent = score.toFixed(2);
+        const url = "/owner/api/report/metrics?adminId=" + encodeURIComponent(adminId)
+            + "&category=" + encodeURIComponent(category);
 
-                // Stars
-                let starsHtml = '';
-                for (let i = 1; i <= 5; i++) {
-                    starsHtml += '<i class="fas fa-star ' + (i <= Math.round(score) ? 'filled' : 'empty') + '"></i>';
+        fetch(url)
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to load report metrics");
                 }
-                sentimentStars.innerHTML = starsHtml;
-
-                // Color class
-                if (score >= 3.5) {
-                    sentimentDisplay.className = 'sentiment-display positive';
-                } else if (score >= 2) {
-                    sentimentDisplay.className = 'sentiment-display neutral';
-                } else {
-                    sentimentDisplay.className = 'sentiment-display low';
-                }
-
-                if (data.count > 0) {
-                    sentimentInfo.textContent = 'Based on ' + data.count + ' feedback rating(s)';
-                } else {
-                    sentimentInfo.textContent = data.message || 'No feedback data';
-                }
+                return response.json();
             })
-            .catch(() => {
-                sentimentVal.textContent = 'ERR';
-                sentimentInfo.textContent = 'Failed to load sentiment';
-                sentimentDisplay.className = 'sentiment-display neutral';
-            });
-    });
-
-    // ===== Count this month's reports =====
-    (function() {
-        const items = document.querySelectorAll('.report-item');
-        let thisMonth = 0;
-        let latestPeriod = '—';
-        const now = new Date();
-        items.forEach((item, i) => {
-            const timeEl = item.querySelector('.report-time span:last-child');
-            if (timeEl) {
-                const d = new Date(timeEl.textContent);
-                if (d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear()) {
-                    thisMonth++;
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
                 }
-            }
-            if (i === 0) {
-                const periodEl = item.querySelector('.report-field-value');
-                if (periodEl) latestPeriod = periodEl.textContent;
+
+                const totalConcerns = Number(data.totalConcerns || 0);
+                const avgHours = Number(data.avgHours || 0);
+                const resolvedCount = Number(data.resolvedCount || 0);
+                const evidenceImageCount = Number(data.evidenceImageCount || 0);
+                const sentimentScore = Number(data.sentimentScore || 0);
+                const sentimentCount = Number(data.sentimentCount || 0);
+
+                totalConcernsInput.value = String(totalConcerns);
+                avgResolutionInput.value = avgHours.toFixed(2);
+                evidenceImageInput.value = String(evidenceImageCount);
+
+                totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + totalConcerns + " concern(s) matched this selection.";
+                if (resolvedCount > 0) {
+                    avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + avgHours.toFixed(2) + " hours over " + resolvedCount + " resolved concern(s).";
+                } else {
+                    avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> No resolved concerns found in this selection.";
+                }
+                evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + evidenceImageCount + " concern(s) include evidence images.";
+
+                renderSentiment(sentimentScore, sentimentCount, data.message);
+            })
+            .catch(function(error) {
+                totalConcernsInput.value = "";
+                avgResolutionInput.value = "";
+                evidenceImageInput.value = "";
+                totalConcernsInput.placeholder = "Error";
+                avgResolutionInput.placeholder = "Error";
+                evidenceImageInput.placeholder = "Error";
+                totalConcernsInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                avgResolutionInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                evidenceImageInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                renderSentiment(0, 0, error.message);
+            });
+    }
+
+    function renderCategoryChart(labels, counts) {
+        if (!ownerCategoryChartCanvas) {
+            return;
+        }
+        if (ownerCategoryChart) {
+            ownerCategoryChart.destroy();
+        }
+
+        ownerCategoryChart = new Chart(ownerCategoryChartCanvas, {
+            type: "bar",
+            data: {
+                labels: labels.length ? labels : ["No Data"],
+                datasets: [{
+                    label: "Concerns",
+                    data: counts.length ? counts : [0],
+                    backgroundColor: [
+                        "#dc2626", "#0ea5e9", "#22c55e", "#f97316", "#1d4ed8", "#0f766e", "#475569"
+                    ],
+                    borderRadius: 8,
+                    maxBarThickness: 44
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { precision: 0 }
+                    }
+                }
             }
         });
-        const monthEl = document.getElementById('thisMonthCount');
-        const periodEl = document.getElementById('activePeriod');
-        if (monthEl) monthEl.textContent = thisMonth;
-        if (periodEl) periodEl.textContent = latestPeriod;
-    })();
+    }
 
-    // ===== Refresh Single Report =====
-    function refreshSingleReport(btn, reportId) {
-        btn.classList.add('refreshing');
-        btn.innerHTML = '<i class="fas fa-rotate"></i> Refreshing...';
+    function renderStatusChart(statusDistribution) {
+        if (!ownerStatusChartCanvas) {
+            return;
+        }
+        if (ownerStatusChart) {
+            ownerStatusChart.destroy();
+        }
 
-        fetch('/owner/api/report/refresh/' + reportId, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) throw new Error(data.error);
+        const resolved = Number(statusDistribution && statusDistribution.resolved || 0);
+        const pending = Number(statusDistribution && statusDistribution.pending || 0);
+        const rejected = Number(statusDistribution && statusDistribution.rejected || 0);
 
-                // Update the report item in the DOM
-                const reportItem = document.querySelector('.report-item[data-report-id="' + reportId + '"]');
-                if (reportItem) {
-                    const values = reportItem.querySelectorAll('.report-field-value');
-                    // values order: Time Period, Total Concerns, Avg Resolution, Top Category, Sentiment Score, Admin ID
-                    if (values[1]) values[1].textContent = data.totalConcerns;
-                    if (values[2]) values[2].textContent = data.avgResolutionTime + ' hrs';
-                    if (values[4]) values[4].textContent = data.sentimentTrendScore;
+        ownerStatusChart = new Chart(ownerStatusChartCanvas, {
+            type: "doughnut",
+            data: {
+                labels: ["Resolved", "Pending", "Rejected"],
+                datasets: [{
+                    data: [resolved, pending, rejected],
+                    backgroundColor: ["#16a34a", "#ea580c", "#be123c"],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            boxWidth: 12,
+                            padding: 16
+                        }
+                    }
+                }
+            }
+        });
 
-                    // Flash green briefly
-                    reportItem.style.transition = 'background 0.3s';
-                    reportItem.style.background = '#f0fdf4';
-                    setTimeout(() => { reportItem.style.background = '#fafbfc'; }, 1500);
+        if (statusResolvedCount) {
+            statusResolvedCount.textContent = String(resolved);
+        }
+        if (statusPendingCount) {
+            statusPendingCount.textContent = String(pending);
+        }
+        if (statusRejectedCount) {
+            statusRejectedCount.textContent = String(rejected);
+        }
+    }
+
+    function loadOwnerAnalyticsCharts() {
+        fetch("/owner/api/analytics/charts")
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to load analytics charts");
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                const categoryLabels = Array.isArray(data.categoryLabels) ? data.categoryLabels : [];
+                const categoryCounts = Array.isArray(data.categoryCounts) ? data.categoryCounts : [];
+                renderCategoryChart(categoryLabels, categoryCounts);
+                renderStatusChart(data.statusDistribution || {});
+                if (liveConcernCount) {
+                    liveConcernCount.textContent = String(Number(data.totalConcerns || 0));
+                }
+            })
+            .catch(function(error) {
+                renderCategoryChart([], []);
+                renderStatusChart({ resolved: 0, pending: 0, rejected: 0 });
+                setExportStatus("Analytics refresh failed: " + error.message, true);
+            });
+    }
+
+    function updateMonthlyFilterScopeLabel() {
+        if (!monthlyFilterScope) {
+            return;
+        }
+        const monthValue = getSelectedMonthValue();
+        const monthLabel = getSelectedMonthLabel(monthValue);
+        const category = monthlyReportCategory.value || "All Categories";
+        const priority = monthlyReportPriority.value || "All Priorities";
+        monthlyFilterScope.textContent = monthLabel + " / " + category + " / " + priority;
+    }
+
+    function renderMonthlyReportRows(rows) {
+        if (!monthlyReportTbody) {
+            return;
+        }
+        if (!Array.isArray(rows) || rows.length === 0) {
+            monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">No concerns found for selected filters.</td></tr>";
+            return;
+        }
+
+        monthlyReportTbody.innerHTML = rows.map(function(row) {
+            const statusLabel = escapeHtml(row.status || "Pending");
+            const statusClass = getStatusClass(row.status || "Pending");
+
+            return "<tr>"
+                + "<td>" + escapeHtml(row.rowNo) + "</td>"
+                + "<td>" + escapeHtml(row.concernId) + "</td>"
+                + "<td>" + escapeHtml(row.studentId || "N/A") + "</td>"
+                + "<td>" + escapeHtml(row.studentName || "Unknown Student") + "</td>"
+                + "<td>" + escapeHtml(row.category || "N/A") + "</td>"
+                + "<td>" + escapeHtml(row.priority || "-") + "</td>"
+                + "<td><span class=\"status-badge " + statusClass + "\">" + statusLabel + "</span></td>"
+                + "<td>" + escapeHtml(row.date || "N/A") + "</td>"
+                + "<td>" + escapeHtml(row.concernMessage || "No message") + "</td>"
+                + "<td>" + escapeHtml(row.adminReply || "No reply yet") + "</td>"
+                + "</tr>";
+        }).join("");
+    }
+
+    function loadMonthlyReport() {
+        const month = getSelectedMonthValue();
+        const category = monthlyReportCategory.value || "All Categories";
+        const priority = monthlyReportPriority.value || "All Priorities";
+
+        updateMonthlyFilterScopeLabel();
+
+        if (!month) {
+            setExportStatus("Please pick a date first.", true);
+            return;
+        }
+
+        monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">Loading report rows...</td></tr>";
+
+        const url = "/owner/api/reports/monthly?month=" + encodeURIComponent(month)
+            + "&category=" + encodeURIComponent(category)
+            + "&priority=" + encodeURIComponent(priority);
+
+        fetch(url)
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to load monthly report");
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                monthlyReportRows = Array.isArray(data.rows) ? data.rows : [];
+                renderMonthlyReportRows(monthlyReportRows);
+
+                if (monthlyReportRows.length > 0) {
+                    setExportStatus("Monthly report ready. Export options are now available.", false);
+                } else {
+                    setExportStatus("No records for this filter selection.", false);
+                }
+            })
+            .catch(function(error) {
+                monthlyReportRows = [];
+                renderMonthlyReportRows([]);
+                setExportStatus("Monthly report generation failed: " + error.message, true);
+            });
+    }
+
+    async function exportMonthlyAsPdf() {
+        if (!monthlyReportRows.length) {
+            setExportStatus("Generate monthly report before exporting PDF.", true);
+            return;
+        }
+
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            setExportStatus("PDF library failed to load.", true);
+            return;
+        }
+
+        const monthValue = getSelectedMonthValue() || "current-month";
+        const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
+        const categoryLabel = monthlyReportCategory.value || "All Categories";
+        const priorityLabel = monthlyReportPriority.value || "All Priorities";
+        const fileMonth = sanitizeFileValue(monthValue);
+
+        try {
+            const jsPDF = window.jspdf.jsPDF;
+            const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+            const pageWidth = doc.internal.pageSize.getWidth();
+
+            doc.setFillColor(15, 23, 42);
+            doc.roundedRect(20, 16, pageWidth - 40, 82, 12, 12, "F");
+
+            try {
+                const logoData = await ensureLogoDataUrl();
+                const imageType = logoData.indexOf("image/png") > -1 ? "PNG" : "JPEG";
+                doc.addImage(logoData, imageType, 34, 27, 52, 52);
+            } catch (logoError) {
+                // Keep export working even if logo fails to load.
+            }
+
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(17);
+            doc.text("Academy of Knowledge Bridge", 98, 44);
+            doc.setFontSize(13);
+            doc.text("Monthly Concern Intelligence Report", 98, 64);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(10);
+            doc.text("Generated: " + new Date().toLocaleString(), 98, 82);
+
+            doc.setTextColor(51, 65, 85);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("Month: " + monthLabel, 24, 116);
+            doc.text("Category: " + categoryLabel, 230, 116);
+            doc.text("Priority: " + priorityLabel, 500, 116);
+
+            const tableRows = monthlyReportRows.map(function(row) {
+                return [
+                    row.rowNo || "",
+                    row.concernId || "",
+                    row.studentId || "",
+                    row.studentName || "",
+                    row.category || "",
+                    row.priority || "",
+                    row.status || "",
+                    row.date || "",
+                    row.concernMessage || "",
+                    row.adminReply || ""
+                ];
+            });
+
+            const tableHead = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
+
+            if (typeof doc.autoTable === "function") {
+                doc.autoTable({
+                    startY: 124,
+                    margin: { left: 20, right: 20 },
+                    head: [tableHead],
+                    body: tableRows,
+                    theme: "grid",
+                    styles: {
+                        fontSize: 8,
+                        cellPadding: 4,
+                        valign: "top",
+                        textColor: [30, 41, 59]
+                    },
+                    headStyles: {
+                        fillColor: [31, 41, 55],
+                        textColor: [255, 255, 255],
+                        fontStyle: "bold",
+                        halign: "left"
+                    },
+                    alternateRowStyles: {
+                        fillColor: [248, 250, 252]
+                    },
+                    columnStyles: {
+                        0: { cellWidth: 22 },
+                        1: { cellWidth: 46 },
+                        2: { cellWidth: 48 },
+                        3: { cellWidth: 72 },
+                        4: { cellWidth: 74 },
+                        5: { cellWidth: 46 },
+                        6: { cellWidth: 54 },
+                        7: { cellWidth: 54 },
+                        8: { cellWidth: 165 },
+                        9: { cellWidth: 165 }
+                    }
+                });
+            }
+
+            const footerY = doc.internal.pageSize.getHeight() - 18;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            doc.setTextColor(100, 116, 139);
+            doc.text("Owner Dashboard Export", 24, footerY);
+            doc.text("Total Records: " + tableRows.length, pageWidth - 130, footerY);
+
+            doc.save("owner-monthly-report-" + fileMonth + ".pdf");
+            setExportStatus("Professional PDF exported successfully.", false);
+        } catch (error) {
+            setExportStatus("PDF export failed: " + error.message, true);
+        }
+    }
+
+    async function exportMonthlyAsExcel() {
+        if (!monthlyReportRows.length) {
+            setExportStatus("Generate monthly report before exporting Excel.", true);
+            return;
+        }
+
+        const monthValue = getSelectedMonthValue() || "current-month";
+        const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
+        const categoryLabel = monthlyReportCategory.value || "All Categories";
+        const priorityLabel = monthlyReportPriority.value || "All Priorities";
+        const fileMonth = sanitizeFileValue(monthValue);
+
+        try {
+            if (window.ExcelJS && typeof window.saveAs === "function") {
+                const workbook = new ExcelJS.Workbook();
+                workbook.creator = "Owner Dashboard";
+                workbook.created = new Date();
+
+                const worksheet = workbook.addWorksheet("Monthly Intelligence", {
+                    views: [{ state: "frozen", ySplit: 6 }]
+                });
+
+                try {
+                    const logoData = await ensureLogoDataUrl();
+                    const logoExtension = logoData.indexOf("image/png") > -1 ? "png" : "jpeg";
+                    const logoImageId = workbook.addImage({
+                        base64: logoData,
+                        extension: logoExtension
+                    });
+                    worksheet.addImage(logoImageId, {
+                        tl: { col: 0, row: 0 },
+                        ext: { width: 96, height: 96 }
+                    });
+                } catch (logoError) {
+                    // Keep export working even if logo fails to load.
                 }
 
-                btn.classList.remove('refreshing');
-                btn.innerHTML = '<i class="fas fa-circle-check" style="color: var(--accent-green)"></i> Updated';
-                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh'; }, 2000);
+                worksheet.mergeCells("C1:J1");
+                worksheet.getCell("C1").value = "Academy of Knowledge Bridge";
+                worksheet.getCell("C1").font = { name: "Calibri", size: 18, bold: true, color: { argb: "FF0F172A" } };
+
+                worksheet.mergeCells("C2:J2");
+                worksheet.getCell("C2").value = "Monthly Concern Intelligence Report";
+                worksheet.getCell("C2").font = { name: "Calibri", size: 13, bold: true, color: { argb: "FF334155" } };
+
+                worksheet.mergeCells("C3:J3");
+                worksheet.getCell("C3").value = "Month: " + monthLabel + " | Category: " + categoryLabel + " | Priority: " + priorityLabel;
+                worksheet.getCell("C3").font = { name: "Calibri", size: 10, color: { argb: "FF475569" } };
+
+                worksheet.mergeCells("C4:J4");
+                worksheet.getCell("C4").value = "Generated on " + new Date().toLocaleString();
+                worksheet.getCell("C4").font = { name: "Calibri", size: 10, italic: true, color: { argb: "FF64748B" } };
+
+                const headerRowNumber = 6;
+                const headerValues = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
+                const headerRow = worksheet.getRow(headerRowNumber);
+                headerRow.values = headerValues;
+                headerRow.height = 22;
+
+                headerRow.eachCell(function(cell) {
+                    cell.font = { name: "Calibri", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
+                    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F2937" } };
+                    cell.alignment = { vertical: "middle", horizontal: "center" };
+                    cell.border = {
+                        top: { style: "thin", color: { argb: "FFCBD5E1" } },
+                        left: { style: "thin", color: { argb: "FFCBD5E1" } },
+                        bottom: { style: "thin", color: { argb: "FFCBD5E1" } },
+                        right: { style: "thin", color: { argb: "FFCBD5E1" } }
+                    };
+                });
+
+                worksheet.getColumn(1).width = 6;
+                worksheet.getColumn(2).width = 12;
+                worksheet.getColumn(3).width = 14;
+                worksheet.getColumn(4).width = 23;
+                worksheet.getColumn(5).width = 24;
+                worksheet.getColumn(6).width = 12;
+                worksheet.getColumn(7).width = 12;
+                worksheet.getColumn(8).width = 14;
+                worksheet.getColumn(9).width = 44;
+                worksheet.getColumn(10).width = 44;
+
+                monthlyReportRows.forEach(function(row, index) {
+                    const excelRow = worksheet.getRow(headerRowNumber + 1 + index);
+                    excelRow.values = [
+                        row.rowNo || "",
+                        row.concernId || "",
+                        row.studentId || "",
+                        row.studentName || "",
+                        row.category || "",
+                        row.priority || "",
+                        row.status || "",
+                        row.date || "",
+                        row.concernMessage || "",
+                        row.adminReply || ""
+                    ];
+                    excelRow.height = 36;
+
+                    excelRow.eachCell(function(cell, colNumber) {
+                        cell.font = { name: "Calibri", size: 10, color: { argb: "FF1E293B" } };
+                        cell.alignment = {
+                            vertical: "top",
+                            horizontal: colNumber <= 3 ? "center" : "left",
+                            wrapText: colNumber >= 9
+                        };
+                        cell.border = {
+                            top: { style: "thin", color: { argb: "FFE2E8F0" } },
+                            left: { style: "thin", color: { argb: "FFE2E8F0" } },
+                            bottom: { style: "thin", color: { argb: "FFE2E8F0" } },
+                            right: { style: "thin", color: { argb: "FFE2E8F0" } }
+                        };
+
+                        if (index % 2 === 0) {
+                            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8FAFC" } };
+                        }
+                    });
+
+                    const statusCell = excelRow.getCell(7);
+                    const normalizedStatus = String(row.status || "").toLowerCase();
+                    if (normalizedStatus.includes("resolv") || normalizedStatus.includes("complete")) {
+                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDCFCE7" } };
+                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF166534" } };
+                    } else if (normalizedStatus.includes("reject") || normalizedStatus.includes("delete")) {
+                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFE4E6" } };
+                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9F1239" } };
+                    } else {
+                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFEDD5" } };
+                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9A3412" } };
+                    }
+                });
+
+                worksheet.autoFilter = {
+                    from: { row: headerRowNumber, column: 1 },
+                    to: { row: headerRowNumber, column: 10 }
+                };
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([
+                    buffer
+                ], {
+                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                });
+                window.saveAs(blob, "owner-monthly-report-" + fileMonth + ".xlsx");
+                setExportStatus("Professional Excel exported successfully.", false);
+                return;
+            }
+
+            if (!window.XLSX) {
+                throw new Error("Excel export library failed to load.");
+            }
+
+            const fallbackRows = monthlyReportRows.map(function(row) {
+                return {
+                    "#": row.rowNo,
+                    "Concern ID": row.concernId,
+                    "Student ID": row.studentId,
+                    "Student Name": row.studentName,
+                    "Category": row.category,
+                    "Priority": row.priority,
+                    "Status": row.status,
+                    "Date": row.date,
+                    "Concern": row.concernMessage,
+                    "Latest Reply": row.adminReply
+                };
+            });
+
+            const fallbackSheet = XLSX.utils.json_to_sheet(fallbackRows);
+            const fallbackWorkbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(fallbackWorkbook, fallbackSheet, "MonthlyReport");
+            XLSX.writeFile(fallbackWorkbook, "owner-monthly-report-" + fileMonth + ".xlsx");
+            setExportStatus("Excel exported successfully.", false);
+        } catch (error) {
+            setExportStatus("Excel export failed: " + error.message, true);
+        }
+    }
+
+    function refreshSingleReport(button, reportId) {
+        if (!button || !reportId) {
+            return;
+        }
+
+        button.classList.add("loading");
+        button.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
+
+        fetch("/owner/api/report/refresh/" + reportId, { method: "POST" })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to refresh report");
+                }
+                return response.json();
             })
-            .catch(err => {
-                btn.classList.remove('refreshing');
-                btn.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#dc2626"></i> Failed';
-                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh'; }, 2000);
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const reportItem = document.querySelector('.report-item[data-report-id="' + reportId + '"]');
+                if (reportItem) {
+                    const totalEl = reportItem.querySelector(".report-total-concerns");
+                    const avgEl = reportItem.querySelector(".report-avg-resolution");
+                    const categoryEl = reportItem.querySelector(".report-category");
+                    const sentimentEl = reportItem.querySelector(".report-sentiment");
+                    const evidenceEl = reportItem.querySelector(".report-evidence-images");
+
+                    if (totalEl) {
+                        totalEl.textContent = String(data.totalConcerns || 0);
+                    }
+                    if (avgEl) {
+                        avgEl.textContent = String(data.avgResolutionTime || "0.00") + " hrs";
+                    }
+                    if (categoryEl) {
+                        categoryEl.textContent = String(data.mostFrequentCategory || "All Categories");
+                    }
+                    if (sentimentEl) {
+                        sentimentEl.textContent = String(data.sentimentTrendScore || "0.00");
+                    }
+                    if (evidenceEl) {
+                        evidenceEl.textContent = String(data.evidenceImageCount || 0);
+                    }
+
+                    reportItem.style.transition = "background .3s ease";
+                    reportItem.style.background = "#ecfdf3";
+                    setTimeout(function() {
+                        reportItem.style.background = "linear-gradient(145deg, #fff, #f8fbff)";
+                    }, 900);
+                }
+
+                button.classList.remove("loading");
+                button.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated";
+                setTimeout(function() {
+                    button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
+                }, 1400);
+            })
+            .catch(function() {
+                button.classList.remove("loading");
+                button.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                setTimeout(function() {
+                    button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
+                }, 1400);
             });
     }
 
-    // ===== Refresh All Reports =====
-    function refreshAllReports(btn) {
-        btn.classList.add('refreshing');
-        btn.innerHTML = '<i class="fas fa-rotate"></i> Refreshing...';
+    function refreshAllReports() {
+        if (!refreshAllBtn) {
+            return;
+        }
 
-        fetch('/owner/api/reports/refresh-all', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                if (data.error) throw new Error(data.error);
+        refreshAllBtn.classList.add("loading");
+        refreshAllBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
 
-                btn.classList.remove('refreshing');
-                btn.innerHTML = '<i class="fas fa-circle-check"></i> Updated ' + data.updatedCount + ' report(s)';
-                setTimeout(() => {
-                    btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh All';
-                    // Reload page to show updated values
+        fetch("/owner/api/reports/refresh-all", { method: "POST" })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to refresh all reports");
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                refreshAllBtn.classList.remove("loading");
+                refreshAllBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated " + (data.updatedCount || 0);
+                setTimeout(function() {
                     window.location.reload();
-                }, 1200);
+                }, 900);
             })
-            .catch(err => {
-                btn.classList.remove('refreshing');
-                btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Failed';
-                setTimeout(() => { btn.innerHTML = '<i class="fas fa-rotate"></i> Refresh All'; }, 2000);
+            .catch(function() {
+                refreshAllBtn.classList.remove("loading");
+                refreshAllBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                setTimeout(function() {
+                    refreshAllBtn.innerHTML = "<i class=\"fas fa-arrows-rotate\"></i> Refresh All";
+                }, 1200);
             });
     }
 
+    function initializeMonthlyDefaults() {
+        if (monthlyReportMonth && !monthlyReportMonth.value) {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, "0");
+            const month = String(now.getMonth() + 1).padStart(2, "0");
+            monthlyReportMonth.value = now.getFullYear() + "-" + month + "-" + day;
+        }
+        updateMonthlyFilterScopeLabel();
+    }
+
+    function bindEvents() {
+        if (adminSelect) {
+            adminSelect.addEventListener("change", loadReportMetrics);
+        }
+        if (categorySelect) {
+            categorySelect.addEventListener("change", loadReportMetrics);
+        }
+        if (generateMonthlyReportBtn) {
+            generateMonthlyReportBtn.addEventListener("click", loadMonthlyReport);
+        }
+        if (monthlyReportCategory) {
+            monthlyReportCategory.addEventListener("change", updateMonthlyFilterScopeLabel);
+        }
+        if (monthlyReportPriority) {
+            monthlyReportPriority.addEventListener("change", updateMonthlyFilterScopeLabel);
+        }
+        if (monthlyReportMonth) {
+            monthlyReportMonth.addEventListener("change", updateMonthlyFilterScopeLabel);
+        }
+        if (refreshAnalyticsBtn) {
+            refreshAnalyticsBtn.addEventListener("click", loadOwnerAnalyticsCharts);
+        }
+        if (exportPdfBtn) {
+            exportPdfBtn.addEventListener("click", exportMonthlyAsPdf);
+        }
+        if (exportExcelBtn) {
+            exportExcelBtn.addEventListener("click", exportMonthlyAsExcel);
+        }
+        if (refreshAllBtn) {
+            refreshAllBtn.addEventListener("click", refreshAllReports);
+        }
+    }
+
+    window.refreshSingleReport = refreshSingleReport;
+
+    dismissFlashMessages();
+    countThisMonthReports();
+    initializeMonthlyDefaults();
+    bindEvents();
+    loadAdmins();
+    loadOwnerAnalyticsCharts();
+    loadMonthlyReport();
+    resetMetrics();
 </script>
 </body>
 </html>

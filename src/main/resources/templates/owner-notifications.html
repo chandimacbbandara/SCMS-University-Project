@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Send Notifications - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/owner-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #e53935;
@@ -35,7 +36,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg-body);
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
             color: var(--text-dark);
             min-height: 100vh;
         }
@@ -331,7 +332,7 @@
             border: 2px solid #eee;
             border-radius: var(--radius-sm);
             font-size: 13px;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             color: var(--text-dark);
             background: #fafafa;
             transition: all 0.3s;
@@ -589,9 +590,215 @@
         .btn-modal-cancel:hover { background: #e0e0e0; }
         .btn-modal-confirm { background: #dc2626; color: #fff; text-decoration: none; display: flex; align-items: center; justify-content: center; }
         .btn-modal-confirm:hover { background: #b91c1c; }
+
+        /* ===== Professional Refresh ===== */
+        .owner-container {
+            max-width: 1240px;
+        }
+
+        .page-hero {
+            padding: 34px 36px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            left: -100px;
+            bottom: -140px;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(96, 165, 250, 0.26) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .hero-right {
+            gap: 14px;
+            align-items: stretch;
+        }
+
+        .hero-side-metrics {
+            display: grid;
+            gap: 10px;
+        }
+
+        .hero-mini-card {
+            min-width: 168px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.08);
+            padding: 10px 12px;
+            display: grid;
+            gap: 3px;
+        }
+
+        .hero-mini-card span {
+            font-size: 10px;
+            letter-spacing: 0.9px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.65);
+        }
+
+        .hero-mini-card strong {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1.1;
+        }
+
+        .hero-mini-card strong.is-text {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .hero-icon-wrap {
+            width: 78px;
+            height: 78px;
+            font-size: 30px;
+        }
+
+        .stats-bar {
+            gap: 14px;
+        }
+
+        .stat-pill {
+            border-color: #dfe7f1;
+            box-shadow: 0 12px 26px rgba(15, 23, 42, 0.07);
+            background: linear-gradient(160deg, #ffffff 0%, #f8fbff 100%);
+        }
+
+        .dashboard-grid {
+            grid-template-columns: minmax(330px, 0.9fr) minmax(0, 1.1fr);
+            gap: 16px;
+        }
+
+        .create-card,
+        .history-card {
+            border-color: #dce5ef;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .send-panel {
+            position: sticky;
+            top: 24px;
+        }
+
+        .history-card-body {
+            max-height: 700px;
+            padding: 16px 18px 18px;
+        }
+
+        .notif-item {
+            border-color: #e2e8f0;
+            background: linear-gradient(145deg, #ffffff, #f8fbff);
+            border-radius: 14px;
+            margin-bottom: 10px;
+            padding: 14px 16px;
+        }
+
+        .notif-item::before {
+            width: 3px;
+            background: linear-gradient(180deg, #fb7185, #f97316);
+        }
+
+        .notif-item:hover {
+            transform: translateX(0);
+            border-color: #fda4af;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .notif-item-header {
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .notif-title {
+            flex: 1;
+        }
+
+        .notif-seq {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 30px;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: 999px;
+            border: 1px solid #fde68a;
+            background: #fef9c3;
+            color: #92400e;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .notif-message {
+            border-left-width: 2px;
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            margin-bottom: 10px;
+        }
+
+        .notif-meta {
+            flex-wrap: wrap;
+            row-gap: 6px;
+        }
+
+        .notif-actions {
+            justify-content: flex-end;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        .btn-action {
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 10px;
+            letter-spacing: 0.7px;
+        }
+
+        @media (max-width: 1100px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .send-panel {
+                position: static;
+            }
+
+            .history-card-body {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .hero-side-metrics {
+                grid-template-columns: 1fr 1fr;
+                width: 100%;
+            }
+
+            .hero-mini-card {
+                min-width: 0;
+            }
+
+            .notif-item-header {
+                flex-wrap: wrap;
+            }
+
+            .notif-actions {
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
-<body>
+<body class="owner-theme">
 <header>
     <div class="container header-content">
         <div class="logo-area">
@@ -641,6 +848,16 @@
                 </p>
             </div>
             <div class="hero-right">
+                <div class="hero-side-metrics">
+                    <div class="hero-mini-card">
+                        <span>Total Broadcasts</span>
+                        <strong th:text="${notifications != null ? #lists.size(notifications) : 0}">0</strong>
+                    </div>
+                    <div class="hero-mini-card">
+                        <span>Audience Scope</span>
+                        <strong class="is-text">All Students</strong>
+                    </div>
+                </div>
                 <div class="hero-icon-wrap">
                     <i class="fas fa-bell"></i>
                 </div>
@@ -676,7 +893,7 @@
         <div class="dashboard-grid">
 
             <!-- LEFT: Send Notification Form -->
-            <div class="create-card animate-in delay-2">
+            <div class="create-card send-panel animate-in delay-2">
                 <div class="create-card-header">
                     <div class="create-card-header-icon"><i class="fas fa-bullhorn"></i></div>
                     <div class="create-card-header-text">
@@ -743,6 +960,7 @@
                     <div th:each="notif, iterStat : ${notifications}" class="notif-item"
                          th:style="'animation: fadeSlideUp 0.5s ease both; animation-delay: ' + ${0.06 * iterStat.index} + 's'">
                         <div class="notif-item-header">
+                            <span class="notif-seq" th:text="' #' + ${iterStat.index + 1}">#1</span>
                             <span class="notif-title">
                                 <i class="fas fa-bullhorn"></i>
                                 <span th:text="${notif.title}">Notification Title</span>
