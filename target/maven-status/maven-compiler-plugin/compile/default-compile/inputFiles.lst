@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/StudentConcernManagementSystemApplication.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/config/useerconfig.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/controller/AdminController.java
@@ -52,3 +53,12 @@
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/NotificationService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentCommunityService.java
 /home/chandima-bandara/Desktop/SCMS-University-Project/src/main/java/Project/_6/demo/service/StudentRegistrationService.java
+=======
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/StudentConcernManagementSystemApplication.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/config/userconfig.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/controller/usercontroller.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/dto/userdto.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/entity/user.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/repository/userrepository.java
+/Users/dini/Downloads/Y2S2/AIML/Project/SCMS-University-Project/src/main/java/Project/_6/demo/service/userservice.java
+>>>>>>> Stashed changes
