@@ -16,6 +16,9 @@ import Project._6.demo.repository.FeedbackRepository;
 import Project._6.demo.repository.UserRepository;
 import Project._6.demo.service.AnalyticsReportService;
 import Project._6.demo.service.EmailVerificationService;
+import Project._6.demo.service.FaqManagementService;
+import Project._6.demo.entity.Tip;
+import Project._6.demo.entity.Faq;
 import Project._6.demo.service.NotificationService;
 
 import org.springframework.http.HttpStatus;
@@ -49,6 +52,7 @@ public class OwnerController {
     private final NotificationService notificationService;
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
+    private final FaqManagementService faqManagementService;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$");
@@ -72,7 +76,8 @@ public class OwnerController {
                            AdminReplyRepository adminReplyRepository,
                            NotificationService notificationService,
                            EmailVerificationService emailVerificationService,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           FaqManagementService faqManagementService) {
         this.analyticsReportService = analyticsReportService;
         this.analyticsReportRepository = analyticsReportRepository;
         this.concernRepository = concernRepository;
@@ -83,6 +88,7 @@ public class OwnerController {
         this.notificationService = notificationService;
         this.emailVerificationService = emailVerificationService;
         this.passwordEncoder = passwordEncoder;
+        this.faqManagementService = faqManagementService;
     }
 
     @GetMapping("/dashboard")
@@ -885,6 +891,136 @@ public class OwnerController {
             return "redirect:/owner/notifications/update/" + id;
         }
         return "redirect:/owner/notifications";
+    }
+
+    // =====================================
+    // FAQ & TIPS MANAGEMENT
+    // =====================================
+
+    @GetMapping("/faq")
+    public String showFaqManagement(HttpSession session, Model model) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+        model.addAttribute("tips", faqManagementService.getAllTips());
+        model.addAttribute("faqs", faqManagementService.getAllFaqs());
+        return "owner-faq";
+    }
+
+    @PostMapping("/faq/tip/create")
+    public String createTip(@RequestParam("title") String title,
+                            @RequestParam("description") String description,
+                            @RequestParam("iconClass") String iconClass,
+                            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        
+        try {
+            Tip tip = new Tip(title.trim(), description.trim(), iconClass.trim());
+            faqManagementService.saveTip(tip);
+            redirectAttributes.addFlashAttribute("successMessage", "Tip created successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to create Tip: " + e.getMessage());
+        }
+        return "redirect:/owner/faq";
+    }
+
+    @PostMapping("/faq/tip/delete/{id}")
+    public String deleteTip(@PathVariable("id") Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            faqManagementService.deleteTip(id);
+            redirectAttributes.addFlashAttribute("successMessage", "Tip deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete Tip.");
+        }
+        return "redirect:/owner/faq";
+    }
+
+    @PostMapping("/faq/faq/create")
+    public String createFaq(@RequestParam("question") String question,
+                            @RequestParam("answer") String answer,
+                            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+
+        try {
+            Faq faq = new Faq(question.trim(), answer.trim());
+            faqManagementService.saveFaq(faq);
+            redirectAttributes.addFlashAttribute("successMessage", "FAQ created successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to create FAQ: " + e.getMessage());
+        }
+        return "redirect:/owner/faq";
+    }
+
+    @PostMapping("/faq/faq/delete/{id}")
+    public String deleteFaq(@PathVariable("id") Long id, HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            faqManagementService.deleteFaq(id);
+            redirectAttributes.addFlashAttribute("successMessage", "FAQ deleted successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete FAQ.");
+        }
+        return "redirect:/owner/faq";
+    }
+
+    @GetMapping("/faq/tip/update/{id}")
+    public String showUpdateTip(@PathVariable("id") Long id, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            Tip tip = faqManagementService.getTipById(id);
+            if(tip == null) throw new Exception("Tip not found");
+            model.addAttribute("tip", tip);
+            return "owner-faq-tip-update";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/owner/faq";
+        }
+    }
+
+    @PostMapping("/faq/tip/update/{id}")
+    public String updateTip(@PathVariable("id") Long id, 
+                            @RequestParam("title") String title,
+                            @RequestParam("description") String description,
+                            @RequestParam("iconClass") String iconClass,
+                            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            faqManagementService.updateTip(id, title.trim(), description.trim(), iconClass.trim());
+            redirectAttributes.addFlashAttribute("successMessage", "Tip updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+        }
+        return "redirect:/owner/faq";
+    }
+
+    @GetMapping("/faq/faq/update/{id}")
+    public String showUpdateFaq(@PathVariable("id") Long id, HttpSession session, Model model, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            Faq faq = faqManagementService.getFaqById(id);
+            if(faq == null) throw new Exception("FAQ not found");
+            model.addAttribute("faq", faq);
+            return "owner-faq-faq-update";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/owner/faq";
+        }
+    }
+
+    @PostMapping("/faq/faq/update/{id}")
+    public String updateFaq(@PathVariable("id") Long id, 
+                            @RequestParam("question") String question,
+                            @RequestParam("answer") String answer,
+                            HttpSession session, RedirectAttributes redirectAttributes) {
+        if (!isOwnerLoggedIn(session)) return "redirect:/login";
+        try {
+            faqManagementService.updateFaq(id, question.trim(), answer.trim());
+            redirectAttributes.addFlashAttribute("successMessage", "FAQ updated successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
+        }
+        return "redirect:/owner/faq";
     }
 
     private boolean isOwnerLoggedIn(HttpSession session) {

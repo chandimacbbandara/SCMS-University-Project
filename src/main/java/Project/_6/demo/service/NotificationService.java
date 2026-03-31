@@ -8,14 +8,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class NotificationService {
 
     private final NotificationRepository notificationRepository;
+    private final EmailVerificationService emailVerificationService;
 
-    public NotificationService(NotificationRepository notificationRepository) {
+    public NotificationService(NotificationRepository notificationRepository, EmailVerificationService emailVerificationService) {
         this.notificationRepository = notificationRepository;
+        this.emailVerificationService = emailVerificationService;
     }
 
     private Notification newNotification() {
@@ -35,7 +38,13 @@ public class NotificationService {
         notification.setType("SUBMITTED");
         notification.setStudent(concern.getStudent());
         notification.setConcern(concern);
-        return notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+
+        CompletableFuture.runAsync(() -> {
+            emailVerificationService.sendConcernStatusEmail(concern, "SUBMITTED");
+        });
+
+        return saved;
     }
 
     /**
@@ -51,7 +60,13 @@ public class NotificationService {
         notification.setType("IN_PROGRESS");
         notification.setStudent(concern.getStudent());
         notification.setConcern(concern);
-        return notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+
+        CompletableFuture.runAsync(() -> {
+            emailVerificationService.sendConcernStatusEmail(concern, "READ");
+        });
+
+        return saved;
     }
 
     /**
@@ -67,7 +82,13 @@ public class NotificationService {
         notification.setType("COMPLETE");
         notification.setStudent(concern.getStudent());
         notification.setConcern(concern);
-        return notificationRepository.save(notification);
+        Notification saved = notificationRepository.save(notification);
+
+        CompletableFuture.runAsync(() -> {
+            emailVerificationService.sendConcernStatusEmail(concern, "REPLIED");
+        });
+
+        return saved;
     }
 
     /**
