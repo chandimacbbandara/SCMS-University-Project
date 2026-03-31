@@ -457,6 +457,73 @@
         .btn-clear:hover { border-color: var(--primary); color: var(--primary); }
 
         .table-card { margin-bottom: 34px; overflow: hidden; }
+        .quick-tools {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--card-shadow);
+            padding: 14px 16px;
+            margin-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+        }
+        .quick-tools-search {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            border: 1px solid #dbe3ef;
+            border-radius: 10px;
+            padding: 9px 12px;
+            background: #f8fafc;
+        }
+        .quick-tools-search i { color: #64748b; }
+        .quick-tools-search input {
+            width: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            color: #0f172a;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+        }
+        .status-chip-row {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .status-chip-btn {
+            border: 1px solid #dbe3ef;
+            background: #fff;
+            color: #475569;
+            border-radius: 999px;
+            padding: 7px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+        .status-chip-btn:hover { border-color: #94a3b8; color: #1e293b; }
+        .status-chip-btn.active {
+            background: rgba(220, 38, 38, 0.12);
+            color: #7f1d1d;
+            border-color: rgba(220, 38, 38, 0.35);
+        }
+        .table-empty-dynamic {
+            text-align: center;
+            padding: 18px 14px;
+            color: #64748b;
+            font-size: 12px;
+            font-weight: 700;
+            display: none;
+        }
+        .table-empty-dynamic.visible { display: block; }
         .table-header {
             padding: 20px;
             background: linear-gradient(120deg, #111827, #1f2937 55%, #7f1d1d);
@@ -672,6 +739,8 @@
             .stats-row { grid-template-columns: repeat(2, 1fr); }
             .filter-form { grid-template-columns: repeat(2, 1fr) auto auto; }
             .department-tab { min-width: 160px; }
+            .quick-tools { grid-template-columns: 1fr; }
+            .status-chip-row { justify-content: flex-start; }
         }
         @media (max-width: 768px) {
             .container,
@@ -902,6 +971,20 @@
             </div>
         </div>
 
+        <!-- Quick Interaction Tools -->
+        <section class="quick-tools anim-up d4">
+            <label class="quick-tools-search" for="concernSearchInput">
+                <i class="fas fa-magnifying-glass"></i>
+                <input type="search" id="concernSearchInput" placeholder="Quick search by student, subject, category, status or message..." aria-label="Search concerns">
+            </label>
+            <div class="status-chip-row" role="group" aria-label="Quick status filter">
+                <button type="button" class="status-chip-btn active" data-quick-status="All">All</button>
+                <button type="button" class="status-chip-btn" data-quick-status="Pending">Pending</button>
+                <button type="button" class="status-chip-btn" data-quick-status="In Progress">In Progress</button>
+                <button type="button" class="status-chip-btn" data-quick-status="Complete">Complete</button>
+            </div>
+        </section>
+
         <!-- Concerns Table -->
         <div class="table-card anim-up d5">
             <div class="table-header">
@@ -913,7 +996,7 @@
                     </div>
                 </div>
                 <div class="concern-count-badge">
-                    <span th:text="${#lists.size(concerns.?[category != 'Education (Creative and IT)'])}">0</span>
+                    <span id="visibleConcernCount" th:text="${#lists.size(concerns.?[category != 'Education (Creative and IT)'])}">0</span>
                     <span class="concern-count-label">Concerns</span>
                 </div>
             </div>
@@ -933,7 +1016,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="concern, iterStat : ${concerns}" th:if="${concern.category != 'Education (Creative and IT)'}">
+                            <tr th:each="concern, iterStat : ${concerns}" th:if="${concern.category != 'Education (Creative and IT)'}"
+                                class="concern-data-row"
+                                th:attr="data-status=${concern.status},
+                                         data-student=${concern.student != null and concern.student.user != null ? concern.student.user.firstName + ' ' + concern.student.user.lastName : 'Unknown'},
+                                         data-student-id=${concern.student != null ? concern.student.studentId : ''},
+                                         data-subject=${concern.subject},
+                                         data-message=${concern.message},
+                                         data-category=${concern.category}">
                                 <td>
                                     <span class="id-pill" th:text="'CON-' + ${concern.concernId}">CON-1</span>
                                 </td>
@@ -990,6 +1080,9 @@
                         </tbody>
                     </table>
                 </div>
+                <div id="dynamicTableEmpty" class="table-empty-dynamic">
+                    <i class="fas fa-circle-info"></i> No concerns match your quick search/status filter.
+                </div>
             </div>
 
             <div th:if="${#lists.isEmpty(concerns.?[category != 'Education (Creative and IT)'])}" class="empty-state">
@@ -1041,6 +1134,60 @@
             });
         }
         window.addEventListener('DOMContentLoaded', () => setTimeout(animateCounters, 300));
+
+        /* Quick table search + status chips */
+        (function() {
+            const searchInput = document.getElementById('concernSearchInput');
+            const statusButtons = Array.from(document.querySelectorAll('.status-chip-btn'));
+            const rows = Array.from(document.querySelectorAll('.concern-data-row'));
+            const visibleCount = document.getElementById('visibleConcernCount');
+            const emptyState = document.getElementById('dynamicTableEmpty');
+            let selectedQuickStatus = 'All';
+
+            function matchesSearch(row, searchText) {
+                if (!searchText) return true;
+                const haystack = [
+                    row.dataset.student,
+                    row.dataset.studentId,
+                    row.dataset.subject,
+                    row.dataset.message,
+                    row.dataset.category,
+                    row.dataset.status
+                ].join(' ').toLowerCase();
+                return haystack.includes(searchText);
+            }
+
+            function updateQuickFilters() {
+                const searchText = (searchInput?.value || '').trim().toLowerCase();
+                let shown = 0;
+
+                rows.forEach((row) => {
+                    const statusMatches = selectedQuickStatus === 'All' || (row.dataset.status || '').toLowerCase() === selectedQuickStatus.toLowerCase();
+                    const searchMatches = matchesSearch(row, searchText);
+                    const shouldShow = statusMatches && searchMatches;
+                    row.style.display = shouldShow ? '' : 'none';
+                    if (shouldShow) shown++;
+                });
+
+                if (visibleCount) visibleCount.textContent = String(shown);
+                if (emptyState) emptyState.classList.toggle('visible', shown === 0 && rows.length > 0);
+            }
+
+            statusButtons.forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    selectedQuickStatus = btn.dataset.quickStatus || 'All';
+                    statusButtons.forEach((b) => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    updateQuickFilters();
+                });
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', updateQuickFilters);
+            }
+
+            updateQuickFilters();
+        })();
     </script>
     <script>
         window.adminTourConfig = {

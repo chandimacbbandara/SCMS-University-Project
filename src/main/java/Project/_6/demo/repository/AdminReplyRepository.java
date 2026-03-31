@@ -10,6 +10,7 @@ import java.util.Optional;
 @Repository
 public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer> {
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
+    List<AdminReply> findByConcern_ConcernIdIn(List<Integer> concernIds);
     List<AdminReply> findByConcern_Category(String category);
     List<AdminReply> findByAdmin_UserId(Integer adminUserId);
     List<AdminReply> findByAdmin_UserIdAndConcern_Category(Integer adminUserId, String category);

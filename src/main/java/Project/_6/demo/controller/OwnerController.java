@@ -725,16 +725,59 @@ public class OwnerController {
                 .sorted(Comparator.comparing(Concern::getCreatedTime).reversed())
                 .collect(Collectors.toList());
 
+        List<Integer> concernIds = filteredConcerns.stream()
+            .map(Concern::getConcernId)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        Map<Integer, AdminReply> latestReplyByConcernId = new HashMap<>();
+        if (!concernIds.isEmpty()) {
+            List<AdminReply> replies = adminReplyRepository.findByConcern_ConcernIdIn(concernIds);
+            latestReplyByConcernId = replies.stream()
+                .filter(reply -> reply.getConcern() != null
+                    && reply.getConcern().getConcernId() != null
+                    && reply.getReplyTime() != null)
+                .collect(Collectors.toMap(
+                    reply -> reply.getConcern().getConcernId(),
+                    reply -> reply,
+                    (existing, candidate) -> candidate.getReplyTime().isAfter(existing.getReplyTime()) ? candidate : existing
+                ));
+        }
+
         List<Map<String, Object>> rows = new ArrayList<>();
         int rowNo = 1;
         for (Concern concern : filteredConcerns) {
+            AdminReply latestReply = latestReplyByConcernId.get(concern.getConcernId());
+
+            String studentId = "N/A";
+            String studentName = "Unknown Student";
+            if (concern.getStudent() != null) {
+            if (StringUtils.hasText(concern.getStudent().getStudentId())) {
+                studentId = concern.getStudent().getStudentId().trim();
+            }
+            if (concern.getStudent().getUser() != null) {
+                String firstName = defaultText(concern.getStudent().getUser().getFirstName(), "");
+                String lastName = defaultText(concern.getStudent().getUser().getLastName(), "");
+                String fullName = (firstName + " " + lastName).trim();
+                if (StringUtils.hasText(fullName)) {
+                studentName = fullName;
+                }
+            }
+            }
+
             Map<String, Object> row = new LinkedHashMap<>();
             row.put("rowNo", rowNo++);
             row.put("concernId", concern.getConcernId());
+            row.put("studentId", studentId);
+            row.put("studentName", studentName);
             row.put("category", defaultText(concern.getCategory(), "N/A"));
             row.put("priority", defaultText(concern.getAiPriorityLevel(), "—"));
             row.put("status", normalizeStatusLabel(concern.getStatus()));
             row.put("date", concern.getCreatedTime().format(dateFormatter));
+            row.put("concernMessage", defaultText(concern.getMessage(), "No message"));
+            row.put("adminReply", latestReply != null
+                ? defaultText(latestReply.getReplyMessage(), "No reply yet")
+                : "No reply yet");
             rows.add(row);
         }
 

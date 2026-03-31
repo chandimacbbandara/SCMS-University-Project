@@ -5,8 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FAQ Management - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/owner-theme.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #e53935;
@@ -35,7 +36,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             background: var(--bg-body);
-            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            font-family: 'Plus Jakarta Sans', -apple-system, system-ui, sans-serif;
             color: var(--text-dark);
             min-height: 100vh;
         }
@@ -228,7 +229,7 @@
         .form-label i { margin-right: 5px; color: var(--accent-blue); }
         .form-control {
             width: 100%; padding: 12px 16px; border: 2px solid #eee; border-radius: var(--radius-sm);
-            font-size: 13px; font-family: 'Inter', sans-serif; color: var(--text-dark); background: #fafafa; outline: none; transition: 0.3s;
+            font-size: 13px; font-family: 'Plus Jakarta Sans', sans-serif; color: var(--text-dark); background: #fafafa; outline: none; transition: 0.3s;
         }
         .form-control:focus { border-color: var(--accent-blue); background: #fff; box-shadow: 0 0 0 4px rgba(37,99,235,0.08); }
         select.form-control { cursor: pointer; }
@@ -285,7 +286,7 @@
         /* ===== Custom Modal ===== */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            background: rgba(0,0,0,0.5); -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px);
             z-index: 9999; display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none; transition: 0.3s;
         }
@@ -308,13 +309,163 @@
         .btn-modal-cancel:hover { background: #e0e0e0; }
         .btn-modal-confirm { background: #dc2626; color: #fff; text-decoration: none; display: flex; justify-content: center; align-items: center; width: 100%; }
         .btn-modal-confirm:hover { background: #b91c1c; }
+        .modal-delete-form { flex: 1; margin: 0; }
+
+        /* ===== Professional Refresh ===== */
+        .owner-container {
+            max-width: 1240px;
+        }
+
+        .page-hero {
+            padding: 34px 36px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 20px;
+        }
+
+        .page-hero::after {
+            content: "";
+            position: absolute;
+            left: -110px;
+            bottom: -160px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(34, 197, 94, 0.24) 0%, transparent 72%);
+            border-radius: 50%;
+        }
+
+        .hero-right {
+            align-self: flex-end;
+        }
+
+        .faq-kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .kpi-card {
+            border: 1px solid #dce5ef;
+            background: linear-gradient(155deg, #ffffff 0%, #f8fbff 100%);
+            border-radius: 15px;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.07);
+            padding: 14px 16px;
+            display: grid;
+            gap: 5px;
+        }
+
+        .kpi-label {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+
+        .kpi-value {
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1;
+            color: #0f172a;
+        }
+
+        .kpi-note {
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .content-grid {
+            grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .create-card,
+        .history-card {
+            border-color: #dce5ef;
+            box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .tips-grid-panel .create-card,
+        .faq-grid-panel .create-card {
+            position: sticky;
+            top: 24px;
+        }
+
+        .history-card-body {
+            max-height: 620px;
+            padding: 16px 18px 18px;
+        }
+
+        .notif-item {
+            border-color: #e2e8f0;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #ffffff, #f8fbff);
+            margin-bottom: 10px;
+            padding: 14px 16px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .notif-item:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 10px 20px rgba(15, 23, 42, 0.08);
+        }
+
+        .notif-title {
+            margin-bottom: 10px;
+        }
+
+        .notif-message {
+            background: #ffffff;
+            border: 1px solid #edf2f7;
+            line-height: 1.65;
+        }
+
+        .notif-actions {
+            justify-content: flex-end;
+            margin-top: 12px;
+            padding-top: 12px;
+        }
+
+        .btn-action {
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 10px;
+            letter-spacing: 0.7px;
+        }
+
+        @media (max-width: 1100px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tips-grid-panel .create-card,
+            .faq-grid-panel .create-card {
+                position: static;
+            }
+
+            .history-card-body {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .faq-kpi-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .notif-actions {
+                justify-content: flex-start;
+            }
+        }
 
         @media (max-width: 768px) {
             .dashboard-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
-<body>
+<body class="owner-theme">
 <header>
     <div class="container header-content">
         <div class="logo-area">
@@ -328,6 +479,8 @@
             <ul>
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
+                <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
                 <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
                 <li><a href="/owner/faq" class="nav-link active">FAQ & Tips</a></li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
@@ -362,8 +515,26 @@
             </div>
         </div>
 
+        <div class="faq-kpi-grid animate-in delay-1">
+            <article class="kpi-card">
+                <span class="kpi-label">Active Tips</span>
+                <strong class="kpi-value" th:text="${tips != null ? #lists.size(tips) : 0}">0</strong>
+                <span class="kpi-note">Student guidance cards currently published.</span>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-label">Active FAQs</span>
+                <strong class="kpi-value" th:text="${faqs != null ? #lists.size(faqs) : 0}">0</strong>
+                <span class="kpi-note">Question-answer entries visible on support page.</span>
+            </article>
+            <article class="kpi-card">
+                <span class="kpi-label">Content Workflow</span>
+                <strong class="kpi-value">Live</strong>
+                <span class="kpi-note">Create, edit, and retire content in one console.</span>
+            </article>
+        </div>
+
         <!-- TIPS SECTION -->
-        <div class="dashboard-grid animate-in delay-1">
+        <div class="dashboard-grid content-grid tips-grid-panel animate-in delay-1">
             <div class="create-card">
                 <div class="card-header header-tips">
                     <div class="card-header-icon"><i class="fas fa-pencil"></i></div>
@@ -384,7 +555,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label"><i class="fas fa-icons"></i> Select Icon</label>
-                            <select name="iconClass" class="form-control" required>
+                            <select name="iconClass" class="form-control" required title="Select tip icon">
                                 <option value="fa-check-circle">Check Circle</option>
                                 <option value="fa-paperclip">Paperclip (Attachment)</option>
                                 <option value="fa-comments">Comments</option>
@@ -427,7 +598,7 @@
         </div>
 
         <!-- FAQS SECTION -->
-        <div class="dashboard-grid animate-in delay-2">
+        <div class="dashboard-grid content-grid faq-grid-panel animate-in delay-2">
             <div class="create-card">
                 <div class="card-header header-faqs">
                     <div class="card-header-icon"><i class="fas fa-question"></i></div>
@@ -506,7 +677,7 @@
         <p class="modal-text" id="deleteModalText">Are you sure you want to delete this item? This action cannot be undone.</p>
         <div class="modal-actions">
             <button type="button" class="btn-modal btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
-            <form id="deleteForm" method="post" style="flex:1; margin:0;">
+            <form id="deleteForm" method="post" class="modal-delete-form">
                 <button type="submit" class="btn-modal btn-modal-confirm">Yes, Delete</button>
             </form>
         </div>
