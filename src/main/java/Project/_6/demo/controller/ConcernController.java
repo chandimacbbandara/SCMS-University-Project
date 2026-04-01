@@ -320,11 +320,7 @@ public class ConcernController {
     }
 
     private void addNotificationAttributes(Model model, Integer userId) {
-        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
-        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
-        allNotifications.addAll(broadcastNotifications);
-        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        List<Notification> allNotifications = notificationService.getNotificationsForStudent(userId);
 
         long unreadCount = notificationService.getUnreadCount(userId);
 

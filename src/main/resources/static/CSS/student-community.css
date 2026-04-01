@@ -1,6 +1,7 @@
 :root {
     --community-font-body: "Manrope", "Segoe UI", sans-serif;
     --community-font-title: "Space Grotesk", "Trebuchet MS", sans-serif;
+    --community-header-font: "Manrope", "Segoe UI", sans-serif;
     --community-bg: #f3f6fb;
     --community-surface: #ffffff;
     --community-border: #e2e8f3;
@@ -1026,7 +1027,7 @@
 }
 
 .admin-community-view .nav-brand-text {
-    font-family: var(--community-font-title);
+    font-family: var(--community-header-font);
     font-size: 1rem;
     font-weight: 700;
     color: #f8fafc;
@@ -1051,9 +1052,10 @@
     text-decoration: none;
     font-size: 0.75rem;
     font-weight: 800;
+    font-family: var(--community-header-font);
     color: #d5deeb;
     padding: 8px 12px;
-    border-radius: 9px;
+    border-radius: 999px;
     transition: background-color 0.2s ease;
 }
 

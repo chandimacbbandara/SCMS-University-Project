@@ -54,43 +54,26 @@
 
         .faq-shell {
             width: min(1180px, 92%);
-            margin: 42px auto 64px;
+            margin: 34px auto 56px;
             min-height: calc(100vh - 190px);
         }
 
         .faq-hero {
             position: relative;
             border: 1px solid var(--brand-border);
-            border-radius: 24px;
+            border-radius: 20px;
             background:
-                radial-gradient(circle at 88% 16%, rgba(229, 57, 53, 0.18), transparent 34%),
+                radial-gradient(circle at 90% 10%, rgba(229, 57, 53, 0.16), transparent 30%),
                 linear-gradient(140deg, #ffffff 0%, #f5f8fc 100%);
-            box-shadow: 0 14px 30px rgba(2, 6, 23, 0.07);
-            padding: 36px 34px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-
-        .faq-hero::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(229, 57, 53, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(229, 57, 53, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
-            -webkit-mask-image: radial-gradient(circle at center, #000 35%, transparent 88%);
-            mask-image: radial-gradient(circle at center, #000 35%, transparent 88%);
-            pointer-events: none;
+            box-shadow: 0 12px 28px rgba(2, 6, 23, 0.06);
+            padding: 28px 30px;
+            margin-bottom: 12px;
         }
 
         .faq-hero-grid {
-            position: relative;
-            z-index: 1;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
-            gap: 18px;
-            align-items: center;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
 
         .hero-kicker {
@@ -104,18 +87,18 @@
 
         .hero-title {
             font-family: 'Sora', 'Manrope', sans-serif;
-            font-size: clamp(28px, 4.4vw, 46px);
+            font-size: clamp(28px, 4vw, 40px);
             letter-spacing: -1px;
-            line-height: 1.1;
-            margin-bottom: 12px;
+            line-height: 1.15;
+            margin-bottom: 10px;
         }
 
         .hero-desc {
             max-width: 620px;
             color: #556173;
-            font-size: 16px;
-            line-height: 1.75;
-            margin-bottom: 14px;
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 12px;
         }
 
         .hero-badges {
@@ -127,108 +110,29 @@
         .hero-badges span {
             font-size: 12px;
             font-weight: 700;
-            color: #374151;
-            padding: 8px 12px;
+            color: #475569;
+            padding: 7px 12px;
             border-radius: 999px;
             border: 1px solid var(--brand-border);
-            background: rgba(255, 255, 255, 0.9);
-        }
-
-        .hero-stats {
-            display: grid;
-            gap: 10px;
-        }
-
-        .hero-stat {
-            border: 1px solid var(--brand-border);
-            border-radius: 14px;
             background: #fff;
-            box-shadow: 0 10px 22px rgba(2, 6, 23, 0.06);
-            padding: 12px 14px;
-            display: grid;
-            gap: 4px;
-        }
-
-        .hero-stat span {
-            font-size: 10px;
-            font-weight: 800;
-            letter-spacing: 1px;
-            color: #6b7280;
-            text-transform: uppercase;
-        }
-
-        .hero-stat strong {
-            font-family: 'Sora', 'Manrope', sans-serif;
-            font-size: 24px;
-            line-height: 1;
-            color: var(--brand-red);
-        }
-
-        .hero-stat p {
-            font-size: 12px;
-            color: #566174;
-            line-height: 1.5;
-            margin: 0;
-        }
-
-        .info-strip {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .public-note {
-            border: 1px solid #fbd5d4;
-            border-radius: 14px;
-            background: linear-gradient(180deg, #fff5f5, #fff);
-            box-shadow: 0 10px 22px rgba(229, 57, 53, 0.08);
-            padding: 12px 14px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
-        }
-
-        .public-note i {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            background: rgba(229, 57, 53, 0.14);
-            color: var(--brand-red);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .public-note strong {
-            display: block;
-            font-size: 13px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            color: #991b1b;
-            margin-bottom: 2px;
-        }
-
-        .public-note p {
-            margin: 0;
-            font-size: 13px;
-            color: #5b3b3b;
-            line-height: 1.6;
         }
 
         .finder-bar {
             border: 1px solid var(--brand-border);
             border-radius: 16px;
             background: #fff;
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
-            padding: 12px;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+            padding: 14px;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 10px;
-            align-items: center;
+            grid-template-columns: 1fr;
+            gap: 12px;
             margin-bottom: 14px;
+        }
+
+        .finder-help {
+            margin: -2px 2px 0;
+            font-size: 13px;
+            color: #64748b;
         }
 
         .finder-input-wrap {
@@ -265,6 +169,7 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 8px;
+            justify-content: flex-start;
         }
 
         .finder-chip {
@@ -291,47 +196,10 @@
             color: #b91c1c;
         }
 
-        .info-card {
-            border: 1px solid var(--brand-border);
-            border-radius: 14px;
-            background: #fff;
-            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
-            padding: 14px 16px;
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .info-card i {
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(229, 57, 53, 0.1);
-            color: var(--brand-red);
-            flex-shrink: 0;
-            margin-top: 1px;
-        }
-
-        .info-card h3 {
-            font-family: 'Sora', 'Manrope', sans-serif;
-            font-size: 15px;
-            margin: 0 0 2px;
-        }
-
-        .info-card p {
-            font-size: 13px;
-            color: #556173;
-            line-height: 1.55;
-            margin: 0;
-        }
-
         .faq-content-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 14px;
+            gap: 12px;
         }
 
         .content-panel {
@@ -344,9 +212,9 @@
         }
 
         .panel-head {
-            padding: 20px 22px;
+            padding: 16px 18px;
             border-bottom: 1px solid #eef2f7;
-            background: linear-gradient(180deg, #ffffff, #fbfcff);
+            background: #fcfdff;
         }
 
         .panel-head-top {
@@ -381,22 +249,22 @@
 
         .panel-title {
             font-family: 'Sora', 'Manrope', sans-serif;
-            font-size: 24px;
-            margin: 0 0 6px;
+            font-size: 21px;
+            margin: 0 0 4px;
             display: inline-flex;
             align-items: center;
             gap: 10px;
         }
 
         .panel-text {
-            font-size: 14px;
+            font-size: 13px;
             color: #596579;
-            line-height: 1.65;
+            line-height: 1.6;
             margin: 0;
         }
 
         .panel-body {
-            padding: 16px;
+            padding: 14px;
         }
 
         .tips-grid {
@@ -573,13 +441,8 @@
         .delay-3 { animation-delay: .3s; }
 
         @media (max-width: 1024px) {
-            .faq-hero-grid,
             .faq-content-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .hero-stats {
-                grid-template-columns: repeat(3, minmax(0, 1fr));
             }
         }
 
@@ -590,19 +453,17 @@
 
             .faq-shell {
                 width: min(1180px, 95%);
-                margin-top: 26px;
+                margin-top: 22px;
             }
 
             .faq-hero {
-                padding: 24px 20px;
+                padding: 22px 18px;
             }
 
             .hero-title {
                 font-size: clamp(26px, 7vw, 36px);
             }
 
-            .hero-stats,
-            .info-strip,
             .tips-grid {
                 grid-template-columns: 1fr;
             }
@@ -617,7 +478,7 @@
             }
 
             .panel-title {
-                font-size: 21px;
+                font-size: 19px;
             }
         }
 
@@ -679,66 +540,16 @@
                 <div class="faq-hero-grid">
                     <div>
                         <p class="hero-kicker">Support Center</p>
-                        <h1 class="hero-title">How Can We Assist You Today?</h1>
+                        <h1 class="hero-title">FAQ & Support Tips</h1>
                         <p class="hero-desc">
-                            This public knowledge page helps students quickly understand best practices for reporting concerns and discover trusted answers to common questions.
+                            Find quick answers and practical tips before submitting a concern. Use the search bar to instantly filter the content you need.
                         </p>
                         <div class="hero-badges">
                             <span>Public Knowledge Base</span>
-                            <span>Clear Response Guidance</span>
-                            <span>Student-Friendly Support</span>
+                            <span>Fast Search</span>
+                            <span>Verified Answers</span>
                         </div>
                     </div>
-
-                    <div class="hero-stats">
-                        <article class="hero-stat">
-                            <span>Active Tips</span>
-                            <strong th:text="${tips != null ? #lists.size(tips) : 0}">0</strong>
-                            <p>Practical guidance cards from your institute team.</p>
-                        </article>
-                        <article class="hero-stat">
-                            <span>Published FAQs</span>
-                            <strong th:text="${faqs != null ? #lists.size(faqs) : 0}">0</strong>
-                            <p>Frequently asked questions with official answers.</p>
-                        </article>
-                        <article class="hero-stat">
-                            <span>Access Type</span>
-                            <strong>Public</strong>
-                            <p>Visible to all visitors before and after login.</p>
-                        </article>
-                    </div>
-                </div>
-            </section>
-
-            <section class="info-strip animate-in delay-1">
-                <article class="info-card">
-                    <i class="fas fa-list-check"></i>
-                    <div>
-                        <h3>Before You Submit</h3>
-                        <p>Review tips first to write clearer and faster-resolved concerns.</p>
-                    </div>
-                </article>
-                <article class="info-card">
-                    <i class="fas fa-shield-halved"></i>
-                    <div>
-                        <h3>Safe and Respectful</h3>
-                        <p>Use respectful language and include only relevant details.</p>
-                    </div>
-                </article>
-                <article class="info-card">
-                    <i class="fas fa-circle-question"></i>
-                    <div>
-                        <h3>Quick Answers</h3>
-                        <p>Check FAQs before opening a new concern to save time.</p>
-                    </div>
-                </article>
-            </section>
-
-            <section class="public-note animate-in delay-1">
-                <i class="fas fa-earth-asia"></i>
-                <div>
-                    <strong>Public Support Library</strong>
-                    <p>This page is open to everyone. Search by keyword to quickly find relevant guidance before reporting a new issue.</p>
                 </div>
             </section>
 
@@ -747,6 +558,7 @@
                     <i class="fas fa-magnifying-glass"></i>
                     <input id="faqSearchInput" type="search" placeholder="Search tips and FAQs (example: payment, registration, attendance)">
                 </label>
+                <p class="finder-help">Tips and FAQs are public and searchable for all users.</p>
                 <div class="finder-chip-row" role="group" aria-label="Content view filter">
                     <button type="button" class="finder-chip active" data-view="all">All Content</button>
                     <button type="button" class="finder-chip" data-view="tips">Tips Only</button>
@@ -837,7 +649,7 @@
                 <p>No notifications yet.</p>
             </div>
             <div th:each="notif : ${notifications}" class="notif-item"
-                  th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+                th:classappend="${!notif.isRead} ? 'unread' : ''"
                  th:attr="data-id=${notif.notificationId}">
                 <div class="notif-icon-wrap"
                      th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
@@ -850,6 +662,11 @@
                         <i class="fas fa-clock"></i>
                         <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                     </div>
+                </div>
+                <div class="notif-item-actions">
+                    <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -966,6 +783,42 @@
                     .catch(err => console.error(err));
                 }
             }
+        }
+
+        function refreshNotifCount() {
+            const countEl = document.querySelector('.notif-count');
+            const list = document.getElementById('notifList');
+            if (!countEl || !list) return;
+
+            const count = list.querySelectorAll('.notif-item').length;
+            countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+            let empty = list.querySelector('.notif-empty');
+            if (count === 0) {
+                if (!empty) {
+                    empty = document.createElement('div');
+                    empty.className = 'notif-empty';
+                    empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                    list.appendChild(empty);
+                }
+            } else if (empty) {
+                empty.remove();
+            }
+        }
+
+        function removeNotif(event, el) {
+            if (event) event.stopPropagation();
+            if (!el) return;
+            const id = el.getAttribute('data-id');
+            if (!id) return;
+
+            fetch('/api/notifications/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    el.remove();
+                    refreshNotifCount();
+                })
+                .catch(err => console.error(err));
         }
     </script>
 </body>

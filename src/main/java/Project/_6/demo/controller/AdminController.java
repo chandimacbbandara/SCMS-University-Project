@@ -363,7 +363,7 @@ public class AdminController {
     }
 
     /**
-     * Delete a concern from dashboard list
+     * Reject a concern from dashboard list (soft-delete from UI).
      */
     @PostMapping("/concern/{id}/delete")
     public String deleteConcern(@PathVariable("id") Integer concernId,
@@ -375,9 +375,9 @@ public class AdminController {
         }
         try {
             adminService.deleteConcern(concernId);
-            redirectAttributes.addFlashAttribute("successMessage", "Concern deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", "Concern rejected and removed from dashboard.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete concern: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to reject concern: " + e.getMessage());
         }
         if ("edu-dashboard".equals(redirectTo)) {
             return "redirect:/admin/edu-dashboard";

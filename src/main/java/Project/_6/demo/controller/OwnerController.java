@@ -15,6 +15,7 @@ import Project._6.demo.repository.ConcernRepository;
 import Project._6.demo.repository.FeedbackRepository;
 import Project._6.demo.repository.UserRepository;
 import Project._6.demo.service.AnalyticsReportService;
+import Project._6.demo.service.AdminService;
 import Project._6.demo.service.EmailVerificationService;
 import Project._6.demo.service.FaqManagementService;
 import Project._6.demo.entity.Tip;
@@ -48,6 +49,7 @@ import java.util.regex.Pattern;
 public class OwnerController {
 
     private final AnalyticsReportService analyticsReportService;
+    private final AdminService adminService;
     private final AnalyticsReportRepository analyticsReportRepository;
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
@@ -74,8 +76,10 @@ public class OwnerController {
     private static final String ALL_CATEGORIES = "All Categories";
     private static final String ALL_PRIORITIES = "All Priorities";
     private static final String ALL_TIME = "All Time";
+    private static final String STATUS_DRAFT = "Draft";
 
     public OwnerController(AnalyticsReportService analyticsReportService,
+                           AdminService adminService,
                            AnalyticsReportRepository analyticsReportRepository,
                            ConcernRepository concernRepository,
                            AdminRepository adminRepository,
@@ -87,6 +91,7 @@ public class OwnerController {
                            PasswordEncoder passwordEncoder,
                            FaqManagementService faqManagementService) {
         this.analyticsReportService = analyticsReportService;
+                this.adminService = adminService;
         this.analyticsReportRepository = analyticsReportRepository;
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
@@ -655,7 +660,9 @@ public class OwnerController {
             return result;
         }
 
-        List<Concern> concerns = concernRepository.findAllByOrderByCreatedTimeDesc();
+        List<Concern> concerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                .filter(concern -> !isDraftStatus(concern.getStatus()))
+                .collect(Collectors.toList());
 
         Map<String, Long> categoryDistribution = concerns.stream()
                 .map(Concern::getCategory)
@@ -690,6 +697,21 @@ public class OwnerController {
         return result;
     }
 
+    @PostMapping("/api/concerns/rejected/delete-all")
+    @ResponseBody
+    public Map<String, Object> deleteAllRejectedConcerns(HttpSession session) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        if (!isOwnerLoggedIn(session)) {
+            result.put("error", "Unauthorized");
+            return result;
+        }
+
+        long deletedCount = adminService.deleteAllRejectedConcernsPermanently();
+        result.put("success", true);
+        result.put("deletedCount", deletedCount);
+        return result;
+    }
+
     @GetMapping("/api/reports/monthly")
     @ResponseBody
     public Map<String, Object> getMonthlyReportData(@RequestParam(value = "month", required = false) String month,
@@ -717,6 +739,7 @@ public class OwnerController {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
         List<Concern> filteredConcerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+            .filter(concern -> !isDraftStatus(concern.getStatus()))
                 .filter(concern -> concern.getCreatedTime() != null)
                 .filter(concern -> YearMonth.from(concern.getCreatedTime()).equals(selectedMonth))
                 .filter(concern -> isAllCategories(selectedCategory)
@@ -814,8 +837,13 @@ public class OwnerController {
         }
 
         long count = isAllCategories(normalizedCategory)
-                ? concernRepository.count()
-                : concernRepository.countByCategory(normalizedCategory);
+                ? concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                    .filter(concern -> !isDraftStatus(concern.getStatus()))
+                    .count()
+                : concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                    .filter(concern -> !isDraftStatus(concern.getStatus()))
+                    .filter(concern -> normalizedCategory.equalsIgnoreCase(defaultText(concern.getCategory(), ALL_CATEGORIES)))
+                    .count();
         result.put("count", count);
         result.put("category", normalizedCategory);
         return result;
@@ -855,6 +883,9 @@ public class OwnerController {
         Map<Integer, AdminReply> earliestReplyPerConcern = new LinkedHashMap<>();
         for (AdminReply reply : replies) {
             if (reply.getConcern() == null || reply.getConcern().getConcernId() == null || reply.getReplyTime() == null) {
+                continue;
+            }
+            if (isDraftStatus(reply.getConcern().getStatus())) {
                 continue;
             }
             int concernId = reply.getConcern().getConcernId();
@@ -1027,6 +1058,10 @@ public class OwnerController {
                 ? concernRepository.findByAdmin_UserId(adminId)
                 : concernRepository.findByAdmin_UserIdAndCategory(adminId, selectedCategory);
 
+        concerns = concerns.stream()
+            .filter(concern -> !isDraftStatus(concern.getStatus()))
+            .collect(Collectors.toList());
+
         int totalConcerns = concerns.size();
         int evidenceImageCount = (int) concerns.stream()
                 .filter(concern -> StringUtils.hasText(concern.getEvidencePath()))
@@ -1049,6 +1084,9 @@ public class OwnerController {
         Map<Integer, AdminReply> earliestReplyPerConcern = new LinkedHashMap<>();
         for (AdminReply reply : replies) {
             if (reply.getConcern() == null || reply.getConcern().getConcernId() == null || reply.getReplyTime() == null) {
+                continue;
+            }
+            if (isDraftStatus(reply.getConcern().getStatus())) {
                 continue;
             }
             Integer concernId = reply.getConcern().getConcernId();
@@ -1140,6 +1178,13 @@ public class OwnerController {
         }
         String normalized = status.trim();
         return "Rejected".equalsIgnoreCase(normalized) || "Deleted".equalsIgnoreCase(normalized);
+    }
+
+    private boolean isDraftStatus(String status) {
+        if (!StringUtils.hasText(status)) {
+            return false;
+        }
+        return STATUS_DRAFT.equalsIgnoreCase(status.trim());
     }
 
     private String normalizeStatusLabel(String status) {

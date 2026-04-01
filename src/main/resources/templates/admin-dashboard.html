@@ -6,6 +6,7 @@
     <title>Admin Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/CSS/admin-tour.css">
     <style>
         :root {
@@ -28,6 +29,7 @@
             --radius-sm: 10px;
             --radius-md: 18px;
             --radius-lg: 26px;
+            --header-nav-font: 'Manrope', 'Segoe UI', Arial, sans-serif;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -102,7 +104,7 @@
         }
         .nav-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; }
         .nav-brand img { height: 40px; border-radius: 11px; border: 2px solid rgba(255,255,255,0.2); }
-        .nav-brand-text { color: #f8fafc; font-size: 17px; font-weight: 800; letter-spacing: -0.5px; }
+        .nav-brand-text { color: #f8fafc; font-size: 17px; font-weight: 800; letter-spacing: -0.5px; font-family: var(--header-nav-font); }
         .nav-brand-text span { color: #fca5a5; }
 
         .nav-links { list-style: none; display: flex; gap: 8px; align-items: center; }
@@ -110,9 +112,10 @@
             text-decoration: none;
             font-size: 13px;
             font-weight: 700;
+            font-family: var(--header-nav-font);
             color: #cbd5e1;
             padding: 9px 15px;
-            border-radius: var(--radius-sm);
+            border-radius: 999px;
             transition: .25s ease;
         }
         .nav-links a:hover { color: #fff; background: rgba(255,255,255,0.1); }

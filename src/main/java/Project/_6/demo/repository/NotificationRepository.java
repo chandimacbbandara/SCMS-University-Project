@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -16,11 +17,13 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.Notification'), 'NotificationID', 'IsIdentity') AS INT)", nativeQuery = true)
     Integer isNotificationIdIdentity();
 
-    List<Notification> findByStudent_UserIdOrderBySentTimeDesc(Integer userId);
+    List<Notification> findByStudent_UserIdAndIsHiddenFalseOrderBySentTimeDesc(Integer userId);
 
-    List<Notification> findByStudent_UserIdAndIsReadFalseOrderBySentTimeDesc(Integer userId);
+    List<Notification> findByStudent_UserIdAndTypeOrderBySentTimeDesc(Integer userId, String type);
 
-    long countByStudent_UserIdAndIsReadFalse(Integer userId);
+    List<Notification> findByStudent_UserIdAndIsReadFalseAndIsHiddenFalseOrderBySentTimeDesc(Integer userId);
+
+    long countByStudent_UserIdAndIsReadFalseAndIsHiddenFalse(Integer userId);
 
     List<Notification> findByConcern_ConcernIdOrderBySentTimeDesc(Integer concernId);
 
@@ -32,4 +35,15 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     List<Notification> findByTargetAudienceAndStudentIsNullOrderBySentTimeDesc(String targetAudience);
 
     List<Notification> findByTypeOrderBySentTimeDesc(String type);
+
+    List<Notification> findByTypeAndStudentIsNullOrderBySentTimeDesc(String type);
+
+    List<Notification> findByTypeAndStudentIsNotNullAndAdminIdFkAndTargetAudienceAndTitleAndMessageAndSentTime(
+            String type,
+            Integer adminIdFk,
+            String targetAudience,
+            String title,
+            String message,
+            LocalDateTime sentTime
+    );
 }

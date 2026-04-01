@@ -40,6 +40,8 @@ public class ConcernService {
     private static final String UPLOAD_DIR = "uploads/";
     private static final String STATUS_PENDING = "Pending";
     private static final String STATUS_DRAFT = "Draft";
+    private static final String STATUS_REJECTED = "Rejected";
+    private static final String STATUS_DELETED = "Deleted";
 
     public ConcernService(ConcernRepository concernRepository,
                           StudentRepository studentRepository,
@@ -103,7 +105,7 @@ public class ConcernService {
     }
 
     /**
-     * Get all submitted (non-draft) concerns by a specific student.
+     * Get all submitted concerns visible to students (exclude draft/rejected/deleted).
      */
     public List<Concern> getConcernsByStudentUserId(Integer userId) {
         Student student = studentRepository.findById(userId)
@@ -111,7 +113,7 @@ public class ConcernService {
         return concernRepository.findByStudent_StudentId(student.getStudentId()).stream()
             .filter(concern -> concern != null
                 && (concern.getStatus() == null
-                || !STATUS_DRAFT.equalsIgnoreCase(concern.getStatus().trim())))
+                || !isHiddenFromStudentViews(concern.getStatus().trim())))
             .sorted(Comparator.comparing(Concern::getCreatedTime,
                 Comparator.nullsLast(Comparator.reverseOrder())))
             .toList();
@@ -315,6 +317,12 @@ public class ConcernService {
                 || category == null || category.trim().isEmpty()) {
             throw new RuntimeException(errorMessage);
         }
+    }
+
+    private boolean isHiddenFromStudentViews(String status) {
+        return STATUS_DRAFT.equalsIgnoreCase(status)
+                || STATUS_REJECTED.equalsIgnoreCase(status)
+                || STATUS_DELETED.equalsIgnoreCase(status);
     }
 
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {

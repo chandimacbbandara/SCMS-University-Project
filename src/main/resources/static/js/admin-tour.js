@@ -10,6 +10,7 @@
     var launchBtn = null;
     var currentIndex = 0;
     var currentTarget = null;
+    var positionTimer = null;
 
     function q(selector) {
         return selector ? document.querySelector(selector) : null;
@@ -23,6 +24,10 @@
     }
 
     function cleanup() {
+        if (positionTimer) {
+            clearTimeout(positionTimer);
+            positionTimer = null;
+        }
         removeHighlight();
         if (overlay) {
             overlay.remove();
@@ -57,6 +62,31 @@
         }
 
         return { left: left, top: top };
+    }
+
+    function placeTooltip() {
+        if (!tooltip || !currentTarget) {
+            return;
+        }
+        var rect = currentTarget.getBoundingClientRect();
+        var pos = calcPosition(rect);
+        tooltip.style.left = pos.left + 'px';
+        tooltip.style.top = pos.top + 'px';
+    }
+
+    function schedulePlaceTooltip() {
+        if (positionTimer) {
+            clearTimeout(positionTimer);
+            positionTimer = null;
+        }
+
+        // Reposition repeatedly because smooth scrolling/layout can shift target bounds.
+        placeTooltip();
+        requestAnimationFrame(placeTooltip);
+        positionTimer = setTimeout(function () {
+            placeTooltip();
+            setTimeout(placeTooltip, 180);
+        }, 120);
     }
 
     function renderStep() {
@@ -108,10 +138,7 @@
                 '</div>' +
             '</div>';
 
-        var rect = target.getBoundingClientRect();
-        var pos = calcPosition(rect);
-        tooltip.style.left = pos.left + 'px';
-        tooltip.style.top = pos.top + 'px';
+        schedulePlaceTooltip();
     }
 
     function startTour(force) {
@@ -173,14 +200,12 @@
     }
 
     window.addEventListener('resize', function () {
-        if (!tooltip || !currentTarget) {
-            return;
-        }
-        var rect = currentTarget.getBoundingClientRect();
-        var pos = calcPosition(rect);
-        tooltip.style.left = pos.left + 'px';
-        tooltip.style.top = pos.top + 'px';
+        schedulePlaceTooltip();
     });
+
+    window.addEventListener('scroll', function () {
+        schedulePlaceTooltip();
+    }, true);
 
     document.addEventListener('keydown', function (evt) {
         if (evt.key === 'Escape') {

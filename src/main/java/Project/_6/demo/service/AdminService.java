@@ -35,6 +35,8 @@ public class AdminService {
 
     private static final String UPLOAD_DIR = "uploads/";
     private static final String STATUS_DRAFT = "Draft";
+    private static final String STATUS_REJECTED = "Rejected";
+    private static final String STATUS_DELETED = "Deleted";
 
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
@@ -61,7 +63,7 @@ public class AdminService {
      * Get all concerns ordered by newest first, with Complete at the bottom
      */
     public List<Concern> getAllConcerns() {
-        return sortCompleteLast(excludeDrafts(concernRepository.findAllByOrderByCreatedTimeDesc()));
+        return sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findAllByOrderByCreatedTimeDesc()));
     }
 
     /**
@@ -71,9 +73,9 @@ public class AdminService {
         if (isInProgressBucket(status)) {
             List<Concern> active = concernRepository.findByStatusOrderByCreatedTimeDesc("In Progress");
             active.addAll(concernRepository.findByStatusOrderByCreatedTimeDesc("Meeting Scheduled"));
-            return sortCompleteLast(active);
+            return sortCompleteLast(excludeHiddenConcernStatuses(active));
         }
-        return sortCompleteLast(concernRepository.findByStatusOrderByCreatedTimeDesc(status));
+        return sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findByStatusOrderByCreatedTimeDesc(status)));
     }
 
     /**
@@ -124,7 +126,7 @@ public class AdminService {
                     .collect(Collectors.toList());
         }
 
-        return sortCompleteLast(excludeDrafts(concerns));
+        return sortCompleteLast(excludeHiddenConcernStatuses(concerns));
     }
 
     /**
@@ -158,11 +160,39 @@ public class AdminService {
     }
 
     /**
-     * Delete a concern and related data (admin replies and feedback).
+     * Soft-delete a concern by marking it as Rejected.
      */
     @Transactional
     public void deleteConcern(Integer concernId) {
         Concern concern = getConcernById(concernId);
+        concern.setStatus(STATUS_REJECTED);
+        concernRepository.save(concern);
+    }
+
+    /**
+     * Permanently remove all rejected concerns and their dependent records.
+     */
+    @Transactional
+    public long deleteAllRejectedConcernsPermanently() {
+        List<Concern> rejectedConcerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                .filter(concern -> concern != null && isRejectedStatus(concern.getStatus()))
+                .collect(Collectors.toList());
+
+        long deletedCount = 0;
+        for (Concern concern : rejectedConcerns) {
+            hardDeleteConcern(concern);
+            deletedCount++;
+        }
+
+        return deletedCount;
+    }
+
+    private void hardDeleteConcern(Concern concern) {
+        if (concern == null || concern.getConcernId() == null) {
+            return;
+        }
+
+        Integer concernId = concern.getConcernId();
 
         // Explicitly remove dependent records first to satisfy FK constraints.
         feedbackRepository.deleteByConcern_ConcernId(concernId);
@@ -176,10 +206,8 @@ public class AdminService {
 
         notificationService.deleteByConcernId(concernId);
 
-        concernRepository.deleteById(concern.getConcernId());
+        concernRepository.deleteById(concernId);
         concernRepository.flush();
-
-        notificationService.sendConcernDeletedEmail(concern);
     }
 
     /**
@@ -355,7 +383,9 @@ public class AdminService {
     public long getTotalConcerns() {
         long total = concernRepository.count();
         long drafts = concernRepository.countByStatus(STATUS_DRAFT);
-        long submitted = total - drafts;
+        long rejected = concernRepository.countByStatus(STATUS_REJECTED);
+        long deleted = concernRepository.countByStatus(STATUS_DELETED);
+        long submitted = total - drafts - rejected - deleted;
         return Math.max(submitted, 0);
     }
 
@@ -427,10 +457,28 @@ public class AdminService {
         return category.trim();
     }
 
-    private List<Concern> excludeDrafts(List<Concern> concerns) {
+    private List<Concern> excludeHiddenConcernStatuses(List<Concern> concerns) {
         return concerns.stream()
-                .filter(c -> c != null && (c.getStatus() == null || !STATUS_DRAFT.equalsIgnoreCase(c.getStatus().trim())))
+                .filter(c -> c != null && !isHiddenFromAdminDashboard(c.getStatus()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isHiddenFromAdminDashboard(String status) {
+        if (status == null) {
+            return false;
+        }
+        String normalized = status.trim();
+        return STATUS_DRAFT.equalsIgnoreCase(normalized)
+                || STATUS_REJECTED.equalsIgnoreCase(normalized)
+                || STATUS_DELETED.equalsIgnoreCase(normalized);
+    }
+
+    private boolean isRejectedStatus(String status) {
+        if (status == null) {
+            return false;
+        }
+        String normalized = status.trim();
+        return STATUS_REJECTED.equalsIgnoreCase(normalized) || STATUS_DELETED.equalsIgnoreCase(normalized);
     }
 
     /**

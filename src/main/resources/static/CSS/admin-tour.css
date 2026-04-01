@@ -29,6 +29,8 @@
 .admin-tour-tooltip {
     position: fixed;
     width: min(360px, calc(100vw - 24px));
+    max-height: calc(100vh - 24px);
+    overflow-y: auto;
     background: #ffffff;
     border: 1px solid #e2e8f0;
     border-radius: 14px;

@@ -1735,7 +1735,7 @@
             </div>
 
               <div th:each="notif : ${notifications}" class="notif-item"
-                  th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+                  th:classappend="${!notif.isRead} ? 'unread' : ''"
                  th:attr="data-id=${notif.notificationId}"
                  onclick="markNotifRead(this)">
                 <div class="notif-icon-wrap"
@@ -1749,6 +1749,11 @@
                         <i class="fas fa-clock"></i>
                         <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                     </div>
+                </div>
+                <div class="notif-item-actions">
+                    <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1960,6 +1965,43 @@
                 });
         }
 
+        function refreshNotifCount() {
+            const countEl = document.querySelector('.notif-count');
+            const list = document.getElementById('notifList');
+            if (!countEl || !list) return;
+
+            const count = list.querySelectorAll('.notif-item').length;
+            countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+            let empty = list.querySelector('.notif-empty');
+            if (count === 0) {
+                if (!empty) {
+                    empty = document.createElement('div');
+                    empty.className = 'notif-empty';
+                    empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                    list.appendChild(empty);
+                }
+            } else if (empty) {
+                empty.remove();
+            }
+        }
+
+        function removeNotif(event, el) {
+            if (event) event.stopPropagation();
+            if (!el) return;
+            const id = el.getAttribute('data-id');
+            if (!id) return;
+
+            fetch('/api/notifications/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    el.remove();
+                    refreshNotifCount();
+                    updateBadge();
+                })
+                .catch(err => console.error(err));
+        }
+
         // Update badge count
         function updateBadge() {
             fetch('/api/notifications/unread-count')
@@ -1978,11 +2020,15 @@
         // Poll for new notifications every 30 seconds
         setInterval(updateBadge, 30000);
     </script>
-    <script>
+    <script th:inline="javascript">
+        const currentStudentUserId = /*[[${session.studentUserId}]]*/ null;
+        const studentDashboardTourStorageKey = 'akb_student_dashboard_tour_completed_'
+            + (currentStudentUserId != null ? currentStudentUserId : 'guest');
+
         window.studentTourConfig = {
             pageId: 'student-dashboard',
             autoStart: true,
-            storageKey: 'akb_student_dashboard_tour_completed',
+            storageKey: studentDashboardTourStorageKey,
             nextPage: '/submit-concern',
             steps: [
                 {

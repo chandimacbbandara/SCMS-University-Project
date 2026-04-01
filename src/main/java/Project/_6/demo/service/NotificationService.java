@@ -4,14 +4,20 @@ import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Notification;
+import Project._6.demo.entity.Student;
 import Project._6.demo.repository.NotificationRepository;
+import Project._6.demo.repository.StudentRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 public class NotificationService {
@@ -19,10 +25,14 @@ public class NotificationService {
     private static final DateTimeFormatter EMAIL_TIME_FORMAT = DateTimeFormatter.ofPattern("dd MMM yyyy, hh:mm a");
 
     private final NotificationRepository notificationRepository;
+    private final StudentRepository studentRepository;
     private final EmailVerificationService emailVerificationService;
 
-    public NotificationService(NotificationRepository notificationRepository, EmailVerificationService emailVerificationService) {
+    public NotificationService(NotificationRepository notificationRepository,
+                               StudentRepository studentRepository,
+                               EmailVerificationService emailVerificationService) {
         this.notificationRepository = notificationRepository;
+        this.studentRepository = studentRepository;
         this.emailVerificationService = emailVerificationService;
     }
 
@@ -181,30 +191,38 @@ public class NotificationService {
      * Get all notifications for a student ordered by newest first.
      */
     public List<Notification> getNotificationsForStudent(Integer userId) {
-        return notificationRepository.findByStudent_UserIdOrderBySentTimeDesc(userId);
+        ensureBroadcastCopiesForStudent(userId);
+        return notificationRepository.findByStudent_UserIdAndIsHiddenFalseOrderBySentTimeDesc(userId);
     }
 
     /**
      * Get unread notifications for a student.
      */
     public List<Notification> getUnreadNotifications(Integer userId) {
-        return notificationRepository.findByStudent_UserIdAndIsReadFalseOrderBySentTimeDesc(userId);
+        ensureBroadcastCopiesForStudent(userId);
+        return notificationRepository.findByStudent_UserIdAndIsReadFalseAndIsHiddenFalseOrderBySentTimeDesc(userId);
     }
 
     /**
      * Count unread notifications for a student.
      */
     public long getUnreadCount(Integer userId) {
-        return notificationRepository.countByStudent_UserIdAndIsReadFalse(userId);
+        ensureBroadcastCopiesForStudent(userId);
+        return notificationRepository.countByStudent_UserIdAndIsReadFalseAndIsHiddenFalse(userId);
     }
 
     /**
      * Mark a single notification as read.
      */
     @Transactional
-    public void markAsRead(Integer notificationId) {
+    public void markAsRead(Integer notificationId, Integer userId) {
         Notification notification = notificationRepository.findById(notificationId)
                 .orElseThrow(() -> new RuntimeException("Notification not found"));
+        if (notification.getStudent() == null
+                || notification.getStudent().getUserId() == null
+                || !notification.getStudent().getUserId().equals(userId)) {
+            throw new RuntimeException("Notification not found for this student");
+        }
         notification.setIsRead(true);
         notificationRepository.save(notification);
     }
@@ -214,11 +232,29 @@ public class NotificationService {
      */
     @Transactional
     public void markAllAsRead(Integer userId) {
-        List<Notification> unread = notificationRepository.findByStudent_UserIdAndIsReadFalseOrderBySentTimeDesc(userId);
+        List<Notification> unread = notificationRepository.findByStudent_UserIdAndIsReadFalseAndIsHiddenFalseOrderBySentTimeDesc(userId);
         for (Notification n : unread) {
             n.setIsRead(true);
         }
         notificationRepository.saveAll(unread);
+    }
+
+    /**
+     * Hide a notification for a specific student so it no longer appears in the list.
+     */
+    @Transactional
+    public void hideNotification(Integer notificationId, Integer userId) {
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new RuntimeException("Notification not found"));
+
+        if (notification.getStudent() == null
+                || notification.getStudent().getUserId() == null
+                || !notification.getStudent().getUserId().equals(userId)) {
+            throw new RuntimeException("Notification not found for this student");
+        }
+
+        notification.setIsHidden(true);
+        notificationRepository.save(notification);
     }
 
     /**
@@ -248,22 +284,45 @@ public class NotificationService {
             throw new RuntimeException("Notification message is required.");
         }
 
-        Notification notification = newNotification();
-        notification.setTitle(title.trim());
-        notification.setMessage(message.trim());
-        notification.setType("BROADCAST");
-        notification.setTargetAudience(targetAudience != null ? targetAudience : "ALL_STUDENTS");
-        notification.setAdminIdFk(adminIdFk);
-        notification.setStudent(null);
-        notification.setConcern(null);
-        return notificationRepository.save(notification);
+        String normalizedAudience = normalizeTargetAudience(targetAudience);
+
+        Notification masterNotification = newNotification();
+        masterNotification.setTitle(title.trim());
+        masterNotification.setMessage(message.trim());
+        masterNotification.setType("BROADCAST");
+        masterNotification.setTargetAudience(normalizedAudience);
+        masterNotification.setAdminIdFk(adminIdFk);
+        masterNotification.setStudent(null);
+        masterNotification.setConcern(null);
+        Notification savedMaster = notificationRepository.save(masterNotification);
+
+        List<Student> recipients = resolveTargetStudents(normalizedAudience);
+        if (!recipients.isEmpty()) {
+            List<Notification> recipientNotifications = new ArrayList<>(recipients.size());
+            for (Student student : recipients) {
+                Notification studentNotification = newNotification();
+                studentNotification.setTitle(savedMaster.getTitle());
+                studentNotification.setMessage(savedMaster.getMessage());
+                studentNotification.setType(savedMaster.getType());
+                studentNotification.setTargetAudience(savedMaster.getTargetAudience());
+                studentNotification.setAdminIdFk(savedMaster.getAdminIdFk());
+                studentNotification.setStudent(student);
+                studentNotification.setConcern(null);
+                studentNotification.setSentTime(savedMaster.getSentTime());
+                studentNotification.setIsRead(false);
+                recipientNotifications.add(studentNotification);
+            }
+            notificationRepository.saveAll(recipientNotifications);
+        }
+
+        return savedMaster;
     }
 
     /**
      * Get all broadcast notifications (for owner to see sent history).
      */
     public List<Notification> getAllBroadcastNotifications() {
-        return notificationRepository.findByTypeOrderBySentTimeDesc("BROADCAST");
+        return notificationRepository.findByTypeAndStudentIsNullOrderBySentTimeDesc("BROADCAST");
     }
 
     /**
@@ -279,10 +338,17 @@ public class NotificationService {
      */
     @Transactional
     public void deleteNotification(Integer id) {
-        if (!notificationRepository.existsById(id)) {
-            throw new RuntimeException("Notification not found.");
+        Notification notification = notificationRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Notification not found."));
+
+        if (isBroadcastMaster(notification)) {
+            List<Notification> relatedStudentCopies = findRelatedBroadcastCopies(notification);
+            if (!relatedStudentCopies.isEmpty()) {
+                notificationRepository.deleteAll(relatedStudentCopies);
+            }
         }
-        notificationRepository.deleteById(id);
+
+        notificationRepository.delete(notification);
     }
 
     /**
@@ -291,6 +357,11 @@ public class NotificationService {
     @Transactional
     public Notification updateBroadcastNotification(Integer id, String title, String message, String targetAudience) {
         Notification notification = getNotificationById(id);
+        if (!isBroadcastMaster(notification)) {
+            throw new RuntimeException("Only original broadcast notifications can be updated.");
+        }
+
+        List<Notification> relatedStudentCopies = findRelatedBroadcastCopies(notification);
 
         if (notification.getSentTime() != null) {
             java.time.Duration duration = java.time.Duration.between(notification.getSentTime(), java.time.LocalDateTime.now());
@@ -306,13 +377,27 @@ public class NotificationService {
             throw new RuntimeException("Notification message is required.");
         }
 
-        notification.setTitle(title.trim());
-        notification.setMessage(message.trim());
+        String normalizedAudience = notification.getTargetAudience();
         if (targetAudience != null && !targetAudience.trim().isEmpty()) {
-            notification.setTargetAudience(targetAudience);
+            normalizedAudience = targetAudience.trim();
         }
 
-        return notificationRepository.save(notification);
+        notification.setTitle(title.trim());
+        notification.setMessage(message.trim());
+        notification.setTargetAudience(normalizedAudience);
+
+        for (Notification relatedStudentCopy : relatedStudentCopies) {
+            relatedStudentCopy.setTitle(notification.getTitle());
+            relatedStudentCopy.setMessage(notification.getMessage());
+            relatedStudentCopy.setTargetAudience(notification.getTargetAudience());
+        }
+
+        Notification saved = notificationRepository.save(notification);
+        if (!relatedStudentCopies.isEmpty()) {
+            notificationRepository.saveAll(relatedStudentCopies);
+        }
+
+        return saved;
     }
 
     private String formatSlot(ConcernMeetingSlot slot) {
@@ -322,6 +407,138 @@ public class NotificationService {
         return slot.getStartTime().format(EMAIL_TIME_FORMAT)
                 + " - "
                 + slot.getEndTime().format(EMAIL_TIME_FORMAT);
+    }
+
+    private String normalizeTargetAudience(String targetAudience) {
+        if (targetAudience == null || targetAudience.trim().isEmpty()) {
+            return "ALL_STUDENTS";
+        }
+        return targetAudience.trim();
+    }
+
+    private List<Student> resolveTargetStudents(String targetAudience) {
+        List<Student> approvedStudents = studentRepository.findByUser_RegistrationStatus("Approved");
+        if ("ALL_STUDENTS".equalsIgnoreCase(targetAudience)) {
+            return approvedStudents;
+        }
+
+        return approvedStudents.stream()
+                .filter(student -> isStudentInAudience(student, targetAudience))
+                .toList();
+    }
+
+    @Transactional
+    protected void ensureBroadcastCopiesForStudent(Integer userId) {
+        if (userId == null) {
+            return;
+        }
+
+        Student student = studentRepository.findById(userId).orElse(null);
+        if (student == null) {
+            return;
+        }
+
+        List<Notification> broadcastMasters = notificationRepository.findByTypeAndStudentIsNullOrderBySentTimeDesc("BROADCAST");
+        if (broadcastMasters.isEmpty()) {
+            return;
+        }
+
+        List<Notification> existingBroadcastCopies = notificationRepository.findByStudent_UserIdAndTypeOrderBySentTimeDesc(userId, "BROADCAST");
+        Set<String> existingKeys = existingBroadcastCopies.stream()
+                .map(this::buildBroadcastKey)
+                .collect(Collectors.toSet());
+
+        List<Notification> missingCopies = new ArrayList<>();
+        for (Notification master : broadcastMasters) {
+            String normalizedAudience = normalizeTargetAudience(master.getTargetAudience());
+            if (!isStudentInAudience(student, normalizedAudience)) {
+                continue;
+            }
+
+            String key = buildBroadcastKey(
+                    master.getAdminIdFk(),
+                    normalizedAudience,
+                    master.getTitle(),
+                    master.getMessage(),
+                    master.getSentTime()
+            );
+            if (existingKeys.contains(key)) {
+                continue;
+            }
+
+            Notification studentNotification = newNotification();
+            studentNotification.setTitle(master.getTitle());
+            studentNotification.setMessage(master.getMessage());
+            studentNotification.setType(master.getType());
+            studentNotification.setTargetAudience(normalizedAudience);
+            studentNotification.setAdminIdFk(master.getAdminIdFk());
+            studentNotification.setStudent(student);
+            studentNotification.setConcern(null);
+            studentNotification.setSentTime(master.getSentTime());
+            studentNotification.setIsRead(false);
+            studentNotification.setIsHidden(false);
+
+            missingCopies.add(studentNotification);
+            existingKeys.add(key);
+        }
+
+        if (!missingCopies.isEmpty()) {
+            notificationRepository.saveAll(missingCopies);
+        }
+    }
+
+    private boolean isStudentInAudience(Student student, String targetAudience) {
+        if (student == null) {
+            return false;
+        }
+
+        String normalizedAudience = normalizeTargetAudience(targetAudience);
+        if ("ALL_STUDENTS".equalsIgnoreCase(normalizedAudience)) {
+            return true;
+        }
+
+        return student.getCategory() != null
+                && student.getCategory().trim().equalsIgnoreCase(normalizedAudience);
+    }
+
+    private String buildBroadcastKey(Notification notification) {
+        return buildBroadcastKey(
+                notification.getAdminIdFk(),
+                notification.getTargetAudience(),
+                notification.getTitle(),
+                notification.getMessage(),
+                notification.getSentTime()
+        );
+    }
+
+    private String buildBroadcastKey(Integer adminIdFk,
+                                     String targetAudience,
+                                     String title,
+                                     String message,
+                                     LocalDateTime sentTime) {
+        String adminKey = adminIdFk == null ? "null" : adminIdFk.toString();
+        String audienceKey = normalizeTargetAudience(targetAudience);
+        String titleKey = title == null ? "" : title;
+        String messageKey = message == null ? "" : message;
+        String sentTimeKey = sentTime == null ? "null" : sentTime.toString();
+        return adminKey + "|" + audienceKey + "|" + titleKey + "|" + messageKey + "|" + sentTimeKey;
+    }
+
+    private boolean isBroadcastMaster(Notification notification) {
+        return notification != null
+                && "BROADCAST".equalsIgnoreCase(notification.getType())
+                && notification.getStudent() == null;
+    }
+
+    private List<Notification> findRelatedBroadcastCopies(Notification masterNotification) {
+        return notificationRepository.findByTypeAndStudentIsNotNullAndAdminIdFkAndTargetAudienceAndTitleAndMessageAndSentTime(
+                masterNotification.getType(),
+                masterNotification.getAdminIdFk(),
+                masterNotification.getTargetAudience(),
+                masterNotification.getTitle(),
+                masterNotification.getMessage(),
+                masterNotification.getSentTime()
+        );
     }
 
     private void assignNotificationIdIfRequired(Notification notification) {

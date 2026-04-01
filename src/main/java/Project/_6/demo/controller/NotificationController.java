@@ -25,7 +25,6 @@ public class NotificationController {
 
     /**
      * Get all notifications for the logged-in student (JSON API).
-     * Includes both personal and broadcast notifications.
      */
     @GetMapping
     public ResponseEntity<?> getNotifications(HttpSession session) {
@@ -34,13 +33,7 @@ public class NotificationController {
             return ResponseEntity.status(401).body("Not logged in");
         }
 
-        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
-        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-
-        // Merge personal + broadcast, sort by sentTime desc
-        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
-        allNotifications.addAll(broadcastNotifications);
-        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        List<Notification> allNotifications = notificationService.getNotificationsForStudent(userId);
 
         long unreadCount = notificationService.getUnreadCount(userId);
 
@@ -87,7 +80,7 @@ public class NotificationController {
         if (userId == null) {
             return ResponseEntity.status(401).body("Not logged in");
         }
-        notificationService.markAsRead(id);
+        notificationService.markAsRead(id, userId);
         return ResponseEntity.ok(Map.of("success", true));
     }
 
@@ -101,6 +94,19 @@ public class NotificationController {
             return ResponseEntity.status(401).body("Not logged in");
         }
         notificationService.markAllAsRead(userId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * Remove a single notification from the student's list.
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> removeNotification(@PathVariable("id") Integer id, HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return ResponseEntity.status(401).body("Not logged in");
+        }
+        notificationService.hideNotification(id, userId);
         return ResponseEntity.ok(Map.of("success", true));
     }
 }
