@@ -713,7 +713,7 @@
         .actions-list {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 12px;
         }
 
@@ -773,6 +773,7 @@
         }
         .action-item:hover .action-item-icon { transform: scale(1.08) rotate(-3deg); }
         .action-item-icon.report  { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .action-item-icon.draft   { background: rgba(245, 158, 11, 0.14); color: #b45309; }
         .action-item-icon.home    { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
         .action-item-icon.home.custom { background: rgba(29,53,87,0.12); color: #1d3557; }
         .action-item-icon.profile { background: rgba(239,108,0,0.1); color: var(--accent-orange); }
@@ -789,6 +790,19 @@
             color: var(--text-light);
             margin: 0;
             line-height: 1.55;
+        }
+        .action-item-hint {
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #b45309;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 999px;
+            padding: 4px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* ===== Tips Section ===== */
@@ -1252,6 +1266,11 @@
             color: #1565c0;
             border: 1px solid rgba(21,101,192,0.2);
         }
+        .track-status-badge.meeting-scheduled {
+            background: rgba(126,34,206,0.1);
+            color: #7e22ce;
+            border: 1px solid rgba(126,34,206,0.25);
+        }
         .track-status-badge.complete {
             background: rgba(46,125,50,0.08);
             color: #2e7d32;
@@ -1418,6 +1437,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -1518,6 +1538,7 @@
                         <button class="status-filter-btn active" data-filter="all" type="button">All</button>
                         <button class="status-filter-btn" data-filter="Pending" type="button">Pending</button>
                         <button class="status-filter-btn" data-filter="In Progress" type="button">In Progress</button>
+                        <button class="status-filter-btn" data-filter="Meeting Scheduled" type="button">Meeting Scheduled</button>
                     </div>
                     <button type="button" class="compact-toggle" id="compactToggleBtn">
                         <i class="fas fa-compress"></i>
@@ -1556,6 +1577,17 @@
                                 <p>Create a new concern report with full details and attachments.</p>
                             </div>
                         </a>
+                        <a href="/student/concern-drafts" class="action-item" data-search="draft concern save draft continue editing pending draft">
+                            <div class="action-item-icon draft"><i class="fas fa-file-pen"></i></div>
+                            <div class="action-item-text">
+                                <h4>My Draft Concerns</h4>
+                                <p>Continue editing saved draft concerns and submit them when ready.</p>
+                                <span class="action-item-hint" th:if="${draftCount != null}">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span th:text="${draftCount} + ' drafts saved'">0 drafts saved</span>
+                                </span>
+                            </div>
+                        </a>
                         <a href="/student/community" class="action-item" data-search="community talk peers support discussion">
                             <div class="action-item-icon home custom"><i class="fas fa-comments"></i></div>
                             <div class="action-item-text">
@@ -1580,16 +1612,16 @@
                     <div class="card-title"><i class="fas fa-route"></i> My Concerns - Live Tracking</div>
                 </div>
 
-                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress'])}" class="tracking-empty">
+                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled'])}" class="tracking-empty">
                     <i class="fas fa-inbox"></i>
-                    <p>No active concerns in live tracking. Pending and In Progress concerns will appear here.</p>
+                    <p>No active concerns in live tracking. Pending, In Progress, and Meeting Scheduled concerns will appear here.</p>
                 </div>
 
                 <div class="status-empty-note" id="trackingEmptyState">
                     No concern cards match your current filter/search.
                 </div>
 
-                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress']}" class="concern-track-card"
+                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']}" class="concern-track-card"
                      th:attr="data-status=${concern.status},data-search=${concern.subject}">
                     <div class="track-card-header">
                         <div>
@@ -1597,7 +1629,7 @@
                             <div class="track-subject" th:text="${concern.subject}">Subject</div>
                         </div>
                         <span class="track-status-badge"
-                              th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : 'complete')"
+                            th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : (${concern.status == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
                               th:text="${concern.status}">Status</span>
                     </div>
 
@@ -1605,7 +1637,7 @@
                     <div class="step-tracker">
                         <!-- Progress line fill -->
                         <div class="progress-line"
-                             th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : '100%'))"></div>
+                                th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : (${concern.status == 'Meeting Scheduled'} ? '75%' : '100%')))"></div>
 
                         <!-- Step 1: Submitted -->
                         <div class="tracker-step done">
@@ -1616,11 +1648,11 @@
 
                         <!-- Step 2: Under Review -->
                         <div class="tracker-step"
-                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Complete'} ? 'done' : '')">
+                                th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? 'done' : '')">
                             <div class="tracker-step-dot"><i class="fas fa-eye"></i></div>
-                            <div class="tracker-step-label">Under Review</div>
+                               <div class="tracker-step-label" th:text="${concern.status == 'Meeting Scheduled'} ? 'Meeting Scheduled' : 'Under Review'">Under Review</div>
                             <div class="tracker-step-time"
-                                 th:text="${concern.status == 'Pending'} ? 'Waiting...' : 'Reviewed'">Waiting...</div>
+                                   th:text="${concern.status == 'Pending'} ? 'Waiting...' : (${concern.status == 'Meeting Scheduled'} ? 'Scheduled' : 'Reviewed')">Waiting...</div>
                         </div>
 
                         <!-- Step 3: Resolved -->
@@ -1703,7 +1735,7 @@
             </div>
 
               <div th:each="notif : ${notifications}" class="notif-item"
-                  th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+                  th:classappend="${!notif.isRead} ? 'unread' : ''"
                  th:attr="data-id=${notif.notificationId}"
                  onclick="markNotifRead(this)">
                 <div class="notif-icon-wrap"
@@ -1717,6 +1749,11 @@
                         <i class="fas fa-clock"></i>
                         <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                     </div>
+                </div>
+                <div class="notif-item-actions">
+                    <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -1928,6 +1965,43 @@
                 });
         }
 
+        function refreshNotifCount() {
+            const countEl = document.querySelector('.notif-count');
+            const list = document.getElementById('notifList');
+            if (!countEl || !list) return;
+
+            const count = list.querySelectorAll('.notif-item').length;
+            countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+            let empty = list.querySelector('.notif-empty');
+            if (count === 0) {
+                if (!empty) {
+                    empty = document.createElement('div');
+                    empty.className = 'notif-empty';
+                    empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                    list.appendChild(empty);
+                }
+            } else if (empty) {
+                empty.remove();
+            }
+        }
+
+        function removeNotif(event, el) {
+            if (event) event.stopPropagation();
+            if (!el) return;
+            const id = el.getAttribute('data-id');
+            if (!id) return;
+
+            fetch('/api/notifications/' + id, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(() => {
+                    el.remove();
+                    refreshNotifCount();
+                    updateBadge();
+                })
+                .catch(err => console.error(err));
+        }
+
         // Update badge count
         function updateBadge() {
             fetch('/api/notifications/unread-count')
@@ -1946,13 +2020,22 @@
         // Poll for new notifications every 30 seconds
         setInterval(updateBadge, 30000);
     </script>
-    <script>
+    <script th:inline="javascript">
+        const currentStudentUserId = /*[[${session.studentUserId}]]*/ null;
+        const studentDashboardTourStorageKey = 'akb_student_dashboard_tour_completed_'
+            + (currentStudentUserId != null ? currentStudentUserId : 'guest');
+
         window.studentTourConfig = {
             pageId: 'student-dashboard',
             autoStart: true,
-            storageKey: 'akb_student_tour_completed',
+            storageKey: studentDashboardTourStorageKey,
             nextPage: '/submit-concern',
             steps: [
+                {
+                    selector: 'header .header-content',
+                    title: 'Student Navigation Bar',
+                    content: 'Use this top bar for Home, Dashboard, Report Issue, Drafts, Community Talk, History, FAQ, profile, and notifications.'
+                },
                 {
                     selector: '.welcome-hero',
                     title: 'Welcome Panel',
@@ -1966,12 +2049,12 @@
                 {
                     selector: '.actions-list',
                     title: 'Quick Actions',
-                    content: 'Jump straight to Report Issue, Community Talk, or refresh your dashboard from here.'
+                    content: 'Jump straight to Report Issue, Drafts, Community Talk, or refresh your dashboard from here.'
                 },
                 {
                     selector: '.tracking-section',
                     title: 'Live Concern Tracking',
-                    content: 'Monitor Pending and In Progress concerns with real-time status progression.'
+                    content: 'Monitor Pending, In Progress, and Meeting Scheduled concerns with real-time status progression.'
                 },
                 {
                     selector: '.tips-section',

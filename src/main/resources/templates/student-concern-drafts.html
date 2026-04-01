@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Draft Concerns - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="/CSS/student-tour.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --accent-amber: #d97706;
+            --accent-blue: #1d4ed8;
+            --accent-green: #15803d;
+            --surface: #ffffff;
+            --bg: #f0f2f5;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --radius: 16px;
+            --shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text-dark);
+            font-family: "Inter", "Segoe UI", Arial, sans-serif;
+        }
+
+        .draft-shell {
+            max-width: 940px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .action-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            border-radius: 10px;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid transparent;
+            transition: all 0.25s ease;
+        }
+
+        .action-link.back {
+            background: #fff;
+            color: #374151;
+            border-color: #e5e7eb;
+        }
+
+        .action-link.back:hover {
+            border-color: #cbd5e1;
+            transform: translateX(-2px);
+        }
+
+        .action-link.new {
+            color: #fff;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            box-shadow: 0 10px 24px rgba(229, 57, 53, 0.24);
+        }
+
+        .action-link.new:hover {
+            transform: translateY(-2px);
+        }
+
+        .alert-toast {
+            border-radius: 12px;
+            padding: 12px 15px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+        }
+
+        .alert-toast.success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .alert-toast.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #b91c1c;
+        }
+
+        .draft-hero {
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: #fff;
+            padding: 28px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 18px;
+            box-shadow: 0 14px 36px rgba(229, 57, 53, 0.28);
+            margin-bottom: 18px;
+            min-height: 0;
+        }
+
+        .draft-hero h1 {
+            margin: 0 0 8px;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -0.4px;
+            line-height: 1.15;
+        }
+
+        .draft-hero p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.92;
+        }
+
+        .hero-badge {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 14px;
+            padding: 12px 16px;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .hero-badge .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+            opacity: 0.84;
+            margin-bottom: 5px;
+        }
+
+        .hero-badge .value {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .draft-summary {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 16px 18px;
+            margin-bottom: 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .draft-summary .left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .draft-toolbar {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            padding: 14px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            flex: 1;
+        }
+
+        .toolbar-search-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #f8fafc;
+            border: 1px solid #dbe3ef;
+            border-radius: 10px;
+            padding: 0 10px;
+            min-height: 40px;
+            min-width: 240px;
+            flex: 1;
+        }
+
+        .toolbar-search-wrap i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .toolbar-search-wrap input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 13px;
+            color: #374151;
+            font-weight: 600;
+            padding: 9px 0;
+        }
+
+        .toolbar-select {
+            border: 1px solid #dbe3ef;
+            background: #fff;
+            color: #374151;
+            border-radius: 10px;
+            padding: 9px 12px;
+            min-height: 40px;
+            font-size: 12px;
+            font-weight: 700;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .results-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #b45309;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 999px;
+            padding: 7px 12px;
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            background: #fffbeb;
+            color: #b45309;
+            border: 1px solid #fcd34d;
+        }
+
+        .empty {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            padding: 60px 22px;
+        }
+
+        .empty i {
+            font-size: 44px;
+            color: #d1d5db;
+            margin-bottom: 12px;
+        }
+
+        .empty h3 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 900;
+        }
+
+        .empty p {
+            margin: 0 0 22px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .draft-list {
+            display: grid;
+            gap: 14px;
+        }
+
+        .draft-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: transform 0.28s ease, box-shadow 0.28s ease, border-color 0.28s ease;
+            animation: cardIn 0.45s ease both;
+        }
+
+        .draft-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+            border-color: #f8b4b4;
+        }
+
+        .draft-head {
+            padding: 16px 20px;
+            border-bottom: 1px solid #f3f4f6;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .draft-ref {
+            font-size: 11px;
+            font-weight: 800;
+            color: #64748b;
+            letter-spacing: 0.9px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 10px;
+            border-radius: 999px;
+        }
+
+        .draft-time {
+            font-size: 12px;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .draft-title {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+            color: var(--text-dark);
+        }
+
+        .draft-body {
+            padding: 16px 20px 18px;
+        }
+
+        .draft-meta {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .draft-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .draft-message {
+            margin: 0 0 12px;
+            font-size: 13px;
+            color: #374151;
+            line-height: 1.7;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+
+        .draft-message.clamped {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .draft-message.expanded {
+            display: block;
+            -webkit-line-clamp: initial;
+            line-clamp: initial;
+            overflow: visible;
+        }
+
+        .message-toggle {
+            border: none;
+            background: transparent;
+            color: var(--accent-blue);
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            margin: -6px 0 12px;
+            padding: 0;
+        }
+
+        .message-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .draft-evidence {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            padding: 7px 12px;
+            margin-bottom: 12px;
+        }
+
+        .draft-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+
+        .draft-actions form {
+            margin: 0;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            padding: 10px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn.update {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+        }
+
+        .btn.submit {
+            background: #ecfdf3;
+            color: var(--accent-green);
+            border: 1px solid #bbf7d0;
+        }
+
+        .btn.delete {
+            background: #fef2f2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .empty-filter {
+            margin-top: 8px;
+            padding: 40px 22px;
+        }
+
+        .reset-filter-btn {
+            border: 1px solid #fca5a5;
+            background: #fff1f2;
+            color: #b91c1c;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .reset-filter-btn:hover {
+            background: #ffe4e6;
+        }
+
+        .is-hidden {
+            display: none;
+        }
+
+        @keyframes cardIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-bell {
+            position: relative;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            font-size: 16px;
+            color: #3b4358;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(229, 57, 53, 0.2);
+            box-shadow: 0 10px 20px rgba(229, 57, 53, 0.08);
+            transition: all 0.28s ease;
+        }
+
+        .nav-bell .bell-badge {
+            position: absolute;
+            top: -5px;
+            right: -7px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            font-size: 10px;
+            font-weight: 800;
+            min-width: 20px;
+            height: 20px;
+            border-radius: 999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 5px;
+            border: 2px solid #fff;
+        }
+
+        .bell-badge.hidden { display: none; }
+
+        .notif-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(17, 24, 39, 0.45);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.35s;
+        }
+
+        .notif-overlay.active { opacity: 1; visibility: visible; }
+
+        .notif-panel {
+            position: fixed;
+            top: 0;
+            right: -420px;
+            width: 410px;
+            height: 100vh;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            z-index: 1000;
+            box-shadow: -18px 0 48px rgba(15, 23, 42, 0.24);
+            transition: right 0.45s cubic-bezier(.22,1,.36,1);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(229, 57, 53, 0.2);
+            border-radius: 20px 0 0 20px;
+            overflow: hidden;
+        }
+
+        .notif-panel.active { right: 0; }
+
+        .notif-panel-header {
+            padding: 24px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notif-panel-header h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+        }
+
+        .notif-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: #fff;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .notif-panel-actions {
+            padding: 14px 24px;
+            border-bottom: 1px solid #e8edf6;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        .notif-panel-actions .notif-count {
+            font-size: 13px;
+            color: #5f6b81;
+            font-weight: 600;
+        }
+
+        .mark-all-btn {
+            background: linear-gradient(135deg, #ef5350, var(--primary));
+            border: none;
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 7px 14px;
+            border-radius: 999px;
+        }
+
+        .notif-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 12px 14px;
+            background: linear-gradient(180deg, rgba(248,251,255,0.75), rgba(244,248,255,0.95));
+        }
+
+        .notif-item {
+            padding: 14px;
+            border: 1px solid #e8edf5;
+            border-radius: 14px;
+            background: #fff;
+            display: flex;
+            gap: 14px;
+            transition: all 0.25s;
+            cursor: pointer;
+            position: relative;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+
+        .notif-item.unread {
+            background: linear-gradient(180deg, #fff6f6, #ffffff);
+            border-color: rgba(229, 57, 53, 0.22);
+        }
+
+        .notif-icon-wrap {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .notif-icon-wrap.submitted { background: rgba(21,101,192,0.08); color: #1565c0; }
+        .notif-icon-wrap.in-progress { background: rgba(239,108,0,0.1); color: #ef6c00; }
+        .notif-icon-wrap.complete { background: rgba(46,125,50,0.08); color: #2e7d32; }
+        .notif-icon-wrap.broadcast { background: rgba(249,115,22,0.1); color: #ea580c; }
+
+        .notif-content { flex: 1; min-width: 0; }
+
+        .notif-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 3px;
+        }
+
+        .notif-message {
+            font-size: 12px;
+            color: #6a768c;
+            line-height: 1.5;
+        }
+
+        .notif-time {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .notif-empty {
+            text-align: center;
+            margin: 12px;
+            border: 1px dashed #d6dfed;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.85);
+            padding: 60px 22px;
+            color: #9ca3af;
+        }
+
+        @media (max-width: 820px) {
+            .draft-hero {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .draft-shell {
+                padding: 0 14px;
+            }
+
+            .toolbar-left,
+            .toolbar-search-wrap {
+                width: 100%;
+                min-width: 0;
+            }
+
+            .toolbar-select {
+                flex: 1;
+                min-width: 140px;
+            }
+
+            .notif-panel {
+                width: 100%;
+                right: -100%;
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body class="student-theme">
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                <li><a href="/student/concern-drafts" class="nav-link active">My Drafts</a></li>
+                <li><a href="/student/community" class="nav-link">Community Talk</a></li>
+                <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                <li><a href="/faq" class="nav-link">FAQ</a></li>
+                <li>
+                    <a href="/student/profile" class="nav-profile-btn" aria-label="Student Profile" title="Student Profile">
+                        <img th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                             src="/images/img1.jpeg"
+                             alt="Profile"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                        <span class="nav-profile-fallback">S</span>
+                    </a>
+                </li>
+                <li>
+                    <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                        <i class="fas fa-bell"></i>
+                        <span class="bell-badge" id="bellBadge"
+                              th:text="${unreadCount != null ? unreadCount : 0}"
+                              th:classappend="${unreadCount == null or unreadCount == 0} ? 'hidden' : ''">0</span>
+                    </div>
+                </li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="draft-shell">
+        <div class="top-actions">
+            <a href="/student/dashboard" class="action-link back"><i class="fas fa-arrow-left"></i> Dashboard</a>
+            <a href="/submit-concern" class="action-link new"><i class="fas fa-plus"></i> New Concern</a>
+        </div>
+
+        <div th:if="${successMessage}" class="alert-toast success">
+            <i class="fas fa-circle-check"></i>
+            <span th:text="${successMessage}"></span>
+        </div>
+        <div th:if="${errorMessage}" class="alert-toast error">
+            <i class="fas fa-circle-exclamation"></i>
+            <span th:text="${errorMessage}"></span>
+        </div>
+
+        <section class="draft-hero">
+            <div>
+                <h1>My Draft Concerns</h1>
+                <p>Save now, review later, and submit only when your concern is ready.</p>
+            </div>
+            <div class="hero-badge">
+                <div class="label">Saved Drafts</div>
+                <div class="value" th:text="${draftConcerns != null ? #lists.size(draftConcerns) : 0}">0</div>
+            </div>
+        </section>
+
+        <section class="draft-summary" th:if="${draftConcerns != null and !#lists.isEmpty(draftConcerns)}">
+            <div class="left">
+                <i class="fas fa-circle-info"></i>
+                Drafts are private until you click submit.
+            </div>
+            <span class="pill"><i class="fas fa-pen"></i> Draft Mode</span>
+        </section>
+
+        <section class="draft-toolbar" id="draftToolbar" th:if="${draftConcerns != null and !#lists.isEmpty(draftConcerns)}">
+            <div class="toolbar-left">
+                <label class="toolbar-search-wrap" for="draftSearchInput">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="draftSearchInput" placeholder="Search by subject, message, or category...">
+                </label>
+
+                <select class="toolbar-select" id="draftCategoryFilter" aria-label="Filter drafts by category">
+                    <option value="all">All Categories</option>
+                </select>
+
+                <select class="toolbar-select" id="draftSortSelect" aria-label="Sort drafts">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                </select>
+            </div>
+
+            <span class="results-count" id="draftVisibleCount">
+                <i class="fas fa-layer-group"></i>
+                0 drafts shown
+            </span>
+        </section>
+
+        <section th:if="${draftConcerns == null or #lists.isEmpty(draftConcerns)}" class="empty">
+            <i class="fas fa-file-circle-xmark"></i>
+            <h3>No Drafts Yet</h3>
+            <p>You have no saved drafts right now. Start a concern and save it as draft anytime.</p>
+            <a href="/submit-concern" class="action-link new"><i class="fas fa-plus"></i> Create Draft</a>
+        </section>
+
+        <section class="draft-list" id="draftList" th:if="${draftConcerns != null and !#lists.isEmpty(draftConcerns)}">
+            <article class="draft-card"
+                     th:each="draft : ${draftConcerns}"
+                     th:attr="data-category=${draft.category},data-created=${draft.createdTime != null ? #temporals.format(draft.createdTime, 'yyyyMMddHHmmss') : ''},data-concern-id=${draft.concernId}">
+                <div class="draft-head">
+                    <div>
+                        <span class="draft-ref" th:text="'CON-' + ${draft.concernId}">CON-1</span>
+                        <div class="draft-time">
+                            <i class="fas fa-clock"></i>
+                            <span th:text="${#temporals.format(draft.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
+                        </div>
+                    </div>
+                    <span class="pill"><i class="fas fa-file-pen"></i> Draft</span>
+                </div>
+                <div class="draft-body">
+                    <h3 class="draft-title" th:text="${draft.subject}">Draft Subject</h3>
+                    <div class="draft-meta">
+                        <span><i class="fas fa-tags"></i> <span th:text="${draft.category}">Category</span></span>
+                        <span><i class="fas fa-user-shield"></i> Not Submitted</span>
+                    </div>
+                    <p class="draft-message" th:text="${draft.message}">Draft message preview</p>
+                    <button type="button" class="message-toggle" hidden>Read more</button>
+
+                    <a th:if="${draft.evidencePath != null}"
+                       th:href="@{'/uploads/' + ${draft.evidencePath}}"
+                       target="_blank"
+                       class="draft-evidence">
+                        <i class="fas fa-paperclip"></i> View Attached Evidence
+                    </a>
+
+                    <div class="draft-actions">
+                        <a th:href="@{'/student/concern/' + ${draft.concernId} + '/edit'}" class="btn update">
+                            <i class="fas fa-pen"></i> Update Draft
+                        </a>
+
+                        <form th:action="@{/student/concern/draft/submit}" method="post"
+                              onsubmit="return confirm('Submit this draft as a new concern?');">
+                            <input type="hidden" name="concernId" th:value="${draft.concernId}">
+                            <button type="submit" class="btn submit">
+                                <i class="fas fa-paper-plane"></i> Submit Concern
+                            </button>
+                        </form>
+
+                        <form th:action="@{/student/concern/delete}" method="post"
+                              onsubmit="return confirm('Delete this draft permanently?');">
+                            <input type="hidden" name="concernId" th:value="${draft.concernId}">
+                            <input type="hidden" name="returnTo" value="drafts">
+                            <button type="submit" class="btn delete">
+                                <i class="fas fa-trash"></i> Delete Draft
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <section class="empty empty-filter is-hidden" id="draftNoResults" th:if="${draftConcerns != null and !#lists.isEmpty(draftConcerns)}">
+            <i class="fas fa-filter-circle-xmark"></i>
+            <h3>No Matching Drafts</h3>
+            <p>Try a different search keyword or reset filters to see all drafts again.</p>
+            <button type="button" class="reset-filter-btn" id="resetDraftFilters">Reset Filters</button>
+        </section>
+    </div>
+</main>
+
+<div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
+<div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+        <h3><i class="fas fa-bell"></i> Notifications</h3>
+        <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="notif-panel-actions">
+        <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>
+        <button class="mark-all-btn" onclick="markAllRead()">Mark all as read</button>
+    </div>
+    <div class="notif-list" id="notifList">
+        <div th:if="${notifications == null or #lists.isEmpty(notifications)}" class="notif-empty">
+            <i class="fas fa-bell-slash"></i>
+            <p>No notifications yet.</p>
+        </div>
+
+           <div th:each="notif : ${notifications}" class="notif-item"
+               th:classappend="${!notif.isRead} ? 'unread' : ''"
+             th:attr="data-id=${notif.notificationId}"
+             onclick="markNotifRead(this)">
+            <div class="notif-icon-wrap"
+                 th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
+                <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : (${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check'))"></i>
+            </div>
+            <div class="notif-content">
+                <div class="notif-title" th:text="${notif.title}">Notification Title</div>
+                <div class="notif-message" th:text="${notif.message}">Notification message</div>
+                <div class="notif-time">
+                    <i class="fas fa-clock"></i>
+                    <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
+                </div>
+            </div>
+            <div class="notif-item-actions">
+                <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            <p><i class="fab fa-facebook-f footer-contact-icon" aria-hidden="true"></i>Facebook: <a href="https://www.facebook.com/profile.php?id=61569531128706" target="_blank" rel="noopener noreferrer">AKB Facebook Page</a></p>
+            <p><i class="fas fa-envelope footer-contact-icon" aria-hidden="true"></i>Email: <a href="mailto:admin@akbinstitute.edu.lk">admin@akbinstitute.edu.lk</a></p>
+            <p><i class="fas fa-phone footer-contact-icon" aria-hidden="true"></i>Tel: <a href="tel:0717514859">0717514859</a></p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    function toggleNotifPanel() {
+        document.getElementById('notifPanel').classList.toggle('active');
+        document.getElementById('notifOverlay').classList.toggle('active');
+        document.body.style.overflow = document.getElementById('notifPanel').classList.contains('active') ? 'hidden' : '';
+    }
+
+    function markNotifRead(el) {
+        const id = el.getAttribute('data-id');
+        if (el.classList.contains('unread')) {
+            fetch('/api/notifications/' + id + '/read', { method: 'POST' })
+                .then(res => res.json())
+                .then(() => {
+                    el.classList.remove('unread');
+                    updateBadge();
+                });
+        }
+    }
+
+    function markAllRead() {
+        fetch('/api/notifications/mark-all-read', { method: 'POST' })
+            .then(res => res.json())
+            .then(() => {
+                document.querySelectorAll('.notif-item.unread').forEach(item => {
+                    item.classList.remove('unread');
+                });
+                updateBadge();
+            });
+    }
+
+    function refreshNotifCount() {
+        const countEl = document.querySelector('.notif-count');
+        const list = document.getElementById('notifList');
+        if (!countEl || !list) return;
+
+        const count = list.querySelectorAll('.notif-item').length;
+        countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+        let empty = list.querySelector('.notif-empty');
+        if (count === 0) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'notif-empty';
+                empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                list.appendChild(empty);
+            }
+        } else if (empty) {
+            empty.remove();
+        }
+    }
+
+    function removeNotif(event, el) {
+        if (event) event.stopPropagation();
+        if (!el) return;
+        const id = el.getAttribute('data-id');
+        if (!id) return;
+
+        fetch('/api/notifications/' + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => {
+                el.remove();
+                refreshNotifCount();
+                updateBadge();
+            })
+            .catch(err => console.error(err));
+    }
+
+    function updateBadge() {
+        fetch('/api/notifications/unread-count')
+            .then(res => res.json())
+            .then(data => {
+                const badge = document.getElementById('bellBadge');
+                if (data.unreadCount > 0) {
+                    badge.textContent = data.unreadCount;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            });
+    }
+
+    function setupMessageToggles(cards) {
+        cards.forEach(card => {
+            const message = card.querySelector('.draft-message');
+            const toggle = card.querySelector('.message-toggle');
+            if (!message || !toggle) {
+                return;
+            }
+
+            message.classList.add('clamped');
+            const needsToggle = message.scrollHeight > message.clientHeight + 4;
+            if (!needsToggle) {
+                toggle.style.display = 'none';
+                return;
+            }
+
+            toggle.hidden = false;
+            toggle.addEventListener('click', () => {
+                const expanded = message.classList.toggle('expanded');
+                message.classList.toggle('clamped', !expanded);
+                toggle.textContent = expanded ? 'Show less' : 'Read more';
+            });
+        });
+    }
+
+    function initializeDraftPageInteractions() {
+        const list = document.getElementById('draftList');
+        if (!list) {
+            return;
+        }
+
+        const cards = Array.from(list.querySelectorAll('.draft-card'));
+        const searchInput = document.getElementById('draftSearchInput');
+        const categoryFilter = document.getElementById('draftCategoryFilter');
+        const sortSelect = document.getElementById('draftSortSelect');
+        const visibleCount = document.getElementById('draftVisibleCount');
+        const noResults = document.getElementById('draftNoResults');
+        const resetBtn = document.getElementById('resetDraftFilters');
+
+        cards.forEach((card, idx) => {
+            card.style.animationDelay = (idx * 0.05).toFixed(2) + 's';
+        });
+
+        if (categoryFilter) {
+            const categories = [...new Set(cards
+                .map(card => (card.dataset.category || '').trim())
+                .filter(Boolean))]
+                .sort((a, b) => a.localeCompare(b));
+
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category.toLowerCase();
+                option.textContent = category;
+                categoryFilter.appendChild(option);
+            });
+        }
+
+        setupMessageToggles(cards);
+
+        const applyFilters = () => {
+            const query = (searchInput?.value || '').trim().toLowerCase();
+            const selectedCategory = (categoryFilter?.value || 'all').toLowerCase();
+            const sortBy = (sortSelect?.value || 'newest').toLowerCase();
+
+            const visibleCards = [];
+            cards.forEach(card => {
+                const category = (card.dataset.category || '').trim().toLowerCase();
+                const text = card.textContent.toLowerCase();
+
+                const matchesQuery = !query || text.includes(query);
+                const matchesCategory = selectedCategory === 'all' || category === selectedCategory;
+                const shouldShow = matchesQuery && matchesCategory;
+
+                card.style.display = shouldShow ? '' : 'none';
+                if (shouldShow) {
+                    visibleCards.push(card);
+                }
+            });
+
+            visibleCards.sort((a, b) => {
+                const aCreated = Number(a.dataset.created || 0);
+                const bCreated = Number(b.dataset.created || 0);
+                const aFallback = Number(a.dataset.concernId || 0);
+                const bFallback = Number(b.dataset.concernId || 0);
+                const aKey = aCreated || aFallback;
+                const bKey = bCreated || bFallback;
+
+                return sortBy === 'oldest' ? aKey - bKey : bKey - aKey;
+            });
+
+            visibleCards.forEach(card => list.appendChild(card));
+
+            const count = visibleCards.length;
+            if (visibleCount) {
+                visibleCount.innerHTML = '<i class="fas fa-layer-group"></i> ' + count + (count === 1 ? ' draft shown' : ' drafts shown');
+            }
+            if (noResults) {
+                noResults.classList.toggle('is-hidden', count !== 0);
+            }
+        };
+
+        searchInput?.addEventListener('input', applyFilters);
+        categoryFilter?.addEventListener('change', applyFilters);
+        sortSelect?.addEventListener('change', applyFilters);
+
+        resetBtn?.addEventListener('click', () => {
+            if (searchInput) {
+                searchInput.value = '';
+            }
+            if (categoryFilter) {
+                categoryFilter.value = 'all';
+            }
+            if (sortSelect) {
+                sortSelect.value = 'newest';
+            }
+            applyFilters();
+            searchInput?.focus();
+        });
+
+        applyFilters();
+    }
+
+    setInterval(updateBadge, 30000);
+    document.addEventListener('DOMContentLoaded', initializeDraftPageInteractions);
+</script>
+<script>
+    window.studentTourConfig = {
+        pageId: 'concern-drafts',
+        autoStart: false,
+        storageKey: 'akb_student_tour_completed',
+        nextPage: '/student/concern-history',
+        steps: [
+            {
+                selector: 'header .header-content',
+                title: 'Student Navigation',
+                content: 'Use the top menu to move between Dashboard, Report Issue, Drafts, History, and other student tools.'
+            },
+            {
+                selector: '.draft-hero',
+                title: 'Draft Workspace',
+                content: 'This page keeps your unfinished concerns safe until you are ready to submit them.'
+            },
+            {
+                selector: '#draftList',
+                title: 'Draft Cards',
+                content: 'Each card shows your saved message, category, evidence, and current draft status.'
+            },
+            {
+                selector: '.draft-actions',
+                title: 'Update, Submit, Or Delete',
+                content: 'You can continue editing a draft, submit it as a concern, or permanently delete it.'
+            }
+        ]
+    };
+</script>
+<script src="/js/student-tour.js"></script>
+</body>
+</html>

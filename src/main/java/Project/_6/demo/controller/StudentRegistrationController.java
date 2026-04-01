@@ -8,7 +8,6 @@ import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.Feedback;
-import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.Student;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.EmailVerificationService;
@@ -319,20 +318,18 @@ public class StudentRegistrationController {
         model.addAttribute("student", student);
         model.addAttribute("studentName", student.getUser().getFirstName() + " " + student.getUser().getLastName());
 
-        // Add notifications for the student (personal + broadcast)
-        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
-        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
-        allNotifications.addAll(broadcastNotifications);
-        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        // Add notifications for the student
+        var allNotifications = notificationService.getNotificationsForStudent(userId);
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
 
         // Add student's concerns for tracking
         List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
+        long draftCount = concernService.countDraftConcernsByStudentUserId(userId);
         Map<Integer, List<AdminReply>> repliesMap = concernService.getRepliesMap(concerns);
         model.addAttribute("concerns", concerns);
+        model.addAttribute("draftCount", draftCount);
         model.addAttribute("repliesMap", repliesMap);
 
         return "student-dashboard";
@@ -366,11 +363,7 @@ public class StudentRegistrationController {
         model.addAttribute("passwordRule", "Use at least 12 characters with uppercase, lowercase, number, and special character.");
 
         // Keep notification drawer data available on profile page
-        List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
-        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-        List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
-        allNotifications.addAll(broadcastNotifications);
-        allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+        var allNotifications = notificationService.getNotificationsForStudent(userId);
         long unreadCount = notificationService.getUnreadCount(userId);
         model.addAttribute("notifications", allNotifications);
         model.addAttribute("unreadCount", unreadCount);
@@ -460,11 +453,7 @@ public class StudentRegistrationController {
     public String showStudentFaq(HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("studentUserId");
         if (userId != null) {
-            List<Notification> personalNotifications = notificationService.getNotificationsForStudent(userId);
-            List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-            List<Notification> allNotifications = new java.util.ArrayList<>(personalNotifications);
-            allNotifications.addAll(broadcastNotifications);
-            allNotifications.sort((a, b) -> b.getSentTime().compareTo(a.getSentTime()));
+            var allNotifications = notificationService.getNotificationsForStudent(userId);
             long unreadCount = notificationService.getUnreadCount(userId);
             model.addAttribute("notifications", allNotifications);
             model.addAttribute("unreadCount", unreadCount);

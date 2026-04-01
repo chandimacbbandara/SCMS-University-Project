@@ -5,8 +5,11 @@ import Project._6.demo.dto.CommunityModerationRequestDTO;
 import Project._6.demo.dto.CommunityModerationResultDTO;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.ConcernMeetingProposal;
+import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.service.AdminService;
+import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.CommunityModerationService;
 import Project._6.demo.service.FeedbackService;
 
@@ -32,14 +35,18 @@ import java.util.Locale;
 public class AdminController {
 
     private final AdminService adminService;
+    private final ConcernMeetingService concernMeetingService;
     private final FeedbackService feedbackService;
     private final Project._6.demo.service.StudentCommunityService communityService;
     private final CommunityModerationService moderationService;
 
-    public AdminController(AdminService adminService, FeedbackService feedbackService,
+    public AdminController(AdminService adminService,
+                           ConcernMeetingService concernMeetingService,
+                           FeedbackService feedbackService,
                            Project._6.demo.service.StudentCommunityService communityService,
                            CommunityModerationService moderationService) {
         this.adminService = adminService;
+        this.concernMeetingService = concernMeetingService;
         this.feedbackService = feedbackService;
         this.communityService = communityService;
         this.moderationService = moderationService;
@@ -157,7 +164,9 @@ public class AdminController {
         model.addAttribute("concerns", eduConcerns);
         model.addAttribute("totalConcerns", eduConcerns.size());
         model.addAttribute("pendingCount", eduConcerns.stream().filter(c -> "Pending".equals(c.getStatus())).count());
-        model.addAttribute("inProgressCount", eduConcerns.stream().filter(c -> "In Progress".equals(c.getStatus())).count());
+        model.addAttribute("inProgressCount", eduConcerns.stream()
+            .filter(c -> "In Progress".equals(c.getStatus()) || "Meeting Scheduled".equals(c.getStatus()))
+            .count());
         model.addAttribute("completeCount", eduConcerns.stream().filter(c -> "Complete".equals(c.getStatus())).count());
 
         return "admin-edu-dashboard";
@@ -247,13 +256,46 @@ public class AdminController {
         Concern concern = adminService.getConcernById(id);
         List<AdminReply> replies = adminService.getRepliesForConcern(id);
         Feedback feedback = feedbackService.getFeedbackByConcernId(id).orElse(null);
+        List<ConcernMeetingProposal> meetingProposals = concernMeetingService.getProposalHistory(id);
+        ConcernMeetingProposal latestMeetingProposal = meetingProposals.isEmpty() ? null : meetingProposals.get(0);
+        List<Integer> proposalIds = meetingProposals.stream()
+                .map(ConcernMeetingProposal::getProposalId)
+                .toList();
+        Map<Integer, List<ConcernMeetingSlot>> meetingSlotsMapByProposalId = concernMeetingService
+                .getSlotsMapByProposalIds(proposalIds);
 
         model.addAttribute("concern", concern);
         model.addAttribute("replies", replies);
         model.addAttribute("feedback", feedback);
         model.addAttribute("replyDTO", new AdminReplyDTO());
+        model.addAttribute("latestMeetingProposal", latestMeetingProposal);
+        model.addAttribute("meetingProposals", meetingProposals);
+        model.addAttribute("meetingSlotsMapByProposalId", meetingSlotsMapByProposalId);
 
         return "admin-concern-detail";
+    }
+
+    @PostMapping("/concern/{id}/meeting/propose")
+    public String proposeMeetingSlots(@PathVariable("id") Integer concernId,
+                                      @RequestParam("slotStarts") List<String> slotStarts,
+                                      @RequestParam("slotEnds") List<String> slotEnds,
+                                      @RequestParam(value = "adminNote", required = false) String adminNote,
+                                      HttpSession session,
+                                      RedirectAttributes redirectAttributes) {
+        if (!isAdminLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        Integer adminUserId = (Integer) session.getAttribute("adminUserId");
+        try {
+            concernMeetingService.proposeMeetingSlots(concernId, adminUserId, slotStarts, slotEnds, adminNote);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Physical meeting slots shared with the student successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to schedule meeting: " + e.getMessage());
+        }
+
+        return "redirect:/admin/concern/" + concernId;
     }
 
     /**
@@ -321,7 +363,7 @@ public class AdminController {
     }
 
     /**
-     * Delete a concern from dashboard list
+     * Reject a concern from dashboard list (soft-delete from UI).
      */
     @PostMapping("/concern/{id}/delete")
     public String deleteConcern(@PathVariable("id") Integer concernId,
@@ -333,9 +375,9 @@ public class AdminController {
         }
         try {
             adminService.deleteConcern(concernId);
-            redirectAttributes.addFlashAttribute("successMessage", "Concern deleted successfully.");
+            redirectAttributes.addFlashAttribute("successMessage", "Concern rejected and removed from dashboard.");
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Failed to delete concern: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to reject concern: " + e.getMessage());
         }
         if ("edu-dashboard".equals(redirectTo)) {
             return "redirect:/admin/edu-dashboard";

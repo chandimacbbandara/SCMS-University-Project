@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="/CSS/student-theme.css">
     <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/CSS/student-community.css">
 </head>
 <body class="community-body student-theme">
 <header>
-    <div class="navbar">
-        <div class="logo">
+    <div class="container header-content">
+        <div class="logo-area">
             <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
             <div class="logo-text">
                 <span>Academy of</span>
@@ -22,17 +23,13 @@
         </div>
         <nav>
             <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                 <li><a href="/student/community" class="nav-link active">Community Talk</a></li>
+                <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                 <li><a href="/faq" class="nav-link">FAQ</a></li>
-                <li>
-                    <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
-                        <i class="fas fa-bell"></i>
-                        <span class="bell-badge"
-                              th:text="${unreadCount != null ? unreadCount : 0}"
-                              th:classappend="${unreadCount == null or unreadCount == 0} ? 'hidden' : ''">0</span>
-                    </div>
-                </li>
                 <li>
                     <a href="/student/profile" class="nav-profile-btn" aria-label="Student Profile" title="Student Profile">
                         <img th:src="@{'/student/photo/' + ${session.studentUserId}}"
@@ -41,6 +38,14 @@
                              onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
                         <span class="nav-profile-fallback">S</span>
                     </a>
+                </li>
+                <li>
+                    <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                        <i class="fas fa-bell"></i>
+                        <span class="bell-badge" id="bellBadge"
+                              th:text="${unreadCount != null ? unreadCount : 0}"
+                              th:classappend="${unreadCount == null or unreadCount == 0} ? 'hidden' : ''">0</span>
+                    </div>
                 </li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
@@ -51,7 +56,7 @@
 <main class="community-shell">
     <section class="rules-hero">
         <h1><i class="fa-solid fa-users-between-lines"></i> Student Community Talk</h1>
-        <p>Before entering the discussion board, you must accept the safety rules.</p>
+        <p>Before entering the shared board viewed by students and admins, you must accept the safety rules.</p>
     </section>
 
     <section class="rules-card">
@@ -100,8 +105,8 @@
             <p>No notifications yet.</p>
         </div>
 
-        <div th:each="notif : ${notifications}" class="notif-item"
-               th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+         <div th:each="notif : ${notifications}" class="notif-item"
+             th:classappend="${!notif.isRead} ? 'unread' : ''"
              th:attr="data-id=${notif.notificationId}"
              onclick="markNotifRead(this)">
             <div class="notif-icon-wrap"
@@ -115,6 +120,11 @@
                     <i class="fas fa-clock"></i>
                     <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                 </div>
+            </div>
+            <div class="notif-item-actions">
+                <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -148,6 +158,43 @@
                 });
                 updateBadge();
             });
+    }
+
+    function refreshNotifCount() {
+        const countEl = document.querySelector('.notif-count');
+        const list = document.getElementById('notifList');
+        if (!countEl || !list) return;
+
+        const count = list.querySelectorAll('.notif-item').length;
+        countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+        let empty = list.querySelector('.notif-empty');
+        if (count === 0) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'notif-empty';
+                empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                list.appendChild(empty);
+            }
+        } else if (empty) {
+            empty.remove();
+        }
+    }
+
+    function removeNotif(event, el) {
+        if (event) event.stopPropagation();
+        if (!el) return;
+        const id = el.getAttribute('data-id');
+        if (!id) return;
+
+        fetch('/api/notifications/' + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => {
+                el.remove();
+                refreshNotifCount();
+                updateBadge();
+            })
+            .catch(err => console.error(err));
     }
 
     function updateBadge() {

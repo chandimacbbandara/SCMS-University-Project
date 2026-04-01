@@ -39,6 +39,7 @@ CREATE TABLE Concern (
     StudentID_FK INT,
     AdminID_FK INT
 );
+-- Status values in Concern.Status: Draft, Pending, In Progress, Meeting Scheduled, Complete
 
 -- 5. Admin_reply Table
 CREATE TABLE Admin_reply (
@@ -90,6 +91,9 @@ ALTER TABLE Admin ADD CONSTRAINT FK_Admin_User FOREIGN KEY (UserID) REFERENCES [
 ALTER TABLE Concern ADD CONSTRAINT FK_Concern_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID);
 ALTER TABLE Concern ADD CONSTRAINT FK_Concern_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
 
+CREATE INDEX IDX_Concern_Student_Status_CreatedTime
+ON Concern(StudentID_FK, Status, CreatedTime DESC);
+
 -- Admin Reply Relationships
 ALTER TABLE Admin_reply ADD CONSTRAINT FK_Reply_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
 ALTER TABLE Admin_reply ADD CONSTRAINT FK_Reply_Concern FOREIGN KEY (ConcernID_FK) REFERENCES Concern(ConcernID);
@@ -103,36 +107,30 @@ ALTER TABLE Notification ADD CONSTRAINT FK_Notification_Admin FOREIGN KEY (Admin
 -- Analytics Report Relationship
 ALTER TABLE Analytics_Report ADD CONSTRAINT FK_Report_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
 
+/* =============================
+   FAQ & Tips Module
+   ============================= */
 
-select *
-from concern
+IF OBJECT_ID('dbo.faqs', 'U') IS NULL
+BEGIN
+    CREATE TABLE faqs (
+        faq_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        question VARCHAR(200) NOT NULL,
+        answer VARCHAR(1000) NOT NULL,
+        created_at DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
 
-select *
-from [User]
-
-select *
-from student
-
-SELECT *
-FROM Admin
-
-select *
-from Admin_reply
-
-SELECT *
-FROM Feedback
-
-select *
-from Notification
-
-SELECT *
-FROM Analytics_Report
-
-select *  
-FROM faqs
-
-select *
-from tips
+IF OBJECT_ID('dbo.tips', 'U') IS NULL
+BEGIN
+    CREATE TABLE tips (
+        tip_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        title VARCHAR(100) NOT NULL,
+        description VARCHAR(500) NOT NULL,
+        icon_class VARCHAR(50) NOT NULL,
+        created_at DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
 
 
 /* =============================
@@ -188,10 +186,144 @@ ON Student_Community_Post(Status, CreatedTime DESC);
 CREATE INDEX IDX_CommunityReply_Post_Status
 ON Student_Community_Reply(PostID_FK, Status, CreatedTime ASC);
 
+-- Optional: allow replies without a linked student account
+ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
 
--- Helpful verification queries
+
+/* ========================================
+   Concern Physical Meeting Scheduling Flow
+   ======================================== */
+
+ALTER TABLE Concern ADD Meeting_Status VARCHAR(60);
+ALTER TABLE Concern ADD Meeting_Booked_Start_Time DATETIME;
+ALTER TABLE Concern ADD Meeting_Booked_End_Time DATETIME;
+ALTER TABLE Concern ADD Meeting_Booked_At DATETIME;
+
+CREATE TABLE Concern_Meeting_Proposal (
+    ProposalID INT IDENTITY(1,1) PRIMARY KEY,
+    ConcernID_FK INT NOT NULL,
+    AdminID_FK INT NOT NULL,
+    Proposal_Status VARCHAR(60) NOT NULL DEFAULT 'PENDING_STUDENT_SELECTION',
+    Admin_Note VARCHAR(MAX),
+    Student_Response_Note VARCHAR(MAX),
+    Created_Time DATETIME NOT NULL DEFAULT GETDATE(),
+    Responded_Time DATETIME NULL,
+    CONSTRAINT FK_MeetingProposal_Concern FOREIGN KEY (ConcernID_FK) REFERENCES Concern(ConcernID),
+    CONSTRAINT FK_MeetingProposal_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID)
+);
+
+CREATE TABLE Concern_Meeting_Slot (
+    SlotID INT IDENTITY(1,1) PRIMARY KEY,
+    ProposalID_FK INT NOT NULL,
+    Start_Time DATETIME NOT NULL,
+    End_Time DATETIME NOT NULL,
+    Slot_Status VARCHAR(40) NOT NULL DEFAULT 'AVAILABLE',
+    CONSTRAINT FK_MeetingSlot_Proposal FOREIGN KEY (ProposalID_FK) REFERENCES Concern_Meeting_Proposal(ProposalID)
+);
+
+CREATE INDEX IDX_MeetingProposal_Concern ON Concern_Meeting_Proposal(ConcernID_FK, Created_Time DESC);
+CREATE INDEX IDX_MeetingSlot_Proposal ON Concern_Meeting_Slot(ProposalID_FK, Start_Time ASC);
+
+/* =============================
+    Verification Queries
+    ============================= */
+
+SELECT * FROM [User];
+SELECT * FROM Student;
+SELECT * FROM Admin;
+SELECT * FROM Concern;
+SELECT * FROM Admin_reply;
+SELECT * FROM Feedback;
+SELECT * FROM SCMS_Feedback ORDER BY FeedbackID DESC
+SELECT * FROM Notification;
+SELECT * FROM Analytics_Report;
+
 SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
 SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
-SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
+SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;
+
+SELECT * FROM Concern_Meeting_Proposal ORDER BY Created_Time DESC;
+SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
+
+/* =============================
+    Draft Concern Query Pack
+    ============================= */
+
+-- 1) Save as Draft
+-- INSERT INTO Concern (ConcernID, Subject, Message, Evidence, AI_Priority_Level, Status, CreatedTime, StudentID_FK, AdminID_FK)
+-- VALUES (@ConcernId, @Subject, @Message, @EvidenceBlob, NULL, 'Draft', GETDATE(), @StudentUserId, NULL);
+
+-- 2) List all drafts for a student
+-- SELECT ConcernID, Subject, Message, Status, CreatedTime, Evidence
+-- FROM Concern
+-- WHERE StudentID_FK = @StudentUserId
+--   AND Status = 'Draft'
+-- ORDER BY CreatedTime DESC;
+
+-- 3) Update an existing draft
+-- UPDATE Concern
+-- SET Subject = @Subject,
+--     Message = @Message,
+--     Evidence = @EvidenceBlob
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
+-- 4) Submit a draft as an active concern
+-- UPDATE Concern
+-- SET Status = 'Pending'
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
+-- 5) Delete a draft
+-- DELETE FROM Concern
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
+SELECT * FROM faqs ORDER BY created_at DESC;
+SELECT * FROM tips ORDER BY created_at DESC;
+
+
+
+
+/* =============================
+    FAQ & Tips Query Pack
+    ============================= */
+
+-- FAQ: Insert
+-- INSERT INTO faqs (question, answer)
+-- VALUES ('How do I reset my password?', 'Use the Forgot Password page and follow the instructions.');
+
+-- FAQ: Update by ID
+-- DECLARE @FaqId BIGINT = 1;
+-- UPDATE faqs
+-- SET question = 'Updated question',
+--     answer = 'Updated answer'
+-- WHERE faq_id = @FaqId;
+
+-- FAQ: Delete by ID
+-- DECLARE @FaqIdToDelete BIGINT = 1;
+-- DELETE FROM faqs
+-- WHERE faq_id = @FaqIdToDelete;
+
+
+-- Tip: Insert
+-- INSERT INTO tips (title, description, icon_class)
+-- VALUES ('Track Progress', 'Regularly check your concern history to monitor updates.', 'fa-chart-line');
+
+-- Tip: Update by ID
+-- DECLARE @TipId BIGINT = 1;
+-- UPDATE tips
+-- SET title = 'Updated tip title',
+--     description = 'Updated tip description',
+--     icon_class = 'fa-circle-info'
+-- WHERE tip_id = @TipId;
+
+-- Tip: Delete by ID
+-- DECLARE @TipIdToDelete BIGINT = 1;
+-- DELETE FROM tips
+-- WHERE tip_id = @TipIdToDelete;
 

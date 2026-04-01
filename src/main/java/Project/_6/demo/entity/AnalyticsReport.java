@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 public class AnalyticsReport {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ReportID")
     private Integer reportId;
 

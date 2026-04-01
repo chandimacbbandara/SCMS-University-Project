@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NotificationID")
     private Integer notificationId;
 
@@ -32,6 +31,9 @@ public class Notification {
 
     @Column(name = "IsRead")
     private Boolean isRead = false;
+
+    @Column(name = "IsHidden")
+    private Boolean isHidden = false;
 
     @Column(name = "SentTime")
     private LocalDateTime sentTime;
@@ -52,6 +54,9 @@ public class Notification {
         this.sentTime = LocalDateTime.now();
         if (this.isRead == null) {
             this.isRead = false;
+        }
+        if (this.isHidden == null) {
+            this.isHidden = false;
         }
     }
 }

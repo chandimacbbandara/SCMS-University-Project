@@ -34,37 +34,48 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private static final String UPLOAD_DIR = "uploads/";
+    private static final String STATUS_DRAFT = "Draft";
+    private static final String STATUS_REJECTED = "Rejected";
+    private static final String STATUS_DELETED = "Deleted";
 
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
     private final AdminReplyRepository adminReplyRepository;
     private final FeedbackRepository feedbackRepository;
     private final NotificationService notificationService;
+    private final ConcernMeetingService concernMeetingService;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
                         FeedbackRepository feedbackRepository,
-                        NotificationService notificationService) {
+                        NotificationService notificationService,
+                        ConcernMeetingService concernMeetingService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.feedbackRepository = feedbackRepository;
         this.notificationService = notificationService;
+        this.concernMeetingService = concernMeetingService;
     }
 
     /**
      * Get all concerns ordered by newest first, with Complete at the bottom
      */
     public List<Concern> getAllConcerns() {
-        return sortCompleteLast(concernRepository.findAllByOrderByCreatedTimeDesc());
+        return sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findAllByOrderByCreatedTimeDesc()));
     }
 
     /**
      * Get concerns by status
      */
     public List<Concern> getConcernsByStatus(String status) {
-        return sortCompleteLast(concernRepository.findByStatusOrderByCreatedTimeDesc(status));
+        if (isInProgressBucket(status)) {
+            List<Concern> active = concernRepository.findByStatusOrderByCreatedTimeDesc("In Progress");
+            active.addAll(concernRepository.findByStatusOrderByCreatedTimeDesc("Meeting Scheduled"));
+            return sortCompleteLast(excludeHiddenConcernStatuses(active));
+        }
+        return sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findByStatusOrderByCreatedTimeDesc(status)));
     }
 
     /**
@@ -77,9 +88,19 @@ public class AdminService {
 
         List<Concern> concerns;
         if (hasStatus && hasTime) {
-            concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
+            if (isInProgressBucket(status)) {
+                concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc("In Progress", from, to);
+                concerns.addAll(concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc("Meeting Scheduled", from, to));
+            } else {
+                concerns = concernRepository.findByStatusAndCreatedTimeBetweenOrderByCreatedTimeDesc(status, from, to);
+            }
         } else if (hasStatus) {
-            concerns = concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+            if (isInProgressBucket(status)) {
+                concerns = concernRepository.findByStatusOrderByCreatedTimeDesc("In Progress");
+                concerns.addAll(concernRepository.findByStatusOrderByCreatedTimeDesc("Meeting Scheduled"));
+            } else {
+                concerns = concernRepository.findByStatusOrderByCreatedTimeDesc(status);
+            }
         } else if (hasTime) {
             concerns = concernRepository.findByCreatedTimeBetweenOrderByCreatedTimeDesc(from, to);
         } else {
@@ -105,7 +126,7 @@ public class AdminService {
                     .collect(Collectors.toList());
         }
 
-        return sortCompleteLast(concerns);
+        return sortCompleteLast(excludeHiddenConcernStatuses(concerns));
     }
 
     /**
@@ -139,11 +160,39 @@ public class AdminService {
     }
 
     /**
-     * Delete a concern and related data (admin replies and feedback).
+     * Soft-delete a concern by marking it as Rejected.
      */
     @Transactional
     public void deleteConcern(Integer concernId) {
         Concern concern = getConcernById(concernId);
+        concern.setStatus(STATUS_REJECTED);
+        concernRepository.save(concern);
+    }
+
+    /**
+     * Permanently remove all rejected concerns and their dependent records.
+     */
+    @Transactional
+    public long deleteAllRejectedConcernsPermanently() {
+        List<Concern> rejectedConcerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                .filter(concern -> concern != null && isRejectedStatus(concern.getStatus()))
+                .collect(Collectors.toList());
+
+        long deletedCount = 0;
+        for (Concern concern : rejectedConcerns) {
+            hardDeleteConcern(concern);
+            deletedCount++;
+        }
+
+        return deletedCount;
+    }
+
+    private void hardDeleteConcern(Concern concern) {
+        if (concern == null || concern.getConcernId() == null) {
+            return;
+        }
+
+        Integer concernId = concern.getConcernId();
 
         // Explicitly remove dependent records first to satisfy FK constraints.
         feedbackRepository.deleteByConcern_ConcernId(concernId);
@@ -153,12 +202,12 @@ public class AdminService {
             adminReplyRepository.deleteAll(replies);
         }
 
+        concernMeetingService.deleteByConcernId(concernId);
+
         notificationService.deleteByConcernId(concernId);
 
-        concernRepository.deleteById(concern.getConcernId());
+        concernRepository.deleteById(concernId);
         concernRepository.flush();
-
-        notificationService.sendConcernDeletedEmail(concern);
     }
 
     /**
@@ -209,6 +258,8 @@ public class AdminService {
             }
         }
 
+        assignReplyIdIfRequired(reply);
+
         // Update concern status
         if (dto.getNewStatus() != null && !dto.getNewStatus().isEmpty()) {
             concern.setStatus(dto.getNewStatus());
@@ -251,6 +302,18 @@ public class AdminService {
         return storedFilename;
     }
 
+    private void assignReplyIdIfRequired(AdminReply reply) {
+        if (reply == null || reply.getReplyId() != null) {
+            return;
+        }
+
+        Integer identityFlag = adminReplyRepository.isReplyIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            reply.setReplyId(adminReplyRepository.getNextReplyId());
+        }
+    }
+
     /**
      * Update concern status
      */
@@ -258,11 +321,20 @@ public class AdminService {
     public Concern updateConcernStatus(Integer concernId, String status) {
         Concern concern = getConcernById(concernId);
         concern.setStatus(status);
+
+        if ("Complete".equalsIgnoreCase(status)) {
+            if ("BOOKED".equalsIgnoreCase(concern.getMeetingStatus())) {
+                concern.setMeetingStatus("MEETING_COMPLETED");
+            }
+        }
+
         Concern saved = concernRepository.save(concern);
 
         // Trigger notification: Step 2 - Concern In Progress (Mark as Read)
         if ("In Progress".equals(status)) {
             notificationService.notifyConcernInProgress(saved);
+        } else if ("Complete".equals(status)) {
+            notificationService.notifyConcernComplete(saved);
         }
 
         return saved;
@@ -309,7 +381,12 @@ public class AdminService {
      * Get dashboard statistics
      */
     public long getTotalConcerns() {
-        return concernRepository.count();
+        long total = concernRepository.count();
+        long drafts = concernRepository.countByStatus(STATUS_DRAFT);
+        long rejected = concernRepository.countByStatus(STATUS_REJECTED);
+        long deleted = concernRepository.countByStatus(STATUS_DELETED);
+        long submitted = total - drafts - rejected - deleted;
+        return Math.max(submitted, 0);
     }
 
     public long getPendingCount() {
@@ -317,7 +394,7 @@ public class AdminService {
     }
 
     public long getInProgressCount() {
-        return concernRepository.countByStatus("In Progress");
+        return concernRepository.countByStatus("In Progress") + concernRepository.countByStatus("Meeting Scheduled");
     }
 
     public long getCompleteCount() {
@@ -380,6 +457,30 @@ public class AdminService {
         return category.trim();
     }
 
+    private List<Concern> excludeHiddenConcernStatuses(List<Concern> concerns) {
+        return concerns.stream()
+                .filter(c -> c != null && !isHiddenFromAdminDashboard(c.getStatus()))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isHiddenFromAdminDashboard(String status) {
+        if (status == null) {
+            return false;
+        }
+        String normalized = status.trim();
+        return STATUS_DRAFT.equalsIgnoreCase(normalized)
+                || STATUS_REJECTED.equalsIgnoreCase(normalized)
+                || STATUS_DELETED.equalsIgnoreCase(normalized);
+    }
+
+    private boolean isRejectedStatus(String status) {
+        if (status == null) {
+            return false;
+        }
+        String normalized = status.trim();
+        return STATUS_REJECTED.equalsIgnoreCase(normalized) || STATUS_DELETED.equalsIgnoreCase(normalized);
+    }
+
     /**
      * Sort concerns so that Complete ones appear at the bottom of the list
      */
@@ -388,5 +489,9 @@ public class AdminService {
                 .sorted(Comparator.comparing((Concern c) -> "Complete".equals(c.getStatus()) ? 1 : 0)
                         .thenComparing(Comparator.comparing(Concern::getCreatedTime).reversed()))
                 .collect(Collectors.toList());
+    }
+
+    private boolean isInProgressBucket(String status) {
+        return "In Progress".equalsIgnoreCase(status);
     }
 }

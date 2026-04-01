@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Owner Dashboard - Academy of Knowledge Bridge</title>
     <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/admin-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -398,6 +399,18 @@
         .btn-surface:hover {
             border-color: #94a3b8;
             color: #0f172a;
+        }
+
+        .btn-surface.danger {
+            border-color: #fecaca;
+            background: #fff1f2;
+            color: #be123c;
+        }
+
+        .btn-surface.danger:hover {
+            border-color: #fda4af;
+            color: #9f1239;
+            background: #ffe4e6;
         }
 
         .chart-wrap {
@@ -1225,6 +1238,9 @@
                         <h3><i class="fas fa-table-list"></i> Monthly Concern Intelligence</h3>
                         <p>Filter by month, category, and AI priority to inspect detailed concern records</p>
                     </div>
+                    <button type="button" class="btn-surface danger" id="deleteAllRejectedBtn">
+                        <i class="fas fa-trash-can"></i> Delete All Rejected
+                    </button>
                 </div>
                 <div class="panel-body">
                     <div class="monthly-filter-grid">
@@ -1491,6 +1507,7 @@
 
     const refreshAnalyticsBtn = document.getElementById("refreshAnalyticsBtn");
     const refreshAllBtn = document.getElementById("refreshAllBtn");
+    const deleteAllRejectedBtn = document.getElementById("deleteAllRejectedBtn");
 
     const exportPdfBtn = document.getElementById("exportPdfBtn");
     const exportExcelBtn = document.getElementById("exportExcelBtn");
@@ -2372,6 +2389,53 @@
             });
     }
 
+    function deleteAllRejectedConcerns() {
+        if (!deleteAllRejectedBtn) {
+            return;
+        }
+
+        const confirmed = window.confirm("Permanently delete all rejected concerns from the database? This action cannot be undone.");
+        if (!confirmed) {
+            return;
+        }
+
+        deleteAllRejectedBtn.disabled = true;
+        deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Deleting";
+
+        fetch("/owner/api/concerns/rejected/delete-all", { method: "POST" })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error("Failed to delete rejected concerns");
+                }
+                return response.json();
+            })
+            .then(function(data) {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                const deletedCount = Number(data.deletedCount || 0);
+                deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Deleted " + deletedCount;
+                setExportStatus(deletedCount + " rejected concern(s) permanently deleted.", false);
+
+                loadOwnerAnalyticsCharts();
+                loadMonthlyReport();
+            })
+            .catch(function(error) {
+                deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                setExportStatus("Delete rejected concerns failed: " + error.message, true);
+            })
+            .finally(function() {
+                setTimeout(function() {
+                    if (!deleteAllRejectedBtn) {
+                        return;
+                    }
+                    deleteAllRejectedBtn.disabled = false;
+                    deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-trash-can\"></i> Delete All Rejected";
+                }, 1300);
+            });
+    }
+
     function initializeMonthlyDefaults() {
         if (monthlyReportMonth && !monthlyReportMonth.value) {
             const now = new Date();
@@ -2413,6 +2477,9 @@
         if (refreshAllBtn) {
             refreshAllBtn.addEventListener("click", refreshAllReports);
         }
+        if (deleteAllRejectedBtn) {
+            deleteAllRejectedBtn.addEventListener("click", deleteAllRejectedConcerns);
+        }
     }
 
     window.refreshSingleReport = refreshSingleReport;
@@ -2426,5 +2493,60 @@
     loadMonthlyReport();
     resetMetrics();
 </script>
+<script>
+    window.adminTourConfig = {
+        pageId: 'owner-dashboard',
+        autoStart: false,
+        storageKey: 'akb_owner_tour_completed',
+        steps: [
+            {
+                selector: 'header .header-content',
+                title: 'Owner Navigation',
+                content: 'Use this top navigation to move between Owner Dashboard, admin management, notifications, and FAQ controls.'
+            },
+            {
+                selector: '.owner-hero',
+                title: 'Executive Overview',
+                content: 'This hero area gives a strategic summary of reporting scope and key owner actions.'
+            },
+            {
+                selector: '.owner-stats',
+                title: 'KPI Snapshot',
+                content: 'These cards show report volume, monthly activity, and live concern totals.'
+            },
+            {
+                selector: '.analytics-grid',
+                title: 'Analytics Charts',
+                content: 'Review category distribution and status mix to understand concern trends quickly.'
+            },
+            {
+                selector: '#generateMonthlyReportBtn',
+                title: 'Generate Monthly Report',
+                content: 'Pick date, category, and priority, then generate records for exports and meetings.'
+            },
+            {
+                selector: '#deleteAllRejectedBtn',
+                title: 'Delete All Rejected',
+                content: 'Use this button to permanently clear rejected concerns from the database when needed.'
+            },
+            {
+                selector: '.export-bottom-panel',
+                title: 'Export Package',
+                content: 'Download the generated monthly report as PDF or Excel after filtering.'
+            },
+            {
+                selector: '#reportForm',
+                title: 'Create Analytics Report',
+                content: 'Select an admin and category to create a saved analytics snapshot.'
+            },
+            {
+                selector: '.reports-panel',
+                title: 'Recent Reports',
+                content: 'Refresh or delete report snapshots from this report timeline.'
+            }
+        ]
+    };
+</script>
+<script src="/js/admin-tour.js"></script>
 </body>
 </html>

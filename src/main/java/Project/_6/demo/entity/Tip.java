@@ -9,18 +9,19 @@ public class Tip {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "tip_id")
     private Long tipId;
 
-    @Column(nullable = false, length = 100)
+    @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "description", nullable = false, length = 500)
     private String description;
 
-    @Column(nullable = false, length = 50)
+    @Column(name = "icon_class", nullable = false, length = 50)
     private String iconClass;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Constructors

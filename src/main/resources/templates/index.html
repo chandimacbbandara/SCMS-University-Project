@@ -661,17 +661,20 @@
                 <span>Knowledge Bridge</span>
             </div>
         </div>
-        <nav th:with="student=${session.loggedInStudent}, admin=${session.adminLoggedIn}">
+        <nav th:with="ownerLoggedIn=${session.ownerLoggedIn == true},
+                      adminLoggedIn=${session.adminLoggedIn == true},
+                      studentLoggedIn=${session.studentUserId != null or session.loggedInStudent != null}">
             <ul>
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="#about" class="nav-link">About</a></li>
                 <li><a href="/faq" class="nav-link">FAQ</a></li>
 
-                <li th:if="${student == null and admin == null}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
-                <li th:if="${student == null and admin == null}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
+                <li th:if="${!ownerLoggedIn and !adminLoggedIn and !studentLoggedIn}"><a th:href="@{/login}" href="/login" class="btn-outline-dark">Student Login</a></li>
+                <li th:if="${!ownerLoggedIn and !adminLoggedIn and !studentLoggedIn}"><a th:href="@{/register}" href="/register" class="btn-red">Sign Up</a></li>
 
-                <li th:if="${student != null}"><a th:href="@{/student/dashboard}" class="btn-red">Back to Dashboard</a></li>
-                <li th:if="${admin != null}"><a th:href="@{/admin/dashboard}" class="btn-red">Back to Admin Dashboard</a></li>
+                <li th:if="${ownerLoggedIn}"><a th:href="@{/owner/dashboard}" class="btn-red">Back to Owner Dashboard</a></li>
+                <li th:if="${!ownerLoggedIn and adminLoggedIn}"><a th:href="@{/admin/dashboard}" class="btn-red">Back to Admin Dashboard</a></li>
+                <li th:if="${!ownerLoggedIn and !adminLoggedIn and studentLoggedIn}"><a th:href="@{/student/dashboard}" class="btn-red">Back to Dashboard</a></li>
             </ul>
         </nav>
     </div>

@@ -21,6 +21,7 @@ public class AnalyticsReportService {
     @Transactional
     public AnalyticsReport createReport(AnalyticsReportDTO dto) {
         AnalyticsReport report = new AnalyticsReport();
+        assignReportIdIfRequired(report);
         report.setTimePeriod(dto.getTimePeriod() == null || dto.getTimePeriod().isBlank() ? "All Time" : dto.getTimePeriod());
         report.setTotalConcerns(dto.getTotalConcerns());
         report.setAvgResolutionTime(dto.getAvgResolutionTime());
@@ -33,5 +34,17 @@ public class AnalyticsReportService {
 
     public List<AnalyticsReport> getAllReports() {
         return analyticsReportRepository.findAllByOrderByCreatedTimeDesc();
+    }
+
+    private void assignReportIdIfRequired(AnalyticsReport report) {
+        if (report == null || report.getReportId() != null) {
+            return;
+        }
+
+        Integer identityFlag = analyticsReportRepository.isReportIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            report.setReportId(analyticsReportRepository.getNextReportId());
+        }
     }
 }

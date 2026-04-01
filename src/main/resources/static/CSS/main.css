@@ -1,3 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap');
+
+:root {
+    --header-nav-font: 'Manrope', 'Segoe UI', Arial, sans-serif;
+}
+
 /* ===== RESET & BASE ===== */
 * {
     margin: 0;
@@ -88,6 +94,17 @@ header {
     color: #222;
 }
 
+/* Shared header typography */
+header .logo-text span,
+header nav,
+header nav ul,
+header nav ul li a,
+header .nav-link,
+header .btn-outline-dark,
+header .btn-red {
+    font-family: var(--header-nav-font);
+}
+
 header ul {
     margin: 0;
     padding: 0;
@@ -102,13 +119,19 @@ header ul {
     color: #222;
     text-decoration: none;
     font-size: 14px;
-    font-weight: 500;
-    padding: 8px 14px;
-    transition: color 0.3s ease;
+    font-weight: 700;
+    padding: 9px 14px;
+    border-radius: 999px;
+    transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .nav-link:hover {
     color: #e53935;
+}
+
+.nav-link.active {
+    color: #e53935;
+    background: rgba(229, 57, 53, 0.12);
 }
 
 /* Button styles */
@@ -145,6 +168,15 @@ header ul {
 .btn-red:hover {
     background: #c62828;
     border-color: #c62828;
+}
+
+header .btn-outline-dark,
+header .btn-red {
+    border-radius: 999px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
 }
 
 /* ===== HERO SECTION ===== */

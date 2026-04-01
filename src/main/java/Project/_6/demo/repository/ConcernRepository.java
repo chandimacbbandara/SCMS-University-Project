@@ -21,6 +21,9 @@ public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     @Query(value = "SELECT COALESCE(MAX(ConcernID), 0) + 1 FROM Concern", nativeQuery = true)
     Integer getNextConcernId();
 
+    @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.Concern'), 'ConcernID', 'IsIdentity') AS INT)", nativeQuery = true)
+    Integer isConcernIdIdentity();
+
     // Category count
     long countByCategory(String category);
 

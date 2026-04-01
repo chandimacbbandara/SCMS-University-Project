@@ -10,6 +10,7 @@ import Project._6.demo.repository.FeedbackRepository;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Service
 public class FeedbackService {
@@ -32,15 +34,18 @@ public class FeedbackService {
     private final ConcernRepository concernRepository;
     private final AdminReplyRepository adminReplyRepository;
     private final FeedbackModerationService feedbackModerationService;
+    private final JdbcTemplate jdbcTemplate;
 
     public FeedbackService(FeedbackRepository feedbackRepository,
                            ConcernRepository concernRepository,
                            AdminReplyRepository adminReplyRepository,
-                           FeedbackModerationService feedbackModerationService) {
+                           FeedbackModerationService feedbackModerationService,
+                           JdbcTemplate jdbcTemplate) {
         this.feedbackRepository = feedbackRepository;
         this.concernRepository = concernRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.feedbackModerationService = feedbackModerationService;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     @Transactional
@@ -74,7 +79,11 @@ public class FeedbackService {
         feedback.setAdminReply(latestReply);
         feedback.setRating(rating);
         feedback.setComments(comments);
-        return feedbackRepository.save(feedback);
+        Feedback saved = feedbackRepository.save(feedback);
+
+        // Keep legacy feedback table in sync for environments that still read from `feedback`.
+        syncLegacyFeedbackRow(concern, latestReply, rating, comments, saved.getSubmissionTime(), studentUserId);
+        return saved;
     }
 
     @Transactional
@@ -99,7 +108,10 @@ public class FeedbackService {
         feedback.setComments(comments);
         feedback.setAdminReply(latestReply);
         feedback.setSubmissionTime(LocalDateTime.now());
-        return feedbackRepository.save(feedback);
+        Feedback saved = feedbackRepository.save(feedback);
+
+        syncLegacyFeedbackRow(feedback.getConcern(), latestReply, rating, comments, saved.getSubmissionTime(), studentUserId);
+        return saved;
     }
 
     @Transactional
@@ -114,6 +126,7 @@ public class FeedbackService {
         }
 
         feedbackRepository.delete(feedback);
+        markLegacyFeedbackDeleted(concernId, studentUserId);
     }
 
     public Optional<Feedback> getFeedbackByConcernId(Integer concernId) {
@@ -251,5 +264,177 @@ public class FeedbackService {
                 && latestReply.get().getReplyTime() != null
                 && feedbackTime != null
                 && latestReply.get().getReplyTime().isAfter(feedbackTime);
+    }
+
+    private void syncLegacyFeedbackRow(Concern concern,
+                                       AdminReply latestReply,
+                                       Integer rating,
+                                       String comments,
+                                       LocalDateTime submissionTime,
+                                       Integer studentUserId) {
+        try {
+            if (!legacyFeedbackTableExists()) {
+                return;
+            }
+
+            Integer concernId = concern != null ? concern.getConcernId() : null;
+            Integer customerId = resolveStudentUserId(concern, studentUserId);
+            if (customerId == null) {
+                return;
+            }
+
+            ensureLegacyCustomerRow(customerId);
+
+            String customerName = resolveStudentDisplayName(concern, customerId);
+            Integer replyId = latestReply != null ? latestReply.getReplyId() : null;
+            String replyMessage = latestReply != null ? latestReply.getReplyMessage() : null;
+            Long adminId = (latestReply != null && latestReply.getAdmin() != null && latestReply.getAdmin().getUserId() != null)
+                    ? latestReply.getAdmin().getUserId().longValue()
+                    : null;
+            LocalDateTime replyTime = latestReply != null ? latestReply.getReplyTime() : null;
+            Timestamp nowTs = Timestamp.valueOf(LocalDateTime.now());
+            Timestamp feedbackTs = Timestamp.valueOf(submissionTime != null ? submissionTime : LocalDateTime.now());
+            Timestamp replyTs = replyTime != null ? Timestamp.valueOf(replyTime) : null;
+
+            if (legacyFeedbackHasConcernColumn() && concernId != null) {
+                Integer existingLegacyId = jdbcTemplate.query(
+                        "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC",
+                        rs -> rs.next() ? rs.getInt(1) : null,
+                        concernId,
+                        customerId);
+
+                if (existingLegacyId != null) {
+                    jdbcTemplate.update(
+                            "UPDATE feedback SET rating = ?, comments = ?, feedback_date = ?, customer_id = ?, customer_name = ?, " +
+                                    "is_deleted = 0, is_resolved = 1, reply = ?, reply_date = ?, admin_id = ?, ReplyID_FK = ?, " +
+                                    "created_at = COALESCE(created_at, ?), ConcernID_FK = ? WHERE feedback_id = ?",
+                            rating,
+                            comments,
+                            feedbackTs,
+                            customerId,
+                            customerName,
+                            replyMessage,
+                            replyTs,
+                            adminId,
+                            replyId,
+                            nowTs,
+                            concernId,
+                            existingLegacyId);
+                    return;
+                }
+
+                jdbcTemplate.update(
+                        "INSERT INTO feedback (rating, comments, feedback_date, customer_id, customer_name, is_deleted, is_resolved, reply, reply_date, admin_id, ReplyID_FK, created_at, ConcernID_FK) " +
+                                "VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?, ?)",
+                        rating,
+                        comments,
+                        feedbackTs,
+                        customerId,
+                        customerName,
+                        replyMessage,
+                        replyTs,
+                        adminId,
+                        replyId,
+                        nowTs,
+                        concernId);
+                return;
+            }
+
+            jdbcTemplate.update(
+                    "INSERT INTO feedback (rating, comments, feedback_date, customer_id, customer_name, is_deleted, is_resolved, reply, reply_date, admin_id, ReplyID_FK, created_at) " +
+                            "VALUES (?, ?, ?, ?, ?, 0, 1, ?, ?, ?, ?, ?)",
+                    rating,
+                    comments,
+                    feedbackTs,
+                    customerId,
+                    customerName,
+                    replyMessage,
+                    replyTs,
+                    adminId,
+                    replyId,
+                    nowTs);
+        } catch (Exception e) {
+            System.out.println("Warning: Could not sync legacy feedback table: " + e.getMessage());
+        }
+    }
+
+    private void markLegacyFeedbackDeleted(Integer concernId, Integer studentUserId) {
+        try {
+            if (!legacyFeedbackTableExists() || !legacyFeedbackHasConcernColumn() || concernId == null || studentUserId == null) {
+                return;
+            }
+
+            jdbcTemplate.update(
+                    "UPDATE feedback SET is_deleted = 1 WHERE feedback_id = (" +
+                            "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC)",
+                    concernId,
+                    studentUserId);
+        } catch (Exception e) {
+            System.out.println("Warning: Could not mark legacy feedback as deleted: " + e.getMessage());
+        }
+    }
+
+    private boolean legacyFeedbackTableExists() {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'feedback'",
+                Integer.class);
+        return count != null && count > 0;
+    }
+
+    private boolean legacyFeedbackHasConcernColumn() {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback' AND COLUMN_NAME = 'ConcernID_FK'",
+                Integer.class);
+        return count != null && count > 0;
+    }
+
+    private boolean legacyCustomersTableExists() {
+        Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'customers'",
+                Integer.class);
+        return count != null && count > 0;
+    }
+
+    private void ensureLegacyCustomerRow(Integer customerId) {
+        if (customerId == null || !legacyCustomersTableExists()) {
+            return;
+        }
+
+        Integer existing = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM customers WHERE user_id = ?",
+                Integer.class,
+                customerId);
+
+        if (existing == null || existing == 0) {
+            jdbcTemplate.update("INSERT INTO customers (user_id) VALUES (?)", customerId);
+        }
+    }
+
+    private Integer resolveStudentUserId(Concern concern, Integer fallbackStudentUserId) {
+        if (fallbackStudentUserId != null) {
+            return fallbackStudentUserId;
+        }
+
+        if (concern != null && concern.getStudent() != null && concern.getStudent().getUserId() != null) {
+            return concern.getStudent().getUserId();
+        }
+
+        if (concern != null && concern.getStudent() != null && concern.getStudent().getUser() != null) {
+            return concern.getStudent().getUser().getUserId();
+        }
+
+        return null;
+    }
+
+    private String resolveStudentDisplayName(Concern concern, Integer customerId) {
+        if (concern != null && concern.getStudent() != null && concern.getStudent().getUser() != null) {
+            String first = concern.getStudent().getUser().getFirstName();
+            String last = concern.getStudent().getUser().getLastName();
+            String full = ((first != null ? first : "") + " " + (last != null ? last : "")).trim();
+            if (!full.isEmpty()) {
+                return full;
+            }
+        }
+        return "Student " + customerId;
     }
 }

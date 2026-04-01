@@ -352,6 +352,7 @@
         .filter-btn[data-filter="all"].active { border-color: var(--accent-purple); background: #ede9fe; color: var(--accent-purple); }
         .filter-btn[data-filter="Pending"].active { border-color: var(--accent-orange); background: #fff7ed; color: var(--accent-orange); }
         .filter-btn[data-filter="In Progress"].active { border-color: var(--accent-blue); background: #eff6ff; color: var(--accent-blue); }
+        .filter-btn[data-filter="Meeting Scheduled"].active { border-color: #8b5cf6; background: #ede9fe; color: #6d28d9; }
         .filter-btn[data-filter="Complete"].active { border-color: var(--accent-green); background: #f0fdf4; color: var(--accent-green); }
 
         /* ===== Empty State ===== */
@@ -437,6 +438,7 @@
         .concern-card:hover::after { width: 100%; }
         .concern-card.status-Pending::after { background: linear-gradient(90deg, var(--accent-orange), #fb923c); }
         .concern-card.status-In-Progress::after { background: linear-gradient(90deg, var(--accent-blue), #60a5fa); }
+        .concern-card.status-Meeting-Scheduled::after { background: linear-gradient(90deg, #7c3aed, #a78bfa); }
         .concern-card.status-Complete::after { background: linear-gradient(90deg, var(--accent-green), #4ade80); }
         .concern-card:hover {
             border-color: rgba(229,57,53,0.15);
@@ -457,6 +459,7 @@
         }
         .concern-card.status-Pending    .concern-list-row { border-left-color: var(--accent-orange); }
         .concern-card.status-In-Progress .concern-list-row { border-left-color: var(--accent-blue); }
+        .concern-card.status-Meeting-Scheduled .concern-list-row { border-left-color: #7c3aed; }
         .concern-card.status-Complete   .concern-list-row { border-left-color: var(--accent-green); }
         .concern-list-row:hover { background: #f9fafb; }
         .concern-card.expanded .concern-list-row { background: #f9fafb; }
@@ -527,6 +530,7 @@
         }
         .concern-card.status-Pending .concern-card-banner { background: linear-gradient(90deg, var(--accent-orange), #fb923c, #fdba74); }
         .concern-card.status-In-Progress .concern-card-banner { background: linear-gradient(90deg, var(--accent-blue), #60a5fa, #93c5fd); }
+        .concern-card.status-Meeting-Scheduled .concern-card-banner { background: linear-gradient(90deg, #7c3aed, #a78bfa, #c4b5fd); }
         .concern-card.status-Complete .concern-card-banner { background: linear-gradient(90deg, var(--accent-green), #4ade80, #86efac); }
 
         .concern-card-body { padding: 26px 30px; }
@@ -581,9 +585,11 @@
         .status-badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
         .status-Pending   { background: #fff7ed; color: var(--accent-orange); border: 1px solid #fed7aa; }
         .status-In-Progress { background: #eff6ff; color: var(--accent-blue); border: 1px solid #bfdbfe; }
+        .status-Meeting-Scheduled { background: #ede9fe; color: #6d28d9; border: 1px solid #c4b5fd; }
         .status-Complete  { background: #f0fdf4; color: var(--accent-green); border: 1px solid #bbf7d0; }
         .status-Pending   .dot { animation: pulse 1.5s infinite; }
         .status-In-Progress .dot { animation: pulse 1.5s infinite; }
+        .status-Meeting-Scheduled .dot { animation: pulse 1.5s infinite; }
 
         /* ===== Progress Mini Tracker ===== */
         .mini-tracker {
@@ -802,6 +808,174 @@
         /* ===== Collapse/Expand ===== */
         .replies-collapsible { display: none; }
         .replies-collapsible.open { display: flex; flex-direction: column; gap: 12px; }
+
+        /* ===== Meeting Section ===== */
+        .meeting-student-panel {
+            margin-top: 18px;
+            border-radius: var(--radius-md);
+            border: 1px solid #dbeafe;
+            background: linear-gradient(135deg, #f8fbff, #eff6ff);
+            padding: 18px;
+            display: grid;
+            gap: 12px;
+        }
+        .meeting-student-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .meeting-student-title {
+            margin: 0;
+            color: #1e40af;
+            font-size: 13px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .meeting-status-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+        .meeting-status-pill.pending {
+            color: #1d4ed8;
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+        .meeting-status-pill.booked {
+            color: #166534;
+            background: #dcfce7;
+            border-color: #86efac;
+        }
+        .meeting-status-pill.reschedule {
+            color: #b45309;
+            background: #ffedd5;
+            border-color: #fdba74;
+        }
+        .meeting-status-pill.none {
+            color: #475569;
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .meeting-student-sub {
+            margin: 0;
+            color: #334155;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+        .meeting-booked-card {
+            border: 1px solid #bbf7d0;
+            border-left: 4px solid #22c55e;
+            border-radius: 12px;
+            background: #f0fdf4;
+            padding: 12px 14px;
+            color: #14532d;
+            font-size: 12px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+        .student-slot-form,
+        .student-slot-decline-form {
+            display: grid;
+            gap: 10px;
+            margin-top: 2px;
+        }
+        .student-slot-options {
+            display: grid;
+            gap: 8px;
+        }
+        .student-slot-item {
+            border: 1px solid #bfdbfe;
+            border-radius: 10px;
+            background: #fff;
+            padding: 9px 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1e3a8a;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .student-slot-item:hover {
+            border-color: #60a5fa;
+            background: #f8fbff;
+            transform: translateY(-1px);
+        }
+        .student-slot-item input[type="radio"] {
+            accent-color: #2563eb;
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+        }
+        .meeting-cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .meeting-btn-primary,
+        .meeting-btn-secondary {
+            border: none;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(.22,1,.36,1);
+        }
+        .meeting-btn-primary {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(37,99,235,0.25);
+        }
+        .meeting-btn-secondary {
+            background: #ffedd5;
+            color: #b45309;
+            border: 1px solid #fdba74;
+        }
+        .meeting-btn-primary:hover,
+        .meeting-btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+        .meeting-reason-input {
+            width: 100%;
+            border: 1px solid #fdba74;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: #7c2d12;
+            background: #fff7ed;
+            box-sizing: border-box;
+            font-family: 'Inter', inherit;
+        }
+        .meeting-reason-input:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+        }
+        .meeting-history-mini {
+            border-top: 1px dashed #bfdbfe;
+            padding-top: 10px;
+            color: #475569;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .meeting-history-mini strong {
+            color: #1e293b;
+        }
 
         /* ===== Bottom Actions ===== */
         .card-actions {
@@ -1127,6 +1301,13 @@
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 22px;
         }
+        .top-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
         .back-btn {
             display: inline-flex; align-items: center; gap: 8px;
             text-decoration: none;
@@ -1142,6 +1323,25 @@
             transform: translateX(-4px);
         }
         .back-btn:hover i { transform: translateX(-3px); }
+        .drafts-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: #b45309;
+            background: #fff7ed;
+            border: 2px solid #fdba74;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+        }
+        .drafts-btn:hover {
+            background: #ffedd5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(180, 83, 9, 0.18);
+        }
         .new-concern-btn {
             display: inline-flex; align-items: center; gap: 8px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -1188,6 +1388,7 @@
             .filter-btn { padding: 6px 14px; font-size: 11px; }
             .concern-subject { font-size: 16px; }
             .top-actions { flex-direction: column; gap: 10px; }
+            .top-actions-right { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -1206,6 +1407,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link active">My History</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -1238,7 +1440,10 @@
         <!-- Top Actions -->
         <div class="top-actions animate-in">
             <a href="/student/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
-            <a href="/submit-concern" class="new-concern-btn"><i class="fas fa-plus"></i> New Concern</a>
+            <div class="top-actions-right">
+                <a href="/student/concern-drafts" class="drafts-btn"><i class="fas fa-file-pen"></i> My Drafts</a>
+                <a href="/submit-concern" class="new-concern-btn"><i class="fas fa-plus"></i> New Concern</a>
+            </div>
         </div>
 
         <!-- Flash Messages -->
@@ -1301,9 +1506,9 @@
             <div class="stat-pill progress">
                 <div class="stat-pill-icon"><i class="fas fa-spinner"></i></div>
                 <div class="stat-pill-info">
-                    <div class="stat-pill-label">In Progress</div>
+                    <div class="stat-pill-label">Active</div>
                     <div class="stat-pill-val"
-                         th:text="${#lists.size(concerns.?[status == 'In Progress'])}">0</div>
+                         th:text="${#lists.size(concerns.?[status == 'In Progress' or status == 'Meeting Scheduled'])}">0</div>
                 </div>
             </div>
             <div class="stat-pill complete">
@@ -1327,6 +1532,9 @@
             <button class="filter-btn" data-filter="In Progress">
                 <i class="fas fa-spinner"></i> In Progress
             </button>
+            <button class="filter-btn" data-filter="Meeting Scheduled">
+                <i class="fas fa-handshake"></i> Meeting Scheduled
+            </button>
             <button class="filter-btn" data-filter="Complete">
                 <i class="fas fa-circle-check"></i> Resolved
             </button>
@@ -1347,6 +1555,7 @@
             <div th:each="concern, iterStat : ${concerns}"
                  class="concern-card animate-in"
                  th:classappend="'status-' + ${#strings.replace(concern.status, ' ', '-')}"
+                 th:with="meetingProposal=${latestMeetingProposalMap[concern.concernId]}, meetingSlots=${meetingProposal != null ? meetingSlotsMapByProposalId[meetingProposal.proposalId] : null}"
                  th:attr="data-status=${concern.status}"
                  th:style="'animation-delay: ' + ${0.08 * (iterStat.index + 3)} + 's'">
 
@@ -1397,13 +1606,13 @@
                             <div class="mini-step-label">Submitted</div>
                         </div>
                         <div class="mini-connector"
-                             th:classappend="${concern.status == 'In Progress' or concern.status == 'Complete'} ? 'filled' : ''"></div>
+                             th:classappend="${concern.status == 'In Progress' or concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? 'filled' : ''"></div>
 
                         <!-- Step 2: Under Review -->
                         <div class="mini-step"
-                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Complete'} ? 'done' : '')">
+                             th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? 'done' : '')">
                             <div class="mini-step-dot"><i class="fas fa-eye"></i></div>
-                            <div class="mini-step-label">In Review</div>
+                            <div class="mini-step-label" th:text="${concern.status == 'Meeting Scheduled'} ? 'Meeting Scheduled' : 'In Review'">In Review</div>
                         </div>
                         <div class="mini-connector"
                              th:classappend="${concern.status == 'Complete'} ? 'filled' : ''"></div>
@@ -1476,6 +1685,91 @@
                                         View Admin Attachment
                                     </a>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meeting-student-panel"
+                         th:if="${meetingProposal != null or (concern.meetingStatus != null and concern.meetingStatus != 'NONE')}"
+                         th:with="availableSlots=${meetingSlots != null ? meetingSlots.?[slotStatus == 'AVAILABLE'] : null}">
+                        <div class="meeting-student-head">
+                            <p class="meeting-student-title"><i class="fas fa-handshake"></i> Physical Meeting Schedule</p>
+                            <span class="meeting-status-pill"
+                                  th:classappend="${concern.meetingStatus == 'PENDING_STUDENT_SELECTION'} ? 'pending' : (${concern.meetingStatus == 'BOOKED' or concern.meetingStatus == 'MEETING_COMPLETED'} ? 'booked' : (${concern.meetingStatus == 'RESCHEDULE_REQUESTED'} ? 'reschedule' : 'none'))"
+                                  th:text="${concern.meetingStatus == 'PENDING_STUDENT_SELECTION'} ? 'Select A Slot' : (${concern.meetingStatus == 'BOOKED'} ? 'Slot Booked' : (${concern.meetingStatus == 'MEETING_COMPLETED'} ? 'Meeting Completed' : (${concern.meetingStatus == 'RESCHEDULE_REQUESTED'} ? 'Reschedule Requested' : 'No Schedule')))">
+                                No Schedule
+                            </span>
+                        </div>
+
+                        <p class="meeting-student-sub" th:if="${concern.meetingStatus == 'PENDING_STUDENT_SELECTION'}">
+                            Admin has shared one or more available slots. Select your preferred time or request another schedule.
+                        </p>
+                        <p class="meeting-student-sub" th:if="${concern.meetingStatus == 'RESCHEDULE_REQUESTED'}">
+                            You already requested a new schedule. Admin will send another set of slots soon.
+                        </p>
+
+                        <div class="meeting-booked-card" th:if="${concern.meetingBookedStartTime != null and concern.meetingBookedEndTime != null}">
+                            <div>
+                                <strong>Booked Time:</strong>
+                                <span th:text="${#temporals.format(concern.meetingBookedStartTime, 'dd MMM yyyy, HH:mm') + ' - ' + #temporals.format(concern.meetingBookedEndTime, 'HH:mm')}">01 Jan 2026, 09:00 - 10:00</span>
+                            </div>
+                            <div th:if="${concern.meetingBookedAt != null}">
+                                <strong>Booked At:</strong>
+                                <span th:text="${#temporals.format(concern.meetingBookedAt, 'dd MMM yyyy, HH:mm')}">01 Jan 2026, 08:00</span>
+                            </div>
+                        </div>
+
+                        <div th:if="${meetingProposal != null and meetingProposal.proposalStatus == 'PENDING_STUDENT_SELECTION'}">
+                            <form class="student-slot-form"
+                                  th:if="${availableSlots != null and !#lists.isEmpty(availableSlots)}"
+                                  th:action="@{'/student/concern/' + ${concern.concernId} + '/meeting/book'}"
+                                  method="post"
+                                  onsubmit="return confirm('Book this meeting slot?');">
+                                <input type="hidden" name="proposalId" th:value="${meetingProposal.proposalId}" />
+
+                                <div class="student-slot-options">
+                                    <label class="student-slot-item" th:each="slot : ${availableSlots}">
+                                        <input type="radio" name="slotId" th:value="${slot.slotId}" required />
+                                        <span th:text="${#temporals.format(slot.startTime, 'EEE, dd MMM yyyy, HH:mm') + ' - ' + #temporals.format(slot.endTime, 'HH:mm')}">Mon, 01 Jan 2026, 09:00 - 10:00</span>
+                                    </label>
+                                </div>
+
+                                <div class="meeting-cta-row">
+                                    <button type="submit" class="meeting-btn-primary">
+                                        <i class="fas fa-calendar-check"></i> Book Selected Slot
+                                    </button>
+                                </div>
+                            </form>
+
+                            <p th:if="${availableSlots == null or #lists.isEmpty(availableSlots)}" class="meeting-history-mini">
+                                No available slots are currently open in this proposal.
+                            </p>
+
+                            <form class="student-slot-decline-form"
+                                  th:action="@{'/student/concern/' + ${concern.concernId} + '/meeting/decline'}"
+                                  method="post"
+                                  onsubmit="return confirm('Send request for another set of meeting slots?');">
+                                <input type="hidden" name="proposalId" th:value="${meetingProposal.proposalId}" />
+                                <textarea class="meeting-reason-input"
+                                          name="reason"
+                                          maxlength="250"
+                                          placeholder="Optional: mention why the current slots do not work for you."></textarea>
+                                <div class="meeting-cta-row">
+                                    <button type="submit" class="meeting-btn-secondary">
+                                        <i class="fas fa-calendar-xmark"></i> I Am Busy In These Slots
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="meeting-history-mini" th:if="${meetingProposal != null and meetingProposal.proposalStatus != 'PENDING_STUDENT_SELECTION'}">
+                            <div>
+                                <strong>Latest Proposal Status:</strong>
+                                <span th:text="${meetingProposal.proposalStatus}">BOOKED</span>
+                            </div>
+                            <div th:if="${meetingProposal.studentResponseNote != null and !meetingProposal.studentResponseNote.isEmpty()}"
+                                 th:text="${'Your note: ' + meetingProposal.studentResponseNote}">
+                                Your note
                             </div>
                         </div>
                     </div>
@@ -1666,13 +1960,13 @@
             <p>No notifications yet.</p>
         </div>
 
-        <div th:each="notif : ${notifications}" class="notif-item"
-               th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+         <div th:each="notif : ${notifications}" class="notif-item"
+             th:classappend="${!notif.isRead} ? 'unread' : ''"
              th:attr="data-id=${notif.notificationId}"
              onclick="markNotifRead(this)">
             <div class="notif-icon-wrap"
-                 th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : (${notif.type == 'SUBMITTED'} ? 'submitted' : (${notif.type == 'IN_PROGRESS'} ? 'in-progress' : 'complete'))">
-                <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : (${notif.type == 'SUBMITTED'} ? 'fas fa-paper-plane' : (${notif.type == 'IN_PROGRESS'} ? 'fas fa-spinner' : 'fas fa-circle-check'))"></i>
+                                 th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : ((notif.type == 'SUBMITTED' or notif.type == 'MEETING_DECLINED') ? 'submitted' : ((notif.type == 'IN_PROGRESS' or notif.type == 'MEETING_PROPOSED') ? 'in-progress' : 'complete'))">
+                                <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : ((notif.type == 'SUBMITTED') ? 'fas fa-paper-plane' : ((notif.type == 'MEETING_DECLINED') ? 'fas fa-calendar-xmark' : ((notif.type == 'IN_PROGRESS') ? 'fas fa-spinner' : ((notif.type == 'MEETING_PROPOSED') ? 'fas fa-calendar-check' : ((notif.type == 'MEETING_BOOKED') ? 'fas fa-handshake' : 'fas fa-circle-check')))))"></i>
             </div>
             <div class="notif-content">
                 <div class="notif-title" th:text="${notif.title}">Notification Title</div>
@@ -1681,6 +1975,11 @@
                     <i class="fas fa-clock"></i>
                     <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                 </div>
+            </div>
+            <div class="notif-item-actions">
+                <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -1732,6 +2031,43 @@
                 });
                 updateBadge();
             });
+    }
+
+    function refreshNotifCount() {
+        const countEl = document.querySelector('.notif-count');
+        const list = document.getElementById('notifList');
+        if (!countEl || !list) return;
+
+        const count = list.querySelectorAll('.notif-item').length;
+        countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+        let empty = list.querySelector('.notif-empty');
+        if (count === 0) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'notif-empty';
+                empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                list.appendChild(empty);
+            }
+        } else if (empty) {
+            empty.remove();
+        }
+    }
+
+    function removeNotif(event, el) {
+        if (event) event.stopPropagation();
+        if (!el) return;
+        const id = el.getAttribute('data-id');
+        if (!id) return;
+
+        fetch('/api/notifications/' + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => {
+                el.remove();
+                refreshNotifCount();
+                updateBadge();
+            })
+            .catch(err => console.error(err));
     }
 
     function updateBadge() {

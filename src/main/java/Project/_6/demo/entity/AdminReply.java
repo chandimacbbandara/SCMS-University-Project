@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class AdminReply {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ReplyID")
     private Integer replyId;
 

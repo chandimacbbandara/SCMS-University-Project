@@ -337,6 +337,13 @@
             animation: heartbeat 1.6s ease-in-out infinite;
         }
 
+        .status-scheduled {
+            background: rgba(124, 58, 237, 0.14);
+            color: #6d28d9;
+            border-color: rgba(124, 58, 237, 0.26);
+            animation: heartbeat 1.6s ease-in-out infinite;
+        }
+
         .status-complete {
             background: rgba(34, 197, 94, 0.14);
             color: var(--green);
@@ -890,6 +897,319 @@
             font-weight: 700;
         }
 
+        .meeting-section {
+            display: grid;
+            gap: 14px;
+        }
+
+        .meeting-current {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .meeting-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+            border: 1px solid transparent;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .meeting-chip.idle {
+            background: #f8fafc;
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
+        .meeting-chip.info {
+            background: #eff6ff;
+            color: #1d4ed8;
+            border-color: #bfdbfe;
+        }
+
+        .meeting-chip.warn {
+            background: #fff7ed;
+            color: #c2410c;
+            border-color: #fed7aa;
+        }
+
+        .meeting-chip.ok {
+            background: #f0fdf4;
+            color: #15803d;
+            border-color: #bbf7d0;
+        }
+
+        .meeting-help {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .meeting-booked-box {
+            border-radius: 14px;
+            border: 1px solid #bfdbfe;
+            background: #f8fbff;
+            padding: 12px 14px;
+            color: #1e3a8a;
+            font-size: 13px;
+            line-height: 1.65;
+            font-weight: 600;
+        }
+
+        .meeting-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .meeting-history-wrap {
+            margin-top: 4px;
+            border-top: 1px dashed #d1d9e8;
+            padding-top: 14px;
+            display: grid;
+            gap: 10px;
+        }
+
+        .meeting-history-wrap h4 {
+            margin: 0;
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 800;
+        }
+
+        .meeting-proposal-card {
+            background: #fff;
+            border: 1px solid #dbe4f3;
+            border-radius: 14px;
+            padding: 12px 14px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+        }
+
+        .meeting-proposal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 7px;
+            flex-wrap: wrap;
+        }
+
+        .meeting-proposal-tag,
+        .meeting-proposal-status,
+        .meeting-slot-status {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-radius: 999px;
+            padding: 4px 10px;
+        }
+
+        .meeting-proposal-tag {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .meeting-proposal-status {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        .meeting-proposal-time {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .meeting-note {
+            margin: 0 0 8px;
+            font-size: 12px;
+            color: #1e293b;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 8px 10px;
+        }
+
+        .meeting-slot-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+            display: grid;
+            gap: 8px;
+        }
+
+        .meeting-slot-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 8px 10px;
+            font-size: 12px;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .meeting-slot-status {
+            background: #f1f5f9;
+            color: #0f172a;
+            border: 1px solid #cbd5e1;
+            white-space: nowrap;
+        }
+
+        .meeting-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.52);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 18px;
+        }
+
+        .meeting-modal-overlay.active {
+            display: flex;
+        }
+
+        .meeting-modal {
+            width: min(780px, 100%);
+            max-height: 90vh;
+            overflow: auto;
+            background: #fff;
+            border-radius: 18px;
+            border: 1px solid #dbe5f5;
+            box-shadow: 0 26px 54px rgba(15, 23, 42, 0.24);
+            padding: 20px;
+            display: grid;
+            gap: 14px;
+        }
+
+        .meeting-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .meeting-modal-header h4 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .meeting-modal-close {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: #64748b;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            font-weight: 700;
+        }
+
+        .meeting-modal-close:hover {
+            color: #b91c1c;
+            border-color: #fecaca;
+            background: #fff5f5;
+        }
+
+        .meeting-modal-sub {
+            margin: 0;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .meeting-modal-note label,
+        .slot-field label {
+            display: block;
+            margin-bottom: 6px;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .meeting-modal-note textarea,
+        .slot-field input[type="datetime-local"] {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            font-size: 14px;
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .meeting-modal-note textarea:focus,
+        .slot-field input[type="datetime-local"]:focus {
+            outline: none;
+            border-color: var(--brand);
+            box-shadow: 0 0 0 4px rgba(var(--brand-rgb), 0.12);
+        }
+
+        #slotRows {
+            display: grid;
+            gap: 10px;
+        }
+
+        .slot-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 10px;
+            align-items: end;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: #f8fafc;
+            padding: 10px;
+        }
+
+        .slot-remove-btn {
+            border: 1px solid #fecaca;
+            background: #fff1f2;
+            color: #b91c1c;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            height: fit-content;
+        }
+
+        .slot-remove-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .meeting-modal-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         footer {
             background: rgba(15, 23, 42, 0.94);
             border-top: 1px solid rgba(148, 163, 184, 0.2);
@@ -996,6 +1316,15 @@
             .reply-header-actions {
                 width: 100%;
             }
+
+            .slot-row {
+                grid-template-columns: 1fr;
+            }
+
+            .meeting-modal-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
     </style>
 </head>
@@ -1040,7 +1369,7 @@
                         <h2 th:text="${concern.subject}">Concern Subject</h2>
                     </div>
                     <span class="status-badge"
-                          th:classappend="${concern.status == 'Pending'} ? 'status-pending' : (${concern.status == 'In Progress'} ? 'status-inprogress' : (${concern.status == 'Complete'} ? 'status-complete' : 'status-complete'))"
+                          th:classappend="${concern.status == 'Pending'} ? 'status-pending' : (${concern.status == 'In Progress'} ? 'status-inprogress' : (${concern.status == 'Meeting Scheduled'} ? 'status-scheduled' : (${concern.status == 'Complete'} ? 'status-complete' : 'status-complete')))"
                           th:text="${concern.status}">Pending</span>
                 </div>
 
@@ -1104,6 +1433,71 @@
                     </select>
                     <button type="submit">Update Department</button>
                 </form>
+            </div>
+
+            <div class="status-section meeting-section">
+                <h3><i class="fas fa-handshake"></i> Physical Meeting Coordination</h3>
+
+                <div class="meeting-current">
+                    <span class="meeting-chip"
+                          th:classappend="${concern.meetingStatus == 'PENDING_STUDENT_SELECTION'} ? 'info' : (${concern.meetingStatus == 'RESCHEDULE_REQUESTED'} ? 'warn' : (${concern.meetingStatus == 'BOOKED' or concern.meetingStatus == 'MEETING_COMPLETED'} ? 'ok' : 'idle'))"
+                          th:text="${concern.meetingStatus == 'PENDING_STUDENT_SELECTION'} ? 'Waiting For Student Selection' : (${concern.meetingStatus == 'RESCHEDULE_REQUESTED'} ? 'Student Requested New Slots' : (${concern.meetingStatus == 'BOOKED'} ? 'Meeting Slot Booked' : (${concern.meetingStatus == 'MEETING_COMPLETED'} ? 'Meeting Completed' : 'No Schedule Yet')))">
+                        No Schedule Yet
+                    </span>
+                    <span class="meeting-help">Use this when a text reply alone cannot fully resolve the concern.</span>
+                </div>
+
+                <div th:if="${concern.meetingBookedStartTime != null and concern.meetingBookedEndTime != null}" class="meeting-booked-box">
+                    <div>
+                        <strong>Booked Meeting Time:</strong>
+                        <span th:text="${#temporals.format(concern.meetingBookedStartTime, 'dd MMM yyyy, HH:mm') + ' - ' + #temporals.format(concern.meetingBookedEndTime, 'dd MMM yyyy, HH:mm')}">01 Jan 2026, 09:00 - 10:00</span>
+                    </div>
+                    <div th:if="${concern.meetingBookedAt != null}">
+                        <strong>Booked At:</strong>
+                        <span th:text="${#temporals.format(concern.meetingBookedAt, 'dd MMM yyyy, HH:mm')}">01 Jan 2026, 08:00</span>
+                    </div>
+                </div>
+
+                <div class="meeting-actions">
+                    <button type="button" class="mark-read-btn" onclick="openMeetingModal()">
+                        <i class="fas fa-calendar-plus"></i> Schedule Time Slots
+                    </button>
+
+                    <form th:if="${concern.meetingStatus == 'BOOKED' and concern.status != 'Complete'}"
+                          th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}"
+                          method="post"
+                          onsubmit="return confirm('Mark this concern complete after confirming the physical meeting is done?');">
+                        <input type="hidden" name="status" value="Complete" />
+                        <button type="submit" class="submit-reply-btn">Mark Concern Complete After Meeting</button>
+                    </form>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(meetingProposals)}" class="meeting-history-wrap">
+                    <h4>Meeting Schedule History</h4>
+                    <div th:each="proposal, proposalStat : ${meetingProposals}" class="meeting-proposal-card">
+                        <div class="meeting-proposal-top">
+                            <span class="meeting-proposal-tag"
+                                th:text="${proposalStat.index == 0 ? 'Latest Proposal' : 'Attempt ' + (proposalStat.index + 1)}">Latest Proposal</span>
+                            <span class="meeting-proposal-status" th:text="${proposal.proposalStatus}">PENDING_STUDENT_SELECTION</span>
+                        </div>
+                        <div class="meeting-proposal-time"
+                            th:text="${'Proposed at ' + #temporals.format(proposal.createdTime, 'dd MMM yyyy, HH:mm')}">Proposed at 01 Jan 2026, 10:00</div>
+                        <div th:if="${proposal.respondedTime != null}" class="meeting-proposal-time"
+                            th:text="${'Response at ' + #temporals.format(proposal.respondedTime, 'dd MMM yyyy, HH:mm')}">Response at 01 Jan 2026, 12:00</div>
+
+                        <p th:if="${proposal.adminNote != null and !proposal.adminNote.isEmpty()}" class="meeting-note"
+                          th:text="${'Admin note: ' + proposal.adminNote}">Admin note text</p>
+                        <p th:if="${proposal.studentResponseNote != null and !proposal.studentResponseNote.isEmpty()}" class="meeting-note"
+                          th:text="${'Student response: ' + proposal.studentResponseNote}">Student response</p>
+
+                        <ul class="meeting-slot-list" th:if="${meetingSlotsMapByProposalId[proposal.proposalId] != null}">
+                            <li th:each="slot : ${meetingSlotsMapByProposalId[proposal.proposalId]}">
+                                <span th:text="${#temporals.format(slot.startTime, 'dd MMM yyyy, HH:mm') + ' - ' + #temporals.format(slot.endTime, 'HH:mm')}">01 Jan 2026, 09:00 - 10:00</span>
+                                <span class="meeting-slot-status" th:text="${slot.slotStatus}">AVAILABLE</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
 
             <!-- Previous Replies -->
@@ -1208,6 +1602,54 @@
 
         </div>
     </main>
+
+    <div id="meetingModalOverlay" class="meeting-modal-overlay" onclick="closeMeetingModal(event)">
+        <div class="meeting-modal" onclick="event.stopPropagation()">
+            <div class="meeting-modal-header">
+                <h4><i class="fas fa-calendar-check"></i> Schedule Physical Meeting Slots</h4>
+                <button type="button" class="meeting-modal-close" onclick="closeMeetingModal()" aria-label="Close schedule dialog">&times;</button>
+            </div>
+            <p class="meeting-modal-sub">
+                Add one or more available times. Student can book one slot or request new options if unavailable.
+            </p>
+
+            <form id="meetingScheduleForm"
+                  th:action="@{'/admin/concern/' + ${concern.concernId} + '/meeting/propose'}"
+                  method="post">
+                <div class="meeting-modal-note">
+                    <label for="meetingAdminNote">Optional note for student</label>
+                    <textarea id="meetingAdminNote"
+                              name="adminNote"
+                              rows="3"
+                              maxlength="400"
+                              placeholder="Example: Bring your payment receipt and student ID card."></textarea>
+                </div>
+
+                <div id="slotRows">
+                    <div class="slot-row">
+                        <div class="slot-field">
+                            <label>Start time</label>
+                            <input type="datetime-local" name="slotStarts" required />
+                        </div>
+                        <div class="slot-field">
+                            <label>End time</label>
+                            <input type="datetime-local" name="slotEnds" required />
+                        </div>
+                        <button type="button" class="slot-remove-btn" onclick="removeSlotRow(this)">Remove</button>
+                    </div>
+                </div>
+
+                <div id="meetingFormError" class="field-feedback error"></div>
+
+                <div class="meeting-modal-actions">
+                    <button type="button" class="mark-read-btn" onclick="addSlotRow()">
+                        <i class="fas fa-plus"></i> Add Another Slot
+                    </button>
+                    <button type="submit" class="submit-reply-btn">Send Schedule To Student</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <footer>
         <div class="footer-content">
@@ -1378,6 +1820,162 @@
         })();
     </script>
     <script>
+        (function () {
+            var meetingOverlay = document.getElementById('meetingModalOverlay');
+            var meetingForm = document.getElementById('meetingScheduleForm');
+            var slotRows = document.getElementById('slotRows');
+            var meetingFormError = document.getElementById('meetingFormError');
+
+            if (!meetingOverlay || !meetingForm || !slotRows) {
+                return;
+            }
+
+            var getMinDateTimeLocal = function () {
+                var minDate = new Date(Date.now() + 5 * 60 * 1000);
+                var pad = function (n) { return String(n).padStart(2, '0'); };
+                return minDate.getFullYear() + '-'
+                    + pad(minDate.getMonth() + 1) + '-'
+                    + pad(minDate.getDate()) + 'T'
+                    + pad(minDate.getHours()) + ':'
+                    + pad(minDate.getMinutes());
+            };
+
+            var refreshSlotControls = function () {
+                var rows = slotRows.querySelectorAll('.slot-row');
+                var minValue = getMinDateTimeLocal();
+
+                rows.forEach(function (row, idx) {
+                    var removeBtn = row.querySelector('.slot-remove-btn');
+                    if (removeBtn) {
+                        removeBtn.disabled = rows.length === 1;
+                        removeBtn.title = rows.length === 1 ? 'At least one slot is required.' : 'Remove slot';
+                    }
+
+                    var startInput = row.querySelector('input[name="slotStarts"]');
+                    var endInput = row.querySelector('input[name="slotEnds"]');
+                    if (startInput) {
+                        startInput.min = minValue;
+                        if (!startInput.id) {
+                            startInput.id = 'slotStart_' + idx;
+                        }
+                    }
+                    if (endInput) {
+                        endInput.min = minValue;
+                        if (!endInput.id) {
+                            endInput.id = 'slotEnd_' + idx;
+                        }
+                    }
+                });
+            };
+
+            var clearMeetingError = function () {
+                if (meetingFormError) {
+                    meetingFormError.textContent = '';
+                }
+            };
+
+            window.openMeetingModal = function () {
+                meetingOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                refreshSlotControls();
+                clearMeetingError();
+            };
+
+            window.closeMeetingModal = function (event) {
+                if (event && event.target && event.target !== meetingOverlay) {
+                    return;
+                }
+                meetingOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                clearMeetingError();
+            };
+
+            window.addSlotRow = function () {
+                var firstRow = slotRows.querySelector('.slot-row');
+                if (!firstRow) {
+                    return;
+                }
+
+                var clone = firstRow.cloneNode(true);
+                clone.querySelectorAll('input').forEach(function (input) {
+                    input.value = '';
+                });
+                slotRows.appendChild(clone);
+                refreshSlotControls();
+                clearMeetingError();
+            };
+
+            window.removeSlotRow = function (button) {
+                var rows = slotRows.querySelectorAll('.slot-row');
+                if (rows.length <= 1) {
+                    return;
+                }
+
+                var row = button ? button.closest('.slot-row') : null;
+                if (row) {
+                    row.remove();
+                }
+
+                refreshSlotControls();
+                clearMeetingError();
+            };
+
+            meetingForm.addEventListener('submit', function (event) {
+                clearMeetingError();
+
+                var slots = [];
+                var rows = slotRows.querySelectorAll('.slot-row');
+                if (rows.length === 0) {
+                    event.preventDefault();
+                    meetingFormError.textContent = 'Please add at least one slot.';
+                    return;
+                }
+
+                for (var i = 0; i < rows.length; i++) {
+                    var row = rows[i];
+                    var startInput = row.querySelector('input[name="slotStarts"]');
+                    var endInput = row.querySelector('input[name="slotEnds"]');
+
+                    if (!startInput || !endInput || !startInput.value || !endInput.value) {
+                        event.preventDefault();
+                        meetingFormError.textContent = 'Please fill both start and end time for every slot.';
+                        return;
+                    }
+
+                    var start = new Date(startInput.value);
+                    var end = new Date(endInput.value);
+                    if (end <= start) {
+                        event.preventDefault();
+                        meetingFormError.textContent = 'Each slot end time must be after its start time.';
+                        return;
+                    }
+
+                    slots.push({ start: start, end: end });
+                }
+
+                slots.sort(function (a, b) {
+                    return a.start.getTime() - b.start.getTime();
+                });
+
+                for (var j = 1; j < slots.length; j++) {
+                    if (slots[j].start < slots[j - 1].end) {
+                        event.preventDefault();
+                        meetingFormError.textContent = 'Time slots overlap. Please adjust them before submitting.';
+                        return;
+                    }
+                }
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && meetingOverlay.classList.contains('active')) {
+                    closeMeetingModal();
+                }
+            });
+
+            refreshSlotControls();
+        })();
+    </script>
+    <script>
         window.adminTourConfig = {
             pageId: 'concern-detail',
             autoStart: false,
@@ -1397,6 +1995,11 @@
                     selector: '.status-section',
                     title: 'Department Assignment',
                     content: 'If the category is incorrect, reassign the concern to the correct department from here.'
+                },
+                {
+                    selector: '.meeting-section',
+                    title: 'Physical Meeting Flow',
+                    content: 'Schedule one or more time slots when a concern needs an in-person meeting, and complete it after the meeting is done.'
                 },
                 {
                     selector: '.replies-section',

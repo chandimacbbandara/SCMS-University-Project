@@ -393,6 +393,7 @@
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
                 <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                 <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                 <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                 <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -670,8 +671,8 @@
             <p>No notifications yet.</p>
         </div>
 
-        <div th:each="notif : ${notifications}" class="notif-item"
-               th:classappend="${notif.type != 'BROADCAST' and !notif.isRead} ? 'unread' : ''"
+         <div th:each="notif : ${notifications}" class="notif-item"
+             th:classappend="${!notif.isRead} ? 'unread' : ''"
              th:attr="data-id=${notif.notificationId}"
              onclick="markNotifRead(this)">
             <div class="notif-icon-wrap"
@@ -685,6 +686,11 @@
                     <i class="fas fa-clock"></i>
                     <span th:text="${#temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
                 </div>
+            </div>
+            <div class="notif-item-actions">
+                <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
         </div>
     </div>
@@ -736,6 +742,43 @@
                 });
                 updateBadge();
             });
+    }
+
+    function refreshNotifCount() {
+        const countEl = document.querySelector('.notif-count');
+        const list = document.getElementById('notifList');
+        if (!countEl || !list) return;
+
+        const count = list.querySelectorAll('.notif-item').length;
+        countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
+
+        let empty = list.querySelector('.notif-empty');
+        if (count === 0) {
+            if (!empty) {
+                empty = document.createElement('div');
+                empty.className = 'notif-empty';
+                empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
+                list.appendChild(empty);
+            }
+        } else if (empty) {
+            empty.remove();
+        }
+    }
+
+    function removeNotif(event, el) {
+        if (event) event.stopPropagation();
+        if (!el) return;
+        const id = el.getAttribute('data-id');
+        if (!id) return;
+
+        fetch('/api/notifications/' + id, { method: 'DELETE' })
+            .then(res => res.json())
+            .then(() => {
+                el.remove();
+                refreshNotifCount();
+                updateBadge();
+            })
+            .catch(err => console.error(err));
     }
 
     function updateBadge() {
@@ -799,100 +842,159 @@
         return '';
     }
 
-    profileEditForm.addEventListener('submit', function (event) {
-        const gender = document.getElementById('gender');
-        const phone = document.getElementById('phoneNumber');
-        const dob = document.getElementById('dob');
-        const category = document.getElementById('category');
-        const address1 = document.getElementById('address1stLane');
-        const address2 = document.getElementById('address2ndLane');
-        const address3 = document.getElementById('address3rdLane');
+    const gender = document.getElementById('gender');
+    const phone = document.getElementById('phoneNumber');
+    const dob = document.getElementById('dob');
+    const category = document.getElementById('category');
+    const address1 = document.getElementById('address1stLane');
+    const address2 = document.getElementById('address2ndLane');
+    const address3 = document.getElementById('address3rdLane');
 
-        const genderError = document.getElementById('genderError');
-        const phoneError = document.getElementById('phoneError');
-        const dobError = document.getElementById('dobError');
-        const categoryError = document.getElementById('categoryError');
-        const address1Error = document.getElementById('address1Error');
-        const address2Error = document.getElementById('address2Error');
-        const address3Error = document.getElementById('address3Error');
+    const genderError = document.getElementById('genderError');
+    const phoneError = document.getElementById('phoneError');
+    const dobError = document.getElementById('dobError');
+    const categoryError = document.getElementById('categoryError');
+    const address1Error = document.getElementById('address1Error');
+    const address2Error = document.getElementById('address2Error');
+    const address3Error = document.getElementById('address3Error');
 
+    const phoneRegex = /^\+?[0-9]{10,15}$/;
+
+    function validateProfileFields(live) {
         let hasErrors = false;
-        const phoneRegex = /^\+?[0-9]{10,15}$/;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
 
-        hasErrors = setFieldError(gender, genderError, gender.value ? '' : 'Please select a gender.') || hasErrors;
-        hasErrors = setFieldError(phone, phoneError, phoneRegex.test(phone.value.trim()) ? '' : 'Phone number must be 10-15 digits and may start with +.') || hasErrors;
+        hasErrors = setFieldError(gender, genderError, !gender.value ? (live ? '' : 'Please select a gender.') : '') || hasErrors;
+
+        const phoneValue = phone.value.trim();
+        let phoneMessage = '';
+        if (!phoneValue) {
+            phoneMessage = live ? '' : 'Please enter a phone number.';
+        } else if (!phoneRegex.test(phoneValue)) {
+            phoneMessage = 'Phone number must be 10-15 digits and may start with +.';
+        }
+        hasErrors = setFieldError(phone, phoneError, phoneMessage) || hasErrors;
 
         let dobMessage = '';
         if (!dob.value) {
-            dobMessage = 'Please select date of birth.';
+            dobMessage = live ? '' : 'Please select date of birth.';
         } else {
             const dobDate = new Date(dob.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             if (dobDate > today) {
                 dobMessage = 'Date of birth cannot be in the future.';
             }
         }
         hasErrors = setFieldError(dob, dobError, dobMessage) || hasErrors;
 
-        hasErrors = setFieldError(category, categoryError, category.value ? '' : 'Please select category.') || hasErrors;
+        hasErrors = setFieldError(category, categoryError, !category.value ? (live ? '' : 'Please select category.') : '') || hasErrors;
         hasErrors = setFieldError(address1, address1Error, validateAddressValue(address1.value.trim())) || hasErrors;
         hasErrors = setFieldError(address2, address2Error, validateAddressValue(address2.value.trim())) || hasErrors;
         hasErrors = setFieldError(address3, address3Error, validateAddressValue(address3.value.trim())) || hasErrors;
 
-        if (hasErrors) {
-            event.preventDefault();
-            profileValidationSummary.classList.remove('hidden');
-        } else {
+        if (live) {
             profileValidationSummary.classList.add('hidden');
+        } else {
+            profileValidationSummary.classList.toggle('hidden', !hasErrors);
+        }
+
+        return !hasErrors;
+    }
+
+    [gender, category].forEach(function (selectField) {
+        selectField.addEventListener('change', function () {
+            validateProfileFields(true);
+        });
+    });
+
+    [phone, dob, address1, address2, address3].forEach(function (inputField) {
+        inputField.addEventListener('input', function () {
+            validateProfileFields(true);
+        });
+        inputField.addEventListener('blur', function () {
+            validateProfileFields(true);
+        });
+    });
+
+    profileEditForm.addEventListener('submit', function (event) {
+        if (!validateProfileFields(false)) {
+            event.preventDefault();
         }
     });
 
-    // Client-side validation for change password form.
-    document.getElementById('changePasswordForm').addEventListener('submit', function (event) {
-        const currentPassword = document.getElementById('currentPassword');
-        const newPassword = document.getElementById('newPassword').value;
-        const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-        const newPasswordInput = document.getElementById('newPassword');
-        const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
-        const currentPasswordError = document.getElementById('currentPasswordError');
-        const newPasswordError = document.getElementById('newPasswordError');
-        const confirmNewPasswordError = document.getElementById('confirmNewPasswordError');
-        const passwordValidationSummary = document.getElementById('passwordValidationSummary');
-        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{12,}$/;
+    // Live client-side validation for change password form.
+    const changePasswordForm = document.getElementById('changePasswordForm');
+    const currentPassword = document.getElementById('currentPassword');
+    const newPasswordInput = document.getElementById('newPassword');
+    const confirmNewPasswordInput = document.getElementById('confirmNewPassword');
+    const currentPasswordError = document.getElementById('currentPasswordError');
+    const newPasswordError = document.getElementById('newPasswordError');
+    const confirmNewPasswordError = document.getElementById('confirmNewPasswordError');
+    const passwordValidationSummary = document.getElementById('passwordValidationSummary');
+    const passwordSubmitBtn = changePasswordForm.querySelector('button[type="submit"]');
+    const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{12,}$/;
+
+    function validatePasswordFields(live) {
         let hasErrors = false;
+
+        const currentValue = currentPassword.value.trim();
+        const newValue = newPasswordInput.value;
+        const confirmValue = confirmNewPasswordInput.value;
 
         hasErrors = setFieldError(
             currentPassword,
             currentPasswordError,
-            currentPassword.value.trim() ? '' : 'Please enter your current password.'
+            !currentValue ? (live ? '' : 'Please enter your current password.') : ''
         ) || hasErrors;
 
         let newPasswordMessage = '';
-        if (!newPassword.trim()) {
-            newPasswordMessage = 'Please enter a new password.';
-        } else if (!strongPasswordRegex.test(newPassword)) {
+        if (!newValue.trim()) {
+            newPasswordMessage = live ? '' : 'Please enter a new password.';
+        } else if (!strongPasswordRegex.test(newValue)) {
             newPasswordMessage = 'Must be 12+ chars with uppercase, lowercase, number, and special character.';
-        } else if (newPassword === currentPassword.value) {
+        } else if (currentValue && newValue === currentValue) {
             newPasswordMessage = 'New password must be different from current password.';
         }
         hasErrors = setFieldError(newPasswordInput, newPasswordError, newPasswordMessage) || hasErrors;
 
         let confirmMessage = '';
-        if (!confirmNewPassword.trim()) {
-            confirmMessage = 'Please confirm your new password.';
-        } else if (newPassword !== confirmNewPassword) {
+        if (!confirmValue.trim()) {
+            confirmMessage = live ? '' : 'Please confirm your new password.';
+        } else if (newValue !== confirmValue) {
             confirmMessage = 'New password and confirm password do not match.';
         }
         hasErrors = setFieldError(confirmNewPasswordInput, confirmNewPasswordError, confirmMessage) || hasErrors;
 
-        if (hasErrors) {
-            event.preventDefault();
-            passwordValidationSummary.classList.remove('hidden');
-        } else {
+        if (live) {
             passwordValidationSummary.classList.add('hidden');
+        } else {
+            passwordValidationSummary.classList.toggle('hidden', !hasErrors);
+        }
+
+        if (passwordSubmitBtn) {
+            const allFilled = Boolean(currentValue && newValue.trim() && confirmValue.trim());
+            passwordSubmitBtn.disabled = !allFilled || hasErrors;
+        }
+
+        return !hasErrors;
+    }
+
+    [currentPassword, newPasswordInput, confirmNewPasswordInput].forEach(function (inputField) {
+        inputField.addEventListener('input', function () {
+            validatePasswordFields(true);
+        });
+        inputField.addEventListener('blur', function () {
+            validatePasswordFields(true);
+        });
+    });
+
+    changePasswordForm.addEventListener('submit', function (event) {
+        if (!validatePasswordFields(false)) {
+            event.preventDefault();
         }
     });
+
+    validatePasswordFields(true);
 
     setInterval(updateBadge, 30000);
 </script>
