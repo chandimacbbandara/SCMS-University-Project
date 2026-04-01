@@ -20,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class ConcernService {
     private final AdminReplyRepository adminReplyRepository;
 
     private static final String UPLOAD_DIR = "uploads/";
+    private static final String STATUS_PENDING = "Pending";
+    private static final String STATUS_DRAFT = "Draft";
 
     public ConcernService(ConcernRepository concernRepository,
                           StudentRepository studentRepository,
@@ -54,32 +57,41 @@ public class ConcernService {
 
     @Transactional
     public Concern submitConcern(ConcernSubmissionDTO dto, MultipartFile evidence) throws IOException {
+        Concern saved = createConcern(dto, evidence, false);
+        notificationService.notifyConcernSubmitted(saved);
+        return saved;
+    }
 
-        // Find or create the student
+    @Transactional
+    public Concern saveConcernDraft(ConcernSubmissionDTO dto, MultipartFile evidence) throws IOException {
+        return createConcern(dto, evidence, true);
+    }
+
+    private Concern createConcern(ConcernSubmissionDTO dto,
+                                  MultipartFile evidence,
+                                  boolean saveAsDraft) throws IOException {
+        validateConcernFields(dto,
+                saveAsDraft
+                        ? "Please fill in Subject, Category, and Message before saving a draft."
+                        : "Please fill in Subject, Category, and Message.");
+
         Student student = findOrCreateStudent(dto);
 
-        // Handle evidence file upload
         String evidencePath = null;
         if (evidence != null && !evidence.isEmpty()) {
             evidencePath = saveEvidence(evidence);
         }
 
-        // Create the concern
         Concern concern = new Concern();
-        concern.setSubject(dto.getSubject());
-        concern.setMessage(dto.getMessage());
+        concern.setSubject(dto.getSubject().trim());
+        concern.setMessage(dto.getMessage().trim());
         concern.setEvidencePath(evidencePath);
-        concern.setStatus("Pending");
-        concern.setCategory(dto.getCategory());
+        concern.setStatus(saveAsDraft ? STATUS_DRAFT : STATUS_PENDING);
+        concern.setCategory(dto.getCategory().trim());
         concern.setStudent(student);
         assignConcernIdIfRequired(concern);
 
-        Concern saved = concernRepository.save(concern);
-
-        // Trigger notification: Step 1 - Concern Submitted
-        notificationService.notifyConcernSubmitted(saved);
-
-        return saved;
+        return concernRepository.save(concern);
     }
 
     /**
@@ -91,12 +103,43 @@ public class ConcernService {
     }
 
     /**
-     * Get all concerns submitted by a specific student.
+     * Get all submitted (non-draft) concerns by a specific student.
      */
     public List<Concern> getConcernsByStudentUserId(Integer userId) {
         Student student = studentRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Student not found"));
-        return concernRepository.findByStudent_StudentId(student.getStudentId());
+        return concernRepository.findByStudent_StudentId(student.getStudentId()).stream()
+            .filter(concern -> concern != null
+                && (concern.getStatus() == null
+                || !STATUS_DRAFT.equalsIgnoreCase(concern.getStatus().trim())))
+            .sorted(Comparator.comparing(Concern::getCreatedTime,
+                Comparator.nullsLast(Comparator.reverseOrder())))
+            .toList();
+    }
+
+    /**
+     * Get all draft concerns by a specific student.
+     */
+    public List<Concern> getDraftConcernsByStudentUserId(Integer userId) {
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return concernRepository.findByStudent_StudentId(student.getStudentId()).stream()
+            .filter(concern -> concern != null
+                && concern.getStatus() != null
+                && STATUS_DRAFT.equalsIgnoreCase(concern.getStatus().trim()))
+            .sorted(Comparator.comparing(Concern::getCreatedTime,
+                Comparator.nullsLast(Comparator.reverseOrder())))
+            .toList();
+    }
+
+    public long countDraftConcernsByStudentUserId(Integer userId) {
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+        return concernRepository.findByStudent_StudentId(student.getStudentId()).stream()
+            .filter(concern -> concern != null
+                && concern.getStatus() != null
+                && STATUS_DRAFT.equalsIgnoreCase(concern.getStatus().trim()))
+            .count();
     }
 
     /**
@@ -116,14 +159,36 @@ public class ConcernService {
      */
     @Transactional(readOnly = true)
     public Concern getPendingConcernForStudent(Integer concernId, Integer studentUserId) {
+        Concern concern = getEditableConcernForStudent(concernId, studentUserId);
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (!STATUS_PENDING.equalsIgnoreCase(status)) {
+            throw new RuntimeException("You can only update concerns before admin review begins.");
+        }
+        return concern;
+    }
+
+    @Transactional(readOnly = true)
+    public Concern getEditableConcernForStudent(Integer concernId, Integer studentUserId) {
         Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
                 .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
 
         String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
-        if (!"Pending".equalsIgnoreCase(status)) {
-            throw new RuntimeException("You can only update concerns before admin review begins.");
+        if (!STATUS_PENDING.equalsIgnoreCase(status) && !STATUS_DRAFT.equalsIgnoreCase(status)) {
+            throw new RuntimeException("This concern cannot be edited now.");
         }
 
+        return concern;
+    }
+
+    @Transactional(readOnly = true)
+    public Concern getDraftConcernForStudent(Integer concernId, Integer studentUserId) {
+        Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Draft concern not found or access denied."));
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (!STATUS_DRAFT.equalsIgnoreCase(status)) {
+            throw new RuntimeException("Only draft concerns are allowed for this action.");
+        }
         return concern;
     }
 
@@ -156,7 +221,65 @@ public class ConcernService {
     }
 
     /**
-     * Allow students to delete only their own pending concerns.
+     * Update an editable concern (Pending or Draft).
+     * If an existing draft is updated with saveAsDraft=false, it gets submitted as Pending.
+     */
+    @Transactional
+    public Concern updateConcernByStudent(Integer concernId,
+                                          Integer studentUserId,
+                                          ConcernSubmissionDTO dto,
+                                          MultipartFile evidence,
+                                          boolean saveAsDraft) throws IOException {
+        Concern concern = getEditableConcernForStudent(concernId, studentUserId);
+        boolean isDraftConcern = STATUS_DRAFT.equalsIgnoreCase(concern.getStatus());
+
+        if (saveAsDraft && !isDraftConcern) {
+            throw new RuntimeException("Only draft concerns can be saved as drafts.");
+        }
+
+        validateConcernFields(dto,
+                saveAsDraft
+                        ? "Please fill in Subject, Category, and Message before saving a draft."
+                        : "Please fill in Subject, Category, and Message.");
+
+        concern.setSubject(dto.getSubject().trim());
+        concern.setMessage(dto.getMessage().trim());
+        concern.setCategory(dto.getCategory().trim());
+
+        if (evidence != null && !evidence.isEmpty()) {
+            concern.setEvidencePath(saveEvidence(evidence));
+        }
+
+        if (isDraftConcern && !saveAsDraft) {
+            concern.setStatus(STATUS_PENDING);
+        }
+
+        Concern saved = concernRepository.save(concern);
+        if (isDraftConcern && !saveAsDraft) {
+            notificationService.notifyConcernSubmitted(saved);
+        }
+
+        return saved;
+    }
+
+    /**
+     * Submit an existing draft concern without changing its content.
+     */
+    @Transactional
+    public Concern submitDraftByStudent(Integer concernId, Integer studentUserId) {
+        Concern concern = getDraftConcernForStudent(concernId, studentUserId);
+
+        validateConcernFields(concern.getSubject(), concern.getCategory(), concern.getMessage(),
+                "Draft is incomplete. Please update Subject, Category, and Message before submitting.");
+
+        concern.setStatus(STATUS_PENDING);
+        Concern saved = concernRepository.save(concern);
+        notificationService.notifyConcernSubmitted(saved);
+        return saved;
+    }
+
+    /**
+     * Allow students to delete only their own editable concerns (Pending or Draft).
      */
     @Transactional
     public void deleteConcernByStudentIfPending(Integer concernId, Integer studentUserId) {
@@ -168,12 +291,30 @@ public class ConcernService {
                 .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
 
         String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
-        if (!"Pending".equalsIgnoreCase(status)) {
-            throw new RuntimeException("You can only delete concerns before admin review begins.");
+        if (!STATUS_PENDING.equalsIgnoreCase(status) && !STATUS_DRAFT.equalsIgnoreCase(status)) {
+            throw new RuntimeException("You can only delete draft or pending concerns before admin review begins.");
         }
 
         notificationService.deleteByConcernId(concernId);
         concernRepository.delete(concern);
+    }
+
+    private void validateConcernFields(ConcernSubmissionDTO dto, String message) {
+        if (dto == null) {
+            throw new RuntimeException(message);
+        }
+        validateConcernFields(dto.getSubject(), dto.getCategory(), dto.getMessage(), message);
+    }
+
+    private void validateConcernFields(String subject,
+                                       String category,
+                                       String message,
+                                       String errorMessage) {
+        if (subject == null || subject.trim().isEmpty()
+                || message == null || message.trim().isEmpty()
+                || category == null || category.trim().isEmpty()) {
+            throw new RuntimeException(errorMessage);
+        }
     }
 
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {

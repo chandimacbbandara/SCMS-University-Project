@@ -39,6 +39,7 @@ CREATE TABLE Concern (
     StudentID_FK INT,
     AdminID_FK INT
 );
+-- Status values in Concern.Status: Draft, Pending, In Progress, Meeting Scheduled, Complete
 
 -- 5. Admin_reply Table
 CREATE TABLE Admin_reply (
@@ -89,6 +90,9 @@ ALTER TABLE Admin ADD CONSTRAINT FK_Admin_User FOREIGN KEY (UserID) REFERENCES [
 -- Concern Relationships
 ALTER TABLE Concern ADD CONSTRAINT FK_Concern_Student FOREIGN KEY (StudentID_FK) REFERENCES Student(UserID);
 ALTER TABLE Concern ADD CONSTRAINT FK_Concern_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
+
+CREATE INDEX IDX_Concern_Student_Status_CreatedTime
+ON Concern(StudentID_FK, Status, CreatedTime DESC);
 
 -- Admin Reply Relationships
 ALTER TABLE Admin_reply ADD CONSTRAINT FK_Reply_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
@@ -230,6 +234,7 @@ SELECT * FROM Admin;
 SELECT * FROM Concern;
 SELECT * FROM Admin_reply;
 SELECT * FROM Feedback;
+SELECT * FROM SCMS_Feedback ORDER BY FeedbackID DESC
 SELECT * FROM Notification;
 SELECT * FROM Analytics_Report;
 
@@ -241,10 +246,47 @@ SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;
 SELECT * FROM Concern_Meeting_Proposal ORDER BY Created_Time DESC;
 SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
 
+/* =============================
+    Draft Concern Query Pack
+    ============================= */
+
+-- 1) Save as Draft
+-- INSERT INTO Concern (ConcernID, Subject, Message, Evidence, AI_Priority_Level, Status, CreatedTime, StudentID_FK, AdminID_FK)
+-- VALUES (@ConcernId, @Subject, @Message, @EvidenceBlob, NULL, 'Draft', GETDATE(), @StudentUserId, NULL);
+
+-- 2) List all drafts for a student
+-- SELECT ConcernID, Subject, Message, Status, CreatedTime, Evidence
+-- FROM Concern
+-- WHERE StudentID_FK = @StudentUserId
+--   AND Status = 'Draft'
+-- ORDER BY CreatedTime DESC;
+
+-- 3) Update an existing draft
+-- UPDATE Concern
+-- SET Subject = @Subject,
+--     Message = @Message,
+--     Evidence = @EvidenceBlob
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
+-- 4) Submit a draft as an active concern
+-- UPDATE Concern
+-- SET Status = 'Pending'
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
+-- 5) Delete a draft
+-- DELETE FROM Concern
+-- WHERE ConcernID = @ConcernId
+--   AND StudentID_FK = @StudentUserId
+--   AND Status = 'Draft';
+
 SELECT * FROM faqs ORDER BY created_at DESC;
 SELECT * FROM tips ORDER BY created_at DESC;
 
-SELECT * FROM SCMS_Feedback ORDER BY FeedbackID DESC
+
 
 
 /* =============================

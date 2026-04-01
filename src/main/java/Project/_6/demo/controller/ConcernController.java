@@ -52,6 +52,8 @@ public class ConcernController {
         model.addAttribute("concernDTO", new ConcernSubmissionDTO());
         model.addAttribute("loggedStudent", student);
         model.addAttribute("isEdit", false);
+        model.addAttribute("isDraftConcern", false);
+        model.addAttribute("draftEnabled", true);
         addNotificationAttributes(model, userId);
         return "submit-concern";
     }
@@ -72,7 +74,9 @@ public class ConcernController {
 
         try {
             var student = concernService.getStudentByUserId(userId);
-            Concern concern = concernService.getPendingConcernForStudent(concernId, userId);
+            Concern concern = concernService.getEditableConcernForStudent(concernId, userId);
+            boolean isDraftConcern = concern.getStatus() != null
+                    && "Draft".equalsIgnoreCase(concern.getStatus().trim());
 
             ConcernSubmissionDTO concernDTO = new ConcernSubmissionDTO();
             concernDTO.setStudentId(student.getStudentId());
@@ -86,6 +90,8 @@ public class ConcernController {
             model.addAttribute("concernDTO", concernDTO);
             model.addAttribute("loggedStudent", student);
             model.addAttribute("isEdit", true);
+            model.addAttribute("isDraftConcern", isDraftConcern);
+            model.addAttribute("draftEnabled", isDraftConcern);
             model.addAttribute("editingConcernId", concern.getConcernId());
             model.addAttribute("existingEvidencePath", concern.getEvidencePath());
             addNotificationAttributes(model, userId);
@@ -100,6 +106,7 @@ public class ConcernController {
     @PostMapping("/submit-concern")
     public String submitConcern(
             @ModelAttribute ConcernSubmissionDTO concernDTO,
+            @RequestParam(value = "action", defaultValue = "submit") String action,
             @RequestParam(value = "evidence", required = false) MultipartFile evidence,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -119,30 +126,34 @@ public class ConcernController {
         concernDTO.setLastName(student.getUser().getLastName());
         concernDTO.setEmail(student.getUser().getEmail());
 
-        if (concernDTO.getSubject() == null || concernDTO.getSubject().trim().isEmpty()
-                || concernDTO.getMessage() == null || concernDTO.getMessage().trim().isEmpty()
-                || concernDTO.getCategory() == null || concernDTO.getCategory().trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Please fill in Subject, Category, and Message.");
-            return "redirect:/submit-concern";
-        }
+        boolean saveAsDraft = "draft".equalsIgnoreCase(action);
 
         try {
-            Concern saved = concernService.submitConcern(concernDTO, evidence);
-            redirectAttributes.addFlashAttribute("successMessage",
-                    "Your concern has been submitted successfully! Reference ID: CON-" + saved.getConcernId());
+            Concern saved = saveAsDraft
+                    ? concernService.saveConcernDraft(concernDTO, evidence)
+                    : concernService.submitConcern(concernDTO, evidence);
+
+            if (saveAsDraft) {
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Concern draft saved successfully. You can continue and submit it later.");
+            } else {
+                redirectAttributes.addFlashAttribute("successMessage",
+                        "Your concern has been submitted successfully! Reference ID: CON-" + saved.getConcernId());
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage",
-                    "Failed to submit concern: " + e.getMessage());
+                    (saveAsDraft ? "Failed to save draft: " : "Failed to submit concern: ") + e.getMessage());
             return "redirect:/submit-concern";
         }
 
-        return "redirect:/student/concern-history";
+        return saveAsDraft ? "redirect:/student/concern-drafts" : "redirect:/student/concern-history";
     }
 
     @PostMapping("/student/concern/update")
     public String updateConcern(
             @RequestParam("concernId") Integer concernId,
             @ModelAttribute ConcernSubmissionDTO concernDTO,
+            @RequestParam(value = "action", defaultValue = "submit") String action,
             @RequestParam(value = "evidence", required = false) MultipartFile evidence,
             HttpSession session,
             RedirectAttributes redirectAttributes) {
@@ -156,14 +167,74 @@ public class ConcernController {
             return "redirect:/login";
         }
 
+        boolean saveAsDraft = "draft".equalsIgnoreCase(action);
+        boolean wasDraft = false;
         try {
-            concernService.updateConcernByStudentIfPending(concernId, userId, concernDTO, evidence);
-            redirectAttributes.addFlashAttribute("successMessage", "Concern updated successfully.");
+            Concern editableConcern = concernService.getEditableConcernForStudent(concernId, userId);
+            wasDraft = editableConcern.getStatus() != null
+                    && "Draft".equalsIgnoreCase(editableConcern.getStatus().trim());
+
+            concernService.updateConcernByStudent(concernId, userId, concernDTO, evidence, saveAsDraft);
+
+            if (saveAsDraft) {
+                redirectAttributes.addFlashAttribute("successMessage", "Draft updated successfully.");
+                return "redirect:/student/concern-drafts";
+            }
+
+            if (wasDraft) {
+                redirectAttributes.addFlashAttribute("successMessage", "Draft submitted successfully.");
+            } else {
+                redirectAttributes.addFlashAttribute("successMessage", "Concern updated successfully.");
+            }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            if (saveAsDraft || wasDraft) {
+                return "redirect:/student/concern-drafts";
+            }
         }
 
         return "redirect:/student/concern-history";
+    }
+
+    @GetMapping("/student/concern-drafts")
+    public String showConcernDrafts(HttpSession session, Model model) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        List<Concern> draftConcerns = concernService.getDraftConcernsByStudentUserId(userId);
+        model.addAttribute("draftConcerns", draftConcerns);
+        addNotificationAttributes(model, userId);
+        return "student-concern-drafts";
+    }
+
+    @PostMapping("/student/concern/draft/submit")
+    public String submitDraftConcern(@RequestParam("concernId") Integer concernId,
+                                     HttpSession session,
+                                     RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        if (studentUserId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            Concern submittedConcern = concernService.submitDraftByStudent(concernId, studentUserId);
+            redirectAttributes.addFlashAttribute("successMessage",
+                    "Draft submitted successfully! Reference ID: CON-" + submittedConcern.getConcernId());
+            return "redirect:/student/concern-history";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            return "redirect:/student/concern-drafts";
+        }
     }
 
     // Concern History page
@@ -321,6 +392,7 @@ public class ConcernController {
 
     @PostMapping("/student/concern/delete")
     public String deleteStudentConcern(@RequestParam("concernId") Integer concernId,
+                                       @RequestParam(value = "returnTo", defaultValue = "history") String returnTo,
                                        HttpSession session,
                                        RedirectAttributes redirectAttributes) {
         if (session.getAttribute("loggedInStudent") == null) {
@@ -328,6 +400,10 @@ public class ConcernController {
         }
 
         Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        String redirectUrl = "drafts".equalsIgnoreCase(returnTo)
+                ? "redirect:/student/concern-drafts"
+                : "redirect:/student/concern-history";
+
         try {
             concernService.deleteConcernByStudentIfPending(concernId, studentUserId);
             redirectAttributes.addFlashAttribute("successMessage", "Concern deleted successfully.");
@@ -335,7 +411,7 @@ public class ConcernController {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 
-        return "redirect:/student/concern-history";
+        return redirectUrl;
     }
 }
 

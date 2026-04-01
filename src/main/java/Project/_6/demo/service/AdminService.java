@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 public class AdminService {
 
     private static final String UPLOAD_DIR = "uploads/";
+    private static final String STATUS_DRAFT = "Draft";
 
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
@@ -60,7 +61,7 @@ public class AdminService {
      * Get all concerns ordered by newest first, with Complete at the bottom
      */
     public List<Concern> getAllConcerns() {
-        return sortCompleteLast(concernRepository.findAllByOrderByCreatedTimeDesc());
+        return sortCompleteLast(excludeDrafts(concernRepository.findAllByOrderByCreatedTimeDesc()));
     }
 
     /**
@@ -123,7 +124,7 @@ public class AdminService {
                     .collect(Collectors.toList());
         }
 
-        return sortCompleteLast(concerns);
+        return sortCompleteLast(excludeDrafts(concerns));
     }
 
     /**
@@ -352,7 +353,10 @@ public class AdminService {
      * Get dashboard statistics
      */
     public long getTotalConcerns() {
-        return concernRepository.count();
+        long total = concernRepository.count();
+        long drafts = concernRepository.countByStatus(STATUS_DRAFT);
+        long submitted = total - drafts;
+        return Math.max(submitted, 0);
     }
 
     public long getPendingCount() {
@@ -421,6 +425,12 @@ public class AdminService {
             return "Other";
         }
         return category.trim();
+    }
+
+    private List<Concern> excludeDrafts(List<Concern> concerns) {
+        return concerns.stream()
+                .filter(c -> c != null && (c.getStatus() == null || !STATUS_DRAFT.equalsIgnoreCase(c.getStatus().trim())))
+                .collect(Collectors.toList());
     }
 
     /**

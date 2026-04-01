@@ -1301,6 +1301,13 @@
             display: flex; align-items: center; justify-content: space-between;
             margin-bottom: 22px;
         }
+        .top-actions-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
         .back-btn {
             display: inline-flex; align-items: center; gap: 8px;
             text-decoration: none;
@@ -1316,6 +1323,25 @@
             transform: translateX(-4px);
         }
         .back-btn:hover i { transform: translateX(-3px); }
+        .drafts-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            color: #b45309;
+            background: #fff7ed;
+            border: 2px solid #fdba74;
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            transition: all 0.3s cubic-bezier(.22,1,.36,1);
+        }
+        .drafts-btn:hover {
+            background: #ffedd5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(180, 83, 9, 0.18);
+        }
         .new-concern-btn {
             display: inline-flex; align-items: center; gap: 8px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -1362,6 +1388,7 @@
             .filter-btn { padding: 6px 14px; font-size: 11px; }
             .concern-subject { font-size: 16px; }
             .top-actions { flex-direction: column; gap: 10px; }
+            .top-actions-right { width: 100%; justify-content: center; }
         }
     </style>
 </head>
@@ -1380,6 +1407,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link active">My History</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -1412,7 +1440,10 @@
         <!-- Top Actions -->
         <div class="top-actions animate-in">
             <a href="/student/dashboard" class="back-btn"><i class="fas fa-arrow-left"></i> Dashboard</a>
-            <a href="/submit-concern" class="new-concern-btn"><i class="fas fa-plus"></i> New Concern</a>
+            <div class="top-actions-right">
+                <a href="/student/concern-drafts" class="drafts-btn"><i class="fas fa-file-pen"></i> My Drafts</a>
+                <a href="/submit-concern" class="new-concern-btn"><i class="fas fa-plus"></i> New Concern</a>
+            </div>
         </div>
 
         <!-- Flash Messages -->

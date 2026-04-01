@@ -455,8 +455,13 @@
         }
 
         /* Submit */
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
         .submit-btn {
-            width: 100%;
+            flex: 1;
             padding: 15px;
             background: linear-gradient(135deg, #e53935, #c62828);
             color: #fff;
@@ -468,7 +473,6 @@
             letter-spacing: 1px;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -480,6 +484,29 @@
             box-shadow: 0 8px 24px rgba(229,57,53,0.3);
         }
         .submit-btn:active { transform: translateY(0); }
+
+        .draft-btn {
+            flex: 1;
+            padding: 15px;
+            background: #fff7ed;
+            color: #b45309;
+            border: 2px solid #fdba74;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .draft-btn:hover {
+            background: #ffedd5;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(180, 83, 9, 0.18);
+        }
 
         .back-link {
             display: flex;
@@ -512,6 +539,7 @@
             .form-card { padding: 26px 20px; }
             .form-row { flex-direction: column; gap: 0; }
             .concern-wrapper { padding: 20px 12px; }
+            .form-actions { flex-direction: column; }
         }
     </style>
 </head>
@@ -530,6 +558,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link active">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -767,10 +796,23 @@
                                 </div>
                             </div>
 
-                            <button type="submit" class="submit-btn animate-in delay-6">
-                                <i class="fas" th:classappend="${isEdit} ? ' fa-floppy-disk' : ' fa-paper-plane'"></i>
-                                <span th:text="${isEdit} ? 'Update Concern' : 'Submit Concern'">Submit Concern</span>
-                            </button>
+                            <div class="form-actions animate-in delay-6">
+                                <button type="submit" class="submit-btn" name="action" value="submit">
+                                    <i class="fas" th:classappend="${isEdit and !isDraftConcern} ? ' fa-floppy-disk' : ' fa-paper-plane'"></i>
+                                    <span th:text="${isEdit and !isDraftConcern} ? 'Update Concern' : 'Submit Concern'">Submit Concern</span>
+                                </button>
+
+                                <button type="submit"
+                                        id="saveDraftBtn"
+                                        class="draft-btn"
+                                        name="action"
+                                        value="draft"
+                                        formnovalidate
+                                        th:if="${draftEnabled}">
+                                    <i class="fas fa-file-pen"></i>
+                                    <span th:text="${isEdit} ? 'Update Draft' : 'Save As Draft'">Save As Draft</span>
+                                </button>
+                            </div>
                         </form>
 
                         <a th:href="${isEdit} ? @{/student/concern-history} : @{/}" href="/" class="back-link animate-in delay-6">
@@ -991,7 +1033,7 @@
             pageId: 'submit-concern',
             autoStart: false,
             storageKey: 'akb_student_tour_completed',
-            nextPage: '/student/concern-history',
+            nextPage: '/student/concern-drafts',
             steps: [
                 {
                     selector: '.concern-sidebar',
@@ -1017,6 +1059,11 @@
                     selector: '#uploadArea',
                     title: 'Optional Evidence',
                     content: 'Attach files if needed to provide stronger context before submitting your concern.'
+                },
+                {
+                    selector: '#saveDraftBtn',
+                    title: 'Save As Draft',
+                    content: 'Use this button when your concern is not ready yet. You can continue editing from the Drafts page later.'
                 }
             ]
         };

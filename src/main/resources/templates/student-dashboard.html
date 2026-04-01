@@ -713,7 +713,7 @@
         .actions-list {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 12px;
         }
 
@@ -773,6 +773,7 @@
         }
         .action-item:hover .action-item-icon { transform: scale(1.08) rotate(-3deg); }
         .action-item-icon.report  { background: rgba(229,57,53,0.1); color: var(--primary); }
+        .action-item-icon.draft   { background: rgba(245, 158, 11, 0.14); color: #b45309; }
         .action-item-icon.home    { background: rgba(30,136,229,0.1); color: var(--accent-blue); }
         .action-item-icon.home.custom { background: rgba(29,53,87,0.12); color: #1d3557; }
         .action-item-icon.profile { background: rgba(239,108,0,0.1); color: var(--accent-orange); }
@@ -789,6 +790,19 @@
             color: var(--text-light);
             margin: 0;
             line-height: 1.55;
+        }
+        .action-item-hint {
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 800;
+            color: #b45309;
+            background: #fff7ed;
+            border: 1px solid #fdba74;
+            border-radius: 999px;
+            padding: 4px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* ===== Tips Section ===== */
@@ -1423,6 +1437,7 @@
                     <li><a href="/" class="nav-link">Home</a></li>
                     <li><a href="/student/dashboard" class="nav-link active">Dashboard</a></li>
                     <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
                     <li><a href="/student/community" class="nav-link">Community Talk</a></li>
                     <li><a href="/student/concern-history" class="nav-link">My History</a></li>
                     <li><a href="/faq" class="nav-link">FAQ</a></li>
@@ -1560,6 +1575,17 @@
                             <div class="action-item-text">
                                 <h4>Submit New Concern</h4>
                                 <p>Create a new concern report with full details and attachments.</p>
+                            </div>
+                        </a>
+                        <a href="/student/concern-drafts" class="action-item" data-search="draft concern save draft continue editing pending draft">
+                            <div class="action-item-icon draft"><i class="fas fa-file-pen"></i></div>
+                            <div class="action-item-text">
+                                <h4>My Draft Concerns</h4>
+                                <p>Continue editing saved draft concerns and submit them when ready.</p>
+                                <span class="action-item-hint" th:if="${draftCount != null}">
+                                    <i class="fas fa-layer-group"></i>
+                                    <span th:text="${draftCount} + ' drafts saved'">0 drafts saved</span>
+                                </span>
                             </div>
                         </a>
                         <a href="/student/community" class="action-item" data-search="community talk peers support discussion">
@@ -1962,7 +1988,7 @@
                 {
                     selector: 'header .header-content',
                     title: 'Student Navigation Bar',
-                    content: 'Use this top bar for Home, Dashboard, Report Issue, Community Talk, History, FAQ, profile, and notifications.'
+                    content: 'Use this top bar for Home, Dashboard, Report Issue, Drafts, Community Talk, History, FAQ, profile, and notifications.'
                 },
                 {
                     selector: '.welcome-hero',
@@ -1977,7 +2003,7 @@
                 {
                     selector: '.actions-list',
                     title: 'Quick Actions',
-                    content: 'Jump straight to Report Issue, Community Talk, or refresh your dashboard from here.'
+                    content: 'Jump straight to Report Issue, Drafts, Community Talk, or refresh your dashboard from here.'
                 },
                 {
                     selector: '.tracking-section',

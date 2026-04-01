@@ -331,8 +331,10 @@ public class StudentRegistrationController {
 
         // Add student's concerns for tracking
         List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
+        long draftCount = concernService.countDraftConcernsByStudentUserId(userId);
         Map<Integer, List<AdminReply>> repliesMap = concernService.getRepliesMap(concerns);
         model.addAttribute("concerns", concerns);
+        model.addAttribute("draftCount", draftCount);
         model.addAttribute("repliesMap", repliesMap);
 
         return "student-dashboard";
