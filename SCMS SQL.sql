@@ -103,36 +103,30 @@ ALTER TABLE Notification ADD CONSTRAINT FK_Notification_Admin FOREIGN KEY (Admin
 -- Analytics Report Relationship
 ALTER TABLE Analytics_Report ADD CONSTRAINT FK_Report_Admin FOREIGN KEY (AdminID_FK) REFERENCES Admin(UserID);
 
+/* =============================
+   FAQ & Tips Module
+   ============================= */
 
-select *
-from concern
+IF OBJECT_ID('dbo.faqs', 'U') IS NULL
+BEGIN
+    CREATE TABLE faqs (
+        faq_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        question VARCHAR(200) NOT NULL,
+        answer VARCHAR(1000) NOT NULL,
+        created_at DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
 
-select *
-from [User]
-
-select *
-from student
-
-SELECT *
-FROM Admin
-
-select *
-from Admin_reply
-
-SELECT *
-FROM Feedback
-
-select *
-from Notification
-
-SELECT *
-FROM Analytics_Report
-
-select *  
-FROM faqs
-
-select *
-from tips
+IF OBJECT_ID('dbo.tips', 'U') IS NULL
+BEGIN
+    CREATE TABLE tips (
+        tip_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+        title VARCHAR(100) NOT NULL,
+        description VARCHAR(500) NOT NULL,
+        icon_class VARCHAR(50) NOT NULL,
+        created_at DATETIME2 NOT NULL DEFAULT GETDATE()
+    );
+END;
 
 
 /* =============================
@@ -188,12 +182,8 @@ ON Student_Community_Post(Status, CreatedTime DESC);
 CREATE INDEX IDX_CommunityReply_Post_Status
 ON Student_Community_Reply(PostID_FK, Status, CreatedTime ASC);
 
-
--- Helpful verification queries
-SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
-SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
-SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
-SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
+-- Optional: allow replies without a linked student account
+ALTER TABLE Student_Community_Reply ALTER COLUMN StudentID_FK INT NULL;
 
 
 /* ========================================
@@ -230,6 +220,68 @@ CREATE TABLE Concern_Meeting_Slot (
 CREATE INDEX IDX_MeetingProposal_Concern ON Concern_Meeting_Proposal(ConcernID_FK, Created_Time DESC);
 CREATE INDEX IDX_MeetingSlot_Proposal ON Concern_Meeting_Slot(ProposalID_FK, Start_Time ASC);
 
+/* =============================
+    Verification Queries
+    ============================= */
+
+SELECT * FROM [User];
+SELECT * FROM Student;
+SELECT * FROM Admin;
+SELECT * FROM Concern;
+SELECT * FROM Admin_reply;
+SELECT * FROM Feedback;
+SELECT * FROM Notification;
+SELECT * FROM Analytics_Report;
+
+SELECT * FROM Student_Community_Post ORDER BY CreatedTime DESC;
+SELECT * FROM Student_Community_Reply ORDER BY CreatedTime DESC;
+SELECT * FROM Student_Community_Rules_Acceptance ORDER BY AcceptedAt DESC;
+SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;
+
 SELECT * FROM Concern_Meeting_Proposal ORDER BY Created_Time DESC;
 SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
+
+SELECT * FROM faqs ORDER BY created_at DESC;
+SELECT * FROM tips ORDER BY created_at DESC;
+
+SELECT * FROM SCMS_Feedback ORDER BY FeedbackID DESC
+
+
+/* =============================
+    FAQ & Tips Query Pack
+    ============================= */
+
+-- FAQ: Insert
+-- INSERT INTO faqs (question, answer)
+-- VALUES ('How do I reset my password?', 'Use the Forgot Password page and follow the instructions.');
+
+-- FAQ: Update by ID
+-- DECLARE @FaqId BIGINT = 1;
+-- UPDATE faqs
+-- SET question = 'Updated question',
+--     answer = 'Updated answer'
+-- WHERE faq_id = @FaqId;
+
+-- FAQ: Delete by ID
+-- DECLARE @FaqIdToDelete BIGINT = 1;
+-- DELETE FROM faqs
+-- WHERE faq_id = @FaqIdToDelete;
+
+
+-- Tip: Insert
+-- INSERT INTO tips (title, description, icon_class)
+-- VALUES ('Track Progress', 'Regularly check your concern history to monitor updates.', 'fa-chart-line');
+
+-- Tip: Update by ID
+-- DECLARE @TipId BIGINT = 1;
+-- UPDATE tips
+-- SET title = 'Updated tip title',
+--     description = 'Updated tip description',
+--     icon_class = 'fa-circle-info'
+-- WHERE tip_id = @TipId;
+
+-- Tip: Delete by ID
+-- DECLARE @TipIdToDelete BIGINT = 1;
+-- DELETE FROM tips
+-- WHERE tip_id = @TipIdToDelete;
 

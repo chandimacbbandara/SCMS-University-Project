@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Feedback")
+@Table(name = "SCMS_Feedback")
 @Getter
 @Setter
 @NoArgsConstructor

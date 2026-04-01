@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class Notification {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "NotificationID")
     private Integer notificationId;
 

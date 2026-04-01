@@ -593,6 +593,7 @@ public class OwnerController {
         user.setLastName("Admin");
         user.setPassword(passwordEncoder.encode(password));
         user.setRegistrationStatus("APPROVED");
+        assignUserIdIfRequired(user);
         user = userRepository.save(user);
 
         Admin admin = new Admin();
@@ -1397,6 +1398,18 @@ public class OwnerController {
         }
         String trimmed = email.trim();
         return trimmed.isEmpty() ? null : trimmed.toLowerCase();
+    }
+
+    private void assignUserIdIfRequired(User user) {
+        if (user == null || user.getUserId() != null) {
+            return;
+        }
+
+        Integer identityFlag = userRepository.isUserIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            user.setUserId(userRepository.getNextUserId());
+        }
     }
 
     private String normalize(String value) {

@@ -23,6 +23,7 @@ import Project._6.demo.repository.UserRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,7 +142,7 @@ public class StudentRegistrationService {
         user.setEmail(normalizedEmail);
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setRegistrationStatus("PENDING");
-        user = userRepository.save(user);
+        user = saveUserForRegistration(user);
 
         // Create Student linked to the User
         Student student = new Student();
@@ -436,6 +437,77 @@ public class StudentRegistrationService {
         }
         String trimmed = email.trim();
         return trimmed.isEmpty() ? null : trimmed.toLowerCase();
+    }
+
+    private void assignUserIdIfRequired(User user) {
+        if (user == null || user.getUserId() != null) {
+            return;
+        }
+
+        Integer identityFlag = userRepository.isUserIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            user.setUserId(userRepository.getNextUserId());
+        }
+    }
+
+    private User saveUserForRegistration(User user) {
+        final int maxAttempts = 3;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            assignUserIdIfRequired(user);
+            try {
+                return userRepository.saveAndFlush(user);
+            } catch (DataIntegrityViolationException ex) {
+                String message = extractDataIntegrityMessage(ex);
+
+                // Handle duplicated form submissions and race conditions gracefully.
+                if (isDuplicateUserIdViolation(message) && attempt < maxAttempts) {
+                    user.setUserId(null);
+                    continue;
+                }
+
+                if (isDuplicateEmailViolation(message)
+                        || (user.getEmail() != null && userRepository.existsByEmailIgnoreCase(user.getEmail()))) {
+                    throw new RuntimeException("An account with this email already exists.");
+                }
+
+                throw ex;
+            }
+        }
+
+        if (user.getEmail() != null && userRepository.existsByEmailIgnoreCase(user.getEmail())) {
+            throw new RuntimeException("An account with this email already exists.");
+        }
+
+        throw new RuntimeException("Could not complete registration due to a temporary conflict. Please try again.");
+    }
+
+    private String extractDataIntegrityMessage(DataIntegrityViolationException ex) {
+        if (ex.getMostSpecificCause() != null && ex.getMostSpecificCause().getMessage() != null) {
+            return ex.getMostSpecificCause().getMessage();
+        }
+        return ex.getMessage() == null ? "" : ex.getMessage();
+    }
+
+    private boolean isDuplicateUserIdViolation(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.toLowerCase();
+        return normalized.contains("duplicate key")
+                && normalized.contains("[user]")
+                && (normalized.contains("userid") || normalized.contains("pk__user"));
+    }
+
+    private boolean isDuplicateEmailViolation(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.toLowerCase();
+        return normalized.contains("duplicate key")
+                && normalized.contains("[user]")
+                && normalized.contains("email");
     }
 
     private void removeRejectedAccount(Integer userId) {

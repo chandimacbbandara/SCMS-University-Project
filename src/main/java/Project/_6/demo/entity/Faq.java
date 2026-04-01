@@ -9,15 +9,16 @@ public class Faq {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "faq_id")
     private Long faqId;
 
-    @Column(nullable = false, length = 200)
+    @Column(name = "question", nullable = false, length = 200)
     private String question;
 
-    @Column(nullable = false, length = 1000)
+    @Column(name = "answer", nullable = false, length = 1000)
     private String answer;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     // Constructors

@@ -229,6 +229,8 @@ public class AdminService {
             }
         }
 
+        assignReplyIdIfRequired(reply);
+
         // Update concern status
         if (dto.getNewStatus() != null && !dto.getNewStatus().isEmpty()) {
             concern.setStatus(dto.getNewStatus());
@@ -269,6 +271,18 @@ public class AdminService {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         return storedFilename;
+    }
+
+    private void assignReplyIdIfRequired(AdminReply reply) {
+        if (reply == null || reply.getReplyId() != null) {
+            return;
+        }
+
+        Integer identityFlag = adminReplyRepository.isReplyIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            reply.setReplyId(adminReplyRepository.getNextReplyId());
+        }
     }
 
     /**

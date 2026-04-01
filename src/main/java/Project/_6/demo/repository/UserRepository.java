@@ -10,8 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    @Query(value = "SELECT COALESCE(MAX(UserID), 0) + 1 FROM [User]", nativeQuery = true)
+    @Query(value = "SELECT COALESCE(MAX(UserID), 0) + 1 FROM [User] WITH (UPDLOCK, HOLDLOCK)", nativeQuery = true)
     Integer getNextUserId();
+
+    @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.[User]'), 'UserID', 'IsIdentity') AS INT)", nativeQuery = true)
+    Integer isUserIdIdentity();
 
     Optional<User> findByEmailIgnoreCase(String email);
     boolean existsByEmailIgnoreCase(String email);

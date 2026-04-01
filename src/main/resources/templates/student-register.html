@@ -724,6 +724,8 @@
         const sendCodeStatus = document.getElementById('sendCodeStatus');
         const confirmCodeStatus = document.getElementById('confirmCodeStatus');
         const emailVerifiedFlag = document.getElementById('emailVerifiedFlag');
+        const submitBtn = form.querySelector('button[type="submit"]');
+        let submitInProgress = false;
 
         function validatePassword() {
             if (confirmPassword.value && password.value !== confirmPassword.value) {
@@ -814,6 +816,11 @@
         password.addEventListener('input', validatePassword);
 
         form.addEventListener('submit', function(e) {
+            if (submitInProgress) {
+                e.preventDefault();
+                return;
+            }
+
             if (!validatePassword()) {
                 e.preventDefault();
                 confirmPassword.focus();
@@ -824,6 +831,13 @@
                 e.preventDefault();
                 setStatus(confirmCodeStatus, 'Please verify your email code before creating the account.', false);
                 emailCodeInput.focus();
+                return;
+            }
+
+            submitInProgress = true;
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating Account...';
             }
         });
     </script>

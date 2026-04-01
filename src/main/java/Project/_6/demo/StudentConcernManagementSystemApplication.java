@@ -29,21 +29,100 @@ public class StudentConcernManagementSystemApplication {
 		return args -> {
 			// First, ensure the table actually exists before trying to alter it
 			Integer tableCount = jdbcTemplate.queryForObject(
-					"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'Feedback'",
+					"SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'SCMS_Feedback'",
 					Integer.class);
 
 			if (tableCount != null && tableCount > 0) {
 				Integer columnCount = jdbcTemplate.queryForObject(
-						"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'Feedback' AND COLUMN_NAME = 'ReplyID_FK'",
+						"SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'SCMS_Feedback' AND COLUMN_NAME = 'ReplyID_FK'",
 						Integer.class);
 
 				if (columnCount == null || columnCount == 0) {
 					try {
-						jdbcTemplate.execute("ALTER TABLE Feedback ADD ReplyID_FK INT NULL");
+						jdbcTemplate.execute("ALTER TABLE SCMS_Feedback ADD ReplyID_FK INT NULL");
 					} catch (Exception e) {
-						System.out.println("Warning: Could not alter Feedback table: " + e.getMessage());
+						System.out.println("Warning: Could not alter SCMS_Feedback table: " + e.getMessage());
 					}
 				}
+			}
+		};
+	}
+
+	@Bean
+	public CommandLineRunner ensureLegacyFeedbackCompatibility(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			try {
+				if (!tableExists(jdbcTemplate, "feedback")) {
+					return;
+				}
+
+				if (!columnExists(jdbcTemplate, "feedback", "ConcernID_FK")) {
+					jdbcTemplate.execute("ALTER TABLE feedback ADD ConcernID_FK INT NULL");
+				}
+
+				if (tableExists(jdbcTemplate, "SCMS_Feedback") && columnExists(jdbcTemplate, "feedback", "ConcernID_FK")) {
+					if (tableExists(jdbcTemplate, "customers")) {
+						jdbcTemplate.update("""
+								INSERT INTO customers (user_id)
+								SELECT DISTINCT c.StudentID_FK
+								FROM SCMS_Feedback sf
+								INNER JOIN Concern c ON c.ConcernID = sf.ConcernID_FK
+								WHERE c.StudentID_FK IS NOT NULL
+								  AND NOT EXISTS (
+								      SELECT 1 FROM customers cs WHERE cs.user_id = c.StudentID_FK
+								  )
+								""");
+					}
+
+					jdbcTemplate.update("""
+							INSERT INTO feedback (
+							    rating,
+							    comments,
+							    feedback_date,
+							    customer_id,
+							    customer_name,
+							    is_deleted,
+							    is_resolved,
+							    reply,
+							    reply_date,
+							    admin_id,
+							    ReplyID_FK,
+							    created_at,
+							    ConcernID_FK
+							)
+							SELECT
+							    sf.Rating,
+							    sf.Comments,
+							    CAST(COALESCE(sf.submission_time, GETDATE()) AS DATETIME),
+							    COALESCE(c.StudentID_FK, 0),
+							    COALESCE(
+							        NULLIF(LTRIM(RTRIM(COALESCE(u.First_Name, '') + ' ' + COALESCE(u.Last_Name, ''))), ''),
+							        CONCAT('Student ', COALESCE(CAST(c.StudentID_FK AS VARCHAR(20)), '0'))
+							    ),
+							    0,
+							    CASE WHEN c.Status = 'Complete' THEN 1 ELSE 0 END,
+							    ar.Reply_Message,
+							    ar.Reply_Time,
+							    CASE WHEN ar.AdminID_FK IS NULL THEN NULL ELSE CAST(ar.AdminID_FK AS BIGINT) END,
+							    sf.ReplyID_FK,
+							    COALESCE(sf.submission_time, SYSDATETIME()),
+							    sf.ConcernID_FK
+							FROM SCMS_Feedback sf
+							LEFT JOIN Concern c ON c.ConcernID = sf.ConcernID_FK
+							LEFT JOIN Student st ON st.UserID = c.StudentID_FK
+							LEFT JOIN [User] u ON u.UserID = st.UserID
+							LEFT JOIN Admin_reply ar ON ar.ReplyID = sf.ReplyID_FK
+							WHERE sf.ConcernID_FK IS NOT NULL
+							  AND NOT EXISTS (
+							      SELECT 1
+							      FROM feedback f
+							      WHERE f.ConcernID_FK = sf.ConcernID_FK
+							        AND ISNULL(f.is_deleted, 0) = 0
+							  )
+							""");
+				}
+			} catch (Exception e) {
+				System.out.println("Warning: Could not align legacy feedback compatibility: " + e.getMessage());
 			}
 		};
 	}
@@ -166,6 +245,24 @@ public class StudentConcernManagementSystemApplication {
 	}
 
 	@Bean
+	public CommandLineRunner ensureFaqTipCompatibility(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			try {
+				if (tableExists(jdbcTemplate, "tips")) {
+					makeColumnNullable(jdbcTemplate, "tips", "createdAt", "DATETIME2");
+					makeColumnNullable(jdbcTemplate, "tips", "iconClass", "VARCHAR(255)");
+				}
+
+				if (tableExists(jdbcTemplate, "faqs")) {
+					makeColumnNullable(jdbcTemplate, "faqs", "createdAt", "DATETIME2");
+				}
+			} catch (Exception e) {
+				System.out.println("Warning: Could not align FAQ/Tips compatibility columns: " + e.getMessage());
+			}
+		};
+	}
+
+	@Bean
 	public CommandLineRunner removePredefinedAdmin(UserRepository userRepository,
 			AdminRepository adminRepository,
 			AdminReplyRepository adminReplyRepository,
@@ -230,6 +327,12 @@ public class StudentConcernManagementSystemApplication {
 	private void ensureColumn(JdbcTemplate jdbcTemplate, String tableName, String columnName, String definition) {
 		if (!columnExists(jdbcTemplate, tableName, columnName)) {
 			jdbcTemplate.execute("ALTER TABLE " + tableName + " ADD " + columnName + " " + definition);
+		}
+	}
+
+	private void makeColumnNullable(JdbcTemplate jdbcTemplate, String tableName, String columnName, String dataTypeDefinition) {
+		if (columnExists(jdbcTemplate, tableName, columnName)) {
+			jdbcTemplate.execute("ALTER TABLE " + tableName + " ALTER COLUMN " + columnName + " " + dataTypeDefinition + " NULL");
 		}
 	}
 

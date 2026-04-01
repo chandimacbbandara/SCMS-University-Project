@@ -178,6 +178,119 @@
             margin-bottom: 16px;
         }
 
+        .public-note {
+            border: 1px solid #fbd5d4;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fff5f5, #fff);
+            box-shadow: 0 10px 22px rgba(229, 57, 53, 0.08);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .public-note i {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(229, 57, 53, 0.14);
+            color: var(--brand-red);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .public-note strong {
+            display: block;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #991b1b;
+            margin-bottom: 2px;
+        }
+
+        .public-note p {
+            margin: 0;
+            font-size: 13px;
+            color: #5b3b3b;
+            line-height: 1.6;
+        }
+
+        .finder-bar {
+            border: 1px solid var(--brand-border);
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+            padding: 12px;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
+        .finder-input-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid #d8e0eb;
+            border-radius: 12px;
+            background: #f9fbff;
+            padding: 10px 12px;
+        }
+
+        .finder-input-wrap i {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        .finder-input-wrap input {
+            border: none;
+            outline: none;
+            background: transparent;
+            width: 100%;
+            font-family: 'Manrope', 'Segoe UI', Arial, sans-serif;
+            font-size: 14px;
+            color: #1f2937;
+        }
+
+        .finder-input-wrap input::placeholder {
+            color: #94a3b8;
+        }
+
+        .finder-chip-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .finder-chip {
+            border: 1px solid #d1d9e6;
+            border-radius: 999px;
+            background: #fff;
+            color: #475569;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+
+        .finder-chip:hover {
+            border-color: #f0b8b6;
+            color: #b91c1c;
+            background: #fff7f7;
+        }
+
+        .finder-chip.active {
+            background: rgba(229, 57, 53, 0.13);
+            border-color: rgba(229, 57, 53, 0.26);
+            color: #b91c1c;
+        }
+
         .info-card {
             border: 1px solid var(--brand-border);
             border-radius: 14px;
@@ -234,6 +347,27 @@
             padding: 20px 22px;
             border-bottom: 1px solid #eef2f7;
             background: linear-gradient(180deg, #ffffff, #fbfcff);
+        }
+
+        .panel-head-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 2px;
+        }
+
+        .panel-count-pill {
+            flex-shrink: 0;
+            border-radius: 999px;
+            border: 1px solid #d8dee8;
+            background: #fff;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
         }
 
         .panel-kicker {
@@ -408,6 +542,27 @@
             border-top: 1px solid #ecf1f7;
         }
 
+        .panel-filter-empty {
+            display: none;
+            border: 2px dashed #d6dce8;
+            border-radius: 12px;
+            background: #f9fbff;
+            color: #64748b;
+            font-size: 13px;
+            line-height: 1.55;
+            text-align: center;
+            padding: 20px 12px;
+            margin-top: 10px;
+        }
+
+        .panel-filter-empty.visible {
+            display: block;
+        }
+
+        .content-panel.hidden-by-view {
+            display: none;
+        }
+
         @keyframes fadeSlideUp {
             from { opacity: 0; transform: translateY(28px); }
             to   { opacity: 1; transform: translateY(0); }
@@ -450,6 +605,15 @@
             .info-strip,
             .tips-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .finder-bar {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-head-top {
+                flex-direction: column;
+                align-items: flex-start;
             }
 
             .panel-title {
@@ -569,16 +733,42 @@
                 </article>
             </section>
 
+            <section class="public-note animate-in delay-1">
+                <i class="fas fa-earth-asia"></i>
+                <div>
+                    <strong>Public Support Library</strong>
+                    <p>This page is open to everyone. Search by keyword to quickly find relevant guidance before reporting a new issue.</p>
+                </div>
+            </section>
+
+            <section class="finder-bar animate-in delay-2">
+                <label class="finder-input-wrap" for="faqSearchInput">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input id="faqSearchInput" type="search" placeholder="Search tips and FAQs (example: payment, registration, attendance)">
+                </label>
+                <div class="finder-chip-row" role="group" aria-label="Content view filter">
+                    <button type="button" class="finder-chip active" data-view="all">All Content</button>
+                    <button type="button" class="finder-chip" data-view="tips">Tips Only</button>
+                    <button type="button" class="finder-chip" data-view="faqs">FAQs Only</button>
+                </div>
+            </section>
+
             <section class="faq-content-grid animate-in delay-2">
-                <article class="content-panel">
+                <article class="content-panel" id="tipsPanel">
                     <header class="panel-head">
-                        <p class="panel-kicker">Guidance</p>
-                        <h2 class="panel-title"><i class="fas fa-lightbulb"></i> Tips for Better Reports</h2>
+                        <div class="panel-head-top">
+                            <div>
+                                <p class="panel-kicker">Guidance</p>
+                                <h2 class="panel-title"><i class="fas fa-lightbulb"></i> Tips for Better Reports</h2>
+                            </div>
+                            <span class="panel-count-pill" th:text="${tips != null ? #lists.size(tips) : 0} + ' Tips'">0 Tips</span>
+                        </div>
                         <p class="panel-text">Use these recommendations to help admins understand and resolve your concern quickly.</p>
                     </header>
                     <div class="panel-body">
                         <div class="tips-grid">
-                            <div th:each="tip : ${tips}" class="tip-tile">
+                               <div th:each="tip : ${tips}" class="tip-tile"
+                                   th:attr="data-search=${(tip.title != null ? tip.title : '') + ' ' + (tip.description != null ? tip.description : '')}">
                                 <h3>
                                     <span class="tip-icon"><i th:class="'fas ' + ${tip.iconClass}"></i></span>
                                     <span th:text="${tip.title}"></span>
@@ -588,21 +778,28 @@
 
                             <div th:if="${tips == null or #lists.isEmpty(tips)}" class="tips-empty">
                                 <i class="fas fa-ghost"></i>
-                                <p>No tips available at this time.</p>
+                                <p>No tips available right now. Please check back later for updated guidance.</p>
                             </div>
                         </div>
+                        <div class="panel-filter-empty" id="tipsFilterEmpty">No tip matches your search keyword.</div>
                     </div>
                 </article>
 
-                <article class="content-panel">
+                <article class="content-panel" id="faqsPanel">
                     <header class="panel-head">
-                        <p class="panel-kicker">Knowledge</p>
-                        <h2 class="panel-title"><i class="fas fa-circle-question"></i> Frequently Asked Questions</h2>
+                        <div class="panel-head-top">
+                            <div>
+                                <p class="panel-kicker">Knowledge</p>
+                                <h2 class="panel-title"><i class="fas fa-circle-question"></i> Frequently Asked Questions</h2>
+                            </div>
+                            <span class="panel-count-pill" th:text="${faqs != null ? #lists.size(faqs) : 0} + ' FAQs'">0 FAQs</span>
+                        </div>
                         <p class="panel-text">Expand each question to view complete answers from the support team.</p>
                     </header>
                     <div class="panel-body">
                         <div class="faq-accordion">
-                            <div th:each="faq : ${faqs}" class="faq-item">
+                               <div th:each="faq : ${faqs}" class="faq-item"
+                                   th:attr="data-search=${(faq.question != null ? faq.question : '') + ' ' + (faq.answer != null ? faq.answer : '')}">
                                 <div class="faq-question">
                                     <span th:text="${faq.question}"></span>
                                     <i class="fas fa-chevron-down"></i>
@@ -612,9 +809,10 @@
 
                             <div th:if="${faqs == null or #lists.isEmpty(faqs)}" class="faq-empty">
                                 <i class="fas fa-folder-open"></i>
-                                <p>No frequently asked questions have been posted yet.</p>
+                                <p>No published FAQs yet. Please check again after support updates.</p>
                             </div>
                         </div>
+                        <div class="panel-filter-empty" id="faqsFilterEmpty">No FAQ matches your search keyword.</div>
                     </div>
                 </article>
             </section>
@@ -662,16 +860,81 @@
         document.querySelectorAll('.faq-question').forEach(question => {
             question.addEventListener('click', () => {
                 const item = question.parentElement;
-                // Close all others
                 document.querySelectorAll('.faq-item').forEach(otherItem => {
                     if (otherItem !== item) {
                         otherItem.classList.remove('active');
                     }
                 });
-                // Toggle current
                 item.classList.toggle('active');
             });
         });
+
+        // Search + View Filters
+        (function() {
+            const searchInput = document.getElementById('faqSearchInput');
+            const viewButtons = Array.from(document.querySelectorAll('.finder-chip'));
+            const tipsPanel = document.getElementById('tipsPanel');
+            const faqsPanel = document.getElementById('faqsPanel');
+            const tipTiles = Array.from(document.querySelectorAll('.tip-tile[data-search]'));
+            const faqItems = Array.from(document.querySelectorAll('.faq-item[data-search]'));
+            const tipsFilterEmpty = document.getElementById('tipsFilterEmpty');
+            const faqsFilterEmpty = document.getElementById('faqsFilterEmpty');
+            let selectedView = 'all';
+
+            function matchesKeyword(element, keyword) {
+                if (!keyword) return true;
+                return (element.getAttribute('data-search') || '').toLowerCase().includes(keyword);
+            }
+
+            function applyView() {
+                if (!tipsPanel || !faqsPanel) return;
+                tipsPanel.classList.toggle('hidden-by-view', selectedView === 'faqs');
+                faqsPanel.classList.toggle('hidden-by-view', selectedView === 'tips');
+            }
+
+            function applySearch() {
+                const keyword = (searchInput?.value || '').trim().toLowerCase();
+
+                let visibleTips = 0;
+                tipTiles.forEach(tile => {
+                    const show = matchesKeyword(tile, keyword);
+                    tile.style.display = show ? '' : 'none';
+                    if (show) visibleTips++;
+                });
+
+                let visibleFaqs = 0;
+                faqItems.forEach(item => {
+                    const show = matchesKeyword(item, keyword);
+                    item.style.display = show ? '' : 'none';
+                    if (show) visibleFaqs++;
+                });
+
+                if (tipsFilterEmpty) {
+                    const hasTipData = tipTiles.length > 0;
+                    tipsFilterEmpty.classList.toggle('visible', hasTipData && visibleTips === 0);
+                }
+                if (faqsFilterEmpty) {
+                    const hasFaqData = faqItems.length > 0;
+                    faqsFilterEmpty.classList.toggle('visible', hasFaqData && visibleFaqs === 0);
+                }
+            }
+
+            viewButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    selectedView = btn.dataset.view || 'all';
+                    viewButtons.forEach(other => other.classList.remove('active'));
+                    btn.classList.add('active');
+                    applyView();
+                });
+            });
+
+            if (searchInput) {
+                searchInput.addEventListener('input', applySearch);
+            }
+
+            applyView();
+            applySearch();
+        })();
 
         // Notifications Drawer
         function toggleNotifPanel() {

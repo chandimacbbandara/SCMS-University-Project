@@ -1956,9 +1956,14 @@
         window.studentTourConfig = {
             pageId: 'student-dashboard',
             autoStart: true,
-            storageKey: 'akb_student_tour_completed',
+            storageKey: 'akb_student_dashboard_tour_completed',
             nextPage: '/submit-concern',
             steps: [
+                {
+                    selector: 'header .header-content',
+                    title: 'Student Navigation Bar',
+                    content: 'Use this top bar for Home, Dashboard, Report Issue, Community Talk, History, FAQ, profile, and notifications.'
+                },
                 {
                     selector: '.welcome-hero',
                     title: 'Welcome Panel',

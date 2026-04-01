@@ -14,7 +14,6 @@ import java.time.LocalDateTime;
 public class Concern {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ConcernID")
     private Integer concernId;
 

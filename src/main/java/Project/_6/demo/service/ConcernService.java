@@ -72,6 +72,7 @@ public class ConcernService {
         concern.setStatus("Pending");
         concern.setCategory(dto.getCategory());
         concern.setStudent(student);
+        assignConcernIdIfRequired(concern);
 
         Concern saved = concernRepository.save(concern);
 
@@ -188,6 +189,7 @@ public class ConcernService {
         user.setPassword(passwordEncoder.encode("temp_" + UUID.randomUUID().toString().substring(0, 8))); // hashed temporary password
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
+        assignUserIdIfRequired(user);
         user = userRepository.save(user);
 
         // Create the Student linked to the User
@@ -215,5 +217,29 @@ public class ConcernService {
         Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
         return storedFilename;
+    }
+
+    private void assignUserIdIfRequired(User user) {
+        if (user == null || user.getUserId() != null) {
+            return;
+        }
+
+        Integer identityFlag = userRepository.isUserIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            user.setUserId(userRepository.getNextUserId());
+        }
+    }
+
+    private void assignConcernIdIfRequired(Concern concern) {
+        if (concern == null || concern.getConcernId() != null) {
+            return;
+        }
+
+        Integer identityFlag = concernRepository.isConcernIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            concern.setConcernId(concernRepository.getNextConcernId());
+        }
     }
 }

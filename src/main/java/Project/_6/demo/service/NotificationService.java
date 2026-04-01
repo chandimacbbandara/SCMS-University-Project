@@ -27,7 +27,9 @@ public class NotificationService {
     }
 
     private Notification newNotification() {
-        return new Notification();
+        Notification notification = new Notification();
+        assignNotificationIdIfRequired(notification);
+        return notification;
     }
 
     /**
@@ -320,5 +322,17 @@ public class NotificationService {
         return slot.getStartTime().format(EMAIL_TIME_FORMAT)
                 + " - "
                 + slot.getEndTime().format(EMAIL_TIME_FORMAT);
+    }
+
+    private void assignNotificationIdIfRequired(Notification notification) {
+        if (notification == null || notification.getNotificationId() != null) {
+            return;
+        }
+
+        Integer identityFlag = notificationRepository.isNotificationIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            notification.setNotificationId(notificationRepository.getNextNotificationId());
+        }
     }
 }

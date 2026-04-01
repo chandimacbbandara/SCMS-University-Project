@@ -8,12 +8,13 @@
     <link rel="stylesheet" href="/CSS/student-theme.css">
     <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/CSS/student-community.css">
 </head>
 <body class="community-body student-theme">
 <header>
-    <div class="navbar">
-        <div class="logo">
+    <div class="container header-content">
+        <div class="logo-area">
             <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
             <div class="logo-text">
                 <span>Academy of</span>
@@ -55,7 +56,7 @@
     <section class="community-hero">
         <div>
             <h1><i class="fa-solid fa-comments"></i> Student Community Talk</h1>
-            <p>Discuss concerns, get peer support, and keep the space respectful.</p>
+            <p>Discuss concerns, get peer support, and collaborate in a shared community space visible to all students and admins.</p>
         </div>
         <div class="hero-actions">
             <a href="#communityFeedStream" class="official-link secondary"><i class="fa-solid fa-compass"></i> Explore Threads</a>
@@ -75,7 +76,7 @@
             <hr class="side-separator">
             <h3 class="side-heading"><i class="fa-solid fa-circle-info"></i> Quick Note</h3>
             <p class="side-note">
-                Peer replies are community guidance only. For official university decisions, use the concern portal.
+                This shared board can be viewed by all students and admins. For official decisions, always use the concern portal.
             </p>
 
             <hr class="side-separator">
@@ -120,7 +121,7 @@
                 </div>
                 <div class="feed-stats">
                     <span class="stat-chip" th:text="${#lists.size(posts)} + ' Active Posts'">0 Active Posts</span>
-                    <span class="stat-chip soft"><i class="fa-solid fa-users"></i> Peer-to-peer discussion</span>
+                    <span class="stat-chip soft"><i class="fa-solid fa-user-group"></i> Shared with students and admins</span>
                 </div>
             </div>
 
