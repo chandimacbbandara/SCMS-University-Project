@@ -36,6 +36,7 @@ public class ConcernService {
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
     private final AdminReplyRepository adminReplyRepository;
+    private final ConcernPriorityService concernPriorityService;
 
     private static final String UPLOAD_DIR = "uploads/";
     private static final String STATUS_PENDING = "Pending";
@@ -48,13 +49,15 @@ public class ConcernService {
                           UserRepository userRepository,
                           PasswordEncoder passwordEncoder,
                           NotificationService notificationService,
-                          AdminReplyRepository adminReplyRepository) {
+                          AdminReplyRepository adminReplyRepository,
+                          ConcernPriorityService concernPriorityService) {
         this.concernRepository = concernRepository;
         this.studentRepository = studentRepository;
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.notificationService = notificationService;
         this.adminReplyRepository = adminReplyRepository;
+        this.concernPriorityService = concernPriorityService;
     }
 
     @Transactional
@@ -90,6 +93,14 @@ public class ConcernService {
         concern.setEvidencePath(evidencePath);
         concern.setStatus(saveAsDraft ? STATUS_DRAFT : STATUS_PENDING);
         concern.setCategory(dto.getCategory().trim());
+        if (saveAsDraft) {
+            concern.setAiPriorityLevel(null);
+        } else {
+            concern.setAiPriorityLevel(concernPriorityService.predictPriority(
+                    concern.getCategory(),
+                    concern.getSubject(),
+                    concern.getMessage()));
+        }
         concern.setStudent(student);
         assignConcernIdIfRequired(concern);
 
@@ -214,6 +225,10 @@ public class ConcernService {
         concern.setSubject(dto.getSubject().trim());
         concern.setMessage(dto.getMessage().trim());
         concern.setCategory(dto.getCategory().trim());
+        concern.setAiPriorityLevel(concernPriorityService.predictPriority(
+            concern.getCategory(),
+            concern.getSubject(),
+            concern.getMessage()));
 
         if (evidence != null && !evidence.isEmpty()) {
             concern.setEvidencePath(saveEvidence(evidence));
@@ -256,6 +271,15 @@ public class ConcernService {
             concern.setStatus(STATUS_PENDING);
         }
 
+        if (saveAsDraft) {
+            concern.setAiPriorityLevel(null);
+        } else {
+            concern.setAiPriorityLevel(concernPriorityService.predictPriority(
+                    concern.getCategory(),
+                    concern.getSubject(),
+                    concern.getMessage()));
+        }
+
         Concern saved = concernRepository.save(concern);
         if (isDraftConcern && !saveAsDraft) {
             notificationService.notifyConcernSubmitted(saved);
@@ -275,6 +299,10 @@ public class ConcernService {
                 "Draft is incomplete. Please update Subject, Category, and Message before submitting.");
 
         concern.setStatus(STATUS_PENDING);
+        concern.setAiPriorityLevel(concernPriorityService.predictPriority(
+            concern.getCategory(),
+            concern.getSubject(),
+            concern.getMessage()));
         Concern saved = concernRepository.save(concern);
         notificationService.notifyConcernSubmitted(saved);
         return saved;

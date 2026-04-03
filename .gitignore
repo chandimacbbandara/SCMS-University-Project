@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local AI model runtime artifacts
+ai-model/concern-priority/.venv/
+ai-model/concern-priority/__pycache__/
+*.pyc

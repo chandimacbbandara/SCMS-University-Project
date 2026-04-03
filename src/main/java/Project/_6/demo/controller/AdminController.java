@@ -26,6 +26,7 @@ import jakarta.servlet.http.HttpSession;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Locale;
@@ -60,6 +61,8 @@ public class AdminController {
             @RequestParam(value = "status", required = false) String status,
             @RequestParam(value = "timePeriod", required = false) String timePeriod,
             @RequestParam(value = "category", required = false) String category,
+            @RequestParam(value = "priority", required = false) String priority,
+            @RequestParam(value = "prioritySort", required = false) String prioritySort,
             Model model) {
 
         if (!isAdminLoggedIn(session)) {
@@ -93,7 +96,14 @@ public class AdminController {
             to = null;
         }
 
-        List<Concern> concerns = adminService.getFilteredConcerns(status, category, from, to);
+        String selectedPriority = normalizePriorityFilter(priority);
+        String selectedPrioritySort = normalizePrioritySort(prioritySort);
+
+        List<Concern> concerns = adminService.getFilteredConcerns(status, category, from, to).stream()
+            .filter(concern -> isAllPriorities(selectedPriority)
+                || selectedPriority.equalsIgnoreCase(defaultPriority(concern.getAiPriorityLevel())))
+            .toList();
+        concerns = applyPrioritySort(concerns, selectedPrioritySort);
         List<Concern> allConcerns = adminService.getAllConcerns();
 
         long instituteCount = allConcerns.stream().filter(c -> "Institute Problem".equals(c.getCategory())).count();
@@ -106,6 +116,8 @@ public class AdminController {
         model.addAttribute("selectedStatus", status != null ? status : "All");
         model.addAttribute("selectedTimePeriod", timePeriod != null ? timePeriod : "All");
         model.addAttribute("selectedCategory", category != null ? category : "All");
+        model.addAttribute("selectedPriority", selectedPriority);
+        model.addAttribute("selectedPrioritySort", selectedPrioritySort);
         model.addAttribute("instituteCount", instituteCount);
         model.addAttribute("registrationCount", registrationCount);
         model.addAttribute("administrativeCount", administrativeCount);
@@ -563,6 +575,91 @@ public class AdminController {
         String contentType = dto.getContentType() == null ? "reply" : dto.getContentType();
         CommunityModerationResultDTO result = moderationService.moderateLiveText(dto.getMessage(), contentType);
         return ResponseEntity.ok(result);
+    }
+
+    private List<Concern> applyPrioritySort(List<Concern> concerns, String selectedPrioritySort) {
+        if (concerns == null || concerns.isEmpty() || "Default".equalsIgnoreCase(selectedPrioritySort)) {
+            return concerns;
+        }
+
+        if ("LowToHigh".equalsIgnoreCase(selectedPrioritySort)) {
+            return concerns.stream()
+                    .sorted(Comparator.comparingInt((Concern concern) -> lowToHighPriorityRank(concern.getAiPriorityLevel()))
+                            .thenComparing(Concern::getCreatedTime, Comparator.nullsLast(Comparator.reverseOrder())))
+                    .toList();
+        }
+
+        return concerns.stream()
+                .sorted(Comparator.comparingInt((Concern concern) -> highToLowPriorityRank(concern.getAiPriorityLevel()))
+                        .thenComparing(Concern::getCreatedTime, Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+    }
+
+    private int highToLowPriorityRank(String value) {
+        String priority = defaultPriority(value);
+        if ("High".equalsIgnoreCase(priority)) {
+            return 0;
+        }
+        if ("Medium".equalsIgnoreCase(priority)) {
+            return 1;
+        }
+        if ("Low".equalsIgnoreCase(priority)) {
+            return 2;
+        }
+        return 3;
+    }
+
+    private int lowToHighPriorityRank(String value) {
+        String priority = defaultPriority(value);
+        if ("Low".equalsIgnoreCase(priority)) {
+            return 0;
+        }
+        if ("Medium".equalsIgnoreCase(priority)) {
+            return 1;
+        }
+        if ("High".equalsIgnoreCase(priority)) {
+            return 2;
+        }
+        return 3;
+    }
+
+    private String normalizePriorityFilter(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "All";
+        }
+
+        String normalized = value.trim();
+        if ("High".equalsIgnoreCase(normalized)
+                || "Medium".equalsIgnoreCase(normalized)
+                || "Low".equalsIgnoreCase(normalized)) {
+            return normalized;
+        }
+        return "All";
+    }
+
+    private String normalizePrioritySort(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "Default";
+        }
+
+        String normalized = value.trim();
+        if ("HighToLow".equalsIgnoreCase(normalized)
+                || "LowToHigh".equalsIgnoreCase(normalized)
+                || "Default".equalsIgnoreCase(normalized)) {
+            return normalized;
+        }
+        return "Default";
+    }
+
+    private boolean isAllPriorities(String value) {
+        return value == null || value.trim().isEmpty() || "All".equalsIgnoreCase(value.trim());
+    }
+
+    private String defaultPriority(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "Medium";
+        }
+        return value.trim();
     }
 
     /**
