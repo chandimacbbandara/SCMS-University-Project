@@ -21,7 +21,7 @@ public class Feedback {
     @Column(name = "Rating", nullable = false)
     private Integer rating; // 1-5
 
-    @Column(name = "Comments", columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Comments", columnDefinition = "TEXT")
     private String comments;
 
     @Column(name = "submission_time")

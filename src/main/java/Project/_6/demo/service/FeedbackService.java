@@ -71,8 +71,10 @@ public class FeedbackService {
                     .orElseThrow(() -> new RuntimeException("Concern not found."));
         }
 
-        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concern.getConcernId())
-            .orElseThrow(() -> new RuntimeException("Feedback can only be submitted after an admin reply is posted."));
+        AdminReply latestReply = findLatestAdminReply(concern.getConcernId()).orElse(null);
+        if (latestReply == null && !canSubmitMeetingCompletionFeedback(concern)) {
+            throw new RuntimeException("Feedback can only be submitted after an admin reply or after a completed meeting.");
+        }
 
         Feedback feedback = new Feedback();
         feedback.setConcern(concern);
@@ -101,8 +103,8 @@ public class FeedbackService {
             throw new RuntimeException("Feedback can only be updated after a new admin reply is posted.");
         }
 
-        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
-                .orElseThrow(() -> new RuntimeException("No admin reply found for this concern."));
+        AdminReply latestReply = findLatestAdminReply(concernId)
+            .orElseThrow(() -> new RuntimeException("No admin reply found for this concern."));
 
         feedback.setRating(rating);
         feedback.setComments(comments);
@@ -259,11 +261,36 @@ public class FeedbackService {
     }
 
     private boolean hasNewAdminReplyAfterFeedback(LocalDateTime feedbackTime, Integer concernId) {
-        Optional<AdminReply> latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId);
+        Optional<AdminReply> latestReply = findLatestAdminReply(concernId);
         return latestReply.isPresent()
                 && latestReply.get().getReplyTime() != null
                 && feedbackTime != null
                 && latestReply.get().getReplyTime().isAfter(feedbackTime);
+    }
+
+    private Optional<AdminReply> findLatestAdminReply(Integer concernId) {
+        return adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+                .stream()
+                .filter(reply -> !isStudentReply(reply))
+                .findFirst();
+    }
+
+    private boolean isStudentReply(AdminReply reply) {
+        return reply != null
+                && reply.getSenderRole() != null
+                && "STUDENT".equalsIgnoreCase(reply.getSenderRole().trim());
+    }
+
+    private boolean canSubmitMeetingCompletionFeedback(Concern concern) {
+        if (concern == null) {
+            return false;
+        }
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        String meetingStatus = concern.getMeetingStatus() == null ? "" : concern.getMeetingStatus().trim();
+        return "Complete".equalsIgnoreCase(status)
+                && ("MEETING_COMPLETED".equalsIgnoreCase(meetingStatus)
+                || "BOOKED".equalsIgnoreCase(meetingStatus));
     }
 
     private void syncLegacyFeedbackRow(Concern concern,
@@ -298,7 +325,7 @@ public class FeedbackService {
 
             if (legacyFeedbackHasConcernColumn() && concernId != null) {
                 Integer existingLegacyId = jdbcTemplate.query(
-                        "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC",
+                    "SELECT feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC LIMIT 1",
                         rs -> rs.next() ? rs.getInt(1) : null,
                         concernId,
                         customerId);
@@ -365,8 +392,10 @@ public class FeedbackService {
             }
 
             jdbcTemplate.update(
-                    "UPDATE feedback SET is_deleted = 1 WHERE feedback_id = (" +
-                            "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC)",
+                    "UPDATE feedback f JOIN (" +
+                        "SELECT feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC LIMIT 1" +
+                        ") latest ON f.feedback_id = latest.feedback_id " +
+                        "SET f.is_deleted = 1",
                     concernId,
                     studentUserId);
         } catch (Exception e) {

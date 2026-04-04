@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 public class StudentRegistrationService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentRegistrationService.class);
+    private static final long MAX_STUDENT_PHOTO_BYTES = 5L * 1024 * 1024;
 
     private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile(
             "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$"
@@ -151,10 +152,13 @@ public class StudentRegistrationService {
 
         // Save student ID photo
         if (studentIdPhoto != null && !studentIdPhoto.isEmpty()) {
+            if (studentIdPhoto.getSize() > MAX_STUDENT_PHOTO_BYTES) {
+                throw new RuntimeException("Student ID photo is too large. Please upload an image smaller than 5MB.");
+            }
             student.setStudentPhoto(studentIdPhoto.getBytes());
         }
 
-        Student savedStudent = studentRepository.save(student);
+        Student savedStudent = saveStudentForRegistration(student);
 
         try {
             emailVerificationService.sendPendingReviewEmail(
@@ -483,6 +487,18 @@ public class StudentRegistrationService {
         throw new RuntimeException("Could not complete registration due to a temporary conflict. Please try again.");
     }
 
+    private Student saveStudentForRegistration(Student student) {
+        try {
+            return studentRepository.saveAndFlush(student);
+        } catch (DataIntegrityViolationException ex) {
+            String message = extractDataIntegrityMessage(ex);
+            if (isStudentPhotoTooLargeViolation(message)) {
+                throw new RuntimeException("Student ID photo is too large for storage. Please upload a smaller image and try again.");
+            }
+            throw ex;
+        }
+    }
+
     private String extractDataIntegrityMessage(DataIntegrityViolationException ex) {
         if (ex.getMostSpecificCause() != null && ex.getMostSpecificCause().getMessage() != null) {
             return ex.getMostSpecificCause().getMessage();
@@ -508,6 +524,15 @@ public class StudentRegistrationService {
         return normalized.contains("duplicate key")
                 && normalized.contains("[user]")
                 && normalized.contains("email");
+    }
+
+    private boolean isStudentPhotoTooLargeViolation(String message) {
+        if (message == null) {
+            return false;
+        }
+        String normalized = message.toLowerCase();
+        return normalized.contains("data too long")
+                && normalized.contains("studentdphoto");
     }
 
     private void removeRejectedAccount(Integer userId) {

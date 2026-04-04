@@ -150,14 +150,13 @@ def model_priority(model_dir: str, label_encoder: Any, category: str, subject: s
 
     model.eval()
 
-    # Use plain training-style text instead of tagged prompt format.
-    # Most concern classifiers are trained on raw concern text (message/subject),
-    # and tag prefixes can skew predictions toward a single class.
+    # Align with notebook behavior by classifying the concern message text.
+    # Including subject/category caused low-severity concerns to skew to High.
     combined_text = message.strip()
     if not combined_text:
-        combined_text = f"{subject} {category}".strip()
-    elif subject.strip():
-        combined_text = f"{subject.strip()} {combined_text}".strip()
+        combined_text = subject.strip()
+    if not combined_text:
+        combined_text = category.strip()
 
     encoded = tokenizer(
         combined_text,

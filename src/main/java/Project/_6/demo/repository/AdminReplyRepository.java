@@ -13,10 +13,13 @@ public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer>
     @Query(value = "SELECT COALESCE(MAX(ReplyID), 0) + 1 FROM Admin_reply", nativeQuery = true)
     Integer getNextReplyId();
 
-    @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.Admin_reply'), 'ReplyID', 'IsIdentity') AS INT)", nativeQuery = true)
+        @Query(value = "SELECT CASE WHEN EXTRA LIKE '%auto_increment%' THEN 1 ELSE 0 END " +
+            "FROM information_schema.columns " +
+            "WHERE table_schema = DATABASE() AND table_name = 'Admin_reply' AND column_name = 'ReplyID' LIMIT 1", nativeQuery = true)
     Integer isReplyIdIdentity();
 
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
+    List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeAsc(Integer concernId);
     List<AdminReply> findByConcern_ConcernIdIn(List<Integer> concernIds);
     List<AdminReply> findByConcern_Category(String category);
     List<AdminReply> findByAdmin_UserId(Integer adminUserId);

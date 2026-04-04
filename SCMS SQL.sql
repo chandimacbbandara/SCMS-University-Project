@@ -1,4 +1,4 @@
--- 1. User Table (Supertype - Wrapped in brackets because 'User' is reserved)
+-- Active: 1775286114500@@mysql-3c9edaea-scmsuni.a.aivencloud.com@13336@mysql
 CREATE TABLE [User] (
     UserID INT PRIMARY KEY,
     Email VARCHAR(255) UNIQUE NOT NULL,
@@ -228,13 +228,18 @@ CREATE INDEX IDX_MeetingSlot_Proposal ON Concern_Meeting_Slot(ProposalID_FK, Sta
     Verification Queries
     ============================= */
 
-SELECT * FROM [User];
+SELECT DATABASE();
+USE defaultdb;
+SHOW TABLES;
+
+SELECT * FROM Users;
 SELECT * FROM Student;
 SELECT * FROM Admin;
 SELECT * FROM Concern;
 SELECT * FROM Admin_reply;
 SELECT * FROM Feedback;
 SELECT * FROM SCMS_Feedback ORDER BY FeedbackID DESC
+
 SELECT * FROM Notification;
 SELECT * FROM Analytics_Report;
 
@@ -245,6 +250,9 @@ SELECT * FROM Student_Community_Moderation_Log ORDER BY CreatedTime DESC;
 
 SELECT * FROM Concern_Meeting_Proposal ORDER BY Created_Time DESC;
 SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
+
+SELECT * FROM faqs ORDER BY created_at DESC;
+SELECT * FROM tips ORDER BY created_at DESC;
 
 /* =============================
     Draft Concern Query Pack
@@ -283,8 +291,7 @@ SELECT * FROM Concern_Meeting_Slot ORDER BY Start_Time ASC;
 --   AND StudentID_FK = @StudentUserId
 --   AND Status = 'Draft';
 
-SELECT * FROM faqs ORDER BY created_at DESC;
-SELECT * FROM tips ORDER BY created_at DESC;
+
 
 
 

@@ -20,13 +20,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -37,6 +41,8 @@ public class AdminService {
     private static final String STATUS_DRAFT = "Draft";
     private static final String STATUS_REJECTED = "Rejected";
     private static final String STATUS_DELETED = "Deleted";
+    private static final String STATUS_IN_PROGRESS = "In Progress";
+    private static final String STATUS_COMPLETE = "Complete";
 
     private final ConcernRepository concernRepository;
     private final AdminRepository adminRepository;
@@ -44,26 +50,31 @@ public class AdminService {
     private final FeedbackRepository feedbackRepository;
     private final NotificationService notificationService;
     private final ConcernMeetingService concernMeetingService;
+    private final ConcernPriorityService concernPriorityService;
 
     public AdminService(ConcernRepository concernRepository,
                         AdminRepository adminRepository,
                         AdminReplyRepository adminReplyRepository,
                         FeedbackRepository feedbackRepository,
                         NotificationService notificationService,
-                        ConcernMeetingService concernMeetingService) {
+                        ConcernMeetingService concernMeetingService,
+                        ConcernPriorityService concernPriorityService) {
         this.concernRepository = concernRepository;
         this.adminRepository = adminRepository;
         this.adminReplyRepository = adminReplyRepository;
         this.feedbackRepository = feedbackRepository;
         this.notificationService = notificationService;
         this.concernMeetingService = concernMeetingService;
+        this.concernPriorityService = concernPriorityService;
     }
 
     /**
      * Get all concerns ordered by newest first, with Complete at the bottom
      */
     public List<Concern> getAllConcerns() {
-        return sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findAllByOrderByCreatedTimeDesc()));
+        List<Concern> concerns = sortCompleteLast(excludeHiddenConcernStatuses(concernRepository.findAllByOrderByCreatedTimeDesc()));
+        backfillMissingPriorities(concerns);
+        return concerns;
     }
 
     /**
@@ -126,7 +137,49 @@ public class AdminService {
                     .collect(Collectors.toList());
         }
 
-        return sortCompleteLast(excludeHiddenConcernStatuses(concerns));
+        concerns = sortCompleteLast(excludeHiddenConcernStatuses(concerns));
+        backfillMissingPriorities(concerns);
+        return concerns;
+    }
+
+    private void backfillMissingPriorities(List<Concern> concerns) {
+        if (concerns == null || concerns.isEmpty()) {
+            return;
+        }
+
+        boolean hasUpdates = false;
+        for (Concern concern : concerns) {
+            if (concern == null || hasPriority(concern)) {
+                continue;
+            }
+
+            String predicted = concernPriorityService.predictPriority(
+                    concern.getCategory(),
+                    concern.getSubject(),
+                    concern.getMessage());
+            concern.setAiPriorityLevel(predicted);
+            hasUpdates = true;
+        }
+
+        if (hasUpdates) {
+            concernRepository.saveAll(concerns);
+        }
+    }
+
+    private boolean hasPriority(Concern concern) {
+        if (concern == null) {
+            return false;
+        }
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (STATUS_DRAFT.equalsIgnoreCase(status)
+                || STATUS_REJECTED.equalsIgnoreCase(status)
+                || STATUS_DELETED.equalsIgnoreCase(status)) {
+            return true;
+        }
+
+        String value = concern.getAiPriorityLevel();
+        return value != null && !value.trim().isEmpty();
     }
 
     /**
@@ -141,7 +194,54 @@ public class AdminService {
      * Get replies for a specific concern
      */
     public List<AdminReply> getRepliesForConcern(Integer concernId) {
-        return adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId);
+        return adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeAsc(concernId);
+    }
+
+    /**
+     * Get linked concern chain from oldest linked concern up to the current concern.
+     */
+    public List<Concern> getLinkedConcernChain(Integer concernId) {
+        Concern currentConcern = getConcernById(concernId);
+        List<Concern> chain = new ArrayList<>();
+        Set<Integer> visitedConcernIds = new HashSet<>();
+
+        Concern cursor = currentConcern;
+        while (cursor != null && cursor.getConcernId() != null && visitedConcernIds.add(cursor.getConcernId())) {
+            chain.add(cursor);
+            cursor = cursor.getLinkedConcern();
+        }
+
+        Collections.reverse(chain);
+        return chain;
+    }
+
+    /**
+     * Build a merged conversation timeline that includes linked concern history.
+     */
+    public List<AdminReply> getConversationTimelineForConcern(Integer concernId) {
+        List<Concern> concernChain = getLinkedConcernChain(concernId);
+        List<AdminReply> timeline = new ArrayList<>();
+
+        for (Concern chainConcern : concernChain) {
+            timeline.add(buildInitialConcernMessage(chainConcern));
+            timeline.addAll(adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeAsc(chainConcern.getConcernId()));
+        }
+
+        timeline.sort(Comparator
+                .comparing(AdminReply::getReplyTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(reply -> reply.getConcern() != null ? reply.getConcern().getConcernId() : Integer.MAX_VALUE)
+                .thenComparing(reply -> reply.getReplyId() == null ? Integer.MIN_VALUE : reply.getReplyId()));
+
+        return timeline;
+    }
+
+    private AdminReply buildInitialConcernMessage(Concern concern) {
+        AdminReply initialMessage = new AdminReply();
+        initialMessage.setConcern(concern);
+        initialMessage.setSenderRole(AdminReply.ROLE_STUDENT);
+        initialMessage.setReplyMessage(concern.getMessage() == null ? "" : concern.getMessage().trim());
+        initialMessage.setReplyTime(concern.getCreatedTime());
+        return initialMessage;
     }
 
     /**
@@ -156,7 +256,21 @@ public class AdminService {
             throw new RuntimeException("Reply does not belong to concern ID: " + concernId);
         }
 
+        if (isStudentReply(reply)) {
+            throw new RuntimeException("Student chat messages cannot be deleted from admin view.");
+        }
+
+        Concern concern = reply.getConcern();
+        boolean deletingLatestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+                .map(latest -> replyId.equals(latest.getReplyId()))
+                .orElse(false);
+
         adminReplyRepository.delete(reply);
+
+        if (deletingLatestReply && STATUS_COMPLETE.equalsIgnoreCase(concern.getStatus())) {
+            concern.setStatus(STATUS_IN_PROGRESS);
+            concernRepository.save(concern);
+        }
     }
 
     /**
@@ -165,6 +279,12 @@ public class AdminService {
     @Transactional
     public void deleteConcern(Integer concernId) {
         Concern concern = getConcernById(concernId);
+
+        String priority = normalizePriority(concern.getAiPriorityLevel());
+        if (!"Low".equalsIgnoreCase(priority)) {
+            throw new RuntimeException("Only low-priority concerns can be removed from admin dashboard.");
+        }
+
         concern.setStatus(STATUS_REJECTED);
         concernRepository.save(concern);
     }
@@ -219,7 +339,9 @@ public class AdminService {
             throw new RuntimeException("Reply message cannot be empty.");
         }
 
-        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+        AdminReply latestReply = adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId).stream()
+                .filter(reply -> !isStudentReply(reply))
+                .findFirst()
                 .orElseThrow(() -> new RuntimeException("No replies found for concern ID: " + concernId));
 
         if (!replyId.equals(latestReply.getReplyId())) {
@@ -249,6 +371,7 @@ public class AdminService {
         reply.setReplyMessage(dto.getReplyMessage());
         reply.setConcern(concern);
         reply.setAdmin(admin);
+        reply.setSenderRole(AdminReply.ROLE_ADMIN);
 
         if (resolutionFile != null && !resolutionFile.isEmpty()) {
             try {
@@ -264,7 +387,7 @@ public class AdminService {
         if (dto.getNewStatus() != null && !dto.getNewStatus().isEmpty()) {
             concern.setStatus(dto.getNewStatus());
         } else {
-            concern.setStatus("In Progress");
+            concern.setStatus(STATUS_IN_PROGRESS);
         }
 
         // Assign admin to concern if not already assigned
@@ -276,7 +399,7 @@ public class AdminService {
         AdminReply savedReply = adminReplyRepository.save(reply);
 
         // Trigger notification: Step 3 - Concern Complete (when reply is submitted)
-        if ("Complete".equals(concern.getStatus())) {
+        if (STATUS_COMPLETE.equals(concern.getStatus())) {
             notificationService.notifyConcernComplete(concern);
         }
 
@@ -322,7 +445,7 @@ public class AdminService {
         Concern concern = getConcernById(concernId);
         concern.setStatus(status);
 
-        if ("Complete".equalsIgnoreCase(status)) {
+        if (STATUS_COMPLETE.equalsIgnoreCase(status)) {
             if ("BOOKED".equalsIgnoreCase(concern.getMeetingStatus())) {
                 concern.setMeetingStatus("MEETING_COMPLETED");
             }
@@ -331,9 +454,9 @@ public class AdminService {
         Concern saved = concernRepository.save(concern);
 
         // Trigger notification: Step 2 - Concern In Progress (Mark as Read)
-        if ("In Progress".equals(status)) {
+        if (STATUS_IN_PROGRESS.equals(status)) {
             notificationService.notifyConcernInProgress(saved);
-        } else if ("Complete".equals(status)) {
+        } else if (STATUS_COMPLETE.equals(status)) {
             notificationService.notifyConcernComplete(saved);
         }
 
@@ -481,17 +604,37 @@ public class AdminService {
         return STATUS_REJECTED.equalsIgnoreCase(normalized) || STATUS_DELETED.equalsIgnoreCase(normalized);
     }
 
+    private String normalizePriority(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "Medium";
+        }
+
+        String normalized = value.trim();
+        if ("High".equalsIgnoreCase(normalized)
+                || "Medium".equalsIgnoreCase(normalized)
+                || "Low".equalsIgnoreCase(normalized)) {
+            return normalized;
+        }
+        return "Medium";
+    }
+
+    private boolean isStudentReply(AdminReply reply) {
+        return reply != null
+                && reply.getSenderRole() != null
+                && AdminReply.ROLE_STUDENT.equalsIgnoreCase(reply.getSenderRole().trim());
+    }
+
     /**
      * Sort concerns so that Complete ones appear at the bottom of the list
      */
     private List<Concern> sortCompleteLast(List<Concern> concerns) {
         return concerns.stream()
-                .sorted(Comparator.comparing((Concern c) -> "Complete".equals(c.getStatus()) ? 1 : 0)
+                .sorted(Comparator.comparing((Concern c) -> STATUS_COMPLETE.equals(c.getStatus()) ? 1 : 0)
                         .thenComparing(Comparator.comparing(Concern::getCreatedTime).reversed()))
                 .collect(Collectors.toList());
     }
 
     private boolean isInProgressBucket(String status) {
-        return "In Progress".equalsIgnoreCase(status);
+        return STATUS_IN_PROGRESS.equalsIgnoreCase(status);
     }
 }

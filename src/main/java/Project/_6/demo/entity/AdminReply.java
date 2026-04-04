@@ -13,11 +13,14 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class AdminReply {
 
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_STUDENT = "STUDENT";
+
     @Id
     @Column(name = "ReplyID")
     private Integer replyId;
 
-    @Column(name = "Reply_Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Reply_Message", nullable = false, columnDefinition = "TEXT")
     private String replyMessage;
 
     @Column(name = "Resolution_Screenshot", length = 500)
@@ -25,6 +28,9 @@ public class AdminReply {
 
     @Column(name = "Reply_Time")
     private LocalDateTime replyTime;
+
+    @Column(name = "Sender_Role", length = 20)
+    private String senderRole;
 
     @ManyToOne
     @JoinColumn(name = "AdminID_FK")
@@ -37,5 +43,8 @@ public class AdminReply {
     @PrePersist
     protected void onCreate() {
         this.replyTime = LocalDateTime.now();
+        if (this.senderRole == null || this.senderRole.isBlank()) {
+            this.senderRole = ROLE_ADMIN;
+        }
     }
 }

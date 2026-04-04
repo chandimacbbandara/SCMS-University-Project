@@ -1128,9 +1128,10 @@
                                         <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">
                                             <i class="fas fa-arrow-right"></i> VIEW
                                         </a>
-                                        <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
+                                        <form th:if="${concern.aiPriorityLevel != null and #strings.equalsIgnoreCase(concern.aiPriorityLevel, 'Low')}"
+                                              th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
                                               method="post"
-                                              onsubmit="return confirm('Delete this concern and related replies/feedback?');">
+                                              onsubmit="return confirm('Remove this low-priority concern from admin dashboard?');">
                                             <input type="hidden" name="redirectTo" value="dashboard" />
                                             <button type="submit" class="delete-btn">
                                                 <i class="fas fa-trash"></i> DELETE

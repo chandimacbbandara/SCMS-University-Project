@@ -21,7 +21,7 @@ public class StudentCommunityPost {
     @Column(name = "Title", nullable = false, length = 160)
     private String title;
 
-    @Column(name = "Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "Category", nullable = false, length = 80)

@@ -20,7 +20,7 @@ public class Notification {
     @Column(name = "Title", length = 255)
     private String title;
 
-    @Column(name = "Message", columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Message", columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "Type", length = 50)
@@ -51,7 +51,9 @@ public class Notification {
 
     @PrePersist
     protected void onCreate() {
-        this.sentTime = LocalDateTime.now();
+        if (this.sentTime == null) {
+            this.sentTime = LocalDateTime.now();
+        }
         if (this.isRead == null) {
             this.isRead = false;
         }

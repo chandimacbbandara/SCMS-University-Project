@@ -14,7 +14,9 @@ public interface NotificationRepository extends JpaRepository<Notification, Inte
     @Query(value = "SELECT COALESCE(MAX(NotificationID), 0) + 1 FROM Notification", nativeQuery = true)
     Integer getNextNotificationId();
 
-    @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.Notification'), 'NotificationID', 'IsIdentity') AS INT)", nativeQuery = true)
+        @Query(value = "SELECT CASE WHEN EXTRA LIKE '%auto_increment%' THEN 1 ELSE 0 END " +
+            "FROM information_schema.columns " +
+            "WHERE table_schema = DATABASE() AND table_name = 'Notification' AND column_name = 'NotificationID' LIMIT 1", nativeQuery = true)
     Integer isNotificationIdIdentity();
 
     List<Notification> findByStudent_UserIdAndIsHiddenFalseOrderBySentTimeDesc(Integer userId);
