@@ -5,6 +5,8 @@ import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Notification;
 import Project._6.demo.entity.Student;
+import Project._6.demo.entity.StudentCommunityPost;
+import Project._6.demo.entity.StudentCommunityReply;
 import Project._6.demo.repository.NotificationRepository;
 import Project._6.demo.repository.StudentRepository;
 
@@ -189,6 +191,72 @@ public class NotificationService {
         CompletableFuture.runAsync(() -> {
             emailVerificationService.sendConcernDepartmentChangedEmail(concern, previousDepartment, newDepartment);
         });
+    }
+
+    @Transactional
+    public Notification notifyCommunityReplyReceived(StudentCommunityPost post, StudentCommunityReply reply) {
+        if (post == null || post.getStudent() == null || post.getStudent().getUserId() == null) {
+            return null;
+        }
+
+        Integer postOwnerUserId = post.getStudent().getUserId();
+        Integer replierUserId = (reply != null && reply.getStudent() != null) ? reply.getStudent().getUserId() : null;
+        if (replierUserId != null && replierUserId.equals(postOwnerUserId)) {
+            return null;
+        }
+
+        Notification notification = newNotification();
+        notification.setTitle("New Reply On Your Community Post");
+        notification.setMessage("Your community post \""
+                + (post.getTitle() == null ? "Untitled" : post.getTitle())
+                + "\" received a new reply. Open Community Talk to view it.");
+        notification.setType("COMMUNITY_REPLY");
+        notification.setStudent(post.getStudent());
+        notification.setConcern(null);
+        Notification saved = notificationRepository.save(notification);
+
+        emailVerificationService.sendCommunityReplyNotificationEmail(post, reply);
+        return saved;
+    }
+
+    @Transactional
+    public Notification notifyCommunityPostDeletedByAdmin(StudentCommunityPost post, String reason) {
+        if (post == null || post.getStudent() == null || post.getStudent().getUserId() == null) {
+            return null;
+        }
+
+        Notification notification = newNotification();
+        notification.setTitle("Community Post Removed By Moderator");
+        notification.setMessage("Your community post \""
+                + (post.getTitle() == null ? "Untitled" : post.getTitle())
+                + "\" was removed by a moderator."
+                + (reason == null || reason.trim().isEmpty() ? "" : " Reason: " + reason.trim()));
+        notification.setType("COMMUNITY_POST_REMOVED");
+        notification.setStudent(post.getStudent());
+        notification.setConcern(null);
+        Notification saved = notificationRepository.save(notification);
+
+        emailVerificationService.sendCommunityPostRemovedEmail(post, reason);
+        return saved;
+    }
+
+    @Transactional
+    public Notification notifyCommunityReplyDeletedByAdmin(StudentCommunityReply reply, String reason) {
+        if (reply == null || reply.getStudent() == null || reply.getStudent().getUserId() == null) {
+            return null;
+        }
+
+        Notification notification = newNotification();
+        notification.setTitle("Community Reply Removed By Moderator");
+        notification.setMessage("One of your community replies was removed by a moderator."
+                + (reason == null || reason.trim().isEmpty() ? "" : " Reason: " + reason.trim()));
+        notification.setType("COMMUNITY_REPLY_REMOVED");
+        notification.setStudent(reply.getStudent());
+        notification.setConcern(null);
+        Notification saved = notificationRepository.save(notification);
+
+        emailVerificationService.sendCommunityReplyRemovedEmail(reply, reason);
+        return saved;
     }
 
     /**

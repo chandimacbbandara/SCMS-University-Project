@@ -51,6 +51,8 @@ public class ConcernController {
         var student = concernService.getStudentByUserId(userId);
         model.addAttribute("concernDTO", new ConcernSubmissionDTO());
         model.addAttribute("loggedStudent", student);
+        model.addAttribute("linkableConcerns", concernService.getLinkableConcernsForStudent(userId, null));
+        model.addAttribute("linkedConcern", null);
         model.addAttribute("isEdit", false);
         model.addAttribute("isDraftConcern", false);
         model.addAttribute("draftEnabled", true);
@@ -86,9 +88,14 @@ public class ConcernController {
             concernDTO.setCategory(concern.getCategory());
             concernDTO.setSubject(concern.getSubject());
             concernDTO.setMessage(concern.getMessage());
+            concernDTO.setLinkedConcernId(concern.getLinkedConcern() != null
+                    ? concern.getLinkedConcern().getConcernId()
+                    : null);
 
             model.addAttribute("concernDTO", concernDTO);
             model.addAttribute("loggedStudent", student);
+            model.addAttribute("linkableConcerns", concernService.getLinkableConcernsForStudent(userId, concernId));
+            model.addAttribute("linkedConcern", concern.getLinkedConcern());
             model.addAttribute("isEdit", true);
             model.addAttribute("isDraftConcern", isDraftConcern);
             model.addAttribute("draftEnabled", isDraftConcern);
@@ -312,6 +319,53 @@ public class ConcernController {
             concernMeetingService.declineMeetingSlots(concernId, proposalId, studentUserId, reason);
             redirectAttributes.addFlashAttribute("successMessage",
                     "You requested new meeting slots. Concern status moved back to Pending until admin shares another schedule.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/concern/{id}/chat")
+    public String sendConcernChatMessage(@PathVariable("id") Integer concernId,
+                                         @RequestParam("message") String message,
+                                         HttpSession session,
+                                         RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        if (studentUserId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            concernService.addStudentChatMessage(concernId, studentUserId, message);
+            redirectAttributes.addFlashAttribute("successMessage", "Message sent to admin successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/student/concern-history";
+    }
+
+    @PostMapping("/student/concern/{id}/complete")
+    public String markConcernCompleteByStudent(@PathVariable("id") Integer concernId,
+                                               HttpSession session,
+                                               RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer studentUserId = (Integer) session.getAttribute("studentUserId");
+        if (studentUserId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            concernService.markConcernCompleteByStudent(concernId, studentUserId);
+            redirectAttributes.addFlashAttribute("successMessage", "Concern marked as complete.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

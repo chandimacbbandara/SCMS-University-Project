@@ -58,6 +58,10 @@ public class Concern {
     @JoinColumn(name = "AdminID_FK")
     private Admin admin;
 
+    @ManyToOne
+    @JoinColumn(name = "Linked_ConcernID_FK")
+    private Concern linkedConcern;
+
     @PrePersist
     protected void onCreate() {
         this.createdTime = LocalDateTime.now();

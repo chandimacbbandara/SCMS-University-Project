@@ -43,6 +43,9 @@ public class ConcernService {
     private static final String STATUS_DRAFT = "Draft";
     private static final String STATUS_REJECTED = "Rejected";
     private static final String STATUS_DELETED = "Deleted";
+    private static final String STATUS_IN_PROGRESS = "In Progress";
+    private static final String STATUS_MEETING_SCHEDULED = "Meeting Scheduled";
+    private static final String STATUS_COMPLETE = "Complete";
 
     public ConcernService(ConcernRepository concernRepository,
                           StudentRepository studentRepository,
@@ -81,6 +84,7 @@ public class ConcernService {
                         : "Please fill in Subject, Category, and Message.");
 
         Student student = findOrCreateStudent(dto);
+        Concern linkedConcern = resolveLinkedConcern(dto.getLinkedConcernId(), student.getUserId(), null);
 
         String evidencePath = null;
         if (evidence != null && !evidence.isEmpty()) {
@@ -102,6 +106,7 @@ public class ConcernService {
                     concern.getMessage()));
         }
         concern.setStudent(student);
+        concern.setLinkedConcern(linkedConcern);
         assignConcernIdIfRequired(concern);
 
         return concernRepository.save(concern);
@@ -156,15 +161,87 @@ public class ConcernService {
     }
 
     /**
+     * Get previous concerns that can be linked to a newly submitted concern.
+     */
+    @Transactional(readOnly = true)
+    public List<Concern> getLinkableConcernsForStudent(Integer userId, Integer excludeConcernId) {
+        Student student = studentRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Student not found"));
+
+        return concernRepository.findByStudent_StudentId(student.getStudentId()).stream()
+                .filter(concern -> concern != null && concern.getConcernId() != null)
+                .filter(concern -> excludeConcernId == null || !excludeConcernId.equals(concern.getConcernId()))
+                .filter(concern -> concern.getStatus() == null
+                        || !isStatusUnavailableForLinking(concern.getStatus().trim()))
+                .sorted(Comparator.comparing(Concern::getCreatedTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())))
+                .toList();
+    }
+
+    /**
      * Build a map of concernId -> List<AdminReply> for a list of concerns.
      */
     public Map<Integer, List<AdminReply>> getRepliesMap(List<Concern> concerns) {
         Map<Integer, List<AdminReply>> map = new HashMap<>();
         for (Concern c : concerns) {
             map.put(c.getConcernId(),
-                    adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(c.getConcernId()));
+                    adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeAsc(c.getConcernId()));
         }
         return map;
+    }
+
+    @Transactional
+    public AdminReply addStudentChatMessage(Integer concernId, Integer studentUserId, String message) {
+        Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        if (STATUS_DRAFT.equalsIgnoreCase(status)
+                || STATUS_REJECTED.equalsIgnoreCase(status)
+                || STATUS_DELETED.equalsIgnoreCase(status)
+                || STATUS_COMPLETE.equalsIgnoreCase(status)) {
+            throw new RuntimeException("This concern is closed for new chat messages.");
+        }
+
+        String normalizedMessage = message == null ? "" : message.trim().replaceAll("\\s+", " ");
+        if (normalizedMessage.isEmpty()) {
+            throw new RuntimeException("Message cannot be empty.");
+        }
+        if (normalizedMessage.length() > 1200) {
+            throw new RuntimeException("Message is too long. Maximum 1200 characters.");
+        }
+
+        AdminReply reply = new AdminReply();
+        reply.setConcern(concern);
+        reply.setAdmin(null);
+        reply.setSenderRole(AdminReply.ROLE_STUDENT);
+        reply.setReplyMessage(normalizedMessage);
+        assignReplyIdIfRequired(reply);
+        return adminReplyRepository.save(reply);
+    }
+
+    @Transactional
+    public Concern markConcernCompleteByStudent(Integer concernId, Integer studentUserId) {
+        Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Concern not found or access denied."));
+
+        String status = concern.getStatus() == null ? "" : concern.getStatus().trim();
+        String meetingStatus = concern.getMeetingStatus() == null ? "" : concern.getMeetingStatus().trim();
+        boolean canComplete = STATUS_PENDING.equalsIgnoreCase(status)
+                || STATUS_IN_PROGRESS.equalsIgnoreCase(status)
+                || STATUS_MEETING_SCHEDULED.equalsIgnoreCase(status);
+
+        if (!canComplete) {
+            throw new RuntimeException("This concern cannot be marked complete right now.");
+        }
+
+        if ("BOOKED".equalsIgnoreCase(meetingStatus)) {
+            throw new RuntimeException("You cannot mark this concern as complete while a meeting is booked.");
+        }
+
+        concern.setStatus(STATUS_COMPLETE);
+
+        return concernRepository.save(concern);
     }
 
     /**
@@ -353,6 +430,34 @@ public class ConcernService {
                 || STATUS_DELETED.equalsIgnoreCase(status);
     }
 
+    private Concern resolveLinkedConcern(Integer linkedConcernId,
+                                         Integer studentUserId,
+                                         Integer currentConcernId) {
+        if (linkedConcernId == null) {
+            return null;
+        }
+
+        if (currentConcernId != null && linkedConcernId.equals(currentConcernId)) {
+            throw new RuntimeException("A concern cannot be linked to itself.");
+        }
+
+        Concern linkedConcern = concernRepository.findByConcernIdAndStudent_UserId(linkedConcernId, studentUserId)
+                .orElseThrow(() -> new RuntimeException("Selected linked concern was not found for this student."));
+
+        String linkedStatus = linkedConcern.getStatus() == null ? "" : linkedConcern.getStatus().trim();
+        if (isStatusUnavailableForLinking(linkedStatus)) {
+            throw new RuntimeException("Selected linked concern is not eligible for linking.");
+        }
+
+        return linkedConcern;
+    }
+
+    private boolean isStatusUnavailableForLinking(String status) {
+        return STATUS_DRAFT.equalsIgnoreCase(status)
+                || STATUS_REJECTED.equalsIgnoreCase(status)
+                || STATUS_DELETED.equalsIgnoreCase(status);
+    }
+
     private Student findOrCreateStudent(ConcernSubmissionDTO dto) {
         Optional<Student> existingStudent = studentRepository.findByStudentId(dto.getStudentId());
 
@@ -417,6 +522,18 @@ public class ConcernService {
         boolean isIdentity = identityFlag != null && identityFlag == 1;
         if (!isIdentity) {
             concern.setConcernId(concernRepository.getNextConcernId());
+        }
+    }
+
+    private void assignReplyIdIfRequired(AdminReply reply) {
+        if (reply == null || reply.getReplyId() != null) {
+            return;
+        }
+
+        Integer identityFlag = adminReplyRepository.isReplyIdIdentity();
+        boolean isIdentity = identityFlag != null && identityFlag == 1;
+        if (!isIdentity) {
+            reply.setReplyId(adminReplyRepository.getNextReplyId());
         }
     }
 }

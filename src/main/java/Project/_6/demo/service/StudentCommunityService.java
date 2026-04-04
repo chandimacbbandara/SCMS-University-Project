@@ -26,19 +26,22 @@ public class StudentCommunityService {
     private final StudentCommunityRulesAcceptanceRepository rulesAcceptanceRepository;
     private final StudentCommunityModerationLogRepository moderationLogRepository;
     private final CommunityModerationService moderationService;
+    private final NotificationService notificationService;
 
     public StudentCommunityService(StudentRepository studentRepository,
                                    StudentCommunityPostRepository postRepository,
                                    StudentCommunityReplyRepository replyRepository,
                                    StudentCommunityRulesAcceptanceRepository rulesAcceptanceRepository,
                                    StudentCommunityModerationLogRepository moderationLogRepository,
-                                   CommunityModerationService moderationService) {
+                                   CommunityModerationService moderationService,
+                                   NotificationService notificationService) {
         this.studentRepository = studentRepository;
         this.postRepository = postRepository;
         this.replyRepository = replyRepository;
         this.rulesAcceptanceRepository = rulesAcceptanceRepository;
         this.moderationLogRepository = moderationLogRepository;
         this.moderationService = moderationService;
+        this.notificationService = notificationService;
     }
 
     public boolean hasAcceptedRules(Integer userId) {
@@ -135,6 +138,7 @@ public class StudentCommunityService {
         post.setStatus("DELETED_BY_MODERATOR");
         // You can save the reason in a log if needed
         postRepository.save(post);
+        notificationService.notifyCommunityPostDeletedByAdmin(post, reason);
     }
 
     @Transactional
@@ -161,7 +165,8 @@ public class StudentCommunityService {
         reply.setStudent(student);
         reply.setMessage(dto.getMessage().trim());
         reply.setStatus("ACTIVE");
-        replyRepository.save(reply);
+        StudentCommunityReply savedReply = replyRepository.save(reply);
+        notificationService.notifyCommunityReplyReceived(post, savedReply);
     }
 
     @Transactional
@@ -196,6 +201,7 @@ public class StudentCommunityService {
                 .orElseThrow(() -> new IllegalArgumentException("Reply not found."));
         reply.setStatus("DELETED_BY_MODERATOR");
         replyRepository.save(reply);
+        notificationService.notifyCommunityReplyDeletedByAdmin(reply, reason);
     }
 
     @Transactional
@@ -216,7 +222,8 @@ public class StudentCommunityService {
         reply.setMessage(message.trim());
         reply.setStatus("ACTIVE");
         reply.setAdminName(adminUsername != null ? adminUsername : "Admin");
-        replyRepository.save(reply);
+        StudentCommunityReply savedReply = replyRepository.save(reply);
+        notificationService.notifyCommunityReplyReceived(post, savedReply);
     }
 
     @Transactional

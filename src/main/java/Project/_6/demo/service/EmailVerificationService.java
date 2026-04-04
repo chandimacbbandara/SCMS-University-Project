@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
+import Project._6.demo.entity.StudentCommunityPost;
+import Project._6.demo.entity.StudentCommunityReply;
 import jakarta.mail.internet.MimeMessage;
 
 import java.time.format.DateTimeFormatter;
@@ -662,6 +664,135 @@ public class EmailVerificationService {
             sendEmailHtml(toEmail, subject, html);
         } catch (Exception ex) {
             System.err.println("Failed to send decline email to admin: " + ex.getMessage());
+        }
+    }
+
+    public void sendCommunityReplyNotificationEmail(StudentCommunityPost post, StudentCommunityReply reply) {
+        try {
+            if (post == null
+                    || post.getStudent() == null
+                    || post.getStudent().getUser() == null
+                    || post.getStudent().getUser().getEmail() == null) {
+                return;
+            }
+
+            String toEmail = post.getStudent().getUser().getEmail();
+            String displayName = safeName(post.getStudent().getUser().getFirstName(), post.getStudent().getUser().getLastName());
+            String postTitle = post.getTitle() == null || post.getTitle().isBlank() ? "Untitled" : post.getTitle().trim();
+
+            String replier = "Someone";
+            if (reply != null && reply.getStudent() != null && reply.getStudent().getUser() != null) {
+                replier = safeName(reply.getStudent().getUser().getFirstName(), reply.getStudent().getUser().getLastName());
+            } else if (reply != null && reply.getAdminName() != null && !reply.getAdminName().isBlank()) {
+                replier = reply.getAdminName().trim() + " (Admin)";
+            }
+
+            String subject = "New Reply On Your Community Post";
+            String html = """
+                    <div style=\"font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;\">
+                        <div style=\"background: #b91c1c; color: #ffffff; padding: 18px 24px;\">
+                            <h2 style=\"margin: 0; font-size: 22px;\">Academy of Knowledge Bridge</h2>
+                            <p style=\"margin: 6px 0 0 0; font-size: 13px; opacity: 0.95;\">Student Concern Management System</p>
+                        </div>
+                        <div style=\"padding: 22px 24px; color: #111827;\">
+                            <img src=\"cid:brandLogo\" alt=\"Institute Logo\" style=\"width: 84px; height: 84px; object-fit: cover; border-radius: 10px; margin-bottom: 14px;\" />
+                            <p style=\"margin: 0 0 12px 0;\">Hello %s,</p>
+                            <p style=\"margin: 0 0 10px 0; font-weight: 700; color: #2563eb;\">Your community post received a new reply.</p>
+                            <p style=\"margin: 0 0 8px 0;\">Post: <strong>%s</strong></p>
+                            <p style=\"margin: 0 0 12px 0;\">Replied by: <strong>%s</strong></p>
+                            <p style=\"margin: 0;\">Please log in to SCMS and open Community Talk to view the full reply.</p>
+                        </div>
+                    </div>
+                    """.formatted(
+                    escapeHtml(displayName),
+                    escapeHtml(postTitle),
+                    escapeHtml(replier)
+            );
+
+            sendEmailHtml(toEmail, subject, html);
+        } catch (Exception ex) {
+            System.err.println("Failed to send community reply email: " + ex.getMessage());
+        }
+    }
+
+    public void sendCommunityPostRemovedEmail(StudentCommunityPost post, String reason) {
+        try {
+            if (post == null
+                    || post.getStudent() == null
+                    || post.getStudent().getUser() == null
+                    || post.getStudent().getUser().getEmail() == null) {
+                return;
+            }
+
+            String toEmail = post.getStudent().getUser().getEmail();
+            String displayName = safeName(post.getStudent().getUser().getFirstName(), post.getStudent().getUser().getLastName());
+            String postTitle = post.getTitle() == null || post.getTitle().isBlank() ? "Untitled" : post.getTitle().trim();
+            String reasonText = reason == null || reason.trim().isEmpty() ? "No specific reason provided." : reason.trim();
+
+            String subject = "Community Post Removed By Moderator";
+            String html = """
+                    <div style=\"font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;\">
+                        <div style=\"background: #b91c1c; color: #ffffff; padding: 18px 24px;\">
+                            <h2 style=\"margin: 0; font-size: 22px;\">Academy of Knowledge Bridge</h2>
+                            <p style=\"margin: 6px 0 0 0; font-size: 13px; opacity: 0.95;\">Student Concern Management System</p>
+                        </div>
+                        <div style=\"padding: 22px 24px; color: #111827;\">
+                            <img src=\"cid:brandLogo\" alt=\"Institute Logo\" style=\"width: 84px; height: 84px; object-fit: cover; border-radius: 10px; margin-bottom: 14px;\" />
+                            <p style=\"margin: 0 0 12px 0;\">Hello %s,</p>
+                            <p style=\"margin: 0 0 10px 0; font-weight: 700; color: #b91c1c;\">Your community post was removed by a moderator.</p>
+                            <p style=\"margin: 0 0 8px 0;\">Post: <strong>%s</strong></p>
+                            <p style=\"margin: 0 0 12px 0;\">Reason: <strong>%s</strong></p>
+                            <p style=\"margin: 0;\">Please follow community guidelines when posting in Community Talk.</p>
+                        </div>
+                    </div>
+                    """.formatted(
+                    escapeHtml(displayName),
+                    escapeHtml(postTitle),
+                    escapeHtml(reasonText)
+            );
+
+            sendEmailHtml(toEmail, subject, html);
+        } catch (Exception ex) {
+            System.err.println("Failed to send community post removed email: " + ex.getMessage());
+        }
+    }
+
+    public void sendCommunityReplyRemovedEmail(StudentCommunityReply reply, String reason) {
+        try {
+            if (reply == null
+                    || reply.getStudent() == null
+                    || reply.getStudent().getUser() == null
+                    || reply.getStudent().getUser().getEmail() == null) {
+                return;
+            }
+
+            String toEmail = reply.getStudent().getUser().getEmail();
+            String displayName = safeName(reply.getStudent().getUser().getFirstName(), reply.getStudent().getUser().getLastName());
+            String reasonText = reason == null || reason.trim().isEmpty() ? "No specific reason provided." : reason.trim();
+
+            String subject = "Community Reply Removed By Moderator";
+            String html = """
+                    <div style=\"font-family: Arial, sans-serif; max-width: 680px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;\">
+                        <div style=\"background: #b91c1c; color: #ffffff; padding: 18px 24px;\">
+                            <h2 style=\"margin: 0; font-size: 22px;\">Academy of Knowledge Bridge</h2>
+                            <p style=\"margin: 6px 0 0 0; font-size: 13px; opacity: 0.95;\">Student Concern Management System</p>
+                        </div>
+                        <div style=\"padding: 22px 24px; color: #111827;\">
+                            <img src=\"cid:brandLogo\" alt=\"Institute Logo\" style=\"width: 84px; height: 84px; object-fit: cover; border-radius: 10px; margin-bottom: 14px;\" />
+                            <p style=\"margin: 0 0 12px 0;\">Hello %s,</p>
+                            <p style=\"margin: 0 0 10px 0; font-weight: 700; color: #b91c1c;\">One of your community replies was removed by a moderator.</p>
+                            <p style=\"margin: 0 0 12px 0;\">Reason: <strong>%s</strong></p>
+                            <p style=\"margin: 0;\">Please follow community guidelines when participating in Community Talk.</p>
+                        </div>
+                    </div>
+                    """.formatted(
+                    escapeHtml(displayName),
+                    escapeHtml(reasonText)
+            );
+
+            sendEmailHtml(toEmail, subject, html);
+        } catch (Exception ex) {
+            System.err.println("Failed to send community reply removed email: " + ex.getMessage());
         }
     }
 

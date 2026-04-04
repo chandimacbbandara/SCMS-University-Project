@@ -15,4 +15,5 @@ public class ConcernSubmissionDTO {
     private String subject;
     private String message;
     private String category;
+    private Integer linkedConcernId;
 }

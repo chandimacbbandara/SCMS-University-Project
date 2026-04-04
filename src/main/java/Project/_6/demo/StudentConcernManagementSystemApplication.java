@@ -25,6 +25,19 @@ public class StudentConcernManagementSystemApplication {
 	}
 
 	@Bean
+	public CommandLineRunner ensureAdminReplySenderRoleColumn(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			try {
+				if (tableExists(jdbcTemplate, "Admin_reply")) {
+					ensureColumn(jdbcTemplate, "Admin_reply", "Sender_Role", "VARCHAR(20) NULL");
+				}
+			} catch (Exception e) {
+				System.out.println("Warning: Could not ensure Admin_reply sender role column: " + e.getMessage());
+			}
+		};
+	}
+
+	@Bean
 	public CommandLineRunner ensureFeedbackReplyColumn(JdbcTemplate jdbcTemplate) {
 		return args -> {
 			// First, ensure the table actually exists before trying to alter it
@@ -253,6 +266,34 @@ public class StudentConcernManagementSystemApplication {
 				}
 			} catch (Exception e) {
 				System.out.println("Warning: Could not ensure concern meeting schema: " + e.getMessage());
+			}
+		};
+	}
+
+	@Bean
+	public CommandLineRunner ensureConcernLinkedReferenceSchema(JdbcTemplate jdbcTemplate) {
+		return args -> {
+			try {
+				if (!tableExists(jdbcTemplate, "Concern")) {
+					return;
+				}
+
+				ensureColumn(jdbcTemplate, "Concern", "Linked_ConcernID_FK", "INT NULL");
+
+				if (!indexExists(jdbcTemplate, "Concern", "IDX_Concern_LinkedConcern")) {
+					jdbcTemplate.execute("CREATE INDEX IDX_Concern_LinkedConcern ON Concern(Linked_ConcernID_FK)");
+				}
+
+				if (!constraintExists(jdbcTemplate, "FK_Concern_LinkedConcern")) {
+					jdbcTemplate.execute("""
+							ALTER TABLE Concern
+							ADD CONSTRAINT FK_Concern_LinkedConcern
+							FOREIGN KEY (Linked_ConcernID_FK) REFERENCES Concern(ConcernID)
+							ON DELETE SET NULL
+							""");
+				}
+			} catch (Exception e) {
+				System.out.println("Warning: Could not ensure linked concern schema compatibility: " + e.getMessage());
 			}
 		};
 	}

@@ -165,21 +165,41 @@ public class AdminController {
     }
 
     @GetMapping("/edu-dashboard")
-    public String showEduDashboard(HttpSession session, Model model) {
+    public String showEduDashboard(HttpSession session,
+                                   @RequestParam(value = "status", required = false) String status,
+                                   @RequestParam(value = "priority", required = false) String priority,
+                                   @RequestParam(value = "prioritySort", required = false) String prioritySort,
+                                   Model model) {
         if (!isAdminLoggedIn(session)) {
             return "redirect:/login";
         }
 
-        // Filter: only education category
-        List<Concern> eduConcerns = adminService.getFilteredConcerns("All", "Education (Creative and IT)", null, null);
+        String selectedStatus = normalizeStatusFilter(status);
+        String selectedPriority = normalizePriorityFilter(priority);
+        String selectedPrioritySort = normalizePrioritySort(prioritySort);
+
+        // Base list for stats
+        List<Concern> allEduConcerns = adminService.getFilteredConcerns("All", "Education (Creative and IT)", null, null);
+
+        // Filtered list for table
+        List<Concern> eduConcerns = adminService
+                .getFilteredConcerns(selectedStatus, "Education (Creative and IT)", null, null)
+                .stream()
+                .filter(concern -> isAllPriorities(selectedPriority)
+                        || selectedPriority.equalsIgnoreCase(defaultPriority(concern.getAiPriorityLevel())))
+                .toList();
+        eduConcerns = applyPrioritySort(eduConcerns, selectedPrioritySort);
 
         model.addAttribute("concerns", eduConcerns);
-        model.addAttribute("totalConcerns", eduConcerns.size());
-        model.addAttribute("pendingCount", eduConcerns.stream().filter(c -> "Pending".equals(c.getStatus())).count());
-        model.addAttribute("inProgressCount", eduConcerns.stream()
+        model.addAttribute("totalConcerns", allEduConcerns.size());
+        model.addAttribute("pendingCount", allEduConcerns.stream().filter(c -> "Pending".equals(c.getStatus())).count());
+        model.addAttribute("inProgressCount", allEduConcerns.stream()
             .filter(c -> "In Progress".equals(c.getStatus()) || "Meeting Scheduled".equals(c.getStatus()))
             .count());
-        model.addAttribute("completeCount", eduConcerns.stream().filter(c -> "Complete".equals(c.getStatus())).count());
+        model.addAttribute("completeCount", allEduConcerns.stream().filter(c -> "Complete".equals(c.getStatus())).count());
+        model.addAttribute("selectedEduStatus", selectedStatus);
+        model.addAttribute("selectedEduPriority", selectedPriority);
+        model.addAttribute("selectedEduPrioritySort", selectedPrioritySort);
 
         return "admin-edu-dashboard";
     }
@@ -266,7 +286,18 @@ public class AdminController {
             return "redirect:/login";
         }
         Concern concern = adminService.getConcernById(id);
-        List<AdminReply> replies = adminService.getRepliesForConcern(id);
+        List<AdminReply> currentConcernReplies = adminService.getRepliesForConcern(id);
+        List<AdminReply> replies = adminService.getConversationTimelineForConcern(id);
+        List<Concern> linkedThread = adminService.getLinkedConcernChain(id);
+        List<Concern> linkedConcerns = linkedThread.stream()
+            .filter(threadConcern -> threadConcern != null && !id.equals(threadConcern.getConcernId()))
+            .toList();
+
+        Integer latestAdminReplyId = currentConcernReplies.stream()
+                .filter(reply -> !isStudentMessage(reply))
+                .reduce((first, second) -> second)
+                .map(AdminReply::getReplyId)
+                .orElse(null);
         Feedback feedback = feedbackService.getFeedbackByConcernId(id).orElse(null);
         List<ConcernMeetingProposal> meetingProposals = concernMeetingService.getProposalHistory(id);
         ConcernMeetingProposal latestMeetingProposal = meetingProposals.isEmpty() ? null : meetingProposals.get(0);
@@ -278,6 +309,8 @@ public class AdminController {
 
         model.addAttribute("concern", concern);
         model.addAttribute("replies", replies);
+        model.addAttribute("linkedConcerns", linkedConcerns);
+        model.addAttribute("latestAdminReplyId", latestAdminReplyId);
         model.addAttribute("feedback", feedback);
         model.addAttribute("replyDTO", new AdminReplyDTO());
         model.addAttribute("latestMeetingProposal", latestMeetingProposal);
@@ -660,6 +693,28 @@ public class AdminController {
             return "Medium";
         }
         return value.trim();
+    }
+
+    private String normalizeStatusFilter(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "All";
+        }
+
+        String normalized = value.trim();
+        if ("All".equalsIgnoreCase(normalized)
+                || "Pending".equalsIgnoreCase(normalized)
+                || "In Progress".equalsIgnoreCase(normalized)
+                || "Meeting Scheduled".equalsIgnoreCase(normalized)
+                || "Complete".equalsIgnoreCase(normalized)) {
+            return normalized;
+        }
+        return "All";
+    }
+
+    private boolean isStudentMessage(AdminReply reply) {
+        return reply != null
+                && reply.getSenderRole() != null
+                && "STUDENT".equalsIgnoreCase(reply.getSenderRole().trim());
     }
 
     /**

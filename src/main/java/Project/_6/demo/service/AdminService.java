@@ -20,13 +20,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
-import java.util.Objects;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -190,7 +194,54 @@ public class AdminService {
      * Get replies for a specific concern
      */
     public List<AdminReply> getRepliesForConcern(Integer concernId) {
-        return adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId);
+        return adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeAsc(concernId);
+    }
+
+    /**
+     * Get linked concern chain from oldest linked concern up to the current concern.
+     */
+    public List<Concern> getLinkedConcernChain(Integer concernId) {
+        Concern currentConcern = getConcernById(concernId);
+        List<Concern> chain = new ArrayList<>();
+        Set<Integer> visitedConcernIds = new HashSet<>();
+
+        Concern cursor = currentConcern;
+        while (cursor != null && cursor.getConcernId() != null && visitedConcernIds.add(cursor.getConcernId())) {
+            chain.add(cursor);
+            cursor = cursor.getLinkedConcern();
+        }
+
+        Collections.reverse(chain);
+        return chain;
+    }
+
+    /**
+     * Build a merged conversation timeline that includes linked concern history.
+     */
+    public List<AdminReply> getConversationTimelineForConcern(Integer concernId) {
+        List<Concern> concernChain = getLinkedConcernChain(concernId);
+        List<AdminReply> timeline = new ArrayList<>();
+
+        for (Concern chainConcern : concernChain) {
+            timeline.add(buildInitialConcernMessage(chainConcern));
+            timeline.addAll(adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeAsc(chainConcern.getConcernId()));
+        }
+
+        timeline.sort(Comparator
+                .comparing(AdminReply::getReplyTime, Comparator.nullsLast(Comparator.naturalOrder()))
+                .thenComparing(reply -> reply.getConcern() != null ? reply.getConcern().getConcernId() : Integer.MAX_VALUE)
+                .thenComparing(reply -> reply.getReplyId() == null ? Integer.MIN_VALUE : reply.getReplyId()));
+
+        return timeline;
+    }
+
+    private AdminReply buildInitialConcernMessage(Concern concern) {
+        AdminReply initialMessage = new AdminReply();
+        initialMessage.setConcern(concern);
+        initialMessage.setSenderRole(AdminReply.ROLE_STUDENT);
+        initialMessage.setReplyMessage(concern.getMessage() == null ? "" : concern.getMessage().trim());
+        initialMessage.setReplyTime(concern.getCreatedTime());
+        return initialMessage;
     }
 
     /**
@@ -203,6 +254,10 @@ public class AdminService {
 
         if (reply.getConcern() == null || !concernId.equals(reply.getConcern().getConcernId())) {
             throw new RuntimeException("Reply does not belong to concern ID: " + concernId);
+        }
+
+        if (isStudentReply(reply)) {
+            throw new RuntimeException("Student chat messages cannot be deleted from admin view.");
         }
 
         Concern concern = reply.getConcern();
@@ -224,6 +279,12 @@ public class AdminService {
     @Transactional
     public void deleteConcern(Integer concernId) {
         Concern concern = getConcernById(concernId);
+
+        String priority = normalizePriority(concern.getAiPriorityLevel());
+        if (!"Low".equalsIgnoreCase(priority)) {
+            throw new RuntimeException("Only low-priority concerns can be removed from admin dashboard.");
+        }
+
         concern.setStatus(STATUS_REJECTED);
         concernRepository.save(concern);
     }
@@ -278,7 +339,9 @@ public class AdminService {
             throw new RuntimeException("Reply message cannot be empty.");
         }
 
-        AdminReply latestReply = adminReplyRepository.findFirstByConcern_ConcernIdOrderByReplyTimeDesc(concernId)
+        AdminReply latestReply = adminReplyRepository.findByConcern_ConcernIdOrderByReplyTimeDesc(concernId).stream()
+                .filter(reply -> !isStudentReply(reply))
+                .findFirst()
                 .orElseThrow(() -> new RuntimeException("No replies found for concern ID: " + concernId));
 
         if (!replyId.equals(latestReply.getReplyId())) {
@@ -308,6 +371,7 @@ public class AdminService {
         reply.setReplyMessage(dto.getReplyMessage());
         reply.setConcern(concern);
         reply.setAdmin(admin);
+        reply.setSenderRole(AdminReply.ROLE_ADMIN);
 
         if (resolutionFile != null && !resolutionFile.isEmpty()) {
             try {
@@ -538,6 +602,26 @@ public class AdminService {
         }
         String normalized = status.trim();
         return STATUS_REJECTED.equalsIgnoreCase(normalized) || STATUS_DELETED.equalsIgnoreCase(normalized);
+    }
+
+    private String normalizePriority(String value) {
+        if (value == null || value.trim().isEmpty()) {
+            return "Medium";
+        }
+
+        String normalized = value.trim();
+        if ("High".equalsIgnoreCase(normalized)
+                || "Medium".equalsIgnoreCase(normalized)
+                || "Low".equalsIgnoreCase(normalized)) {
+            return normalized;
+        }
+        return "Medium";
+    }
+
+    private boolean isStudentReply(AdminReply reply) {
+        return reply != null
+                && reply.getSenderRole() != null
+                && AdminReply.ROLE_STUDENT.equalsIgnoreCase(reply.getSenderRole().trim());
     }
 
     /**

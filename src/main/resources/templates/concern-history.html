@@ -571,6 +571,99 @@
         }
         .concern-meta span:hover { color: var(--primary); }
 
+        .linked-mini-chip {
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #6d28d9;
+            background: #ede9fe;
+            border: 1px solid #c4b5fd;
+        }
+
+        .linked-concern-panel {
+            margin-bottom: 16px;
+            border: 1px solid #ddd6fe;
+            border-left: 4px solid #8b5cf6;
+            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, #f5f3ff, #faf5ff);
+            padding: 13px 15px;
+        }
+
+        .linked-concern-label {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #6d28d9;
+            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .linked-concern-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .linked-concern-ref {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #5b21b6;
+            border: 1px solid #c4b5fd;
+            background: #ede9fe;
+        }
+
+        .linked-concern-subject {
+            font-size: 12px;
+            font-weight: 700;
+            color: #4c1d95;
+        }
+
+        .linked-concern-status {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            color: #3730a3;
+            border: 1px solid #c7d2fe;
+            background: #e0e7ff;
+        }
+
+        .linked-concern-jump {
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #6d28d9;
+            text-decoration: none;
+        }
+
+        .linked-concern-jump:hover {
+            text-decoration: underline;
+        }
+
         .status-badge {
             display: inline-flex; align-items: center; gap: 7px;
             padding: 7px 18px; border-radius: 100px;
@@ -691,7 +784,7 @@
         .evidence-pill:hover i { transform: rotate(15deg); }
         .evidence-wrap { margin-bottom: 14px; }
 
-        /* ===== Admin Replies ===== */
+        /* ===== Conversation ===== */
         .replies-section { margin-top: 6px; }
         .replies-header {
             display: flex; align-items: center; gap: 8px;
@@ -747,6 +840,13 @@
             transform: translateX(4px);
             box-shadow: 0 4px 16px rgba(37,99,235,0.08);
         }
+        .reply-bubble.from-student {
+            background: linear-gradient(135deg, #f5f3ff, #ede9fe);
+            border-color: #ddd6fe;
+        }
+        .reply-bubble.from-student::before {
+            background: rgba(109,40,217,0.06);
+        }
         .reply-avatar {
             width: 42px; height: 42px; border-radius: 50%;
             background: linear-gradient(135deg, var(--accent-blue), #1d4ed8);
@@ -756,6 +856,10 @@
             position: relative;
             z-index: 1;
             box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+        }
+        .reply-avatar.student {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            box-shadow: 0 4px 12px rgba(109,40,217,0.26);
         }
         .reply-body { flex: 1; position: relative; z-index: 1; }
         .reply-meta-row {
@@ -771,6 +875,12 @@
             padding: 3px;
             border-radius: 4px;
             font-size: 10px;
+        }
+        .reply-bubble.from-student .reply-sender {
+            color: #6d28d9;
+        }
+        .reply-bubble.from-student .reply-sender i {
+            background: rgba(109,40,217,0.12);
         }
         .reply-time   { font-size: 11px; color: #999; display: flex; align-items: center; gap: 4px; }
         .reply-message { font-size: 13px; color: #333; line-height: 1.7; }
@@ -804,6 +914,72 @@
             font-size: 12px; color: #aaa; font-style: italic;
         }
         .no-reply-pill i { font-size: 16px; color: #aaa; }
+
+        .chat-compose-form {
+            margin-top: 10px;
+            border: 1px solid #ddd6fe;
+            border-radius: 14px;
+            background: #faf5ff;
+            padding: 12px;
+            display: grid;
+            gap: 8px;
+        }
+        .chat-compose-head {
+            margin: 0;
+            color: #6d28d9;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .chat-compose-input {
+            width: 100%;
+            border: 1px solid #c4b5fd;
+            border-radius: 10px;
+            background: #fff;
+            color: #4c1d95;
+            font-size: 12px;
+            line-height: 1.6;
+            padding: 9px 11px;
+            min-height: 72px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: 'Inter', inherit;
+        }
+        .chat-compose-input:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 4px rgba(139,92,246,0.15);
+        }
+        .chat-compose-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .chat-compose-note {
+            color: #7c3aed;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .chat-send-btn {
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 9px 13px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .chat-send-btn:hover {
+            transform: translateY(-1px);
+        }
 
         /* ===== Collapse/Expand ===== */
         .replies-collapsible { display: none; }
@@ -1018,6 +1194,16 @@
             background: #fecaca;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(185,28,28,0.2);
+        }
+        .action-btn.complete {
+            background: #dcfce7;
+            color: #166534;
+            border-color: #86efac;
+        }
+        .action-btn.complete:hover {
+            background: #bbf7d0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22,163,74,0.2);
         }
 
         /* ===== Alert Toasts ===== */
@@ -1421,7 +1607,7 @@
                         </a>
                     </li>
                     <li>
-                        <div class="nav-bell" id="notifBellBtn" onclick="toggleNotifPanel()">
+                        <div class="nav-bell" id="notifBellBtn">
                             <i class="fas fa-bell"></i>
                             <span class="bell-badge" id="bellBadge"
                                   th:text="${unreadCount != null ? unreadCount : 0}"
@@ -1555,12 +1741,13 @@
             <div th:each="concern, iterStat : ${concerns}"
                  class="concern-card animate-in"
                  th:classappend="'status-' + ${#strings.replace(concern.status, ' ', '-')}"
+                 th:id="'concern-' + ${concern.concernId}"
                  th:with="meetingProposal=${latestMeetingProposalMap[concern.concernId]}, meetingSlots=${meetingProposal != null ? meetingSlotsMapByProposalId[meetingProposal.proposalId] : null}"
                  th:attr="data-status=${concern.status}"
                  th:style="'animation-delay: ' + ${0.08 * (iterStat.index + 3)} + 's'">
 
                 <!-- Clickable Summary Row -->
-                <div class="concern-list-row" onclick="toggleConcern(this)">
+                <div class="concern-list-row">
                     <div class="concern-list-left">
                         <span class="concern-ref" th:text="'CON-' + ${concern.concernId}">CON-1</span>
                         <span class="concern-priority"
@@ -1577,6 +1764,10 @@
                             <span><i class="fas fa-clock"></i>
                                 <span th:text="${#temporals.format(concern.createdTime, 'hh:mm a')}">09:00 AM</span>
                             </span>
+                        </div>
+                        <div class="linked-mini-chip" th:if="${concern.linkedConcern != null}">
+                            <i class="fas fa-link"></i>
+                            <span th:text="${'Linked to CON-' + concern.linkedConcern.concernId}">Linked to CON-1</span>
                         </div>
                     </div>
                     <div class="concern-list-right">
@@ -1631,6 +1822,22 @@
                         <div class="message-text" th:text="${concern.message}">Message</div>
                     </div>
 
+                    <div class="linked-concern-panel" th:if="${concern.linkedConcern != null}">
+                        <div class="linked-concern-label"><i class="fas fa-link"></i> Linked Previous Concern</div>
+                        <div class="linked-concern-row">
+                            <span class="linked-concern-ref"
+                                  th:text="${'CON-' + concern.linkedConcern.concernId}">CON-1</span>
+                            <span class="linked-concern-subject"
+                                  th:text="${concern.linkedConcern.subject != null ? concern.linkedConcern.subject : 'No subject'}">Previous concern subject</span>
+                            <span class="linked-concern-status"
+                                  th:text="${concern.linkedConcern.status != null ? concern.linkedConcern.status : 'Unknown'}">Pending</span>
+                        </div>
+                        <a class="linked-concern-jump"
+                           th:href="${'#concern-' + concern.linkedConcern.concernId}">
+                            <i class="fas fa-arrow-down"></i> Jump to linked concern card
+                        </a>
+                    </div>
+
                     <!-- Evidence -->
                     <div th:if="${concern.evidencePath != null}" class="evidence-wrap">
                         <a th:href="@{'/uploads/' + ${concern.evidencePath}}" target="_blank" class="evidence-pill">
@@ -1638,13 +1845,12 @@
                         </a>
                     </div>
 
-                    <!-- Admin Replies Section -->
+                    <!-- Conversation Section -->
                     <div class="replies-section">
-                        <div class="replies-header"
-                             th:attr="onclick='toggleReplies(this)'"
-                             th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
+                                    <div class="replies-header"
+                                        th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
                             <i class="fas fa-reply reply-icon"></i>
-                            <span>Admin Replies</span>
+                            <span>Conversation</span>
                             <span class="reply-count-badge"
                                   th:text="${#lists.size(repliesMap[concern.concernId])}">0</span>
                             <i class="fas fa-chevron-down toggle-icon"></i>
@@ -1656,20 +1862,29 @@
                             <!-- No replies yet -->
                             <div th:if="${#lists.isEmpty(repliesMap[concern.concernId])}" class="no-reply-pill">
                                 <i class="fas fa-hourglass-half"></i>
-                                Awaiting admin response — we'll notify you when a reply is received.
+                                Start your conversation with admin by sending a quick message.
                             </div>
 
-                            <!-- Render each reply -->
-                            <div th:each="reply : ${repliesMap[concern.concernId]}" class="reply-bubble">
-                                <div class="reply-avatar">A</div>
+                            <!-- Render chat timeline -->
+                            <div th:each="reply : ${repliesMap[concern.concernId]}"
+                                 class="reply-bubble"
+                                 th:classappend="${reply.senderRole != null and #strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')} ? ' from-student' : ' from-admin'">
+                                <div class="reply-avatar"
+                                     th:classappend="${reply.senderRole != null and #strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')} ? ' student' : ''"
+                                     th:text="${reply.senderRole != null and #strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')} ? 'S' : 'A'">A</div>
                                 <div class="reply-body">
                                     <div class="reply-meta-row">
-                                        <span class="reply-sender" th:if="${reply.admin != null and reply.admin.user != null}">
-                                            <i class="fas fa-shield-halved"></i>
-                                            <span th:text="${((reply.admin.staffId != null and !reply.admin.staffId.isEmpty()) ? reply.admin.staffId : reply.admin.user.firstName) + ' (Admin)'}">admin001 (Admin)</span>
+                                        <span class="reply-sender"
+                                              th:if="${reply.senderRole != null and #strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')}">
+                                            <i class="fas fa-user"></i>
+                                            <span>You (Student)</span>
                                         </span>
-                                        <span class="reply-sender" th:if="${reply.admin == null or reply.admin.user == null}">
-                                            <i class="fas fa-shield-halved"></i> Admin
+                                        <span class="reply-sender"
+                                              th:if="${reply.senderRole == null or !#strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')}">
+                                            <i class="fas fa-shield-halved"></i>
+                                            <span th:if="${reply.admin != null and reply.admin.user != null}"
+                                                  th:text="${((reply.admin.staffId != null and !reply.admin.staffId.isEmpty()) ? reply.admin.staffId : reply.admin.user.firstName) + ' (Admin)'}">admin001 (Admin)</span>
+                                            <span th:if="${reply.admin == null or reply.admin.user == null}">Admin</span>
                                         </span>
                                         <span class="reply-time">
                                             <i class="fas fa-clock"></i>
@@ -1686,6 +1901,22 @@
                                     </a>
                                 </div>
                             </div>
+
+                            <form class="chat-compose-form"
+                                  th:if="${concern.status == 'Pending' or concern.status == 'In Progress' or concern.status == 'Meeting Scheduled'}"
+                                  th:action="@{'/student/concern/' + ${concern.concernId} + '/chat'}"
+                                  method="post">
+                                <p class="chat-compose-head"><i class="fas fa-comments"></i> Send Message to Admin</p>
+                                <textarea class="chat-compose-input"
+                                          name="message"
+                                          maxlength="1200"
+                                          placeholder="Type your message to continue this concern conversation..."
+                                          required></textarea>
+                                <div class="chat-compose-actions">
+                                    <span class="chat-compose-note">12-1200 characters recommended.</span>
+                                    <button type="submit" class="chat-send-btn"><i class="fas fa-paper-plane"></i> Send</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -1774,15 +2005,24 @@
                         </div>
                     </div>
 
-                    <div class="card-actions" th:if="${concern.status == 'Pending'}">
-                        <a th:href="@{'/student/concern/' + ${concern.concernId} + '/edit'}" class="action-btn update">
+                    <div class="card-actions" th:if="${concern.status == 'Pending' or concern.status == 'In Progress' or concern.status == 'Meeting Scheduled'}">
+                        <a th:if="${concern.status == 'Pending'}"
+                           th:href="@{'/student/concern/' + ${concern.concernId} + '/edit'}" class="action-btn update">
                             <i class="fas fa-pen"></i> Update Concern
                         </a>
-                        <form th:action="@{/student/concern/delete}" method="post"
+                        <form th:if="${concern.status == 'Pending'}"
+                              th:action="@{/student/concern/delete}" method="post"
                               onsubmit="return confirm('Are you sure you want to delete this concern? This cannot be undone.');">
                             <input type="hidden" name="concernId" th:value="${concern.concernId}">
                             <button type="submit" class="action-btn delete">
                                 <i class="fas fa-trash"></i> Delete Concern
+                            </button>
+                        </form>
+                        <form th:if="${concern.meetingStatus == null or !#strings.equalsIgnoreCase(concern.meetingStatus, 'BOOKED')}"
+                              th:action="@{'/student/concern/' + ${concern.concernId} + '/complete'}" method="post"
+                              onsubmit="return confirm('Mark this concern as complete?');">
+                            <button type="submit" class="action-btn complete">
+                                <i class="fas fa-circle-check"></i> Mark As Complete
                             </button>
                         </form>
                     </div>
@@ -1944,15 +2184,15 @@
     </div>
 </main>
 
-<div class="notif-overlay" id="notifOverlay" onclick="toggleNotifPanel()"></div>
+<div class="notif-overlay" id="notifOverlay"></div>
 <div class="notif-panel" id="notifPanel">
     <div class="notif-panel-header">
         <h3><i class="fas fa-bell"></i> Notifications</h3>
-        <button class="notif-close" onclick="toggleNotifPanel()" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
+        <button type="button" class="notif-close" title="Close notifications" aria-label="Close notifications"><i class="fas fa-times"></i></button>
     </div>
     <div class="notif-panel-actions">
         <span class="notif-count" th:text="${notifications != null ? #lists.size(notifications) : 0} + ' notifications'">0 notifications</span>
-        <button class="mark-all-btn" onclick="markAllRead()">Mark all as read</button>
+        <button type="button" class="mark-all-btn">Mark all as read</button>
     </div>
     <div class="notif-list" id="notifList">
         <div th:if="${notifications == null or #lists.isEmpty(notifications)}" class="notif-empty">
@@ -1962,11 +2202,11 @@
 
          <div th:each="notif : ${notifications}" class="notif-item"
              th:classappend="${!notif.isRead} ? 'unread' : ''"
-             th:attr="data-id=${notif.notificationId}"
-             onclick="markNotifRead(this)">
+             th:attr="data-id=${notif.notificationId}">
             <div class="notif-icon-wrap"
-                                 th:classappend="${notif.type == 'BROADCAST'} ? 'broadcast' : ((notif.type == 'SUBMITTED' or notif.type == 'MEETING_DECLINED') ? 'submitted' : ((notif.type == 'IN_PROGRESS' or notif.type == 'MEETING_PROPOSED') ? 'in-progress' : 'complete'))">
-                                <i th:classappend="${notif.type == 'BROADCAST'} ? 'fas fa-bullhorn' : ((notif.type == 'SUBMITTED') ? 'fas fa-paper-plane' : ((notif.type == 'MEETING_DECLINED') ? 'fas fa-calendar-xmark' : ((notif.type == 'IN_PROGRESS') ? 'fas fa-spinner' : ((notif.type == 'MEETING_PROPOSED') ? 'fas fa-calendar-check' : ((notif.type == 'MEETING_BOOKED') ? 'fas fa-handshake' : 'fas fa-circle-check')))))"></i>
+                 th:with="t=${notif.type != null ? #strings.toUpperCase(#strings.trim(notif.type)) : ''}"
+                 th:classappend="${t == 'BROADCAST' ? 'broadcast' : ((t == 'SUBMITTED' or t == 'MEETING_DECLINED' or t == 'COMMUNITY_POST_REMOVED' or t == 'COMMUNITY_REPLY_REMOVED') ? 'submitted' : ((t == 'IN_PROGRESS' or t == 'MEETING_PROPOSED' or t == 'COMMUNITY_REPLY') ? 'in-progress' : 'complete'))}">
+                <i th:class="${t == 'BROADCAST' ? 'fas fa-bullhorn' : (t == 'SUBMITTED' ? 'fas fa-paper-plane' : (t == 'MEETING_DECLINED' ? 'fas fa-calendar-xmark' : (t == 'IN_PROGRESS' ? 'fas fa-spinner' : (t == 'MEETING_PROPOSED' ? 'fas fa-calendar-check' : (t == 'MEETING_BOOKED' ? 'fas fa-handshake' : (t == 'COMMUNITY_REPLY' ? 'fas fa-comments' : ((t == 'COMMUNITY_POST_REMOVED' or t == 'COMMUNITY_REPLY_REMOVED') ? 'fas fa-trash-can' : 'fas fa-circle-check')))))))}"></i>
             </div>
             <div class="notif-content">
                 <div class="notif-title" th:text="${notif.title}">Notification Title</div>
@@ -1977,7 +2217,7 @@
                 </div>
             </div>
             <div class="notif-item-actions">
-                <button type="button" class="notif-remove-btn" onclick="removeNotif(event, this.closest('.notif-item'))" title="Remove notification" aria-label="Remove notification">
+                <button type="button" class="notif-remove-btn" title="Remove notification" aria-label="Remove notification">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -2003,275 +2243,7 @@
     </div>
 </footer>
 
-<script>
-    function toggleNotifPanel() {
-        document.getElementById('notifPanel').classList.toggle('active');
-        document.getElementById('notifOverlay').classList.toggle('active');
-        document.body.style.overflow = document.getElementById('notifPanel').classList.contains('active') ? 'hidden' : '';
-    }
-
-    function markNotifRead(el) {
-        const id = el.getAttribute('data-id');
-        if (el.classList.contains('unread')) {
-            fetch('/api/notifications/' + id + '/read', { method: 'POST' })
-                .then(res => res.json())
-                .then(() => {
-                    el.classList.remove('unread');
-                    updateBadge();
-                });
-        }
-    }
-
-    function markAllRead() {
-        fetch('/api/notifications/mark-all-read', { method: 'POST' })
-            .then(res => res.json())
-            .then(() => {
-                document.querySelectorAll('.notif-item.unread').forEach(item => {
-                    item.classList.remove('unread');
-                });
-                updateBadge();
-            });
-    }
-
-    function refreshNotifCount() {
-        const countEl = document.querySelector('.notif-count');
-        const list = document.getElementById('notifList');
-        if (!countEl || !list) return;
-
-        const count = list.querySelectorAll('.notif-item').length;
-        countEl.textContent = count + (count === 1 ? ' notification' : ' notifications');
-
-        let empty = list.querySelector('.notif-empty');
-        if (count === 0) {
-            if (!empty) {
-                empty = document.createElement('div');
-                empty.className = 'notif-empty';
-                empty.innerHTML = '<i class="fas fa-bell-slash"></i><p>No notifications yet.</p>';
-                list.appendChild(empty);
-            }
-        } else if (empty) {
-            empty.remove();
-        }
-    }
-
-    function removeNotif(event, el) {
-        if (event) event.stopPropagation();
-        if (!el) return;
-        const id = el.getAttribute('data-id');
-        if (!id) return;
-
-        fetch('/api/notifications/' + id, { method: 'DELETE' })
-            .then(res => res.json())
-            .then(() => {
-                el.remove();
-                refreshNotifCount();
-                updateBadge();
-            })
-            .catch(err => console.error(err));
-    }
-
-    function updateBadge() {
-        fetch('/api/notifications/unread-count')
-            .then(res => res.json())
-            .then(data => {
-                const badge = document.getElementById('bellBadge');
-                if (data.unreadCount > 0) {
-                    badge.textContent = data.unreadCount;
-                    badge.classList.remove('hidden');
-                } else {
-                    badge.classList.add('hidden');
-                }
-            });
-    }
-
-    // ===== Intersection Observer for staggered card entrance =====
-    const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -40px 0px' };
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach((entry, idx) => {
-            if (entry.isIntersecting) {
-                entry.target.style.animationDelay = `${idx * 0.08}s`;
-                entry.target.classList.add('animate-in');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, observerOptions);
-
-    // Observe concern cards
-    document.querySelectorAll('.concern-card').forEach(card => {
-        observer.observe(card);
-    });
-
-    // ===== Staggered stat pill entrance =====
-    document.querySelectorAll('.stat-pill').forEach((pill, i) => {
-        pill.style.opacity = '0';
-        pill.style.transform = 'translateY(20px)';
-        setTimeout(() => {
-            pill.style.transition = 'all 0.5s cubic-bezier(.22,1,.36,1)';
-            pill.style.opacity = '1';
-            pill.style.transform = 'translateY(0)';
-        }, 300 + i * 100);
-    });
-
-    // ===== Filter functionality with smooth transitions =====
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    const cards = document.querySelectorAll('.concern-card');
-    const noResults = document.getElementById('noFilterResults');
-
-    filterBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            filterBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const filter = btn.dataset.filter;
-            let visible = 0;
-            let delay = 0;
-
-            cards.forEach(card => {
-                const status = card.dataset.status;
-                if (filter === 'all' || status === filter) {
-                    card.style.display = '';
-                    card.style.opacity = '0';
-                    card.style.transform = 'translateY(16px)';
-                    setTimeout(() => {
-                        card.style.transition = 'all 0.4s cubic-bezier(.22,1,.36,1)';
-                        card.style.opacity = '1';
-                        card.style.transform = 'translateY(0)';
-                    }, delay);
-                    delay += 60;
-                    visible++;
-                } else {
-                    card.style.transition = 'all 0.25s ease';
-                    card.style.opacity = '0';
-                    card.style.transform = 'scale(0.95)';
-                    setTimeout(() => { card.style.display = 'none'; }, 250);
-                }
-            });
-            noResults.style.display = visible === 0 ? 'block' : 'none';
-        });
-    });
-
-    // ===== Toggle concern accordion =====
-    function toggleConcern(row) {
-        const card = row.closest('.concern-card');
-        const wasExpanded = card.classList.contains('expanded');
-        // Close any other open card
-        document.querySelectorAll('.concern-card.expanded').forEach(c => {
-            if (c !== card) c.classList.remove('expanded');
-        });
-        card.classList.toggle('expanded', !wasExpanded);
-    }
-
-    // ===== Toggle replies with smooth animation =====
-    function toggleReplies(header) {
-        header.classList.toggle('open');
-        const collapsible = header.nextElementSibling;
-        if (collapsible.classList.contains('open')) {
-            collapsible.style.opacity = '0';
-            setTimeout(() => {
-                collapsible.classList.remove('open');
-                collapsible.style.opacity = '';
-            }, 200);
-        } else {
-            collapsible.classList.add('open');
-            collapsible.style.opacity = '0';
-            requestAnimationFrame(() => {
-                collapsible.style.transition = 'opacity 0.3s ease';
-                collapsible.style.opacity = '1';
-            });
-        }
-    }
-
-    // ===== Feedback validation rules =====
-    function countCharacters(text) {
-        return (text || '').trim().length;
-    }
-
-    document.querySelectorAll('.feedback-form').forEach(form => {
-        const ratingInputs = form.querySelectorAll('input[name="rating"]');
-        const commentField = form.querySelector('textarea[name="comments"]');
-        const errorText = form.querySelector('.feedback-error-text');
-        const wordCounter = form.querySelector('.feedback-word-count');
-
-        if (!commentField || ratingInputs.length === 0) {
-            return;
-        }
-
-        function selectedRating() {
-            const checked = Array.from(ratingInputs).find(input => input.checked);
-            return checked ? Number(checked.value) : null;
-        }
-
-        function validateFeedbackRules() {
-            const rating = selectedRating();
-            const comment = commentField.value.trim();
-            const characters = countCharacters(comment);
-            const hasComment = comment.length > 0;
-            const errors = [];
-
-            ratingInputs.forEach(input => input.setCustomValidity(''));
-
-            if (wordCounter) {
-                wordCounter.textContent = `Characters: ${characters}`;
-            }
-
-            if (rating === null) {
-                const ratingMessage = 'Please select a rating before submitting feedback.';
-                errors.push(ratingMessage);
-                ratingInputs[0].setCustomValidity(ratingMessage);
-            }
-
-            if (rating !== null && rating <= 3 && !hasComment) {
-                errors.push('Comment is required when rating is 3 stars or below.');
-            }
-
-            if (hasComment && (characters < 10 || characters > 100)) {
-                errors.push('Comment must contain between 10 and 100 characters.');
-            }
-
-            if (errors.length > 0) {
-                const message = errors.join(' ');
-                commentField.setCustomValidity(message);
-                if (errorText) {
-                    errorText.textContent = message;
-                    errorText.style.display = 'block';
-                }
-            } else {
-                commentField.setCustomValidity('');
-                if (errorText) {
-                    errorText.textContent = '';
-                    errorText.style.display = 'none';
-                }
-            }
-        }
-
-        ratingInputs.forEach(input => {
-            input.addEventListener('change', validateFeedbackRules);
-        });
-
-        commentField.addEventListener('input', validateFeedbackRules);
-
-        form.addEventListener('submit', event => {
-            validateFeedbackRules();
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                form.reportValidity();
-            }
-        });
-
-        validateFeedbackRules();
-    });
-
-    // ===== Auto-dismiss alert toasts =====
-    document.querySelectorAll('.alert-toast').forEach(toast => {
-        setTimeout(() => {
-            toast.style.transition = 'all 0.5s ease';
-            toast.style.opacity = '0';
-            toast.style.transform = 'translateY(-10px)';
-            setTimeout(() => toast.remove(), 500);
-        }, 5000);
-    });
-
-    setInterval(updateBadge, 30000);
-</script>
+<script src="/js/concern-history.js?v=20260404-3"></script>
 <script>
     window.studentTourConfig = {
         pageId: 'concern-history',

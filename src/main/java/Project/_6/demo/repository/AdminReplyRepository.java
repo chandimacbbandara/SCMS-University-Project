@@ -19,6 +19,7 @@ public interface AdminReplyRepository extends JpaRepository<AdminReply, Integer>
     Integer isReplyIdIdentity();
 
     List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeDesc(Integer concernId);
+    List<AdminReply> findByConcern_ConcernIdOrderByReplyTimeAsc(Integer concernId);
     List<AdminReply> findByConcern_ConcernIdIn(List<Integer> concernIds);
     List<AdminReply> findByConcern_Category(String category);
     List<AdminReply> findByAdmin_UserId(Integer adminUserId);

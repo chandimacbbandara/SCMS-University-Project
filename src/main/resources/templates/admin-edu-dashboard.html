@@ -257,6 +257,72 @@
             gap: 16px;
             grid-template-columns: repeat(4, 1fr);
         }
+
+        .filter-card {
+            margin: -6px 0 22px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(221,225,251,0.95);
+            border-radius: 18px;
+            box-shadow: var(--card-shadow);
+            padding: 14px;
+        }
+        .filter-form {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(140px, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .filter-group label {
+            font-size: 10px;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--text-light);
+        }
+        .filter-group select {
+            width: 100%;
+            border: 1px solid var(--border);
+            background: #fff;
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-mid);
+            outline: none;
+        }
+        .filter-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-apply,
+        .btn-clear {
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            padding: 10px 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-apply {
+            color: #fff;
+            background: linear-gradient(130deg, var(--primary-light), var(--primary));
+        }
+        .btn-clear {
+            color: var(--primary-dark);
+            background: #edf0ff;
+            border: 1px solid rgba(67,56,202,0.26);
+        }
         .stat-card {
             background: rgba(255, 255, 255, 0.85);
             -webkit-backdrop-filter: blur(8px);
@@ -454,6 +520,35 @@
         .st-complete { background: rgba(22,163,74,0.14); color: #15803d; border: 1px solid rgba(22,163,74,0.28); }
         .st-complete .status-dot { background: #16a34a; }
 
+        .priority-pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 70px;
+            border-radius: 999px;
+            padding: 5px 11px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .6px;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+        .pr-high {
+            color: #b91c1c;
+            background: rgba(239,68,68,0.14);
+            border-color: rgba(239,68,68,0.3);
+        }
+        .pr-medium {
+            color: #92400e;
+            background: rgba(245,158,11,0.16);
+            border-color: rgba(245,158,11,0.32);
+        }
+        .pr-low {
+            color: #166534;
+            background: rgba(34,197,94,0.14);
+            border-color: rgba(34,197,94,0.3);
+        }
+
         .date-text { font-size: 12.5px; font-weight: 700; color: var(--text-dark); }
         .time-text { font-size: 11px; color: var(--text-light); margin-top: 2px; }
 
@@ -530,6 +625,7 @@
         @media (max-width: 768px) {
             .container,
             .navbar-inner { padding: 0 15px; }
+            .filter-form { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
             .hero-content { flex-direction: column; }
             .hero-right { text-align: left; }
             .hero h1 { font-size: 28px; }
@@ -537,6 +633,7 @@
             .nav-links a { padding: 8px 11px; font-size: 11.5px; }
         }
         @media (max-width: 500px) {
+            .filter-form { grid-template-columns: 1fr; }
             .stats-row { grid-template-columns: 1fr; }
             .hero-btns { flex-direction: column; }
             .hero-btn { width: 100%; justify-content: center; }
@@ -639,6 +736,42 @@
             </div>
         </div>
 
+        <div class="filter-card anim-up d4">
+            <form class="filter-form" action="/admin/edu-dashboard" method="get">
+                <div class="filter-group">
+                    <label>Status</label>
+                    <select name="status" title="Filter by status">
+                        <option value="All" th:selected="${selectedEduStatus == 'All'}">All</option>
+                        <option value="Pending" th:selected="${selectedEduStatus == 'Pending'}">Pending</option>
+                        <option value="In Progress" th:selected="${selectedEduStatus == 'In Progress'}">In Progress</option>
+                        <option value="Meeting Scheduled" th:selected="${selectedEduStatus == 'Meeting Scheduled'}">Meeting Scheduled</option>
+                        <option value="Complete" th:selected="${selectedEduStatus == 'Complete'}">Complete</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Priority</label>
+                    <select name="priority" title="Filter by priority">
+                        <option value="All" th:selected="${selectedEduPriority == 'All'}">All Priorities</option>
+                        <option value="High" th:selected="${selectedEduPriority == 'High'}">High</option>
+                        <option value="Medium" th:selected="${selectedEduPriority == 'Medium'}">Medium</option>
+                        <option value="Low" th:selected="${selectedEduPriority == 'Low'}">Low</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Priority Sort</label>
+                    <select name="prioritySort" title="Sort by priority">
+                        <option value="Default" th:selected="${selectedEduPrioritySort == 'Default'}">Default</option>
+                        <option value="HighToLow" th:selected="${selectedEduPrioritySort == 'HighToLow'}">High to Low</option>
+                        <option value="LowToHigh" th:selected="${selectedEduPrioritySort == 'LowToHigh'}">Low to High</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button type="submit" class="btn-apply"><i class="fas fa-filter"></i>&nbsp;Apply</button>
+                    <a href="/admin/edu-dashboard" class="btn-clear">Clear</a>
+                </div>
+            </form>
+        </div>
+
         <!-- Concerns Table -->
         <div class="table-card anim-up d5">
             <div class="table-header">
@@ -663,6 +796,7 @@
                                 <th>ID</th>
                                 <th>Student</th>
                                 <th>Subject</th>
+                                <th>Priority</th>
                                 <th>Status</th>
                                 <th>Submitted</th>
                                 <th>Action</th>
@@ -694,6 +828,11 @@
                                     <div class="desc-text" th:text="${#strings.abbreviate(concern.message, 45)}">Description...</div>
                                 </td>
                                 <td>
+                                    <span class="priority-pill"
+                                          th:classappend="${concern.aiPriorityLevel == 'High'} ? 'pr-high' : (${concern.aiPriorityLevel == 'Low'} ? 'pr-low' : 'pr-medium')"
+                                          th:text="${concern.aiPriorityLevel != null ? concern.aiPriorityLevel : 'Medium'}">Medium</span>
+                                </td>
+                                <td>
                                     <span class="status-pill"
                                         th:classappend="${concern.status == 'Pending'} ? 'st-pending' : (${concern.status == 'In Progress'} ? 'st-progress' : (${concern.status == 'Meeting Scheduled'} ? 'st-scheduled' : 'st-complete'))">
                                         <span class="status-dot"></span>
@@ -709,9 +848,10 @@
                                         <a th:href="@{'/admin/concern/' + ${concern.concernId}}" class="view-btn">
                                             <i class="fas fa-arrow-right"></i> VIEW
                                         </a>
-                                        <form th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
+                                        <form th:if="${concern.aiPriorityLevel != null and #strings.equalsIgnoreCase(concern.aiPriorityLevel, 'Low')}"
+                                              th:action="@{'/admin/concern/' + ${concern.concernId} + '/delete'}"
                                               method="post"
-                                              onsubmit="return confirm('Delete this concern and related replies/feedback?');">
+                                              onsubmit="return confirm('Remove this low-priority concern from admin dashboard?');">
                                             <input type="hidden" name="redirectTo" value="edu-dashboard" />
                                             <button type="submit" class="delete-btn">
                                                 <i class="fas fa-trash"></i> DELETE
