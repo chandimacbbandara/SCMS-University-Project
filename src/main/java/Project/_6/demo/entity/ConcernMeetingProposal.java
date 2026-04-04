@@ -31,10 +31,10 @@ public class ConcernMeetingProposal {
     @Column(name = "Proposal_Status", length = 60, nullable = false)
     private String proposalStatus;
 
-    @Column(name = "Admin_Note", columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Admin_Note", columnDefinition = "TEXT")
     private String adminNote;
 
-    @Column(name = "Student_Response_Note", columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Student_Response_Note", columnDefinition = "TEXT")
     private String studentResponseNote;
 
     @Column(name = "Created_Time", nullable = false)

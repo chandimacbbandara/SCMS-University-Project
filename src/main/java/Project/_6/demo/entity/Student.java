@@ -32,7 +32,7 @@ public class Student implements Serializable {
     private LocalDate dob;
 
     @Lob
-    @Column(name = "StudentDPhoto")
+    @Column(name = "StudentDPhoto", columnDefinition = "LONGBLOB")
     private byte[] studentPhoto;
 
     @Column(name = "Category", length = 50)

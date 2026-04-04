@@ -17,7 +17,7 @@ public class AdminReply {
     @Column(name = "ReplyID")
     private Integer replyId;
 
-    @Column(name = "Reply_Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Reply_Message", nullable = false, columnDefinition = "TEXT")
     private String replyMessage;
 
     @Column(name = "Resolution_Screenshot", length = 500)

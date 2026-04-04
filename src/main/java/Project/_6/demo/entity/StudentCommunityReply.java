@@ -18,7 +18,7 @@ public class StudentCommunityReply {
     @Column(name = "ReplyID")
     private Integer replyId;
 
-    @Column(name = "Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "Status", nullable = false, length = 20)

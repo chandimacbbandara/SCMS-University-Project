@@ -14,7 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -27,6 +30,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final StudentRepository studentRepository;
     private final EmailVerificationService emailVerificationService;
+    private final Object broadcastBackfillLock = new Object();
 
     public NotificationService(NotificationRepository notificationRepository,
                                StudentRepository studentRepository,
@@ -199,7 +203,6 @@ public class NotificationService {
      * Get unread notifications for a student.
      */
     public List<Notification> getUnreadNotifications(Integer userId) {
-        ensureBroadcastCopiesForStudent(userId);
         return notificationRepository.findByStudent_UserIdAndIsReadFalseAndIsHiddenFalseOrderBySentTimeDesc(userId);
     }
 
@@ -286,36 +289,38 @@ public class NotificationService {
 
         String normalizedAudience = normalizeTargetAudience(targetAudience);
 
-        Notification masterNotification = newNotification();
-        masterNotification.setTitle(title.trim());
-        masterNotification.setMessage(message.trim());
-        masterNotification.setType("BROADCAST");
-        masterNotification.setTargetAudience(normalizedAudience);
-        masterNotification.setAdminIdFk(adminIdFk);
-        masterNotification.setStudent(null);
-        masterNotification.setConcern(null);
-        Notification savedMaster = notificationRepository.save(masterNotification);
+        synchronized (broadcastBackfillLock) {
+            Notification masterNotification = newNotification();
+            masterNotification.setTitle(title.trim());
+            masterNotification.setMessage(message.trim());
+            masterNotification.setType("BROADCAST");
+            masterNotification.setTargetAudience(normalizedAudience);
+            masterNotification.setAdminIdFk(adminIdFk);
+            masterNotification.setStudent(null);
+            masterNotification.setConcern(null);
+            Notification savedMaster = notificationRepository.save(masterNotification);
 
-        List<Student> recipients = resolveTargetStudents(normalizedAudience);
-        if (!recipients.isEmpty()) {
-            List<Notification> recipientNotifications = new ArrayList<>(recipients.size());
-            for (Student student : recipients) {
-                Notification studentNotification = newNotification();
-                studentNotification.setTitle(savedMaster.getTitle());
-                studentNotification.setMessage(savedMaster.getMessage());
-                studentNotification.setType(savedMaster.getType());
-                studentNotification.setTargetAudience(savedMaster.getTargetAudience());
-                studentNotification.setAdminIdFk(savedMaster.getAdminIdFk());
-                studentNotification.setStudent(student);
-                studentNotification.setConcern(null);
-                studentNotification.setSentTime(savedMaster.getSentTime());
-                studentNotification.setIsRead(false);
-                recipientNotifications.add(studentNotification);
+            List<Student> recipients = resolveTargetStudents(normalizedAudience);
+            if (!recipients.isEmpty()) {
+                List<Notification> recipientNotifications = new ArrayList<>(recipients.size());
+                for (Student student : recipients) {
+                    Notification studentNotification = newNotification();
+                    studentNotification.setTitle(savedMaster.getTitle());
+                    studentNotification.setMessage(savedMaster.getMessage());
+                    studentNotification.setType(savedMaster.getType());
+                    studentNotification.setTargetAudience(savedMaster.getTargetAudience());
+                    studentNotification.setAdminIdFk(savedMaster.getAdminIdFk());
+                    studentNotification.setStudent(student);
+                    studentNotification.setConcern(null);
+                    studentNotification.setSentTime(savedMaster.getSentTime());
+                    studentNotification.setIsRead(false);
+                    recipientNotifications.add(studentNotification);
+                }
+                notificationRepository.saveAll(recipientNotifications);
             }
-            notificationRepository.saveAll(recipientNotifications);
-        }
 
-        return savedMaster;
+            return savedMaster;
+        }
     }
 
     /**
@@ -433,58 +438,133 @@ public class NotificationService {
             return;
         }
 
-        Student student = studentRepository.findById(userId).orElse(null);
-        if (student == null) {
+        synchronized (broadcastBackfillLock) {
+            Student student = studentRepository.findById(userId).orElse(null);
+            if (student == null) {
+                return;
+            }
+
+            List<Notification> broadcastMasters = notificationRepository.findByTypeAndStudentIsNullOrderBySentTimeDesc("BROADCAST");
+            if (broadcastMasters.isEmpty()) {
+                return;
+            }
+
+            List<Notification> existingBroadcastCopies = notificationRepository.findByStudent_UserIdAndTypeOrderBySentTimeDesc(userId, "BROADCAST");
+            Set<String> validMasterKeys = broadcastMasters.stream()
+                    .filter(master -> isStudentInAudience(student, normalizeTargetAudience(master.getTargetAudience())))
+                    .map(master -> buildBroadcastKey(
+                            master.getAdminIdFk(),
+                            normalizeTargetAudience(master.getTargetAudience()),
+                            master.getTitle(),
+                            master.getMessage(),
+                            master.getSentTime()
+                    ))
+                    .collect(Collectors.toCollection(HashSet::new));
+
+            hideDuplicateBroadcastCopies(existingBroadcastCopies, validMasterKeys);
+
+            Set<String> existingKeys = existingBroadcastCopies.stream()
+                    .map(this::buildBroadcastKey)
+                    .filter(validMasterKeys::contains)
+                    .collect(Collectors.toSet());
+
+            List<Notification> missingCopies = new ArrayList<>();
+            for (Notification master : broadcastMasters) {
+                String normalizedAudience = normalizeTargetAudience(master.getTargetAudience());
+                if (!isStudentInAudience(student, normalizedAudience)) {
+                    continue;
+                }
+
+                String key = buildBroadcastKey(
+                        master.getAdminIdFk(),
+                        normalizedAudience,
+                        master.getTitle(),
+                        master.getMessage(),
+                        master.getSentTime()
+                );
+                if (existingKeys.contains(key)) {
+                    continue;
+                }
+
+                Notification studentNotification = newNotification();
+                studentNotification.setTitle(master.getTitle());
+                studentNotification.setMessage(master.getMessage());
+                studentNotification.setType(master.getType());
+                studentNotification.setTargetAudience(normalizedAudience);
+                studentNotification.setAdminIdFk(master.getAdminIdFk());
+                studentNotification.setStudent(student);
+                studentNotification.setConcern(null);
+                studentNotification.setSentTime(master.getSentTime());
+                studentNotification.setIsRead(false);
+                studentNotification.setIsHidden(false);
+
+                missingCopies.add(studentNotification);
+                existingKeys.add(key);
+            }
+
+            if (!missingCopies.isEmpty()) {
+                notificationRepository.saveAll(missingCopies);
+            }
+        }
+    }
+
+    private void hideDuplicateBroadcastCopies(List<Notification> existingBroadcastCopies, Set<String> validMasterKeys) {
+        if (existingBroadcastCopies == null || existingBroadcastCopies.isEmpty()) {
             return;
         }
 
-        List<Notification> broadcastMasters = notificationRepository.findByTypeAndStudentIsNullOrderBySentTimeDesc("BROADCAST");
-        if (broadcastMasters.isEmpty()) {
-            return;
+        Map<String, List<Notification>> groupedByBroadcast = new LinkedHashMap<>();
+        for (Notification notification : existingBroadcastCopies) {
+            groupedByBroadcast
+                    .computeIfAbsent(buildBroadcastKey(notification), key -> new ArrayList<>())
+                    .add(notification);
         }
 
-        List<Notification> existingBroadcastCopies = notificationRepository.findByStudent_UserIdAndTypeOrderBySentTimeDesc(userId, "BROADCAST");
-        Set<String> existingKeys = existingBroadcastCopies.stream()
-                .map(this::buildBroadcastKey)
-                .collect(Collectors.toSet());
+        List<Notification> duplicatesToHide = new ArrayList<>();
+        for (Map.Entry<String, List<Notification>> entry : groupedByBroadcast.entrySet()) {
+            String key = entry.getKey();
+            List<Notification> group = entry.getValue();
 
-        List<Notification> missingCopies = new ArrayList<>();
-        for (Notification master : broadcastMasters) {
-            String normalizedAudience = normalizeTargetAudience(master.getTargetAudience());
-            if (!isStudentInAudience(student, normalizedAudience)) {
+            if (!validMasterKeys.contains(key)) {
+                for (Notification candidate : group) {
+                    if (!Boolean.TRUE.equals(candidate.getIsHidden())) {
+                        candidate.setIsHidden(true);
+                        duplicatesToHide.add(candidate);
+                    }
+                }
                 continue;
             }
 
-            String key = buildBroadcastKey(
-                    master.getAdminIdFk(),
-                    normalizedAudience,
-                    master.getTitle(),
-                    master.getMessage(),
-                    master.getSentTime()
-            );
-            if (existingKeys.contains(key)) {
+            if (group.size() < 2) {
                 continue;
             }
 
-            Notification studentNotification = newNotification();
-            studentNotification.setTitle(master.getTitle());
-            studentNotification.setMessage(master.getMessage());
-            studentNotification.setType(master.getType());
-            studentNotification.setTargetAudience(normalizedAudience);
-            studentNotification.setAdminIdFk(master.getAdminIdFk());
-            studentNotification.setStudent(student);
-            studentNotification.setConcern(null);
-            studentNotification.setSentTime(master.getSentTime());
-            studentNotification.setIsRead(false);
-            studentNotification.setIsHidden(false);
+            Notification keep = selectBroadcastCopyToKeep(group);
+            Integer keepId = keep.getNotificationId();
 
-            missingCopies.add(studentNotification);
-            existingKeys.add(key);
+            for (Notification candidate : group) {
+                if (keepId != null && keepId.equals(candidate.getNotificationId())) {
+                    continue;
+                }
+                if (!Boolean.TRUE.equals(candidate.getIsHidden())) {
+                    candidate.setIsHidden(true);
+                    duplicatesToHide.add(candidate);
+                }
+            }
         }
 
-        if (!missingCopies.isEmpty()) {
-            notificationRepository.saveAll(missingCopies);
+        if (!duplicatesToHide.isEmpty()) {
+            notificationRepository.saveAll(duplicatesToHide);
         }
+    }
+
+    private Notification selectBroadcastCopyToKeep(List<Notification> copies) {
+        for (Notification copy : copies) {
+            if (!Boolean.TRUE.equals(copy.getIsHidden())) {
+                return copy;
+            }
+        }
+        return copies.get(0);
     }
 
     private boolean isStudentInAudience(Student student, String targetAudience) {

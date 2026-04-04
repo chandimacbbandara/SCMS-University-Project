@@ -20,7 +20,7 @@ public class Concern {
     @Column(name = "Subject", nullable = false, length = 255)
     private String subject;
 
-    @Column(name = "Message", nullable = false, columnDefinition = "VARCHAR(MAX)")
+    @Column(name = "Message", nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "Evidence", length = 500)

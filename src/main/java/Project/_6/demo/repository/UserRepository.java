@@ -10,10 +10,12 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
-    @Query(value = "SELECT COALESCE(MAX(UserID), 0) + 1 FROM [User] WITH (UPDLOCK, HOLDLOCK)", nativeQuery = true)
+    @Query(value = "SELECT COALESCE(MAX(UserID), 0) + 1 FROM Users", nativeQuery = true)
     Integer getNextUserId();
 
-    @Query(value = "SELECT CAST(COLUMNPROPERTY(OBJECT_ID('dbo.[User]'), 'UserID', 'IsIdentity') AS INT)", nativeQuery = true)
+    @Query(value = "SELECT CASE WHEN EXTRA LIKE '%auto_increment%' THEN 1 ELSE 0 END " +
+            "FROM information_schema.columns " +
+            "WHERE table_schema = DATABASE() AND table_name = 'Users' AND column_name = 'UserID' LIMIT 1", nativeQuery = true)
     Integer isUserIdIdentity();
 
     Optional<User> findByEmailIgnoreCase(String email);

@@ -298,7 +298,7 @@ public class FeedbackService {
 
             if (legacyFeedbackHasConcernColumn() && concernId != null) {
                 Integer existingLegacyId = jdbcTemplate.query(
-                        "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC",
+                    "SELECT feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC LIMIT 1",
                         rs -> rs.next() ? rs.getInt(1) : null,
                         concernId,
                         customerId);
@@ -365,8 +365,10 @@ public class FeedbackService {
             }
 
             jdbcTemplate.update(
-                    "UPDATE feedback SET is_deleted = 1 WHERE feedback_id = (" +
-                            "SELECT TOP 1 feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC)",
+                    "UPDATE feedback f JOIN (" +
+                        "SELECT feedback_id FROM feedback WHERE ConcernID_FK = ? AND customer_id = ? ORDER BY feedback_id DESC LIMIT 1" +
+                        ") latest ON f.feedback_id = latest.feedback_id " +
+                        "SET f.is_deleted = 1",
                     concernId,
                     studentUserId);
         } catch (Exception e) {
