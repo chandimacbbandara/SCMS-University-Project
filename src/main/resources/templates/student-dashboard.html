@@ -1421,6 +1421,8 @@
             .tracker-step-dot { margin-bottom: 0; width: 40px; height: 40px; font-size: 16px; }
         }
     </style>
+    <link rel="stylesheet" href="/CSS/student-unified-pages.css?v=20260413-1">
+    <link rel="stylesheet" href="/CSS/student-dashboard-remix.css?v=20260413-1">
 </head>
 <body class="student-theme">
     <header>
@@ -1500,218 +1502,238 @@
                 </div>
             </div>
 
-            <!-- Stat Strip -->
-            <div class="stat-strip">
-                <div class="stat-card red animate-in delay-1">
-                    <div class="stat-icon"><i class="fas fa-shield-halved"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-label">Account Status</div>
-                        <div class="stat-value">Verified &amp; Active</div>
+            <!-- Dashboard Remix -->
+            <div class="dashboard-remix">
+
+                <div class="stat-strip stat-strip-remix">
+                    <div class="stat-card remix red animate-in delay-1">
+                        <div class="stat-icon"><i class="fas fa-signal"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Active Concerns</div>
+                            <div class="stat-value" th:text="${#lists.size(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled'])}">0</div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card green animate-in delay-2">
-                    <div class="stat-icon"><i class="fas fa-paper-plane"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-label">Concern Portal</div>
-                        <div class="stat-value">Ready to Submit</div>
+                    <div class="stat-card remix green animate-in delay-2">
+                        <div class="stat-icon"><i class="fas fa-handshake"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Meetings Scheduled</div>
+                            <div class="stat-value" th:text="${#lists.size(concerns.?[status == 'Meeting Scheduled'])}">0</div>
+                        </div>
                     </div>
-                </div>
-                <div class="stat-card blue clickable animate-in delay-3" onclick="toggleNotifPanel()">
-                    <div class="stat-icon"><i class="fas fa-bell"></i></div>
-                    <div class="stat-info">
-                        <div class="stat-label">Notifications</div>
-                        <div class="stat-value">
-                            <span th:if="${unreadCount > 0}" th:text="${unreadCount} + ' unread'">0 unread</span>
-                            <span th:if="${unreadCount == 0}">All caught up</span>
+                    <div class="stat-card remix blue animate-in delay-3">
+                        <div class="stat-icon"><i class="fas fa-layer-group"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Saved Drafts</div>
+                            <div class="stat-value" th:text="${draftCount != null ? draftCount : 0}">0</div>
+                        </div>
+                    </div>
+                    <div class="stat-card remix blue clickable animate-in delay-4" onclick="toggleNotifPanel()">
+                        <div class="stat-icon"><i class="fas fa-bell"></i></div>
+                        <div class="stat-info">
+                            <div class="stat-label">Unread Alerts</div>
+                            <div class="stat-value" th:text="${unreadCount != null ? unreadCount : 0}">0</div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="dashboard-controls animate-in delay-2">
-                <div class="control-search">
-                    <i class="fas fa-magnifying-glass"></i>
-                    <input type="text" id="dashboardSearchInput" placeholder="Search concerns, actions, or tips...">
-                </div>
-                <div class="control-meta">
-                    <div class="status-filters" id="statusFilters">
-                        <button class="status-filter-btn active" data-filter="all" type="button">All</button>
-                        <button class="status-filter-btn" data-filter="Pending" type="button">Pending</button>
-                        <button class="status-filter-btn" data-filter="In Progress" type="button">In Progress</button>
-                        <button class="status-filter-btn" data-filter="Meeting Scheduled" type="button">Meeting Scheduled</button>
+                <div class="dashboard-controls dashboard-controls-remix animate-in delay-2">
+                    <div class="control-search">
+                        <i class="fas fa-magnifying-glass"></i>
+                        <input type="text" id="dashboardSearchInput" placeholder="Search active concerns, actions, and student playbook...">
                     </div>
-                    <button type="button" class="compact-toggle" id="compactToggleBtn">
-                        <i class="fas fa-compress"></i>
-                        Compact Mode
-                    </button>
-                </div>
-            </div>
-
-            <!-- Two-Column Grid -->
-            <div class="dash-grid">
-
-                <div class="student-focus-panel animate-in delay-3">
-                    <div>
-                        <h3 class="student-focus-title">Focused Student Workspace</h3>
-                        <p class="student-focus-sub">
-                            Report concerns faster, check updates quickly, and stay connected with your student community using this simplified dashboard.
-                        </p>
-                    </div>
-                    <div class="student-focus-badges">
-                        <span class="focus-pill red"><i class="fas fa-bolt"></i> Fast Actions</span>
-                        <span class="focus-pill blue"><i class="fas fa-comments"></i> Peer Talk</span>
-                        <span class="focus-pill green"><i class="fas fa-satellite-dish"></i> Live Status</span>
+                    <div class="control-meta">
+                        <div class="status-filters" id="statusFilters">
+                            <button class="status-filter-btn active" data-filter="all" type="button">All</button>
+                            <button class="status-filter-btn" data-filter="Pending" type="button">Pending</button>
+                            <button class="status-filter-btn" data-filter="In Progress" type="button">In Progress</button>
+                            <button class="status-filter-btn" data-filter="Meeting Scheduled" type="button">Meeting Scheduled</button>
+                        </div>
+                        <button type="button" class="compact-toggle" id="compactToggleBtn">
+                            <i class="fas fa-compress"></i>
+                            Compact Mode
+                        </button>
                     </div>
                 </div>
 
-                <!-- Quick Actions Card -->
-                <div class="actions-card animate-in delay-4">
+                <div class="dash-grid workspace-grid">
+                    <div class="actions-card actions-card-remix animate-in delay-3">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fas fa-bolt"></i> Action Command Board</div>
+                        </div>
+                        <div class="actions-list actions-list-remix">
+                            <a href="/submit-concern" class="action-item remix" data-search="submit concern report issue academic campus urgent">
+                                <div class="action-item-icon report"><i class="fas fa-pen-to-square"></i></div>
+                                <div class="action-item-text">
+                                    <h4>New Concern</h4>
+                                    <p>Create an official concern with details and evidence.</p>
+                                </div>
+                            </a>
+                            <a href="/student/concern-history" class="action-item remix" data-search="history concern timeline reply admin updates status">
+                                <div class="action-item-icon home"><i class="fas fa-clock-rotate-left"></i></div>
+                                <div class="action-item-text">
+                                    <h4>My Concern History</h4>
+                                    <p>See full conversation history and status updates.</p>
+                                </div>
+                            </a>
+                            <a href="/student/concern-drafts" class="action-item remix" data-search="draft concern save draft continue editing pending">
+                                <div class="action-item-icon draft"><i class="fas fa-file-pen"></i></div>
+                                <div class="action-item-text">
+                                    <h4>Drafts</h4>
+                                    <p>Continue and submit saved draft concerns.</p>
+                                    <span class="action-item-hint" th:if="${draftCount != null and draftCount > 0}">
+                                        <i class="fas fa-layer-group"></i>
+                                        <span th:text="${draftCount} + ' drafts'">0 drafts</span>
+                                    </span>
+                                </div>
+                            </a>
+                            <a href="/student/community" class="action-item remix" data-search="community talk peer support discussion student board">
+                                <div class="action-item-icon home custom"><i class="fas fa-comments"></i></div>
+                                <div class="action-item-text">
+                                    <h4>Community Talk</h4>
+                                    <p>Discuss issues and learn from peer experience.</p>
+                                </div>
+                            </a>
+                            <a href="/student/profile" class="action-item remix" data-search="student profile account settings password">
+                                <div class="action-item-icon profile"><i class="fas fa-user-gear"></i></div>
+                                <div class="action-item-text">
+                                    <h4>Profile Settings</h4>
+                                    <p>Manage student profile details and account security.</p>
+                                </div>
+                            </a>
+                            <a href="/faq" class="action-item remix" data-search="faq support guidelines tips help">
+                                <div class="action-item-icon home"><i class="fas fa-circle-question"></i></div>
+                                <div class="action-item-text">
+                                    <h4>Support FAQ</h4>
+                                    <p>Get quick answers before submitting a new concern.</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="student-focus-panel student-focus-remix animate-in delay-4">
+                        <h3 class="student-focus-title">Today’s Focus</h3>
+                        <p class="student-focus-sub">Use this board to prioritize pending concerns first, then in-progress items, and keep your follow-ups clear.</p>
+                        <div class="student-focus-badges">
+                            <span class="focus-pill red"><i class="fas fa-hourglass-half"></i> Pending First</span>
+                            <span class="focus-pill blue"><i class="fas fa-people-arrows"></i> Reply Clearly</span>
+                            <span class="focus-pill green"><i class="fas fa-check-double"></i> Close Fast</span>
+                        </div>
+                        <div class="focus-checklist">
+                            <div class="focus-check-item"><i class="fas fa-circle-check"></i> Check unread notifications before posting new updates.</div>
+                            <div class="focus-check-item"><i class="fas fa-circle-check"></i> Use My Concern History to avoid duplicate concerns.</div>
+                            <div class="focus-check-item"><i class="fas fa-circle-check"></i> Attach evidence when reporting facility or service issues.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tracking-section tracking-section-remix animate-in delay-5">
                     <div class="card-header">
-                        <div class="card-title"><i class="fas fa-bolt"></i> Quick Actions</div>
-                    </div>
-                    <div class="actions-list">
-                        <a href="/submit-concern" class="action-item" data-search="submit concern report issue academic campus">
-                            <div class="action-item-icon report"><i class="fas fa-pen-to-square"></i></div>
-                            <div class="action-item-text">
-                                <h4>Submit New Concern</h4>
-                                <p>Create a new concern report with full details and attachments.</p>
-                            </div>
-                        </a>
-                        <a href="/student/concern-drafts" class="action-item" data-search="draft concern save draft continue editing pending draft">
-                            <div class="action-item-icon draft"><i class="fas fa-file-pen"></i></div>
-                            <div class="action-item-text">
-                                <h4>My Draft Concerns</h4>
-                                <p>Continue editing saved draft concerns and submit them when ready.</p>
-                                <span class="action-item-hint" th:if="${draftCount != null}">
-                                    <i class="fas fa-layer-group"></i>
-                                    <span th:text="${draftCount} + ' drafts saved'">0 drafts saved</span>
-                                </span>
-                            </div>
-                        </a>
-                        <a href="/student/community" class="action-item" data-search="community talk peers support discussion">
-                            <div class="action-item-icon home custom"><i class="fas fa-comments"></i></div>
-                            <div class="action-item-text">
-                                <h4>Student Community Talk</h4>
-                                <p>Discuss with peers, share experiences, and learn from others.</p>
-                            </div>
-                        </a>
-                        <a href="/student/dashboard" class="action-item" data-search="refresh dashboard reload data latest">
-                            <div class="action-item-icon profile"><i class="fas fa-user-gear"></i></div>
-                            <div class="action-item-text">
-                                <h4>Refresh Dashboard</h4>
-                                <p>Reload your latest status, notifications, and live tracking data.</p>
-                            </div>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Concern Tracking Section -->
-            <div class="tracking-section animate-in delay-5">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-route"></i> My Concerns - Live Tracking</div>
-                </div>
-
-                <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled'])}" class="tracking-empty">
-                    <i class="fas fa-inbox"></i>
-                    <p>No active concerns in live tracking. Pending, In Progress, and Meeting Scheduled concerns will appear here.</p>
-                </div>
-
-                <div class="status-empty-note" id="trackingEmptyState">
-                    No concern cards match your current filter/search.
-                </div>
-
-                 <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']}" class="concern-track-card"
-                     th:attr="data-status=${concern.status},data-search=${concern.subject}">
-                    <div class="track-card-header">
-                        <div>
-                            <div class="track-ref" th:text="'REF: CON-' + ${concern.concernId}">REF: CON-1</div>
-                            <div class="track-subject" th:text="${concern.subject}">Subject</div>
-                        </div>
-                        <span class="track-status-badge"
-                            th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : (${concern.status == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
-                              th:text="${concern.status}">Status</span>
+                        <div class="card-title"><i class="fas fa-route"></i> Active Concern Radar</div>
                     </div>
 
-                    <!-- Step-by-Step Tracker -->
-                    <div class="step-tracker">
-                        <!-- Progress line fill -->
-                        <div class="progress-line"
-                                th:style="'--progress-width: ' + (${concern.status == 'Pending'} ? '0%' : (${concern.status == 'In Progress'} ? '50%' : (${concern.status == 'Meeting Scheduled'} ? '75%' : '100%')))"></div>
+                    <div th:if="${#lists.isEmpty(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled'])}" class="tracking-empty">
+                        <i class="fas fa-inbox"></i>
+                        <p>No active concerns right now. Pending, In Progress, and Meeting Scheduled concerns will appear here.</p>
+                    </div>
 
-                        <!-- Step 1: Submitted -->
-                        <div class="tracker-step done">
-                            <div class="tracker-step-dot"><i class="fas fa-paper-plane"></i></div>
-                            <div class="tracker-step-label">Submitted</div>
-                            <div class="tracker-step-time" th:text="${#temporals.format(concern.createdTime, 'dd MMM, HH:mm')}">01 Jan, 09:00</div>
+                    <div class="status-empty-note" id="trackingEmptyState">
+                        No concern cards match your current filter or search.
+                    </div>
+
+                    <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']}"
+                         class="concern-track-card remix"
+                         th:attr="data-status=${concern.status},data-search=${(concern.subject != null ? concern.subject : '') + ' ' + (concern.message != null ? concern.message : '') + ' ' + concern.status}">
+                        <div class="track-card-header">
+                            <div>
+                                <div class="track-ref" th:text="'CON-' + ${concern.concernId}">CON-1</div>
+                                <div class="track-subject" th:text="${concern.subject}">Subject</div>
+                                <p class="concern-preview" th:text="${concern.message != null ? concern.message : 'No message content available.'}">Concern preview</p>
+                            </div>
+                            <span class="track-status-badge"
+                                  th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : (${concern.status == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
+                                  th:text="${concern.status}">Status</span>
                         </div>
 
-                        <!-- Step 2: Under Review -->
-                        <div class="tracker-step"
-                                th:classappend="${concern.status == 'In Progress'} ? 'active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? 'done' : '')">
-                            <div class="tracker-step-dot"><i class="fas fa-eye"></i></div>
-                               <div class="tracker-step-label" th:text="${concern.status == 'Meeting Scheduled'} ? 'Meeting Scheduled' : 'Under Review'">Under Review</div>
-                            <div class="tracker-step-time"
-                                   th:text="${concern.status == 'Pending'} ? 'Waiting...' : (${concern.status == 'Meeting Scheduled'} ? 'Scheduled' : 'Reviewed')">Waiting...</div>
+                        <div class="journey-track"
+                             th:style="'--journey-progress:' + (${concern.status == 'Pending'} ? '0' : (${concern.status == 'In Progress'} ? '0.33' : (${concern.status == 'Meeting Scheduled'} ? '0.66' : '1')))">
+                            <div class="journey-node done">
+                                <span class="node-dot"></span>
+                                <span class="node-label">Submitted</span>
+                            </div>
+                            <div class="journey-node"
+                                 th:classappend="${concern.status == 'In Progress'} ? ' active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? ' done' : '')">
+                                <span class="node-dot"></span>
+                                <span class="node-label">In Review</span>
+                            </div>
+                            <div class="journey-node"
+                                 th:classappend="${concern.status == 'Meeting Scheduled'} ? ' active' : (${concern.status == 'Complete'} ? ' done' : '')">
+                                <span class="node-dot"></span>
+                                <span class="node-label">Meeting</span>
+                            </div>
+                            <div class="journey-node"
+                                 th:classappend="${concern.status == 'Complete'} ? ' done' : ''">
+                                <span class="node-dot"></span>
+                                <span class="node-label">Resolved</span>
+                            </div>
                         </div>
 
-                        <!-- Step 3: Resolved -->
-                        <div class="tracker-step"
-                             th:classappend="${concern.status == 'Complete'} ? 'done' : ''">
-                            <div class="tracker-step-dot"><i class="fas fa-circle-check"></i></div>
-                            <div class="tracker-step-label">Resolved</div>
-                            <div class="tracker-step-time"
-                                 th:text="${concern.status == 'Complete'} ? 'Completed' : 'Pending...'">Pending...</div>
+                        <div class="track-meta-bar">
+                            <span class="track-date">
+                                <i class="fas fa-clock"></i>
+                                <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
+                            </span>
+                            <span class="track-date"
+                                  th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId])}"
+                                  th:with="latestReply=${repliesMap[concern.concernId][0]}">
+                                <i class="fas fa-shield-halved"></i>
+                                <span th:text="${((latestReply.admin != null and latestReply.admin.staffId != null and !latestReply.admin.staffId.isEmpty()) ? latestReply.admin.staffId : 'Admin') + ' replied'}">Admin replied</span>
+                            </span>
+                        </div>
+
+                        <div class="track-actions-row">
+                            <a class="admin-attachment-pill" th:href="@{'/student/concern-history#concern-' + ${concern.concernId}}">
+                                <i class="fas fa-arrow-up-right-from-square"></i>
+                                Open Full Timeline
+                            </a>
+                            <a th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}"
+                               th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
+                               target="_blank"
+                               class="admin-attachment-pill secondary">
+                                <i class="fas fa-paperclip"></i>
+                                View Attachment
+                            </a>
                         </div>
                     </div>
+                </div>
 
-                    <div class="track-date">
-                        <i class="fas fa-clock"></i>
-                        <span>Submitted: </span>
-                        <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
+                <div class="tips-section tips-section-remix animate-in delay-6">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fas fa-lightbulb"></i> Student Playbook</div>
                     </div>
-
-                    <div class="track-date"
-                         th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId])}"
-                         th:with="latestReply=${repliesMap[concern.concernId][0]}">
-                        <i class="fas fa-shield-halved"></i>
-                        <span>Latest Reply By: </span>
-                        <span th:text="${((latestReply.admin != null and latestReply.admin.staffId != null and !latestReply.admin.staffId.isEmpty()) ? latestReply.admin.staffId : 'Admin') + ' (Admin)'}">admin001 (Admin)</span>
-                    </div>
-
-                    <div th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}">
-                        <a th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
-                           target="_blank"
-                           class="admin-attachment-pill">
-                            <i class="fas fa-paperclip"></i>
-                            View Admin Attachment
-                        </a>
+                    <div class="tips-grid tips-grid-remix">
+                        <div class="tip-card remix" data-search="report concern quality details evidence issue reporting">
+                            <div class="tip-icon"><i class="fas fa-file-circle-plus"></i></div>
+                            <h5>Write Better Concerns</h5>
+                            <p>Add subject, location, and impact so admins can resolve faster.</p>
+                        </div>
+                        <div class="tip-card remix" data-search="follow up admin response timeline concern history">
+                            <div class="tip-icon"><i class="fas fa-reply"></i></div>
+                            <h5>Follow Up Clearly</h5>
+                            <p>Reply inside the same concern timeline instead of creating duplicates.</p>
+                        </div>
+                        <div class="tip-card remix" data-search="meeting scheduled slots campus meeting support">
+                            <div class="tip-icon"><i class="fas fa-calendar-check"></i></div>
+                            <h5>Manage Meetings</h5>
+                            <p>When slots arrive, confirm quickly to avoid delays in resolution.</p>
+                        </div>
+                        <div class="tip-card remix" data-search="community peer support board advice">
+                            <div class="tip-icon"><i class="fas fa-users"></i></div>
+                            <h5>Use Community Smartly</h5>
+                            <p>Use community talk for peer advice, official concerns for admin action.</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Tips Section -->
-            <div class="tips-section animate-in delay-6">
-                <div class="card-header">
-                    <div class="card-title"><i class="fas fa-lightbulb"></i> Getting Started</div>
-                </div>
-                <div class="tips-grid">
-                    <div class="tip-card" data-search="submit concern report issue form">
-                        <div class="tip-icon"><i class="fas fa-file-lines"></i></div>
-                        <h5>Submit a Concern</h5>
-                        <p>Use the report tool to raise any academic or campus issue directly to the admin team.</p>
-                    </div>
-                    <div class="tip-card" data-search="track progress status review updates">
-                        <div class="tip-icon"><i class="fas fa-clock-rotate-left"></i></div>
-                        <h5>Track Progress</h5>
-                        <p>Once submitted, your concern is reviewed by administrators and prioritized accordingly.</p>
-                    </div>
-                    <div class="tip-card" data-search="responses admin replies notifications communication">
-                        <div class="tip-icon"><i class="fas fa-comments"></i></div>
-                        <h5>Get Responses</h5>
-                        <p>Administrators will reply to your concern and keep you updated on the resolution status.</p>
-                    </div>
-                </div>
             </div>
 
         </div>
@@ -1817,7 +1839,7 @@
             });
         }, { threshold: 0.1 });
 
-        document.querySelectorAll('.tip-card, .concern-track-card').forEach((card, i) => {
+        document.querySelectorAll('.tip-card.remix, .concern-track-card.remix').forEach((card, i) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(20px)';
             card.style.transition = 'all 0.6s cubic-bezier(.22,1,.36,1) ' + (i * 0.1) + 's';
@@ -1825,7 +1847,7 @@
         });
 
         // Stagger stat cards entrance
-        document.querySelectorAll('.stat-card').forEach((card, i) => {
+        document.querySelectorAll('.stat-card.remix').forEach((card, i) => {
             card.style.opacity = '0';
             card.style.transform = 'translateY(15px)';
             setTimeout(() => {
@@ -2044,22 +2066,22 @@
                 {
                     selector: '.dashboard-controls',
                     title: 'Search And Filters',
-                    content: 'Use search and status filters to quickly narrow active concern cards and dashboard content.'
+                    content: 'Use search, status filters, and compact mode to quickly focus on the right student tasks.'
                 },
                 {
                     selector: '.actions-list',
-                    title: 'Quick Actions',
-                    content: 'Jump straight to Report Issue, Drafts, Community Talk, or refresh your dashboard from here.'
+                    title: 'Action Command Board',
+                    content: 'Launch the right page immediately: new concern, history, drafts, community, profile, or FAQ.'
                 },
                 {
                     selector: '.tracking-section',
-                    title: 'Live Concern Tracking',
-                    content: 'Monitor Pending, In Progress, and Meeting Scheduled concerns with real-time status progression.'
+                    title: 'Active Concern Radar',
+                    content: 'Track each active concern from submitted to meeting and final resolution in a single view.'
                 },
                 {
                     selector: '.tips-section',
-                    title: 'Getting Started Tips',
-                    content: 'These tips explain the best flow for submitting concerns and following updates effectively.'
+                    title: 'Student Playbook',
+                    content: 'Follow these practical tips to write clearer concerns and receive faster responses.'
                 }
             ]
         };

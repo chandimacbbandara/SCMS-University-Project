@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/CSS/student-theme.css">
     <link rel="stylesheet" href="/CSS/student-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1577,6 +1578,8 @@
             .top-actions-right { width: 100%; justify-content: center; }
         }
     </style>
+    <link rel="stylesheet" href="/CSS/concern-history-redesign.css?v=20260413-1">
+    <link rel="stylesheet" href="/CSS/student-unified-pages.css?v=20260413-1">
 </head>
 <body class="student-theme">
 <header>
@@ -1658,7 +1661,7 @@
                 <h1 class="hero-title">My Concern History</h1>
                 <p class="hero-sub">
                     <i class="fas fa-circle-info"></i>
-                    Track all submitted concerns and view admin replies
+                    Quickly identify concern status, admin responses, and next actions
                 </p>
             </div>
             <div class="hero-right">
@@ -1707,23 +1710,54 @@
             </div>
         </div>
 
+        <div class="history-intel animate-in delay-2" th:if="${!#lists.isEmpty(concerns)}">
+            <div class="intel-item">
+                <i class="fas fa-triangle-exclamation"></i>
+                <div>
+                    <div class="intel-label">Needs Your Attention</div>
+                    <p th:text="${#lists.size(concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']) + ' active concerns waiting for your response or review.'}">0 active concerns waiting for your response or review.</p>
+                </div>
+            </div>
+            <div class="intel-item">
+                <i class="fas fa-comments"></i>
+                <div>
+                    <div class="intel-label">Conversation Clarity</div>
+                    <p>Admin replies and your messages are now visually separated so you can scan updates faster.</p>
+                </div>
+            </div>
+        </div>
+
         <!-- Filter Bar -->
         <div class="filter-bar animate-in delay-2" th:if="${!#lists.isEmpty(concerns)}">
-            <button class="filter-btn active" data-filter="all">
-                <i class="fas fa-border-all"></i> All Concerns
-            </button>
-            <button class="filter-btn" data-filter="Pending">
-                <i class="fas fa-hourglass-half"></i> Pending
-            </button>
-            <button class="filter-btn" data-filter="In Progress">
-                <i class="fas fa-spinner"></i> In Progress
-            </button>
-            <button class="filter-btn" data-filter="Meeting Scheduled">
-                <i class="fas fa-handshake"></i> Meeting Scheduled
-            </button>
-            <button class="filter-btn" data-filter="Complete">
-                <i class="fas fa-circle-check"></i> Resolved
-            </button>
+            <div class="filter-toolbar">
+                <div class="filter-chip-row">
+                    <button class="filter-btn active" data-filter="all">
+                        <i class="fas fa-border-all"></i> All Concerns
+                    </button>
+                    <button class="filter-btn" data-filter="Pending">
+                        <i class="fas fa-hourglass-half"></i> Pending
+                    </button>
+                    <button class="filter-btn" data-filter="In Progress">
+                        <i class="fas fa-spinner"></i> In Progress
+                    </button>
+                    <button class="filter-btn" data-filter="Meeting Scheduled">
+                        <i class="fas fa-handshake"></i> Meeting Scheduled
+                    </button>
+                    <button class="filter-btn" data-filter="Complete">
+                        <i class="fas fa-circle-check"></i> Resolved
+                    </button>
+                </div>
+
+                <div class="filter-search">
+                    <i class="fas fa-magnifying-glass" aria-hidden="true"></i>
+                    <input id="concernSearchInput"
+                           class="concern-search-input"
+                           type="search"
+                           placeholder="Search by concern ID, subject, status, or message..."
+                           aria-label="Search concerns">
+                    <span id="visibleConcernCount" class="filter-count" th:text="${#lists.size(concerns)} + ' concerns shown'">0 concerns shown</span>
+                </div>
+            </div>
         </div>
 
         <!-- Empty State -->
@@ -1742,8 +1776,8 @@
                  class="concern-card animate-in"
                  th:classappend="'status-' + ${#strings.replace(concern.status, ' ', '-')}"
                  th:id="'concern-' + ${concern.concernId}"
-                 th:with="meetingProposal=${latestMeetingProposalMap[concern.concernId]}, meetingSlots=${meetingProposal != null ? meetingSlotsMapByProposalId[meetingProposal.proposalId] : null}"
-                 th:attr="data-status=${concern.status}"
+                  th:with="meetingProposal=${latestMeetingProposalMap[concern.concernId]}, meetingSlots=${meetingProposal != null ? meetingSlotsMapByProposalId[meetingProposal.proposalId] : null}, adminReplyCount=${#lists.size(repliesMap[concern.concernId].?[senderRole == null or !#strings.equalsIgnoreCase(senderRole, 'STUDENT')])}"
+                  th:attr="data-status=${concern.status},data-search=${('CON-' + concern.concernId + ' ' + (concern.subject != null ? concern.subject : '') + ' ' + (concern.message != null ? concern.message : '') + ' ' + concern.status + ' ' + (concern.aiPriorityLevel != null ? concern.aiPriorityLevel : ''))}"
                  th:style="'animation-delay: ' + ${0.08 * (iterStat.index + 3)} + 's'">
 
                 <!-- Clickable Summary Row -->
@@ -1763,6 +1797,20 @@
                             </span>
                             <span><i class="fas fa-clock"></i>
                                 <span th:text="${#temporals.format(concern.createdTime, 'hh:mm a')}">09:00 AM</span>
+                            </span>
+                        </div>
+                        <div class="concern-identifiers">
+                            <span class="identifier-pill replies">
+                                <i class="fas fa-comments"></i>
+                                <span th:text="${#lists.size(repliesMap[concern.concernId]) + ' total replies'}">0 total replies</span>
+                            </span>
+                            <span class="identifier-pill admin" th:if="${adminReplyCount > 0}">
+                                <i class="fas fa-shield-halved"></i>
+                                <span th:text="${adminReplyCount + (adminReplyCount == 1 ? ' admin reply' : ' admin replies')}">0 admin replies</span>
+                            </span>
+                            <span class="identifier-pill waiting" th:if="${adminReplyCount == 0}">
+                                <i class="fas fa-hourglass-half"></i>
+                                Awaiting first admin reply
                             </span>
                         </div>
                         <div class="linked-mini-chip" th:if="${concern.linkedConcern != null}">
@@ -1847,10 +1895,10 @@
 
                     <!-- Conversation Section -->
                     <div class="replies-section">
-                                    <div class="replies-header"
-                                        th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
+                        <div class="replies-header"
+                             th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
                             <i class="fas fa-reply reply-icon"></i>
-                            <span>Conversation</span>
+                            <span>Admin Replies &amp; Chat Timeline</span>
                             <span class="reply-count-badge"
                                   th:text="${#lists.size(repliesMap[concern.concernId])}">0</span>
                             <i class="fas fa-chevron-down toggle-icon"></i>
@@ -1859,10 +1907,15 @@
                         <div class="replies-collapsible"
                              th:classappend="${!#lists.isEmpty(repliesMap[concern.concernId])} ? 'open' : ''">
 
+                            <div class="replies-layout-legend">
+                                <span class="legend-item admin"><i class="fas fa-shield-halved"></i> Admin response</span>
+                                <span class="legend-item student"><i class="fas fa-user"></i> Your message</span>
+                            </div>
+
                             <!-- No replies yet -->
                             <div th:if="${#lists.isEmpty(repliesMap[concern.concernId])}" class="no-reply-pill">
                                 <i class="fas fa-hourglass-half"></i>
-                                Start your conversation with admin by sending a quick message.
+                                No admin response yet. Send a clear follow-up message to start the conversation.
                             </div>
 
                             <!-- Render chat timeline -->
@@ -1879,6 +1932,8 @@
                                             <i class="fas fa-user"></i>
                                             <span>You (Student)</span>
                                         </span>
+                                        <span class="reply-role-pill"
+                                              th:if="${reply.senderRole != null and #strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')}">Your message</span>
                                         <span class="reply-sender"
                                               th:if="${reply.senderRole == null or !#strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')}">
                                             <i class="fas fa-shield-halved"></i>
@@ -1886,6 +1941,8 @@
                                                   th:text="${((reply.admin.staffId != null and !reply.admin.staffId.isEmpty()) ? reply.admin.staffId : reply.admin.user.firstName) + ' (Admin)'}">admin001 (Admin)</span>
                                             <span th:if="${reply.admin == null or reply.admin.user == null}">Admin</span>
                                         </span>
+                                        <span class="reply-role-pill admin"
+                                              th:if="${reply.senderRole == null or !#strings.equalsIgnoreCase(reply.senderRole, 'STUDENT')}">Admin response</span>
                                         <span class="reply-time">
                                             <i class="fas fa-clock"></i>
                                             <span th:text="${#temporals.format(reply.replyTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026</span>
@@ -1906,9 +1963,10 @@
                                   th:if="${concern.status == 'Pending' or concern.status == 'In Progress' or concern.status == 'Meeting Scheduled'}"
                                   th:action="@{'/student/concern/' + ${concern.concernId} + '/chat'}"
                                   method="post">
-                                <p class="chat-compose-head"><i class="fas fa-comments"></i> Send Message to Admin</p>
+                                  <p class="chat-compose-head"><i class="fas fa-comments"></i> Send a Follow-up Message to Admin</p>
                                 <textarea class="chat-compose-input"
                                           name="message"
+                                        minlength="12"
                                           maxlength="1200"
                                           placeholder="Type your message to continue this concern conversation..."
                                           required></textarea>
@@ -2059,6 +2117,13 @@
                                     </div>
                                 </div>
 
+                                <div class="feedback-rating-hint" aria-live="polite">Select a rating to see guidance.</div>
+                                <div class="feedback-tags" role="group" aria-label="Quick feedback tags">
+                                    <button type="button" class="feedback-tag-btn" data-tag="Clear and helpful response from admin.">Clear response</button>
+                                    <button type="button" class="feedback-tag-btn" data-tag="Need faster response times for urgent issues.">Need faster response</button>
+                                    <button type="button" class="feedback-tag-btn" data-tag="Issue was resolved professionally.">Professional handling</button>
+                                </div>
+
                                 <!-- Comment -->
                                 <textarea name="comments"
                                           class="feedback-textarea"
@@ -2066,7 +2131,7 @@
                                           rows="3"></textarea>
 
                                 <div class="feedback-helper-row">
-                                    <span class="feedback-helper-text">Comment must be 10-100 characters when provided.</span>
+                                    <span class="feedback-helper-text">For 3 stars or below, add a comment so we can improve.</span>
                                     <span class="feedback-word-count">Characters: 0</span>
                                 </div>
                                 <div class="feedback-error-text"></div>
@@ -2137,6 +2202,13 @@
                                                 </div>
                                             </div>
 
+                                            <div class="feedback-rating-hint" aria-live="polite">Select a rating to see guidance.</div>
+                                            <div class="feedback-tags" role="group" aria-label="Quick feedback tags">
+                                                <button type="button" class="feedback-tag-btn" data-tag="Clear and helpful response from admin.">Clear response</button>
+                                                <button type="button" class="feedback-tag-btn" data-tag="Need faster response times for urgent issues.">Need faster response</button>
+                                                <button type="button" class="feedback-tag-btn" data-tag="Issue was resolved professionally.">Professional handling</button>
+                                            </div>
+
                                             <textarea name="comments"
                                                       class="feedback-textarea"
                                                       rows="3"
@@ -2144,7 +2216,7 @@
                                                       th:text="${feedbackMap[concern.concernId].comments}"></textarea>
 
                                             <div class="feedback-helper-row">
-                                                <span class="feedback-helper-text">Comment must be 10-100 characters when provided.</span>
+                                                <span class="feedback-helper-text">For 3 stars or below, add a comment so we can improve.</span>
                                                 <span class="feedback-word-count">Characters: 0</span>
                                             </div>
                                             <div class="feedback-error-text"></div>
@@ -2243,7 +2315,7 @@
     </div>
 </footer>
 
-<script src="/js/concern-history.js?v=20260404-3"></script>
+<script src="/js/concern-history.js?v=20260413-1"></script>
 <script>
     window.studentTourConfig = {
         pageId: 'concern-history',

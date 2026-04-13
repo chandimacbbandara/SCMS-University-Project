@@ -1,0 +1,457 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap");
+
+:root {
+    --student-theme-primary: #d0382b;
+    --student-theme-primary-dark: #ab261b;
+    --student-theme-accent: #0f766e;
+    --student-theme-accent-soft: #e6fffa;
+    --student-theme-info: #0369a1;
+    --student-theme-info-soft: #ecfeff;
+    --student-theme-bg: #eef3f9;
+    --student-theme-bg-soft: #f8fbff;
+    --student-theme-surface: #ffffff;
+    --student-theme-border: #dbe5f0;
+    --student-theme-text: #0f172a;
+    --student-theme-muted: #475569;
+    --student-theme-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+    --student-theme-shadow-strong: 0 22px 44px rgba(15, 23, 42, 0.14);
+}
+
+body.student-theme {
+    font-family: "Manrope", "Inter", "Segoe UI", Arial, sans-serif;
+    color: var(--student-theme-text);
+    background:
+        radial-gradient(circle at 4% -12%, rgba(208, 56, 43, 0.14) 0%, transparent 34%),
+        radial-gradient(circle at 100% 0%, rgba(3, 105, 161, 0.11) 0%, transparent 32%),
+        linear-gradient(180deg, #f9fcff 0%, var(--student-theme-bg) 46%, #e9f0f8 100%);
+}
+
+body.student-theme h1,
+body.student-theme h2,
+body.student-theme h3,
+body.student-theme h4,
+body.student-theme h5,
+body.student-theme .hero-title,
+body.student-theme .hero-name,
+body.student-theme .feed-title,
+body.student-theme .draft-hero h1,
+body.student-theme .profile-hero h1,
+body.student-theme .form-header h2,
+body.student-theme .rules-hero h1,
+body.student-theme .community-hero h1 {
+    font-family: "Sora", "Manrope", "Inter", sans-serif;
+    letter-spacing: -0.02em;
+}
+
+body.student-theme p,
+body.student-theme li,
+body.student-theme span,
+body.student-theme label,
+body.student-theme input,
+body.student-theme select,
+body.student-theme textarea,
+body.student-theme button {
+    letter-spacing: 0.002em;
+}
+
+body.student-theme main {
+    isolation: isolate;
+}
+
+body.student-theme .container.header-content {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    border-radius: 16px;
+    padding: 10px 14px;
+    margin-top: 10px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+}
+
+body.student-theme .nav-link {
+    font-weight: 700;
+    border-radius: 999px;
+    padding: 9px 13px;
+    transition: all 0.22s ease;
+}
+
+body.student-theme .nav-link.active,
+body.student-theme .nav-link:hover {
+    background: #fff1ef;
+    color: var(--student-theme-primary);
+}
+
+body.student-theme .btn-red {
+    background: linear-gradient(135deg, var(--student-theme-primary), var(--student-theme-primary-dark));
+    border-radius: 999px;
+    box-shadow: 0 10px 18px rgba(208, 56, 43, 0.28);
+}
+
+body.student-theme .nav-profile-btn,
+body.student-theme .nav-bell {
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+}
+
+body.student-theme .page-hero,
+body.student-theme .welcome-hero,
+body.student-theme .draft-hero,
+body.student-theme .profile-hero,
+body.student-theme .community-hero,
+body.student-theme .rules-hero,
+body.student-theme .student-focus-panel {
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 22px 46px rgba(208, 56, 43, 0.24);
+}
+
+body.student-theme .page-hero,
+body.student-theme .welcome-hero,
+body.student-theme .draft-hero,
+body.student-theme .profile-hero,
+body.student-theme .rules-hero {
+    background: linear-gradient(132deg, #d0382b 0%, #ea130c 52%, #f53a0b 100%);
+}
+
+body.student-theme .community-hero {
+    background: linear-gradient(126deg, #0f172a 0%, #1d3557 48%, #0f766e 100%);
+    box-shadow: 0 22px 46px rgba(15, 23, 42, 0.28);
+}
+
+body.student-theme .hero-pill,
+body.student-theme .hero-badge,
+body.student-theme .hero-count-badge,
+body.student-theme .hero-date-time {
+    border-radius: 14px;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.16);
+}
+
+body.student-theme .alert,
+body.student-theme .alert-toast,
+body.student-theme .alert-box,
+body.student-theme .flash-success,
+body.student-theme .flash-error {
+    border-radius: 12px;
+    border-width: 1px;
+    border-style: solid;
+}
+
+body.student-theme .flash-success,
+body.student-theme .alert-success,
+body.student-theme .alert-toast.success,
+body.student-theme .alert-box.alert-success {
+    color: #166534;
+    background: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+body.student-theme .flash-error,
+body.student-theme .alert-error,
+body.student-theme .alert-toast.error,
+body.student-theme .alert-box.alert-error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border-color: #fecaca;
+}
+
+body.student-theme .card,
+body.student-theme .form-card,
+body.student-theme .sidebar-card,
+body.student-theme .stat-card,
+body.student-theme .stat-pill,
+body.student-theme .profile-card,
+body.student-theme .actions-card,
+body.student-theme .tracking-section,
+body.student-theme .tips-section,
+body.student-theme .draft-summary,
+body.student-theme .draft-toolbar,
+body.student-theme .draft-card,
+body.student-theme .community-main-card,
+body.student-theme .community-side,
+body.student-theme .rules-card,
+body.student-theme .feed-controls,
+body.student-theme .scan-card,
+body.student-theme .post-card,
+body.student-theme .concern-card,
+body.student-theme .empty-state,
+body.student-theme .empty,
+body.student-theme .meeting-student-panel,
+body.student-theme .feedback-prompt,
+body.student-theme .feedback-submitted {
+    border: 1px solid var(--student-theme-border);
+    box-shadow: var(--student-theme-shadow);
+    background: var(--student-theme-surface);
+}
+
+body.student-theme .form-card,
+body.student-theme .community-main-card,
+body.student-theme .rules-card,
+body.student-theme .concern-card,
+body.student-theme .draft-card,
+body.student-theme .tracking-section,
+body.student-theme .tips-section {
+    border-radius: 20px;
+}
+
+body.student-theme .card-head,
+body.student-theme .section-title,
+body.student-theme .feed-head,
+body.student-theme .stream-label {
+    border-bottom-color: #e8eef6;
+}
+
+body.student-theme .tips-section,
+body.student-theme .tracking-section,
+body.student-theme .community-main-card,
+body.student-theme .form-card,
+body.student-theme .rules-card {
+    background:
+        radial-gradient(circle at 100% -10%, rgba(3, 105, 161, 0.06), transparent 36%),
+        radial-gradient(circle at -20% 120%, rgba(208, 56, 43, 0.07), transparent 36%),
+        #ffffff;
+}
+
+body.student-theme .dashboard-controls,
+body.student-theme .draft-toolbar,
+body.student-theme .filter-bar,
+body.student-theme .feed-controls,
+body.student-theme .top-actions {
+    border: 1px solid var(--student-theme-border);
+    background: #f8fbff;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    border-radius: 16px;
+}
+
+body.student-theme .control-search,
+body.student-theme .toolbar-search-wrap,
+body.student-theme .search-box,
+body.student-theme .filter-search,
+body.student-theme .input-field input,
+body.student-theme .input-field select,
+body.student-theme .textarea-field textarea,
+body.student-theme input,
+body.student-theme select,
+body.student-theme textarea,
+body.student-theme .feedback-textarea,
+body.student-theme .chat-compose-input,
+body.student-theme .meeting-reason-input {
+    border-radius: 12px;
+    border-color: #d8e2ee;
+}
+
+body.student-theme .control-search input:focus,
+body.student-theme .toolbar-search-wrap input:focus,
+body.student-theme .search-box input:focus,
+body.student-theme .input-field input:focus,
+body.student-theme .input-field select:focus,
+body.student-theme .textarea-field textarea:focus,
+body.student-theme input:focus,
+body.student-theme select:focus,
+body.student-theme textarea:focus,
+body.student-theme .feedback-textarea:focus,
+body.student-theme .chat-compose-input:focus,
+body.student-theme .meeting-reason-input:focus {
+    border-color: var(--student-theme-primary);
+    box-shadow: 0 0 0 4px rgba(208, 56, 43, 0.12);
+}
+
+body.student-theme .submit-btn,
+body.student-theme .btn-primary,
+body.student-theme .btn.update,
+body.student-theme .action-link.new,
+body.student-theme .new-concern-btn,
+body.student-theme .feedback-submit-btn,
+body.student-theme .chat-send-btn,
+body.student-theme .primary-submit,
+body.student-theme .meeting-btn-primary,
+body.student-theme .official-link:not(.secondary),
+body.student-theme .action-btn.complete {
+    border: none;
+    color: #ffffff;
+    background: linear-gradient(135deg, var(--student-theme-primary), var(--student-theme-primary-dark));
+    box-shadow: 0 10px 22px rgba(208, 56, 43, 0.24);
+}
+
+body.student-theme .submit-btn:hover,
+body.student-theme .btn-primary:hover,
+body.student-theme .btn.update:hover,
+body.student-theme .action-link.new:hover,
+body.student-theme .new-concern-btn:hover,
+body.student-theme .feedback-submit-btn:hover,
+body.student-theme .chat-send-btn:hover,
+body.student-theme .primary-submit:hover,
+body.student-theme .meeting-btn-primary:hover,
+body.student-theme .official-link:not(.secondary):hover,
+body.student-theme .action-btn.complete:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(208, 56, 43, 0.3);
+}
+
+body.student-theme .btn-subtle,
+body.student-theme .draft-btn,
+body.student-theme .back-btn,
+body.student-theme .drafts-btn,
+body.student-theme .action-link.back,
+body.student-theme .ghost-btn,
+body.student-theme .meeting-btn-secondary,
+body.student-theme .action-btn.view,
+body.student-theme .action-btn.update,
+body.student-theme .action-btn.delete,
+body.student-theme .btn.delete,
+body.student-theme .btn.submit {
+    border-radius: 11px;
+    border: 1px solid #cfdbea;
+    background: #f8fbff;
+    color: #1f3552;
+}
+
+body.student-theme .pill,
+body.student-theme .status-badge,
+body.student-theme .track-status-badge,
+body.student-theme .reply-count-badge,
+body.student-theme .results-count,
+body.student-theme .hero-pill,
+body.student-theme .filter-count,
+body.student-theme .stat-chip,
+body.student-theme .focus-pill,
+body.student-theme .identifier-pill {
+    border-radius: 999px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+body.student-theme .reply-bubble.from-admin,
+body.student-theme .reply-role-pill.admin,
+body.student-theme .legend-item.admin {
+    background: #ecfeff;
+    border-color: #a5f3fc;
+    color: #0e7490;
+}
+
+body.student-theme .reply-bubble.from-student,
+body.student-theme .reply-role-pill,
+body.student-theme .legend-item.student {
+    background: #fff1f7;
+    border-color: #f9a8d4;
+    color: #9d174d;
+}
+
+body.student-theme .notif-panel {
+    border-left: 1px solid #dbe5f0;
+    box-shadow: -10px 0 28px rgba(15, 23, 42, 0.14);
+}
+
+body.student-theme .notif-panel-header {
+    background: linear-gradient(135deg, var(--student-theme-primary), var(--student-theme-primary-dark));
+}
+
+body.student-theme .notif-panel-actions {
+    border-bottom: 1px solid #e8eef6;
+}
+
+body.student-theme .notif-item {
+    border: 1px solid #e4ebf5;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+}
+
+body.student-theme .notif-item.unread {
+    background: #fff8f1;
+    border-color: #fed7aa;
+}
+
+body.student-theme .notif-item.unread::before {
+    background: linear-gradient(180deg, #f97316, #ea580c);
+}
+
+body.student-theme .footer-content {
+    border-top: 1px solid #dbe5f0;
+}
+
+body.student-theme a,
+body.student-theme button {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+body.student-theme .concern-identifiers .identifier-pill,
+body.student-theme .feedback-tags .feedback-tag-btn,
+body.student-theme .thread-jump-link,
+body.student-theme .status-filter-btn,
+body.student-theme .filter-btn,
+body.student-theme .toolbar-select,
+body.student-theme .compact-toggle,
+body.student-theme .message-toggle {
+    font-weight: 700;
+}
+
+body.student-theme .profile-view-grid .view-item,
+body.student-theme .readonly-list li,
+body.student-theme .view-item,
+body.student-theme .form-validation-summary,
+body.student-theme .password-rule,
+body.student-theme .note-box,
+body.student-theme .locked-info-banner,
+body.student-theme .linked-concern-panel,
+body.student-theme .concern-message-block,
+body.student-theme .meeting-booked-card,
+body.student-theme .draft-message,
+body.student-theme .rules-note {
+    border-radius: 12px;
+}
+
+body.student-theme .rules-note,
+body.student-theme .locked-info-banner {
+    background: #ecfeff;
+    border: 1px solid #a5f3fc;
+    color: #0e7490;
+}
+
+body.student-theme .student-focus-title,
+body.student-theme .section-title,
+body.student-theme .feed-title,
+body.student-theme .side-heading,
+body.student-theme .rules-pill,
+body.student-theme .message-label,
+body.student-theme .feedback-prompt-title {
+    color: #0f172a;
+}
+
+@media (max-width: 960px) {
+    body.student-theme .container.header-content {
+        border-radius: 12px;
+    }
+
+    body.student-theme .community-grid,
+    body.student-theme .grid,
+    body.student-theme .concern-layout,
+    body.student-theme .dash-grid {
+        gap: 14px;
+    }
+}
+
+@media (max-width: 768px) {
+    body.student-theme .container.header-content {
+        padding: 8px 10px;
+    }
+
+    body.student-theme .page-hero,
+    body.student-theme .welcome-hero,
+    body.student-theme .draft-hero,
+    body.student-theme .profile-hero,
+    body.student-theme .community-hero,
+    body.student-theme .rules-hero {
+        border-radius: 18px;
+    }
+
+    body.student-theme .dashboard-container,
+    body.student-theme .profile-page,
+    body.student-theme .history-container,
+    body.student-theme .draft-shell,
+    body.student-theme .community-shell,
+    body.student-theme .concern-wrapper {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+}

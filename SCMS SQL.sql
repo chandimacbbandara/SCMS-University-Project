@@ -1,4 +1,4 @@
--- Active: 1775286114500@@mysql-3c9edaea-scmsuni.a.aivencloud.com@13336@mysql
+-- Active: 1775286114500@@mysql-3c9edaea-scmsuni.a.aivencloud.com@13336
 CREATE TABLE [User] (
     UserID INT PRIMARY KEY,
     Email VARCHAR(255) UNIQUE NOT NULL,

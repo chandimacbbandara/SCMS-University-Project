@@ -264,8 +264,44 @@
         var filterBtns = toArray(document.querySelectorAll('.filter-btn'));
         var cards = toArray(document.querySelectorAll('.concern-card'));
         var noResults = document.getElementById('noFilterResults');
+        var searchInput = document.getElementById('concernSearchInput');
+        var visibleCount = document.getElementById('visibleConcernCount');
+        var activeFilter = 'all';
 
         if (filterBtns.length === 0 || cards.length === 0) return;
+
+        function updateVisibleCount(totalVisible) {
+            if (!visibleCount) return;
+            visibleCount.textContent = totalVisible + (totalVisible === 1 ? ' concern shown' : ' concerns shown');
+        }
+
+        function applyFilters() {
+            var searchTerm = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            var visible = 0;
+
+            cards.forEach(function (card) {
+                var status = card.getAttribute('data-status') || '';
+                var haystack = (card.getAttribute('data-search') || '').toLowerCase();
+                var matchesFilter = activeFilter === 'all' || status === activeFilter;
+                var matchesSearch = searchTerm === '' || haystack.indexOf(searchTerm) !== -1;
+
+                if (matchesFilter && matchesSearch) {
+                    card.style.display = '';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                    card.style.pointerEvents = '';
+                    visible += 1;
+                } else {
+                    card.style.display = 'none';
+                    card.style.pointerEvents = 'none';
+                }
+            });
+
+            if (noResults) {
+                noResults.style.display = visible === 0 ? 'block' : 'none';
+            }
+            updateVisibleCount(visible);
+        }
 
         filterBtns.forEach(function (btn) {
             btn.addEventListener('click', function () {
@@ -273,39 +309,16 @@
                     b.classList.remove('active');
                 });
                 btn.classList.add('active');
-
-                var filter = btn.getAttribute('data-filter');
-                var visible = 0;
-                var delay = 0;
-
-                cards.forEach(function (card) {
-                    var status = card.getAttribute('data-status');
-                    if (filter === 'all' || status === filter) {
-                        card.style.display = '';
-                        card.style.opacity = '0';
-                        card.style.transform = 'translateY(16px)';
-                        setTimeout(function () {
-                            card.style.transition = 'all 0.4s cubic-bezier(.22,1,.36,1)';
-                            card.style.opacity = '1';
-                            card.style.transform = 'translateY(0)';
-                        }, delay);
-                        delay += 60;
-                        visible += 1;
-                    } else {
-                        card.style.transition = 'all 0.25s ease';
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.95)';
-                        setTimeout(function () {
-                            card.style.display = 'none';
-                        }, 250);
-                    }
-                });
-
-                if (noResults) {
-                    noResults.style.display = visible === 0 ? 'block' : 'none';
-                }
+                activeFilter = btn.getAttribute('data-filter') || 'all';
+                applyFilters();
             });
         });
+
+        if (searchInput) {
+            searchInput.addEventListener('input', applyFilters);
+        }
+
+        applyFilters();
     }
 
     function setupFeedbackValidation() {
@@ -314,14 +327,45 @@
             var commentField = form.querySelector('textarea[name="comments"]');
             var errorText = form.querySelector('.feedback-error-text');
             var wordCounter = form.querySelector('.feedback-word-count');
+            var ratingHint = form.querySelector('.feedback-rating-hint');
+            var quickTags = toArray(form.querySelectorAll('.feedback-tag-btn'));
 
             if (!commentField || ratingInputs.length === 0) {
                 return;
             }
 
+            var ratingMessages = {
+                1: 'Very poor: please explain what should have been handled better.',
+                2: 'Poor: tell us what improvement you expected from the admin response.',
+                3: 'Average: mention what was okay and what can still improve.',
+                4: 'Good: share what worked well in this concern handling.',
+                5: 'Excellent: thank you, your positive feedback helps us keep this standard.'
+            };
+
             function selectedRating() {
                 var checked = ratingInputs.find(function (input) { return input.checked; });
                 return checked ? Number(checked.value) : null;
+            }
+
+            function updateRatingHint(rating) {
+                if (!ratingHint) return;
+                ratingHint.textContent = ratingMessages[rating] || 'Select a rating to see guidance.';
+            }
+
+            function appendQuickTag(tagText) {
+                if (!tagText) return;
+
+                var current = commentField.value.trim();
+                var lowerCurrent = current.toLowerCase();
+                var lowerTag = tagText.toLowerCase();
+                if (lowerCurrent.indexOf(lowerTag) !== -1) {
+                    return;
+                }
+
+                var merged = current.length > 0 ? current + ' ' + tagText : tagText;
+                commentField.value = merged.length > 100 ? merged.slice(0, 100) : merged;
+                validateFeedbackRules();
+                commentField.focus();
             }
 
             function validateFeedbackRules() {
@@ -334,6 +378,8 @@
                 ratingInputs.forEach(function (input) {
                     input.setCustomValidity('');
                 });
+
+                updateRatingHint(rating);
 
                 if (wordCounter) {
                     wordCounter.textContent = 'Characters: ' + characters;
@@ -374,6 +420,12 @@
             });
 
             commentField.addEventListener('input', validateFeedbackRules);
+
+            quickTags.forEach(function (tagBtn) {
+                tagBtn.addEventListener('click', function () {
+                    appendQuickTag(tagBtn.getAttribute('data-tag') || '');
+                });
+            });
 
             form.addEventListener('submit', function (event) {
                 validateFeedbackRules();
