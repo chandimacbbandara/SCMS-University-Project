@@ -331,6 +331,14 @@ public class AdminController {
             return "redirect:/login";
         }
 
+        Concern concern = adminService.getConcernById(concernId);
+        if (concern != null
+                && ConcernMeetingService.STATUS_COMPLETE.equalsIgnoreCase(concern.getStatus())) {
+            redirectAttributes.addFlashAttribute("errorMessage",
+                    "Cannot schedule a meeting for a completed concern.");
+            return "redirect:/admin/concern/" + concernId;
+        }
+
         Integer adminUserId = (Integer) session.getAttribute("adminUserId");
         try {
             concernMeetingService.proposeMeetingSlots(concernId, adminUserId, slotStarts, slotEnds, adminNote);
