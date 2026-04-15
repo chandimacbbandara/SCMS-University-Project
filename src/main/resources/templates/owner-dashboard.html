@@ -292,6 +292,122 @@
             gap: 12px;
         }
 
+        .owner-tab-switcher {
+            margin: 0 0 16px;
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .owner-tab-btn {
+            border: 1px solid #dbe5ef;
+            border-radius: var(--owner-radius-md);
+            background: linear-gradient(145deg, #ffffff, #f8fbff);
+            padding: 12px 14px;
+            text-align: left;
+            cursor: pointer;
+            display: grid;
+            gap: 6px;
+            color: #0f172a;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+            transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+
+        .owner-tab-btn:hover {
+            transform: translateY(-2px);
+            border-color: #fecaca;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+        }
+
+        .owner-tab-btn.active {
+            border-color: #fb7185;
+            background: linear-gradient(145deg, #fff7f7, #fff);
+            box-shadow: 0 14px 30px rgba(244, 63, 94, 0.14);
+        }
+
+        .owner-tab-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .owner-tab-index {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            color: #334155;
+            border: 1px solid #d1d9e5;
+            background: #f8fafc;
+        }
+
+        .owner-tab-btn.active .owner-tab-index {
+            color: #9f1239;
+            border-color: #fda4af;
+            background: #fff1f2;
+        }
+
+        .owner-tab-shortcut {
+            font-size: 10px;
+            font-weight: 800;
+            color: #64748b;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: #f1f5f9;
+            border: 1px solid #dbe5ef;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .owner-tab-btn.active .owner-tab-shortcut {
+            color: #881337;
+            border-color: #fecdd3;
+            background: #fff1f2;
+        }
+
+        .owner-tab-title {
+            font-size: 14px;
+            font-weight: 800;
+            line-height: 1.35;
+        }
+
+        .owner-tab-sub {
+            margin: 0;
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.45;
+        }
+
+        .owner-tab-panels {
+            display: grid;
+            gap: 0;
+        }
+
+        .owner-tab-panel {
+            animation: ownerTabFade .25s ease;
+        }
+
+        .owner-tab-panel[hidden] {
+            display: none !important;
+        }
+
+        @keyframes ownerTabFade {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .stat-card {
             border-radius: var(--owner-radius-md);
             border: 1px solid var(--owner-border);
@@ -1009,6 +1125,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .owner-tab-switcher {
+                grid-template-columns: 1fr;
+            }
+
             .quick-actions,
             .owner-stats {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1072,6 +1192,541 @@
                 max-height: 430px;
             }
         }
+
+        /* UX refresh: cleaner, easier-to-scan owner workspace */
+        :root {
+            --owner-ui-bg: #f3f7fb;
+            --owner-ui-surface: #ffffff;
+            --owner-ui-surface-soft: #f8fafc;
+            --owner-ui-border: #d7e1ed;
+            --owner-ui-text: #122033;
+            --owner-ui-muted: #5b6b7f;
+            --owner-ui-accent: #b4233a;
+            --owner-ui-accent-soft: #ffe8ec;
+            --owner-ui-accent-strong: #8f1d30;
+            --owner-ui-info: #0f6ea8;
+            --owner-ui-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+        }
+
+        body {
+            color: var(--owner-ui-text);
+            background:
+                radial-gradient(circle at 12% -2%, rgba(180, 35, 58, 0.12), transparent 30%),
+                radial-gradient(circle at 90% 6%, rgba(15, 110, 168, 0.12), transparent 26%),
+                linear-gradient(180deg, #f8fbff 0%, var(--owner-ui-bg) 100%);
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            letter-spacing: -0.01em;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 90;
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            background: rgba(255, 255, 255, 0.92);
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .owner-shell {
+            max-width: 1320px;
+            margin: 22px auto 42px;
+            padding: 0 20px;
+        }
+
+        .flash-stack {
+            margin-bottom: 16px;
+        }
+
+        .flash-item {
+            border-radius: 14px;
+            padding: 14px 16px;
+            font-size: 13px;
+        }
+
+        .owner-hero {
+            margin-bottom: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 24px;
+            padding: 30px;
+            gap: 18px;
+            background: linear-gradient(125deg, #0f172a 0%, #1b2c42 48%, #144966 100%);
+        }
+
+        .owner-hero::before {
+            width: 300px;
+            height: 300px;
+            top: -120px;
+            right: -120px;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.3), transparent 65%);
+        }
+
+        .owner-hero::after {
+            width: 320px;
+            height: 320px;
+            left: -120px;
+            bottom: -200px;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.24), transparent 68%);
+        }
+
+        .hero-kicker {
+            padding: 6px 12px;
+            border-color: rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.14);
+            font-size: 10px;
+        }
+
+        .hero-title {
+            font-size: 34px;
+            margin-bottom: 12px;
+        }
+
+        .hero-sub {
+            max-width: 720px;
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .hero-action {
+            border-radius: 12px;
+            font-size: 13px;
+            padding: 10px 15px;
+        }
+
+        .hero-info-card {
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            background: rgba(255, 255, 255, 0.12);
+            padding: 14px 15px;
+        }
+
+        .hero-info-card strong {
+            font-size: 20px;
+        }
+
+        .owner-tab-switcher {
+            position: sticky;
+            top: 78px;
+            z-index: 60;
+            margin: 0 0 18px;
+            padding: 10px;
+            border: 1px solid var(--owner-ui-border);
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+            gap: 8px;
+        }
+
+        .owner-tab-btn {
+            border: 1px solid transparent;
+            border-radius: 14px;
+            background: transparent;
+            box-shadow: none;
+            padding: 12px;
+            gap: 5px;
+            transition: all .2s ease;
+        }
+
+        .owner-tab-btn:hover {
+            transform: translateY(0);
+            border-color: #ecd6dc;
+            box-shadow: none;
+            background: #fff6f8;
+        }
+
+        .owner-tab-btn.active {
+            border-color: #f3bdc6;
+            background: #ffffff;
+            box-shadow: 0 8px 18px rgba(180, 35, 58, 0.12);
+        }
+
+        .owner-tab-index {
+            border-radius: 10px;
+            background: #f1f5f9;
+            border-color: #d7e1ed;
+            color: #334155;
+            min-width: 32px;
+        }
+
+        .owner-tab-btn.active .owner-tab-index {
+            color: var(--owner-ui-accent-strong);
+            border-color: #f7c9d1;
+            background: #fff1f4;
+        }
+
+        .owner-tab-shortcut {
+            font-size: 9px;
+            padding: 3px 9px;
+            letter-spacing: .7px;
+            color: #61748a;
+            background: #f7fafc;
+            border-color: #dce6f1;
+        }
+
+        .owner-tab-btn.active .owner-tab-shortcut {
+            color: #8f1d30;
+            border-color: #ffd7df;
+            background: #fff2f5;
+        }
+
+        .owner-tab-title {
+            font-size: 13px;
+            font-weight: 800;
+            line-height: 1.4;
+        }
+
+        .owner-tab-sub {
+            font-size: 12px;
+            color: var(--owner-ui-muted);
+        }
+
+        .owner-tab-panels {
+            gap: 0;
+        }
+
+        .quick-actions,
+        .owner-stats,
+        .analytics-grid,
+        .operations-grid,
+        .export-bottom-section,
+        .dashboard-grid {
+            margin-bottom: 16px;
+            gap: 14px;
+        }
+
+        .quick-action-card {
+            border-radius: 16px;
+            border-color: var(--owner-ui-border);
+            background: linear-gradient(140deg, #ffffff, #f8fbff);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+            padding: 16px;
+            min-height: 132px;
+        }
+
+        .quick-action-card:hover {
+            transform: translateY(-1px);
+            border-color: #f3bdc6;
+            box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+        }
+
+        .quick-action-card h3 {
+            font-size: 15px;
+        }
+
+        .quick-action-card p {
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .stat-card {
+            border-radius: 16px;
+            border-color: var(--owner-ui-border);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            color: #5b6b7f;
+        }
+
+        .stat-value {
+            font-size: 29px;
+        }
+
+        .panel {
+            border: 1px solid var(--owner-ui-border);
+            border-radius: 18px;
+            background: var(--owner-ui-surface);
+            box-shadow: var(--owner-ui-shadow);
+        }
+
+        .panel-head,
+        .card-header {
+            padding: 16px 18px;
+            border-bottom: 1px solid #e6edf5;
+            background: linear-gradient(180deg, #ffffff, #fbfdff);
+        }
+
+        .panel-title h3,
+        .card-header h2 {
+            font-size: 17px;
+            margin-bottom: 2px;
+        }
+
+        .panel-title p,
+        .card-header p {
+            font-size: 12px;
+            color: var(--owner-ui-muted);
+        }
+
+        .panel-body,
+        .card-body {
+            padding: 16px 18px;
+        }
+
+        .btn-surface,
+        .btn-mini {
+            border-radius: 10px;
+            border-color: #ccd8e5;
+            color: #23334a;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 9px 12px;
+            transition: all .2s ease;
+        }
+
+        .btn-surface:hover,
+        .btn-mini:hover {
+            border-color: #9ab0c6;
+            background: #f8fbff;
+        }
+
+        .btn-surface.danger,
+        .btn-mini.danger {
+            border-color: #f3b9c4;
+            background: #fff1f4;
+            color: #9f1239;
+        }
+
+        .btn-primary {
+            border-radius: 12px;
+            font-size: 13px;
+            padding: 11px 16px;
+            background: linear-gradient(135deg, var(--owner-ui-accent), var(--owner-ui-accent-strong));
+            box-shadow: 0 12px 22px rgba(180, 35, 58, 0.24);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 24px rgba(180, 35, 58, 0.3);
+        }
+
+        .form-label {
+            font-size: 12px;
+            text-transform: none;
+            letter-spacing: .2px;
+            color: #324256;
+            margin-bottom: 7px;
+        }
+
+        .form-control {
+            border-color: #c8d5e2;
+            border-radius: 11px;
+            font-size: 14px;
+            padding: 11px 12px;
+            color: #102338;
+            background: #fff;
+        }
+
+        .form-control:focus {
+            border-color: var(--owner-ui-info);
+            box-shadow: 0 0 0 3px rgba(15, 110, 168, 0.18);
+        }
+
+        .metric-highlight {
+            border-radius: 14px;
+            border-color: #f7c9d1;
+            background: linear-gradient(180deg, #fff6f8, #fff);
+            padding: 11px;
+        }
+
+        .form-hint {
+            font-size: 11px;
+            line-height: 1.5;
+            color: #4f6178;
+        }
+
+        .chart-wrap {
+            height: 320px;
+            padding: 16px;
+        }
+
+        .status-summary {
+            gap: 10px;
+            padding: 0 16px 16px;
+        }
+
+        .status-pill {
+            border-radius: 12px;
+            border-color: #dbe5ef;
+            background: #f8fbff;
+            padding: 11px;
+        }
+
+        .monthly-filter-grid {
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .monthly-table-wrap {
+            margin-top: 12px;
+            border: 1px solid #d9e4ef;
+            border-radius: 14px;
+            max-height: 420px;
+        }
+
+        .monthly-table {
+            min-width: 960px;
+        }
+
+        .monthly-table thead th {
+            background: #f6faff;
+            color: #31465d;
+            font-size: 10px;
+            border-bottom-color: #d9e4ef;
+            padding: 10px;
+        }
+
+        .monthly-table tbody tr:nth-child(even) {
+            background: #fafcff;
+        }
+
+        .monthly-table tbody td {
+            padding: 10px;
+            font-size: 12px;
+            color: #1f344b;
+        }
+
+        .export-bottom-panel .panel-body {
+            align-items: stretch;
+            gap: 14px;
+        }
+
+        .export-help {
+            font-size: 13px;
+            line-height: 1.7;
+            color: #4f6178;
+        }
+
+        .export-actions-wrap {
+            border-radius: 14px;
+            border-color: #d7e1ed;
+            background: linear-gradient(140deg, #f7fbff, #ffffff);
+            padding: 14px;
+        }
+
+        .btn-export {
+            border-radius: 11px;
+            font-size: 13px;
+            padding: 11px;
+        }
+
+        .reports-panel .card-body {
+            height: 640px;
+        }
+
+        .reports-list {
+            gap: 12px;
+        }
+
+        .report-item {
+            border-radius: 14px;
+            border-color: #dae5f1;
+            padding: 13px;
+            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
+        }
+
+        .report-item:hover {
+            border-color: #f3bdc6;
+            box-shadow: 0 12px 22px rgba(15, 23, 42, 0.09);
+        }
+
+        .report-field {
+            border-style: solid;
+            border-color: #e2eaf3;
+            border-radius: 11px;
+            background: #fcfeff;
+            padding: 9px;
+        }
+
+        .footer-wrap {
+            margin-top: 20px;
+            padding: 14px 2px 4px;
+            border-top: 1px solid #dbe5ef;
+            color: #60748b;
+            font-size: 12px;
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 3px solid rgba(15, 110, 168, 0.28);
+            outline-offset: 1px;
+        }
+
+        @media (max-width: 1200px) {
+            .owner-tab-switcher {
+                position: static;
+            }
+
+            .quick-actions,
+            .owner-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .analytics-grid,
+            .dashboard-grid,
+            .export-bottom-panel .panel-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .owner-shell {
+                padding: 0 14px;
+                margin-top: 16px;
+            }
+
+            .owner-tab-switcher {
+                grid-template-columns: 1fr;
+                padding: 8px;
+            }
+
+            .owner-hero {
+                grid-template-columns: 1fr;
+                padding: 22px;
+            }
+
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .quick-actions,
+            .owner-stats,
+            .monthly-filter-grid,
+            .metrics-grid,
+            .status-summary,
+            .report-grid,
+            .export-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrap {
+                height: 260px;
+            }
+
+            .monthly-table {
+                min-width: 760px;
+            }
+
+            .reports-panel .card-body {
+                height: auto;
+            }
+
+            .reports-panel .reports-list {
+                max-height: 460px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1088,10 +1743,8 @@
             <ul>
                 <li><a href="/" class="nav-link">Home</a></li>
                 <li><a href="/owner/dashboard" class="nav-link active">Owner Dashboard</a></li>
-                <li><a href="/owner/admin/create-page" class="nav-link">Create Admin</a></li>
-                <li><a href="/owner/admin/manage" class="nav-link">Manage Admins</a></li>
-                <li><a href="/owner/notifications" class="nav-link">Notifications</a></li>
-                <li><a href="/owner/faq" class="nav-link">FAQ & Tips</a></li>
+                <li><a href="/owner/admin/workspace" class="nav-link">Admin Workspace</a></li>
+                <li><a href="/owner/notifications" class="nav-link">Content Workspace</a></li>
                 <li><a href="/logout" class="btn-red">Logout</a></li>
             </ul>
         </nav>
@@ -1114,14 +1767,14 @@
 
         <section class="owner-hero">
             <div class="hero-left">
-                <span class="hero-kicker"><i class="fas fa-crown"></i> Institute Owner Command Center</span>
-                <h1 class="hero-title">Strategic Overview and Analytics Governance</h1>
+                <span class="hero-kicker"><i class="fas fa-crown"></i> Owner Workspace</span>
+                <h1 class="hero-title">Owner Dashboard</h1>
                 <p class="hero-sub">
-                    Review concern performance, observe trends by category and status, create analytics snapshots, and export evidence-backed monthly insights for leadership reporting.
+                    Monitor concern activity, review monthly records, create analytics reports, and export files for meetings in one clean workspace.
                 </p>
                 <div class="hero-actions">
-                    <a href="/owner/admin/create-page" class="hero-action primary"><i class="fas fa-user-plus"></i> Create Admin Account</a>
-                    <a href="/owner/admin/manage" class="hero-action ghost"><i class="fas fa-user-gear"></i> Manage Admin Team</a>
+                    <a href="/owner/admin/workspace#create" class="hero-action primary"><i class="fas fa-user-plus"></i> Open Create Admin Tab</a>
+                    <a href="/owner/admin/workspace#manage" class="hero-action ghost"><i class="fas fa-user-gear"></i> Open Manage Admin Tab</a>
                 </div>
             </div>
             <div class="hero-right">
@@ -1136,23 +1789,55 @@
             </div>
         </section>
 
+        <section class="owner-tab-switcher" role="tablist" aria-label="Owner dashboard sections">
+            <button type="button" class="owner-tab-btn active" id="ownerTabAnalytics" role="tab" aria-controls="ownerPanelAnalytics" aria-selected="true" data-owner-tab-target="analytics">
+                <span class="owner-tab-head">
+                    <span class="owner-tab-index">01</span>
+                    <span class="owner-tab-shortcut">Shortcut 1</span>
+                </span>
+                <span class="owner-tab-title"><i class="fas fa-chart-column"></i> Live Analytics</span>
+                <p class="owner-tab-sub">Quick view of KPIs, category trends, and status distribution.</p>
+            </button>
+
+            <button type="button" class="owner-tab-btn" id="ownerTabMonthly" role="tab" aria-controls="ownerPanelMonthly" aria-selected="false" data-owner-tab-target="monthly">
+                <span class="owner-tab-head">
+                    <span class="owner-tab-index">02</span>
+                    <span class="owner-tab-shortcut">Shortcut 2</span>
+                </span>
+                <span class="owner-tab-title"><i class="fas fa-table-list"></i> Monthly Records and Export</span>
+                <p class="owner-tab-sub">Filter monthly concerns and download PDF or Excel reports.</p>
+            </button>
+
+            <button type="button" class="owner-tab-btn" id="ownerTabReports" role="tab" aria-controls="ownerPanelReports" aria-selected="false" data-owner-tab-target="reports">
+                <span class="owner-tab-head">
+                    <span class="owner-tab-index">03</span>
+                    <span class="owner-tab-shortcut">Shortcut 3</span>
+                </span>
+                <span class="owner-tab-title"><i class="fas fa-screwdriver-wrench"></i> Create and Manage Reports</span>
+                <p class="owner-tab-sub">Create new analytics snapshots and manage recent reports.</p>
+            </button>
+        </section>
+
+        <div class="owner-tab-panels">
+            <section class="owner-tab-panel" id="ownerPanelAnalytics" data-owner-tab-panel="analytics" role="tabpanel" aria-labelledby="ownerTabAnalytics">
+
         <section class="quick-actions">
-            <a class="quick-action-card" href="/owner/admin/create-page">
+            <a class="quick-action-card" href="/owner/admin/workspace#create">
                 <span class="quick-action-icon"><i class="fas fa-user-shield"></i></span>
                 <h3>Admin Provisioning</h3>
                 <p>Create verified admin accounts and expand operations safely.</p>
             </a>
-            <a class="quick-action-card" href="/owner/admin/manage">
+            <a class="quick-action-card" href="/owner/admin/workspace#manage">
                 <span class="quick-action-icon"><i class="fas fa-users-gear"></i></span>
                 <h3>Admin Governance</h3>
                 <p>Review existing admin accounts and apply account-level updates.</p>
             </a>
-            <a class="quick-action-card" href="/owner/notifications">
+            <a class="quick-action-card" href="/owner/notifications#notifications">
                 <span class="quick-action-icon"><i class="fas fa-bullhorn"></i></span>
                 <h3>Broadcast Center</h3>
                 <p>Publish messages to students quickly from one central place.</p>
             </a>
-            <a class="quick-action-card" href="/owner/faq">
+            <a class="quick-action-card" href="/owner/notifications#faq">
                 <span class="quick-action-icon"><i class="fas fa-circle-question"></i></span>
                 <h3>Knowledge Management</h3>
                 <p>Maintain FAQs and tips to reduce recurring concerns.</p>
@@ -1195,7 +1880,7 @@
                 <div class="panel-head">
                     <div class="panel-title">
                         <h3><i class="fas fa-chart-column"></i> Category Distribution</h3>
-                        <p>How submitted concerns are currently spread across categories</p>
+                        <p>See which categories currently receive the most concerns.</p>
                     </div>
                     <button type="button" class="btn-surface" id="refreshAnalyticsBtn"><i class="fas fa-rotate"></i> Refresh Data</button>
                 </div>
@@ -1208,7 +1893,7 @@
                 <div class="panel-head">
                     <div class="panel-title">
                         <h3><i class="fas fa-chart-pie"></i> Status Mix</h3>
-                        <p>Resolved vs pending vs rejected concerns across the institute</p>
+                        <p>View resolved, pending, and rejected concerns at a glance.</p>
                     </div>
                 </div>
                 <div class="chart-wrap">
@@ -1231,12 +1916,16 @@
             </article>
         </section>
 
+            </section>
+
+            <section class="owner-tab-panel" id="ownerPanelMonthly" data-owner-tab-panel="monthly" role="tabpanel" aria-labelledby="ownerTabMonthly" hidden>
+
         <section class="operations-grid">
             <article class="panel">
                 <div class="panel-head">
                     <div class="panel-title">
-                        <h3><i class="fas fa-table-list"></i> Monthly Concern Intelligence</h3>
-                        <p>Filter by month, category, and AI priority to inspect detailed concern records</p>
+                        <h3><i class="fas fa-table-list"></i> Monthly Concern Records</h3>
+                        <p>Choose month, category, and priority to load detailed monthly concern records.</p>
                     </div>
                     <button type="button" class="btn-surface danger" id="deleteAllRejectedBtn">
                         <i class="fas fa-trash-can"></i> Delete All Rejected
@@ -1245,7 +1934,7 @@
                 <div class="panel-body">
                     <div class="monthly-filter-grid">
                         <div class="form-group tight">
-                            <label class="form-label" for="monthlyReportMonth">Select Date (Monthly)</label>
+                            <label class="form-label" for="monthlyReportMonth">Select Month</label>
                             <input type="date" id="monthlyReportMonth" class="form-control" title="Pick a date for monthly report">
                         </div>
                         <div class="form-group tight">
@@ -1273,7 +1962,7 @@
                     </div>
 
                     <button type="button" class="btn-primary" id="generateMonthlyReportBtn">
-                        <i class="fas fa-filter-circle-xmark"></i> Generate Monthly Report
+                        <i class="fas fa-file-lines"></i> Load Monthly Records
                     </button>
 
                     <div class="monthly-table-wrap">
@@ -1307,13 +1996,13 @@
             <article class="panel export-bottom-panel">
                 <div class="panel-head">
                     <div class="panel-title">
-                        <h3><i class="fas fa-file-arrow-down"></i> Export Package</h3>
-                        <p>Download generated monthly records as PDF or Excel files</p>
+                        <h3><i class="fas fa-file-arrow-down"></i> Export Monthly Report</h3>
+                        <p>Download the currently loaded monthly data as PDF or Excel.</p>
                     </div>
                 </div>
                 <div class="panel-body">
                     <p class="export-help">
-                        Generate monthly records first. Then export polished reports for meetings and documentation. The file output includes selected month, category, and priority filters with institute branding.
+                        First load monthly records using filters above, then export a branded report for meetings or documentation.
                     </p>
                     <div class="export-actions-wrap">
                         <div class="export-actions">
@@ -1326,12 +2015,16 @@
             </article>
         </section>
 
+            </section>
+
+            <section class="owner-tab-panel" id="ownerPanelReports" data-owner-tab-panel="reports" role="tabpanel" aria-labelledby="ownerTabReports" hidden>
+
         <section class="dashboard-grid">
             <article class="panel">
                 <div class="card-header">
                     <div>
                         <h2><i class="fas fa-screwdriver-wrench"></i> Create Analytics Report</h2>
-                        <p>Select admin and category. Metrics auto-calculate from live concern and feedback data.</p>
+                        <p>Choose an admin and category. Metrics are auto-filled from live concern and feedback data.</p>
                     </div>
                 </div>
 
@@ -1340,7 +2033,7 @@
                         <input type="hidden" name="timePeriod" value="All Time">
 
                         <div class="form-group">
-                            <label class="form-label" for="adminSelect">Select Admin</label>
+                            <label class="form-label" for="adminSelect">Choose Admin</label>
                             <select name="adminIdFk" id="adminSelect" class="form-control" required title="Select admin">
                                 <option value="" selected>Loading admins...</option>
                             </select>
@@ -1348,7 +2041,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" for="categorySelect">Most Frequent Category</label>
+                            <label class="form-label" for="categorySelect">Category Filter</label>
                             <select name="mostFrequentCategory" id="categorySelect" class="form-control" required title="Select category">
                                 <option value="All Categories" selected>All Categories</option>
                                 <option value="Education (Creative and IT)">Education (Creative and IT)</option>
@@ -1392,7 +2085,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-paper-plane"></i> Create Report</button>
+                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-paper-plane"></i> Save Analytics Report</button>
                     </form>
                 </div>
             </article>
@@ -1401,7 +2094,7 @@
                 <div class="card-header">
                     <div>
                         <h2><i class="fas fa-clock-rotate-left"></i> Recent Reports</h2>
-                        <p>Refresh or remove analytics snapshots from the report timeline.</p>
+                        <p>Refresh values or remove older analytics snapshots from the timeline.</p>
                     </div>
                     <button type="button" class="btn-surface" id="refreshAllBtn"><i class="fas fa-arrows-rotate"></i> Refresh All</button>
                 </div>
@@ -1469,6 +2162,9 @@
             </article>
         </section>
 
+            </section>
+        </div>
+
         <div class="footer-wrap">
             <span>Owner Dashboard - Academy of Knowledge Bridge</span>
             <span>Operational intelligence for institute-level decisions</span>
@@ -1505,6 +2201,9 @@
     const generateMonthlyReportBtn = document.getElementById("generateMonthlyReportBtn");
     const monthlyReportTbody = document.getElementById("monthlyReportTbody");
 
+    const ownerTabButtons = Array.from(document.querySelectorAll(".owner-tab-btn"));
+    const ownerTabPanels = Array.from(document.querySelectorAll(".owner-tab-panel"));
+
     const refreshAnalyticsBtn = document.getElementById("refreshAnalyticsBtn");
     const refreshAllBtn = document.getElementById("refreshAllBtn");
     const deleteAllRejectedBtn = document.getElementById("deleteAllRejectedBtn");
@@ -1519,6 +2218,125 @@
     let adminDirectory = new Map();
     const ownerLogoPath = "/images/img1.jpeg";
     let ownerLogoDataUrl = null;
+
+    function resizeOwnerCharts() {
+        if (ownerCategoryChart && typeof ownerCategoryChart.resize === "function") {
+            ownerCategoryChart.resize();
+        }
+        if (ownerStatusChart && typeof ownerStatusChart.resize === "function") {
+            ownerStatusChart.resize();
+        }
+    }
+
+    function activateOwnerTab(tabKey, shouldFocus) {
+        if (!ownerTabButtons.length || !ownerTabPanels.length) {
+            return;
+        }
+
+        let selectedButton = null;
+
+        ownerTabButtons.forEach(function(button) {
+            const isActive = button.dataset.ownerTabTarget === tabKey;
+            button.classList.toggle("active", isActive);
+            button.setAttribute("aria-selected", isActive ? "true" : "false");
+            if (isActive) {
+                selectedButton = button;
+            }
+        });
+
+        ownerTabPanels.forEach(function(panel) {
+            const isActive = panel.dataset.ownerTabPanel === tabKey;
+            panel.hidden = !isActive;
+        });
+
+        if (selectedButton && shouldFocus) {
+            selectedButton.focus();
+        }
+
+        if (tabKey === "analytics") {
+            setTimeout(resizeOwnerCharts, 120);
+        }
+    }
+
+    function initializeOwnerTabs() {
+        if (!ownerTabButtons.length || !ownerTabPanels.length) {
+            return;
+        }
+
+        ownerTabButtons.forEach(function(button) {
+            button.addEventListener("click", function() {
+                const targetTab = button.dataset.ownerTabTarget || "analytics";
+                activateOwnerTab(targetTab, false);
+            });
+        });
+
+        document.addEventListener("keydown", function(event) {
+            if (event.altKey || event.ctrlKey || event.metaKey) {
+                return;
+            }
+
+            const target = event.target;
+            const tagName = target && target.tagName ? target.tagName.toUpperCase() : "";
+            if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT" || (target && target.isContentEditable)) {
+                return;
+            }
+
+            const keyToTab = {
+                "1": "analytics",
+                "2": "monthly",
+                "3": "reports"
+            };
+
+            const nextTab = keyToTab[event.key];
+            if (!nextTab) {
+                return;
+            }
+
+            event.preventDefault();
+            activateOwnerTab(nextTab, true);
+        });
+
+        const activeButton = ownerTabButtons.find(function(button) {
+            return button.classList.contains("active");
+        });
+        const initialTab = activeButton
+            ? activeButton.dataset.ownerTabTarget
+            : ownerTabButtons[0].dataset.ownerTabTarget;
+
+        activateOwnerTab(initialTab || "analytics", false);
+    }
+
+    function syncTabsWithTourHighlights() {
+        if (typeof MutationObserver !== "function" || !ownerTabPanels.length) {
+            return;
+        }
+
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type !== "attributes" || mutation.attributeName !== "class") {
+                    return;
+                }
+
+                const target = mutation.target;
+                if (!target || !target.classList || !target.classList.contains("admin-tour-highlight")) {
+                    return;
+                }
+
+                const parentPanel = target.closest(".owner-tab-panel");
+                if (!parentPanel || !parentPanel.dataset.ownerTabPanel) {
+                    return;
+                }
+
+                activateOwnerTab(parentPanel.dataset.ownerTabPanel, false);
+            });
+        });
+
+        observer.observe(document.body, {
+            subtree: true,
+            attributes: true,
+            attributeFilter: ["class"]
+        });
+    }
 
     function setExportStatus(text, isError) {
         if (!exportStatusText) {
@@ -2487,6 +3305,8 @@
     dismissFlashMessages();
     countThisMonthReports();
     initializeMonthlyDefaults();
+    initializeOwnerTabs();
+    syncTabsWithTourHighlights();
     bindEvents();
     loadAdmins();
     loadOwnerAnalyticsCharts();
@@ -2502,7 +3322,7 @@
             {
                 selector: 'header .header-content',
                 title: 'Owner Navigation',
-                content: 'Use this top navigation to move between Owner Dashboard, admin management, notifications, and FAQ controls.'
+                content: 'Use this top navigation to move between Owner Dashboard, the Admin Workspace, and the Content Workspace.'
             },
             {
                 selector: '.owner-hero',

@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Workspace - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/owner-theme.css">
+    <link rel="stylesheet" href="/CSS/admin-tour.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body.owner-theme {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.owner-theme main {
+            flex: 1;
+            width: 100%;
+        }
+
+        .workspace-hero {
+            padding: 28px 30px;
+            margin-bottom: 16px;
+            border-radius: 22px;
+            color: #fff;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 14px;
+            align-items: center;
+            background: linear-gradient(125deg, #0f172a 0%, #1b2c42 48%, #144966 100%);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.34);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workspace-hero::before {
+            content: "";
+            position: absolute;
+            right: -110px;
+            top: -110px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.28), transparent 66%);
+        }
+
+        .workspace-hero::after {
+            content: "";
+            position: absolute;
+            left: -130px;
+            bottom: -190px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.22), transparent 68%);
+        }
+
+        .workspace-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            margin: 0 0 9px;
+            font-size: 31px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-sub {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hero-action {
+            border-radius: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 9px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .hero-action.primary {
+            border-color: #f9a8b7;
+            background: linear-gradient(135deg, #c03954, #8f1d30);
+        }
+
+        .workspace-flash-stack {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .workspace-flash {
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workspace-flash.success {
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .workspace-flash.error {
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .workspace-tab-switcher {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid #d7e1ed;
+            background: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .workspace-tab-btn {
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: #122033;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 11px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workspace-tab-btn.active {
+            background: #ffffff;
+            border-color: #f3bdc6;
+            box-shadow: 0 8px 18px rgba(180, 35, 58, 0.12);
+            color: #8f1d30;
+        }
+
+        .workspace-panel[hidden] {
+            display: none !important;
+        }
+
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+        }
+
+        .setup-steps {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .step-chip {
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #fff, #f8fbff);
+            padding: 11px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .step-chip.active {
+            border-color: #f5c2cb;
+            background: linear-gradient(145deg, #fff6f8, #fff);
+        }
+
+        .step-chip.done {
+            border-color: #86efac;
+            background: linear-gradient(145deg, #f0fdf4, #ffffff);
+        }
+
+        .step-chip-no {
+            width: 24px;
+            height: 24px;
+            border-radius: 999px;
+            background: #fee2e2;
+            color: #9f1239;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 800;
+            flex-shrink: 0;
+        }
+
+        .step-chip-text {
+            font-size: 12px;
+            font-weight: 700;
+            color: #334155;
+            line-height: 1.45;
+        }
+
+        .security-strip {
+            border-radius: 12px;
+            border: 1px solid #cfe0ff;
+            background: linear-gradient(140deg, #eff6ff, #f8fbff);
+            color: #1f3a76;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-account-card {
+            border: 1px solid #d7e1ed;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .admin-account-header {
+            background: linear-gradient(135deg, #b4233a, #8f1d30);
+            padding: 18px 20px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .admin-account-header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .admin-account-header h2 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 800;
+        }
+
+        .admin-account-header p {
+            margin: 2px 0 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.82);
+        }
+
+        .admin-account-body {
+            padding: 16px 18px;
+        }
+
+        .stage-block {
+            border: 1px solid #dbe5ef;
+            border-radius: 12px;
+            background: #fff;
+            padding: 12px;
+            margin-bottom: 12px;
+        }
+
+        .stage-block.locked {
+            opacity: 0.64;
+            background: #f8fafc;
+        }
+
+        .section-divider {
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid #d8e4ef;
+            border-radius: 999px;
+            background: #f8fbff;
+            color: #51647a;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+            padding: 6px 10px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #324256;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #c8d5e2;
+            background: #fff;
+            color: #122033;
+            border-radius: 11px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #0f6ea8;
+            box-shadow: 0 0 0 3px rgba(15, 110, 168, 0.16);
+        }
+
+        .inline-row {
+            display: flex;
+            gap: 8px;
+            align-items: stretch;
+        }
+
+        .inline-row .form-control {
+            flex: 1;
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-verify-admin,
+        .btn-create-admin,
+        .btn-update,
+        .btn-delete,
+        .mini-btn {
+            border: none;
+            border-radius: 11px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-verify-admin,
+        .btn-create-admin,
+        .mini-btn.send,
+        .mini-btn.verify,
+        .btn-update {
+            color: #fff;
+            background: linear-gradient(135deg, #b4233a, #8f1d30);
+            box-shadow: 0 10px 20px rgba(143, 29, 48, 0.24);
+        }
+
+        .btn-create-admin {
+            width: 100%;
+            margin-top: 4px;
+        }
+
+        .btn-delete {
+            border: 1px solid #f4b7c3;
+            background: #fff1f4;
+            color: #9f1239;
+            box-shadow: none;
+        }
+
+        .btn-delete:hover {
+            background: #9f1239;
+            color: #fff;
+        }
+
+        .btn-verify-admin:disabled,
+        .btn-create-admin:disabled,
+        .mini-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+
+        .field-feedback {
+            margin-top: 6px;
+            min-height: 15px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #5b6b7f;
+        }
+
+        .field-feedback.ok {
+            color: #15803d;
+        }
+
+        .field-feedback.error {
+            color: #b91c1c;
+        }
+
+        .inline-status {
+            margin-top: 7px;
+            font-size: 12px;
+            font-weight: 800;
+            display: none;
+        }
+
+        .inline-status.ok {
+            color: #15803d;
+            display: block;
+        }
+
+        .inline-status.error {
+            color: #b91c1c;
+            display: block;
+        }
+
+        .form-hint {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #4f6178;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .admin-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-item {
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            background: linear-gradient(145deg, #fff, #f8fbff);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .admin-summary {
+            list-style: none;
+            display: grid;
+            grid-template-columns: minmax(180px, 1.1fr) minmax(160px, 1fr) minmax(210px, 1.2fr) auto auto;
+            gap: 10px;
+            align-items: center;
+            padding: 12px 14px;
+            cursor: pointer;
+            background: #fff;
+            border-bottom: 1px solid transparent;
+        }
+
+        .admin-summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .admin-item[open] .admin-summary {
+            border-bottom-color: #e5edf7;
+            background: #f8fbff;
+        }
+
+        .summary-name {
+            font-size: 14px;
+            font-weight: 900;
+            color: #112034;
+        }
+
+        .summary-username,
+        .summary-email {
+            font-size: 12px;
+            color: #4f6178;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .summary-meta {
+            font-size: 10px;
+            font-weight: 800;
+            color: #51647a;
+            border: 1px solid #d8e4ef;
+            background: #f8fbff;
+            border-radius: 999px;
+            padding: 3px 9px;
+        }
+
+        .summary-toggle {
+            width: 27px;
+            height: 27px;
+            border-radius: 999px;
+            border: 1px solid #dbe3ee;
+            color: #64748b;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s ease;
+        }
+
+        .admin-item[open] .summary-toggle {
+            transform: rotate(180deg);
+        }
+
+        .admin-panel {
+            padding: 14px;
+        }
+
+        .email-verify-wrap {
+            margin-top: 8px;
+            border-radius: 10px;
+            border: 1px dashed #f3bd6b;
+            background: #fffaf0;
+            padding: 8px 10px;
+            display: none;
+        }
+
+        .email-verify-label {
+            font-size: 12px;
+            color: #92400e;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 7px;
+        }
+
+        .email-verify-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .email-code-input {
+            max-width: 180px;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .empty-state {
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            background: #fff;
+            text-align: center;
+            padding: 30px 16px;
+            color: #64748b;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .empty-state h3 {
+            font-size: 17px;
+            color: #1f2937;
+            margin-bottom: 7px;
+        }
+
+        .delete-form {
+            margin-top: 8px;
+        }
+
+        footer {
+            padding: 24px 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+        }
+
+        .footer-left {
+            gap: 14px;
+        }
+
+        .footer-logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 10px;
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            margin-bottom: 2px;
+            letter-spacing: 0.8px;
+        }
+
+        .footer-sub,
+        .footer-right p {
+            font-size: 12px;
+        }
+
+        @media (max-width: 980px) {
+            .workspace-hero {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .hero-actions {
+                justify-content: flex-start;
+            }
+
+            .setup-steps,
+            .workspace-tab-switcher,
+            .admin-grid,
+            .row-2,
+            .actions {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-summary {
+                grid-template-columns: 1fr auto;
+            }
+
+            .summary-username,
+            .summary-email,
+            .summary-meta {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            footer {
+                padding: 18px 14px;
+            }
+
+            .inline-row {
+                flex-direction: column;
+            }
+
+            .email-code-input {
+                max-width: 100%;
+            }
+
+            .btn-delete {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="owner-theme">
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                <li><a href="/owner/admin/workspace" class="nav-link active">Admin Workspace</a></li>
+                <li><a href="/owner/notifications" class="nav-link">Content Workspace</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="owner-container" id="adminWorkspaceRoot" th:attr="data-initial-tab=${activeAdminTab}">
+
+        <div class="workspace-flash-stack">
+            <div th:if="${successMessage}" class="workspace-flash success" role="status">
+                <i class="fas fa-circle-check"></i>
+                <span th:text="${successMessage}">Success</span>
+            </div>
+            <div th:if="${errorMessage}" class="workspace-flash error" role="alert">
+                <i class="fas fa-circle-exclamation"></i>
+                <span th:text="${errorMessage}">Error</span>
+            </div>
+        </div>
+
+        <section class="workspace-hero">
+            <div>
+                <span class="hero-kicker"><i class="fas fa-user-shield"></i> Owner Admin Workspace</span>
+                <h1 class="hero-title">Create and Manage Admin Accounts</h1>
+                <p class="hero-sub">Verify admin emails, create new admin accounts, update existing profiles, and remove unused accounts from one place.</p>
+            </div>
+            <div class="hero-actions">
+                <a href="/owner/dashboard" class="hero-action"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                <button type="button" class="hero-action primary" id="openCreateFromHero"><i class="fas fa-user-plus"></i> Create Admin</button>
+            </div>
+        </section>
+
+        <section class="workspace-tab-switcher" role="tablist" aria-label="Admin workspace sections">
+            <button type="button" class="workspace-tab-btn" id="workspaceTabCreate" role="tab" aria-controls="adminPanelCreate" aria-selected="false" data-admin-tab-target="create">
+                <i class="fas fa-user-plus"></i>
+                <span>Create Admin</span>
+            </button>
+            <button type="button" class="workspace-tab-btn" id="workspaceTabManage" role="tab" aria-controls="adminPanelManage" aria-selected="false" data-admin-tab-target="manage">
+                <i class="fas fa-users-gear"></i>
+                <span>Manage Admins</span>
+            </button>
+        </section>
+
+        <div class="workspace-grid">
+            <section class="workspace-panel" id="adminPanelCreate" role="tabpanel" aria-labelledby="workspaceTabCreate" data-admin-tab-panel="create">
+                <div class="setup-steps">
+                    <div class="step-chip">
+                        <span class="step-chip-no">1</span>
+                        <span class="step-chip-text">Enter admin email and send verification code</span>
+                    </div>
+                    <div class="step-chip">
+                        <span class="step-chip-no">2</span>
+                        <span class="step-chip-text">Verify email ownership with the 6-digit code</span>
+                    </div>
+                    <div class="step-chip">
+                        <span class="step-chip-no">3</span>
+                        <span class="step-chip-text">Set username and strong password</span>
+                    </div>
+                </div>
+
+                <div class="security-strip">
+                    <i class="fas fa-shield-halved"></i>
+                    <span>Only verified emails can be used to create admin accounts.</span>
+                </div>
+
+                <div class="admin-account-card">
+                    <div class="admin-account-header">
+                        <div class="icon"><i class="fas fa-user-shield"></i></div>
+                        <div>
+                            <h2>Create Admin Account</h2>
+                            <p>Verify admin email, then set username and password</p>
+                        </div>
+                    </div>
+                    <div class="admin-account-body">
+                        <form id="adminCreateForm" novalidate onsubmit="return false;">
+                            <div class="stage-block" id="stageEmail">
+                                <div class="section-divider">Step 1: Email Verification</div>
+
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-envelope"></i> Admin Email</label>
+                                    <div class="inline-row">
+                                        <input type="email" id="adminEmail" class="form-control" placeholder="admin@example.com" required>
+                                        <button type="button" class="btn-verify-admin" id="sendAdminCodeBtn">Send Code</button>
+                                    </div>
+                                    <div id="emailLiveStatus" class="field-feedback"></div>
+                                    <div id="adminSendStatus" class="inline-status"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-key"></i> Verification Code</label>
+                                    <div class="inline-row">
+                                        <input type="text" id="adminVerifyCode" class="form-control" placeholder="6-digit code" maxlength="6" disabled>
+                                        <button type="button" class="btn-verify-admin" id="verifyAdminCodeBtn" disabled>Verify Code</button>
+                                    </div>
+                                    <div id="adminVerifyStatus" class="inline-status"></div>
+                                </div>
+                            </div>
+
+                            <div class="stage-block locked" id="stageCredentials">
+                                <div class="section-divider">Step 2: Credentials</div>
+
+                                <div class="admin-grid">
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-id-badge"></i> Username</label>
+                                        <input type="text" id="adminUsername" class="form-control" placeholder="username" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-lock"></i> Password</label>
+                                        <input type="password" id="adminPassword" class="form-control" placeholder="Strong password" disabled>
+                                        <div id="passwordLiveStatus" class="field-feedback"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-shield-halved"></i> Confirm Password</label>
+                                    <input type="password" id="adminConfirmPassword" class="form-control" placeholder="Re-enter password" disabled>
+                                    <div id="confirmPasswordLiveStatus" class="field-feedback"></div>
+                                    <div class="form-hint"><i class="fas fa-info-circle"></i> Use at least 12 chars with uppercase, lowercase, number, and special character.</div>
+                                </div>
+
+                                <button type="button" class="btn-create-admin" id="createAdminBtn" disabled>
+                                    <i class="fas fa-user-plus"></i> Create Admin Account
+                                </button>
+                                <div id="adminCreateStatus" class="inline-status"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <section class="workspace-panel" id="adminPanelManage" role="tabpanel" aria-labelledby="workspaceTabManage" data-admin-tab-panel="manage" hidden>
+                <div th:if="${admins == null or #lists.isEmpty(admins)}" class="empty-state">
+                    <i class="fas fa-user-slash"></i>
+                    <h3>No Admin Accounts Found</h3>
+                    <p>No admins are available right now. Create a new admin to get started.</p>
+                </div>
+
+                <div th:if="${admins != null and !#lists.isEmpty(admins)}" class="admin-list">
+                    <details class="admin-item" th:each="admin : ${admins}">
+                        <summary class="admin-summary">
+                            <span class="summary-name" th:text="${admin.user.firstName}">Admin</span>
+                            <span class="summary-username" th:text="'@' + ${admin.staffId}">@admin001</span>
+                            <span class="summary-email" th:text="${admin.user.email}">admin@example.com</span>
+                            <span class="summary-meta" th:text="'User ID: ' + ${admin.userId}">User ID: 1</span>
+                            <span class="summary-toggle"><i class="fas fa-chevron-down"></i></span>
+                        </summary>
+
+                        <div class="admin-panel">
+                            <form th:action="@{'/owner/admin/' + ${admin.userId} + '/update'}" method="post" class="admin-update-form" novalidate>
+                                <input type="hidden" name="emailVerifiedForUpdate" value="false" class="email-verified-flag">
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-envelope"></i> Email</label>
+                                    <input type="email" class="form-control" name="email" th:value="${admin.user.email}" th:attr="data-original-email=${admin.user.email}" required>
+                                    <div class="field-feedback email-feedback" aria-live="polite"></div>
+                                    <div class="email-verify-wrap">
+                                        <div class="email-verify-label"><i class="fas fa-envelope-open-text"></i> Verify this new email with a code</div>
+                                        <div class="email-verify-actions">
+                                            <button type="button" class="mini-btn send send-email-code-btn">Send Code</button>
+                                            <input type="text" class="form-control email-code-input" placeholder="Enter code" maxlength="6">
+                                            <button type="button" class="mini-btn verify verify-email-code-btn">Verify Code</button>
+                                        </div>
+                                        <div class="field-feedback email-verify-feedback" aria-live="polite"></div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label"><i class="fas fa-id-badge"></i> Username</label>
+                                    <input type="text" class="form-control" name="username" th:value="${admin.staffId}" required>
+                                </div>
+
+                                <div class="row-2">
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-lock"></i> New Password (optional)</label>
+                                        <input type="password" class="form-control" name="newPassword" placeholder="Leave blank to keep current">
+                                        <div class="field-feedback new-password-feedback" aria-live="polite"></div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label"><i class="fas fa-shield-halved"></i> Confirm Password</label>
+                                        <input type="password" class="form-control" name="confirmPassword" placeholder="Re-enter new password">
+                                        <div class="field-feedback confirm-password-feedback" aria-live="polite"></div>
+                                    </div>
+                                </div>
+
+                                <div class="actions">
+                                    <button type="submit" class="btn-update"><i class="fas fa-pen-to-square"></i> Update Admin</button>
+                                </div>
+                            </form>
+
+                            <form th:action="@{'/owner/admin/' + ${admin.userId} + '/delete'}" method="post" class="delete-form">
+                                <button type="submit" class="btn-delete" onclick="return confirm('Delete this admin account? This action cannot be undone.');">
+                                    <i class="fas fa-trash"></i> Delete
+                                </button>
+                            </form>
+                        </div>
+                    </details>
+                </div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<script>
+    (function () {
+        const root = document.getElementById("adminWorkspaceRoot");
+        const tabButtons = Array.from(document.querySelectorAll(".workspace-tab-btn"));
+        const tabPanels = Array.from(document.querySelectorAll(".workspace-panel"));
+        const createFromHero = document.getElementById("openCreateFromHero");
+
+        if (!root || !tabButtons.length || !tabPanels.length) {
+            return;
+        }
+
+        function activateTab(tabName, pushHash) {
+            tabButtons.forEach(function (button) {
+                const active = button.dataset.adminTabTarget === tabName;
+                button.classList.toggle("active", active);
+                button.setAttribute("aria-selected", active ? "true" : "false");
+            });
+
+            tabPanels.forEach(function (panel) {
+                panel.hidden = panel.dataset.adminTabPanel !== tabName;
+            });
+
+            if (pushHash) {
+                window.location.hash = tabName;
+            }
+        }
+
+        tabButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                activateTab(button.dataset.adminTabTarget || "manage", true);
+            });
+        });
+
+        if (createFromHero) {
+            createFromHero.addEventListener("click", function () {
+                activateTab("create", true);
+            });
+        }
+
+        window.addEventListener("hashchange", function () {
+            const hashTab = (window.location.hash || "").replace("#", "");
+            if (hashTab === "create" || hashTab === "manage") {
+                activateTab(hashTab, false);
+            }
+        });
+
+        document.querySelectorAll(".workspace-flash").forEach(function (alertBox) {
+            setTimeout(function () {
+                alertBox.style.transition = "opacity .45s ease, transform .45s ease";
+                alertBox.style.opacity = "0";
+                alertBox.style.transform = "translateY(-8px)";
+                setTimeout(function () {
+                    alertBox.remove();
+                }, 450);
+            }, 5200);
+        });
+
+        const initialFromHash = (window.location.hash || "").replace("#", "");
+        const initialFromServer = (root.dataset.initialTab || "manage").trim().toLowerCase();
+        const initial = (initialFromHash === "create" || initialFromHash === "manage")
+            ? initialFromHash
+            : (initialFromServer === "create" ? "create" : "manage");
+
+        activateTab(initial, false);
+    })();
+</script>
+
+<script>
+    (function () {
+        const stepChips = Array.from(document.querySelectorAll('.step-chip'));
+        const stageCredentials = document.getElementById('stageCredentials');
+        const adminEmail = document.getElementById('adminEmail');
+        const emailLiveStatus = document.getElementById('emailLiveStatus');
+        const sendAdminCodeBtn = document.getElementById('sendAdminCodeBtn');
+        const adminSendStatus = document.getElementById('adminSendStatus');
+        const adminVerifyCode = document.getElementById('adminVerifyCode');
+        const verifyAdminCodeBtn = document.getElementById('verifyAdminCodeBtn');
+        const adminVerifyStatus = document.getElementById('adminVerifyStatus');
+        const adminUsername = document.getElementById('adminUsername');
+        const adminPassword = document.getElementById('adminPassword');
+        const passwordLiveStatus = document.getElementById('passwordLiveStatus');
+        const adminConfirmPassword = document.getElementById('adminConfirmPassword');
+        const confirmPasswordLiveStatus = document.getElementById('confirmPasswordLiveStatus');
+        const createAdminBtn = document.getElementById('createAdminBtn');
+        const adminCreateStatus = document.getElementById('adminCreateStatus');
+
+        if (!stageCredentials || !adminEmail || !sendAdminCodeBtn || !adminVerifyCode || !verifyAdminCodeBtn || !adminUsername || !adminPassword || !adminConfirmPassword || !createAdminBtn) {
+            return;
+        }
+
+        let adminEmailVerified = false;
+
+        function updateStepState(index, status) {
+            const chip = stepChips[index];
+            if (!chip) {
+                return;
+            }
+            chip.classList.remove('active', 'done');
+            if (status === 'active') {
+                chip.classList.add('active');
+            }
+            if (status === 'done') {
+                chip.classList.add('done');
+            }
+        }
+
+        function setFieldStatus(el, message, ok, isError) {
+            if (!el) {
+                return;
+            }
+            el.textContent = message || '';
+            el.className = 'field-feedback';
+            if (message) {
+                if (ok) {
+                    el.classList.add('ok');
+                } else if (isError) {
+                    el.classList.add('error');
+                }
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+        }
+
+        function isStrongPassword(password) {
+            return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{12,}$/.test(password);
+        }
+
+        function refreshPasswordFeedback() {
+            const pwd = adminPassword.value || '';
+            const cpwd = adminConfirmPassword.value || '';
+
+            if (!pwd) {
+                setFieldStatus(passwordLiveStatus, 'Enter a strong password.', false, false);
+            } else if (isStrongPassword(pwd)) {
+                setFieldStatus(passwordLiveStatus, 'Strong password format is valid.', true, false);
+            } else {
+                setFieldStatus(passwordLiveStatus, 'Password must be 12+ chars with uppercase, lowercase, number, and special character.', false, true);
+            }
+
+            if (!cpwd) {
+                setFieldStatus(confirmPasswordLiveStatus, '', false, false);
+            } else if (pwd === cpwd) {
+                setFieldStatus(confirmPasswordLiveStatus, 'Passwords match.', true, false);
+            } else {
+                setFieldStatus(confirmPasswordLiveStatus, 'Passwords do not match.', false, true);
+            }
+        }
+
+        function setInlineStatus(el, message, ok) {
+            if (!el) {
+                return;
+            }
+            el.textContent = message || '';
+            el.className = 'inline-status ' + (ok ? 'ok' : 'error');
+        }
+
+        function resetAdminCreateFlow() {
+            adminEmailVerified = false;
+            adminVerifyCode.value = '';
+            adminUsername.value = '';
+            adminPassword.value = '';
+            adminConfirmPassword.value = '';
+
+            adminVerifyCode.disabled = true;
+            verifyAdminCodeBtn.disabled = true;
+            adminUsername.disabled = true;
+            adminPassword.disabled = true;
+            adminConfirmPassword.disabled = true;
+            createAdminBtn.disabled = true;
+            stageCredentials.classList.add('locked');
+
+            updateStepState(0, 'active');
+            updateStepState(1, '');
+            updateStepState(2, '');
+
+            if (adminVerifyStatus) {
+                adminVerifyStatus.className = 'inline-status';
+                adminVerifyStatus.textContent = '';
+            }
+            if (adminCreateStatus) {
+                adminCreateStatus.className = 'inline-status';
+                adminCreateStatus.textContent = '';
+            }
+            setFieldStatus(passwordLiveStatus, '', false, false);
+            setFieldStatus(confirmPasswordLiveStatus, '', false, false);
+        }
+
+        adminEmail.addEventListener('input', function () {
+            const email = adminEmail.value.trim();
+            if (!email) {
+                setFieldStatus(emailLiveStatus, 'Enter admin email to continue.', false, false);
+            } else if (isValidEmail(email)) {
+                setFieldStatus(emailLiveStatus, 'Email format looks valid.', true, false);
+            } else {
+                setFieldStatus(emailLiveStatus, 'Please enter a valid email address.', false, true);
+            }
+            resetAdminCreateFlow();
+        });
+
+        adminPassword.addEventListener('input', refreshPasswordFeedback);
+        adminConfirmPassword.addEventListener('input', refreshPasswordFeedback);
+
+        sendAdminCodeBtn.addEventListener('click', async function () {
+            const email = adminEmail.value.trim();
+            if (!email || !isValidEmail(email)) {
+                setInlineStatus(adminSendStatus, 'Please enter admin email first.', false);
+                return;
+            }
+
+            sendAdminCodeBtn.disabled = true;
+            sendAdminCodeBtn.textContent = 'Sending...';
+
+            try {
+                const res = await fetch('/owner/admin/send-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email: email }).toString()
+                });
+                const data = await res.json();
+                const ok = res.ok && data.status === 'ok';
+                setInlineStatus(adminSendStatus, data.message || 'Failed to send code.', ok);
+                if (ok) {
+                    adminVerifyCode.disabled = false;
+                    verifyAdminCodeBtn.disabled = false;
+                    adminVerifyCode.focus();
+                    updateStepState(0, 'done');
+                    updateStepState(1, 'active');
+                }
+            } catch (e) {
+                setInlineStatus(adminSendStatus, 'Unable to send code right now.', false);
+            } finally {
+                sendAdminCodeBtn.disabled = false;
+                sendAdminCodeBtn.textContent = 'Send Code';
+            }
+        });
+
+        verifyAdminCodeBtn.addEventListener('click', async function () {
+            const email = adminEmail.value.trim();
+            const code = adminVerifyCode.value.trim();
+            if (!email || !code) {
+                setInlineStatus(adminVerifyStatus, 'Enter both email and verification code.', false);
+                return;
+            }
+
+            verifyAdminCodeBtn.disabled = true;
+            verifyAdminCodeBtn.textContent = 'Checking...';
+
+            try {
+                const res = await fetch('/owner/admin/verify-code', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email: email, code: code }).toString()
+                });
+                const data = await res.json();
+                const ok = res.ok && data.status === 'ok';
+                adminEmailVerified = ok;
+                setInlineStatus(adminVerifyStatus, data.message || 'Verification failed.', ok);
+
+                if (ok) {
+                    adminEmail.disabled = true;
+                    sendAdminCodeBtn.disabled = true;
+                    adminVerifyCode.disabled = true;
+                    verifyAdminCodeBtn.disabled = true;
+
+                    adminUsername.disabled = false;
+                    adminPassword.disabled = false;
+                    adminConfirmPassword.disabled = false;
+                    createAdminBtn.disabled = false;
+                    stageCredentials.classList.remove('locked');
+                    updateStepState(1, 'done');
+                    updateStepState(2, 'active');
+                    adminUsername.focus();
+                }
+            } catch (e) {
+                setInlineStatus(adminVerifyStatus, 'Unable to verify code right now.', false);
+            } finally {
+                if (!adminEmailVerified) {
+                    verifyAdminCodeBtn.disabled = false;
+                }
+                verifyAdminCodeBtn.textContent = 'Verify Code';
+            }
+        });
+
+        createAdminBtn.addEventListener('click', async function () {
+            const email = adminEmail.value.trim();
+            const username = adminUsername.value.trim();
+            const password = adminPassword.value;
+            const confirmPassword = adminConfirmPassword.value;
+
+            if (!adminEmailVerified) {
+                setInlineStatus(adminCreateStatus, 'Please verify admin email first.', false);
+                return;
+            }
+
+            if (!username) {
+                setInlineStatus(adminCreateStatus, 'Username is required.', false);
+                return;
+            }
+
+            if (!isStrongPassword(password)) {
+                setInlineStatus(adminCreateStatus, 'Password is not strong enough.', false);
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                setInlineStatus(adminCreateStatus, 'Password and confirm password do not match.', false);
+                return;
+            }
+
+            createAdminBtn.disabled = true;
+            createAdminBtn.textContent = 'Creating...';
+
+            try {
+                const res = await fetch('/owner/admin/create', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        email: email,
+                        username: username,
+                        password: password,
+                        confirmPassword: confirmPassword
+                    }).toString()
+                });
+                const data = await res.json();
+                const ok = res.ok && data.status === 'ok';
+                setInlineStatus(adminCreateStatus, data.message || 'Failed to create admin account.', ok);
+                if (ok) {
+                    updateStepState(2, 'done');
+                    setTimeout(function () {
+                        window.location.reload();
+                    }, 900);
+                }
+            } catch (e) {
+                setInlineStatus(adminCreateStatus, 'Unable to create admin account right now.', false);
+            } finally {
+                createAdminBtn.disabled = false;
+                createAdminBtn.textContent = 'Create Admin Account';
+            }
+        });
+
+        updateStepState(0, 'active');
+        setFieldStatus(emailLiveStatus, 'Enter admin email to continue.', false, false);
+    })();
+</script>
+
+<script>
+    (function () {
+        const emailRegex = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])\S{12,}$/;
+
+        function setFeedback(input, el, message, isValid) {
+            if (!el || !input) {
+                return isValid;
+            }
+            el.textContent = message;
+            el.classList.remove('ok', 'error');
+            input.classList.remove('is-invalid');
+
+            if (!message) {
+                return isValid;
+            }
+
+            if (isValid) {
+                el.classList.add('ok');
+            } else {
+                el.classList.add('error');
+                input.classList.add('is-invalid');
+            }
+            return isValid;
+        }
+
+        document.querySelectorAll('.admin-update-form').forEach(function (form) {
+            const email = form.querySelector('input[name="email"]');
+            const newPassword = form.querySelector('input[name="newPassword"]');
+            const confirmPassword = form.querySelector('input[name="confirmPassword"]');
+            const emailVerifyWrap = form.querySelector('.email-verify-wrap');
+            const sendCodeBtn = form.querySelector('.send-email-code-btn');
+            const codeInput = form.querySelector('.email-code-input');
+            const verifyCodeBtn = form.querySelector('.verify-email-code-btn');
+            const emailVerifiedFlag = form.querySelector('.email-verified-flag');
+            const adminUserId = form.getAttribute('action').split('/').slice(-2)[0];
+
+            const emailFeedback = form.querySelector('.email-feedback');
+            const emailVerifyFeedback = form.querySelector('.email-verify-feedback');
+            const newPasswordFeedback = form.querySelector('.new-password-feedback');
+            const confirmPasswordFeedback = form.querySelector('.confirm-password-feedback');
+
+            if (!email || !newPassword || !confirmPassword || !emailVerifyWrap || !sendCodeBtn || !codeInput || !verifyCodeBtn || !emailVerifiedFlag) {
+                return;
+            }
+
+            let verifiedEmailValue = null;
+
+            function isEmailChanged() {
+                const original = (email.dataset.originalEmail || '').trim().toLowerCase();
+                const current = email.value.trim().toLowerCase();
+                return original !== current;
+            }
+
+            function resetEmailVerificationState() {
+                verifiedEmailValue = null;
+                emailVerifiedFlag.value = 'false';
+                codeInput.value = '';
+            }
+
+            function validateEmail() {
+                const value = email.value.trim();
+                if (!value) {
+                    emailVerifyWrap.style.display = 'none';
+                    resetEmailVerificationState();
+                    return setFeedback(email, emailFeedback, 'Email is required.', false);
+                }
+
+                if (!isEmailChanged()) {
+                    emailVerifyWrap.style.display = 'none';
+                    resetEmailVerificationState();
+                    setFeedback(email, emailFeedback, '', true);
+                    setFeedback(codeInput, emailVerifyFeedback, '', true);
+                    return true;
+                }
+
+                emailVerifyWrap.style.display = 'block';
+                const formatOk = emailRegex.test(value);
+                if (!formatOk) {
+                    resetEmailVerificationState();
+                    setFeedback(codeInput, emailVerifyFeedback, '', true);
+                    return setFeedback(email, emailFeedback, 'Enter a valid new email address.', false);
+                }
+
+                setFeedback(email, emailFeedback, 'New email format looks good.', true);
+
+                if (verifiedEmailValue && verifiedEmailValue.toLowerCase() === value.toLowerCase()) {
+                    emailVerifiedFlag.value = 'true';
+                    setFeedback(codeInput, emailVerifyFeedback, 'Email verified successfully.', true);
+                    return true;
+                }
+
+                emailVerifiedFlag.value = 'false';
+                setFeedback(codeInput, emailVerifyFeedback, 'Send and verify the code for this new email before updating.', false);
+                return false;
+            }
+
+            async function postFormEncoded(url, body) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8' },
+                    body: new URLSearchParams(body)
+                });
+                return response.json();
+            }
+
+            sendCodeBtn.addEventListener('click', async function () {
+                const value = email.value.trim();
+                if (!emailRegex.test(value) || !isEmailChanged()) {
+                    validateEmail();
+                    return false;
+                }
+
+                sendCodeBtn.disabled = true;
+                try {
+                    const data = await postFormEncoded('/owner/admin/' + adminUserId + '/email/send-code', { email: value });
+                    if (data.status === 'ok') {
+                        resetEmailVerificationState();
+                        setFeedback(codeInput, emailVerifyFeedback, data.message || 'Verification code sent.', true);
+                    } else {
+                        setFeedback(codeInput, emailVerifyFeedback, data.message || 'Failed to send verification code.', false);
+                    }
+                } catch (e) {
+                    setFeedback(codeInput, emailVerifyFeedback, 'Failed to send verification code. Try again.', false);
+                } finally {
+                    sendCodeBtn.disabled = false;
+                }
+            });
+
+            verifyCodeBtn.addEventListener('click', async function () {
+                const value = email.value.trim();
+                const code = codeInput.value.trim();
+
+                if (!emailRegex.test(value) || !isEmailChanged()) {
+                    validateEmail();
+                    return;
+                }
+
+                if (!code) {
+                    setFeedback(codeInput, emailVerifyFeedback, 'Enter the verification code sent to the new email.', false);
+                    return;
+                }
+
+                verifyCodeBtn.disabled = true;
+                try {
+                    const data = await postFormEncoded('/owner/admin/' + adminUserId + '/email/verify-code', { email: value, code: code });
+                    if (data.status === 'ok') {
+                        verifiedEmailValue = value;
+                        emailVerifiedFlag.value = 'true';
+                        setFeedback(codeInput, emailVerifyFeedback, data.message || 'Email verified successfully.', true);
+                    } else {
+                        verifiedEmailValue = null;
+                        emailVerifiedFlag.value = 'false';
+                        setFeedback(codeInput, emailVerifyFeedback, data.message || 'Invalid verification code.', false);
+                    }
+                } catch (e) {
+                    verifiedEmailValue = null;
+                    emailVerifiedFlag.value = 'false';
+                    setFeedback(codeInput, emailVerifyFeedback, 'Verification failed. Try again.', false);
+                } finally {
+                    verifyCodeBtn.disabled = false;
+                }
+            });
+
+            function validatePasswordPair() {
+                const pw = newPassword.value;
+                const cpw = confirmPassword.value;
+                const hasAny = pw.trim().length > 0 || cpw.trim().length > 0;
+
+                if (!hasAny) {
+                    setFeedback(newPassword, newPasswordFeedback, '', true);
+                    setFeedback(confirmPassword, confirmPasswordFeedback, '', true);
+                    return true;
+                }
+
+                let valid = true;
+                if (!strongPasswordRegex.test(pw)) {
+                    setFeedback(newPassword, newPasswordFeedback, 'Password needs 12+ chars with upper, lower, number and special char.', false);
+                    valid = false;
+                } else {
+                    setFeedback(newPassword, newPasswordFeedback, 'Strong password format accepted.', true);
+                }
+
+                if (!cpw) {
+                    setFeedback(confirmPassword, confirmPasswordFeedback, 'Confirm password is required when changing password.', false);
+                    valid = false;
+                } else if (pw !== cpw) {
+                    setFeedback(confirmPassword, confirmPasswordFeedback, 'Passwords do not match.', false);
+                    valid = false;
+                } else {
+                    setFeedback(confirmPassword, confirmPasswordFeedback, 'Passwords match.', true);
+                }
+
+                return valid;
+            }
+
+            email.addEventListener('input', validateEmail);
+            newPassword.addEventListener('input', validatePasswordPair);
+            confirmPassword.addEventListener('input', validatePasswordPair);
+
+            form.addEventListener('submit', function (event) {
+                const okEmail = validateEmail();
+                const okPassword = validatePasswordPair();
+                const ok = okEmail && okPassword;
+                if (!ok) {
+                    event.preventDefault();
+                }
+            });
+        });
+    })();
+</script>
+
+<script>
+    window.adminTourConfig = {
+        pageId: 'owner-admin-workspace',
+        autoStart: false,
+        storageKey: 'akb_owner_admin_workspace_tour_completed',
+        steps: [
+            {
+                selector: 'header .header-content',
+                title: 'Owner Navigation',
+                content: 'Use this navigation to move between dashboard, admin workspace, and content workspace.'
+            },
+            {
+                selector: '.workspace-hero',
+                title: 'Admin Workspace Overview',
+                content: 'This area explains what you can do here and gives quick access to dashboard and create flow.'
+            },
+            {
+                selector: '.workspace-tab-switcher',
+                title: 'Switch Between Tasks',
+                content: 'Use these tabs to move between creating admins and managing existing admin accounts.'
+            },
+            {
+                selector: '#stageEmail',
+                title: 'Step 1: Verify Email',
+                content: 'Enter an admin email, send the verification code, and verify ownership before account creation.'
+            },
+            {
+                selector: '#stageCredentials',
+                title: 'Step 2: Create Credentials',
+                content: 'After verification, set username and a strong password to create the new admin account.'
+            },
+            {
+                selector: '.admin-list',
+                title: 'Manage Existing Admins',
+                content: 'Expand an admin card to update email, username, password, or delete the account.'
+            }
+        ]
+    };
+</script>
+<script src="/js/admin-tour.js"></script>
+</body>
+</html>
