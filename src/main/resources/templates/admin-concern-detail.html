@@ -195,7 +195,7 @@
         }
 
         .detail-container {
-            width: min(1080px, 95%);
+            width: min(1140px, 95%);
             margin: 26px auto 56px;
             padding: 0;
             animation: revealPage 0.7s cubic-bezier(.2, .9, .2, 1);
@@ -226,6 +226,210 @@
             transform: translateX(-4px);
             background: #fff;
             box-shadow: 0 8px 24px rgba(var(--brand-rgb), 0.2);
+        }
+
+        .admin-flow-hero {
+            position: relative;
+            margin: 0 0 18px;
+            border-radius: 24px;
+            border: 1px solid rgba(var(--brand-rgb), 0.22);
+            background:
+                radial-gradient(circle at 92% -14%, rgba(var(--brand-rgb), 0.16), transparent 48%),
+                linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(249, 251, 255, 0.92));
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.12);
+            padding: 20px 22px;
+            overflow: hidden;
+        }
+
+        .admin-flow-hero::after {
+            content: '';
+            position: absolute;
+            inset: auto -40px -70px auto;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--brand-rgb), 0.16), transparent 64%);
+            pointer-events: none;
+        }
+
+        .flow-topline {
+            margin: 0 0 8px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.95px;
+            text-transform: uppercase;
+            color: var(--brand-strong);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            background: rgba(var(--brand-rgb), 0.11);
+            border: 1px solid rgba(var(--brand-rgb), 0.2);
+            padding: 6px 10px;
+        }
+
+        .flow-title {
+            margin: 0;
+            font-size: clamp(1.25rem, 1.06rem + 1vw, 1.95rem);
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+            color: #0f172a;
+            max-width: 760px;
+        }
+
+        .flow-title strong {
+            color: var(--brand-strong);
+        }
+
+        .flow-sub {
+            margin: 10px 0 14px;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.65;
+            max-width: 920px;
+            font-weight: 500;
+        }
+
+        .flow-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .flow-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            color: #334155;
+            font-weight: 700;
+            min-height: 42px;
+        }
+
+        .flow-stat i {
+            color: var(--brand);
+        }
+
+        .flow-stat strong {
+            color: #0f172a;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .flow-quick-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .flow-link {
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 999px;
+            border: 1px solid #d6deed;
+            background: #fff;
+            color: #334155;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .flow-link span {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #fff;
+            background: linear-gradient(135deg, var(--brand-light), var(--brand));
+        }
+
+        .flow-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(var(--brand-rgb), 0.35);
+            box-shadow: 0 8px 20px rgba(var(--brand-rgb), 0.18);
+        }
+
+        #section-concern-overview,
+        #section-conversation,
+        #section-reply-compose {
+            scroll-margin-top: 96px;
+        }
+
+        .section-ribbon {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .section-step {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(145deg, var(--brand-light), var(--brand));
+            box-shadow: 0 8px 18px rgba(var(--brand-rgb), 0.25);
+            flex-shrink: 0;
+        }
+
+        .section-ribbon .section-heading {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #0f172a;
+            letter-spacing: -0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0;
+            border: none;
+        }
+
+        .section-note {
+            margin: 4px 0 0;
+            color: #64748b;
+            font-size: 12px;
+            line-height: 1.55;
+            font-weight: 600;
+        }
+
+        .section-intro-copy {
+            margin: -4px 0 14px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .message-label {
+            margin: 0 0 8px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.85px;
+            color: #475569;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
         }
 
         .alert {
@@ -262,6 +466,7 @@
             margin-bottom: 22px;
             position: relative;
             overflow: hidden;
+            transition: transform 0.26s ease, box-shadow 0.26s ease;
         }
 
         .concern-card::before,
@@ -279,6 +484,14 @@
         .replies-section,
         .reply-form-section {
             padding: 34px;
+        }
+
+        .concern-card:hover,
+        .status-section:hover,
+        .replies-section:hover,
+        .reply-form-section:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
         }
 
         .status-section {
@@ -449,6 +662,7 @@
         }
 
         .concern-message {
+            position: relative;
             background: #fff;
             border: 1px solid var(--line);
             border-radius: 18px;
@@ -458,6 +672,18 @@
             font-size: 15px;
             color: #222;
             box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+            background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
+        }
+
+        .concern-message::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            bottom: 14px;
+            width: 4px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, var(--brand-light), var(--brand));
         }
 
         .linked-thread-card {
@@ -675,11 +901,42 @@
         }
 
         .conversation-shell {
-            border: 1px dashed #d6deeb;
+            border: 1px dashed #cfd8ea;
             border-radius: 18px;
-            background: linear-gradient(180deg, #fbfdff 0%, #f7faff 100%);
-            padding: 14px;
+            background: linear-gradient(180deg, #fcfdff 0%, #f6f9ff 100%);
+            padding: 16px;
             margin-bottom: 14px;
+        }
+
+        .conversation-legend {
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .legend-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            border: 1px solid transparent;
+            letter-spacing: 0.2px;
+        }
+
+        .legend-pill.admin {
+            color: #1d4ed8;
+            background: #dbeafe;
+            border-color: #93c5fd;
+        }
+
+        .legend-pill.student {
+            color: #6d28d9;
+            background: #ede9fe;
+            border-color: #c4b5fd;
         }
 
         .conversation-toolbar {
@@ -734,6 +991,15 @@
             max-height: 520px;
             overflow-y: auto;
             padding-right: 4px;
+        }
+
+        .conversation-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .conversation-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 999px;
         }
 
         .reply-item {
@@ -972,6 +1238,13 @@
             line-height: 1.65;
         }
 
+        .reply-form {
+            padding: 16px;
+            border: 1px solid #dbe4f3;
+            border-radius: 18px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+        }
+
         .reply-form textarea::placeholder,
         .update-reply-textarea::placeholder {
             color: #94a3b8;
@@ -1116,6 +1389,20 @@
             flex-wrap: wrap;
             gap: 10px;
             align-items: center;
+        }
+
+        .meeting-disabled-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 10px;
+            border: 1px solid #dbe4f3;
+            background: #f8fafc;
+            color: #475569;
+            padding: 9px 12px;
+            font-size: 12px;
+            font-weight: 700;
+            line-height: 1.4;
         }
 
         .meeting-history-wrap {
@@ -1440,6 +1727,19 @@
                 margin-top: 22px;
             }
 
+            .admin-flow-hero {
+                padding: 16px;
+            }
+
+            .flow-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .flow-link {
+                width: 100%;
+                justify-content: flex-start;
+            }
+
             .concern-card,
             .status-section,
             .replies-section,
@@ -1505,12 +1805,57 @@
 
             <a th:href="${concern.category == 'Education (Creative and IT)'} ? @{/admin/edu-dashboard} : @{/admin/dashboard}" class="back-link">&larr; Back to Dashboard</a>
 
+            <section class="admin-flow-hero" aria-label="Admin response guide">
+                <p class="flow-topline"><i class="fas fa-route"></i> Admin Response Workspace</p>
+                <h1 class="flow-title">
+                    Resolve <strong th:text="'CON-' + ${concern.concernId}">CON-1</strong> with a clear section-by-section flow
+                </h1>
+                <p class="flow-sub">
+                    Review the student concern, inspect the full chat timeline, then submit an action-oriented reply from the final section.
+                    This layout helps you process context quickly and respond with confidence.
+                </p>
+                <div class="flow-stats">
+                    <div class="flow-stat">
+                        <i class="fas fa-signal"></i>
+                        Status:
+                        <strong th:text="${concern.status}">Pending</strong>
+                    </div>
+                    <div class="flow-stat">
+                        <i class="fas fa-layer-group"></i>
+                        Category:
+                        <strong th:text="${concern.category != null ? concern.category : 'Unassigned'}">Institute Problem</strong>
+                    </div>
+                    <div class="flow-stat">
+                        <i class="fas fa-comments"></i>
+                        Messages:
+                        <strong th:text="${replies != null ? #lists.size(replies) : 0}">0</strong>
+                    </div>
+                    <div class="flow-stat">
+                        <i class="fas fa-star"></i>
+                        Feedback:
+                        <strong th:text="${feedback != null ? 'Submitted' : 'Pending'}">Pending</strong>
+                    </div>
+                </div>
+                <div class="flow-quick-links" aria-label="Jump to key sections">
+                    <a class="flow-link" href="#section-concern-overview"><span>01</span> Student Concern Message</a>
+                    <a class="flow-link" href="#section-conversation"><span>02</span> Admin &amp; Student Chat</a>
+                    <a class="flow-link" href="#section-reply-compose"><span>03</span> Submit Admin Reply</a>
+                </div>
+            </section>
+
             <!-- Alerts -->
             <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
             <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
 
             <!-- Concern Details -->
-            <div class="concern-card">
+            <div class="concern-card" id="section-concern-overview">
+                <div class="section-ribbon">
+                    <span class="section-step">01</span>
+                    <div>
+                        <h3 class="section-heading"><i class="fas fa-file-lines"></i> Student Concern Message</h3>
+                        <p class="section-note">Start here to review the original student message, profile context, and evidence before replying.</p>
+                    </div>
+                </div>
                 <div class="card-header">
                     <div>
                         <span class="concern-id" th:text="'CON-' + ${concern.concernId}">CON-1</span>
@@ -1571,6 +1916,8 @@
                     </ul>
                 </div>
 
+                <p class="message-label"><i class="fas fa-comment-dots"></i> Original student message</p>
+
                 <div class="concern-message" th:text="${concern.message}">
                     Concern message goes here...
                 </div>
@@ -1621,9 +1968,17 @@
                 </div>
 
                 <div class="meeting-actions">
-                    <button type="button" class="mark-read-btn" onclick="openMeetingModal()">
+                    <button type="button"
+                            class="mark-read-btn"
+                            th:if="${concern.status != 'Complete'}"
+                            onclick="openMeetingModal()">
                         <i class="fas fa-calendar-plus"></i> Schedule Time Slots
                     </button>
+
+                    <span class="meeting-disabled-note" th:if="${concern.status == 'Complete'}">
+                        <i class="fas fa-lock"></i>
+                        Meeting scheduling is disabled because this concern is already completed.
+                    </span>
 
                     <form th:if="${concern.meetingStatus == 'BOOKED' and concern.status != 'Complete'}"
                           th:action="@{'/admin/concern/' + ${concern.concernId} + '/status'}"
@@ -1663,10 +2018,23 @@
             </div>
 
             <!-- Previous Replies -->
-            <div class="replies-section">
+            <div class="replies-section" id="section-conversation">
+                <div class="section-ribbon">
+                    <span class="section-step">02</span>
+                    <div>
+                        <h3 class="section-heading"><i class="fas fa-comments"></i> Admin &amp; Student Chat</h3>
+                        <p class="section-note">Track message history clearly, compare both sides quickly, and update only the latest admin reply when needed.</p>
+                    </div>
+                </div>
                 <h3 th:text="${linkedConcerns != null and !#lists.isEmpty(linkedConcerns)} ? 'Conversation (Current + Linked Concern History)' : 'Conversation (Admin & Student)'">
                     Conversation (Admin &amp; Student)
                 </h3>
+                <p class="section-intro-copy">Use filters to focus on only admin or student messages while keeping the conversation context intact.</p>
+
+                <div class="conversation-legend" th:if="${!#lists.isEmpty(replies)}">
+                    <span class="legend-pill admin"><i class="fas fa-user-shield"></i> Admin messages</span>
+                    <span class="legend-pill student"><i class="fas fa-user-graduate"></i> Student messages</span>
+                </div>
 
                 <div class="conversation-shell">
                     <div class="conversation-toolbar" th:if="${!#lists.isEmpty(replies)}">
@@ -1772,8 +2140,16 @@
             </div>
 
             <!-- Reply Form -->
-            <div class="reply-form-section">
+            <div class="reply-form-section" id="section-reply-compose">
+                <div class="section-ribbon">
+                    <span class="section-step">03</span>
+                    <div>
+                        <h3 class="section-heading"><i class="fas fa-paper-plane"></i> Submit Admin Reply</h3>
+                        <p class="section-note">Compose a concise resolution update, attach supporting evidence, and close or progress the concern from one place.</p>
+                    </div>
+                </div>
                 <h3>Send Reply</h3>
+                <p class="section-intro-copy">Best results come from clear next actions, expected timelines, and precise attachment evidence.</p>
                 <form id="replyForm" th:action="@{'/admin/concern/' + ${concern.concernId} + '/reply'}" method="post" enctype="multipart/form-data" class="reply-form"
                       th:object="${replyDTO}">
 
@@ -1812,7 +2188,10 @@
         </div>
     </main>
 
-    <div id="meetingModalOverlay" class="meeting-modal-overlay" onclick="closeMeetingModal(event)">
+        <div id="meetingModalOverlay"
+            class="meeting-modal-overlay"
+            th:if="${concern.status != 'Complete'}"
+            onclick="closeMeetingModal(event)">
         <div class="meeting-modal" onclick="event.stopPropagation()">
             <div class="meeting-modal-header">
                 <h4><i class="fas fa-calendar-check"></i> Schedule Physical Meeting Slots</h4>

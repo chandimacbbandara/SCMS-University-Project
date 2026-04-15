@@ -150,16 +150,14 @@ def model_priority(model_dir: str, label_encoder: Any, category: str, subject: s
 
     model.eval()
 
-    # Align with notebook behavior by classifying the concern message text.
-    # Including subject/category caused low-severity concerns to skew to High.
-    combined_text = message.strip()
-    if not combined_text:
-        combined_text = subject.strip()
-    if not combined_text:
-        combined_text = category.strip()
+    model_text = message.strip()
+    if not model_text:
+        model_text = subject.strip()
+    if not model_text:
+        model_text = category.strip()
 
     encoded = tokenizer(
-        combined_text,
+        model_text,
         return_tensors="pt",
         truncation=True,
         padding=True,

@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Workspace - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/owner-theme.css">
+    <link rel="stylesheet" href="/CSS/admin-tour.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body.owner-theme {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.owner-theme main {
+            flex: 1;
+            width: 100%;
+        }
+
+        .workspace-flash-stack {
+            display: grid;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .workspace-flash {
+            border-radius: 12px;
+            padding: 12px 14px;
+            font-size: 13px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workspace-flash.success {
+            color: #166534;
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+        }
+
+        .workspace-flash.error {
+            color: #b91c1c;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+        }
+
+        .workspace-hero {
+            border-radius: 24px;
+            padding: 30px 32px;
+            margin-bottom: 16px;
+            color: #fff;
+            background: linear-gradient(125deg, #0f172a 0%, #1b2c42 48%, #144966 100%);
+            box-shadow: 0 18px 42px rgba(15, 23, 42, 0.34);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 14px;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workspace-hero::before {
+            content: "";
+            position: absolute;
+            right: -110px;
+            top: -110px;
+            width: 280px;
+            height: 280px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(251, 146, 60, 0.28), transparent 66%);
+        }
+
+        .workspace-hero::after {
+            content: "";
+            position: absolute;
+            left: -130px;
+            bottom: -190px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(56, 189, 248, 0.22), transparent 68%);
+        }
+
+        .workspace-hero > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
+            border-radius: 999px;
+            padding: 6px 12px;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .hero-title {
+            margin: 0 0 9px;
+            font-size: 31px;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-sub {
+            margin: 0;
+            color: rgba(255, 255, 255, 0.86);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .hero-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hero-action {
+            border-radius: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.34);
+            background: rgba(255, 255, 255, 0.14);
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 800;
+            padding: 9px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .hero-action.primary {
+            border-color: #f9a8b7;
+            background: linear-gradient(135deg, #c03954, #8f1d30);
+        }
+
+        .workspace-tab-switcher {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
+            padding: 8px;
+            border-radius: 16px;
+            border: 1px solid #d7e1ed;
+            background: rgba(255, 255, 255, 0.9);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+        }
+
+        .workspace-tab-btn {
+            border: 1px solid transparent;
+            border-radius: 12px;
+            background: transparent;
+            color: #122033;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 800;
+            padding: 11px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .workspace-tab-btn.active {
+            background: #ffffff;
+            border-color: #f3bdc6;
+            box-shadow: 0 8px 18px rgba(180, 35, 58, 0.12);
+            color: #8f1d30;
+        }
+
+        .workspace-panel[hidden] {
+            display: none !important;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .stats-card {
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            background: linear-gradient(155deg, #fff, #f8fbff);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+            padding: 12px 14px;
+            display: grid;
+            gap: 4px;
+        }
+
+        .stats-card span {
+            font-size: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: #64748b;
+        }
+
+        .stats-card strong {
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 900;
+            color: #0f172a;
+        }
+
+        .stats-card strong.text {
+            font-size: 15px;
+            line-height: 1.3;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: minmax(330px, 0.9fr) minmax(0, 1.1fr);
+            gap: 14px;
+            margin-bottom: 14px;
+            align-items: start;
+        }
+
+        .panel {
+            border: 1px solid #d7e1ed;
+            border-radius: 16px;
+            background: #fff;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+            overflow: hidden;
+        }
+
+        .panel-head {
+            padding: 18px 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        }
+
+        .panel-head.orange {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+        }
+
+        .panel-head.green {
+            background: linear-gradient(135deg, #059669, #0f766e);
+        }
+
+        .panel-head.gray {
+            background: linear-gradient(135deg, #334155, #1f2937);
+        }
+
+        .panel-head .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            background: rgba(255, 255, 255, 0.2);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .panel-head h2 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .panel-head p {
+            margin: 2px 0 0;
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .panel-body {
+            padding: 16px 18px;
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #324256;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 1px solid #c8d5e2;
+            background: #fff;
+            color: #122033;
+            border-radius: 11px;
+            padding: 10px 12px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-control:focus {
+            border-color: #0f6ea8;
+            box-shadow: 0 0 0 3px rgba(15, 110, 168, 0.16);
+        }
+
+        textarea.form-control {
+            min-height: 110px;
+            resize: vertical;
+            line-height: 1.65;
+        }
+
+        .form-hint {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #4f6178;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .char-count {
+            margin-top: 5px;
+            font-size: 11px;
+            color: #64748b;
+            text-align: right;
+            font-weight: 700;
+        }
+
+        .char-count.warn {
+            color: #b45309;
+        }
+
+        .char-count.over {
+            color: #b91c1c;
+        }
+
+        .audience-note {
+            border-radius: 12px;
+            border: 1px solid #cfe0ff;
+            background: linear-gradient(140deg, #eff6ff, #f8fbff);
+            color: #1f3a76;
+            padding: 10px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .audience-note-detail {
+            font-size: 11px;
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            width: 100%;
+            border: none;
+            border-radius: 11px;
+            padding: 10px 14px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            cursor: pointer;
+            background: linear-gradient(135deg, #b4233a, #8f1d30);
+            box-shadow: 0 10px 20px rgba(143, 29, 48, 0.24);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 24px rgba(143, 29, 48, 0.3);
+        }
+
+        .history-list {
+            display: grid;
+            gap: 10px;
+            max-height: 620px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .history-item {
+            border: 1px solid #dbe5ef;
+            border-radius: 13px;
+            background: linear-gradient(145deg, #fff, #f8fbff);
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+            padding: 12px;
+        }
+
+        .history-item-head {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 8px;
+            align-items: flex-start;
+        }
+
+        .history-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border-radius: 999px;
+            border: 1px solid #d8e4ef;
+            background: #f8fbff;
+            color: #51647a;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            padding: 3px 9px;
+        }
+
+        .history-title {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+        }
+
+        .history-text {
+            margin: 0 0 10px;
+            border: 1px solid #e2eaf3;
+            border-left: 3px solid #f97316;
+            border-radius: 10px;
+            background: #fff;
+            padding: 9px 10px;
+            font-size: 12px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .history-meta {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .history-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .history-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            padding-top: 10px;
+            border-top: 1px dashed #dbe5ef;
+        }
+
+        .btn-action {
+            border-radius: 999px;
+            padding: 7px 14px;
+            font-size: 10px;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            font-weight: 800;
+            text-decoration: none;
+            border: 1px solid transparent;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-action.update {
+            border-color: #bcd5ff;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .btn-action.update:hover {
+            border-color: #1d4ed8;
+            background: #1d4ed8;
+            color: #fff;
+        }
+
+        .btn-action.delete {
+            border-color: #f4b7c3;
+            background: #fff1f4;
+            color: #9f1239;
+        }
+
+        .btn-action.delete:hover {
+            border-color: #9f1239;
+            background: #9f1239;
+            color: #fff;
+        }
+
+        .mini-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .empty-state {
+            border: 1px solid #dbe5ef;
+            border-radius: 14px;
+            background: #fff;
+            text-align: center;
+            padding: 28px 14px;
+            color: #64748b;
+            box-shadow: 0 10px 22px rgba(15, 23, 42, 0.06);
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            color: #1f2937;
+            margin: 6px 0;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .custom-modal {
+            background: #fff;
+            width: 90%;
+            max-width: 400px;
+            border-radius: 14px;
+            padding: 30px 24px;
+            text-align: center;
+            transform: translateY(20px) scale(0.95);
+            transition: all 0.25s ease;
+        }
+
+        .modal-overlay.active .custom-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #fef2f2;
+            color: #dc2626;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 14px;
+        }
+
+        .modal-title {
+            margin: 0 0 8px;
+            font-size: 18px;
+            font-weight: 800;
+            color: #122033;
+        }
+
+        .modal-text {
+            margin: 0 0 20px;
+            font-size: 13px;
+            color: #4f6178;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-modal {
+            flex: 1;
+            border: none;
+            border-radius: 11px;
+            padding: 10px 12px;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .btn-modal.cancel {
+            background: #f1f5f9;
+            color: #334155;
+        }
+
+        .btn-modal.confirm {
+            background: #b91c1c;
+            color: #fff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tip-delete-form,
+        .faq-delete-form {
+            margin: 0;
+        }
+
+        footer {
+            padding: 24px 20px;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1100px;
+        }
+
+        .footer-left {
+            gap: 14px;
+        }
+
+        .footer-logo {
+            width: 54px;
+            height: 54px;
+            border-radius: 10px;
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            margin-bottom: 2px;
+            letter-spacing: 0.8px;
+        }
+
+        .footer-sub,
+        .footer-right p {
+            font-size: 12px;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace-hero {
+                grid-template-columns: 1fr;
+            }
+
+            .hero-actions {
+                justify-content: flex-start;
+            }
+
+            .content-grid,
+            .mini-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-list {
+                max-height: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .workspace-tab-switcher,
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .history-item-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .history-actions {
+                justify-content: flex-start;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            footer {
+                padding: 18px 14px;
+            }
+        }
+    </style>
+</head>
+<body class="owner-theme">
+<header>
+    <div class="container header-content">
+        <div class="logo-area">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+            <div class="logo-text">
+                <span>Academy of</span>
+                <span>Knowledge Bridge</span>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="/" class="nav-link">Home</a></li>
+                <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                <li><a href="/owner/admin/workspace" class="nav-link">Admin Workspace</a></li>
+                <li><a href="/owner/notifications" class="nav-link active">Content Workspace</a></li>
+                <li><a href="/logout" class="btn-red">Logout</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="owner-container" id="contentWorkspaceRoot" th:attr="data-initial-tab=${activeContentTab}">
+        <div class="workspace-flash-stack">
+            <div th:if="${successMessage}" class="workspace-flash success" role="status">
+                <i class="fas fa-circle-check"></i>
+                <span th:text="${successMessage}">Success</span>
+            </div>
+            <div th:if="${errorMessage}" class="workspace-flash error" role="alert">
+                <i class="fas fa-circle-exclamation"></i>
+                <span th:text="${errorMessage}">Error</span>
+            </div>
+        </div>
+
+        <section class="workspace-hero">
+            <div>
+                <span class="hero-kicker"><i class="fas fa-layer-group"></i> Owner Content Workspace</span>
+                <h1 class="hero-title">Notifications and FAQ Management</h1>
+                <p class="hero-sub">Broadcast important notices, manage tips, and maintain FAQs from one unified workspace.</p>
+            </div>
+            <div class="hero-actions">
+                <a href="/owner/dashboard" class="hero-action"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                <button type="button" class="hero-action primary" id="openNotificationsFromHero"><i class="fas fa-bullhorn"></i> Send Notice</button>
+            </div>
+        </section>
+
+        <section class="workspace-tab-switcher" role="tablist" aria-label="Content workspace sections">
+            <button type="button" class="workspace-tab-btn" id="contentTabNotifications" role="tab" aria-controls="contentPanelNotifications" aria-selected="false" data-content-tab-target="notifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </button>
+            <button type="button" class="workspace-tab-btn" id="contentTabFaq" role="tab" aria-controls="contentPanelFaq" aria-selected="false" data-content-tab-target="faq">
+                <i class="fas fa-circle-question"></i>
+                <span>FAQ and Tips</span>
+            </button>
+        </section>
+
+        <section class="workspace-panel" id="contentPanelNotifications" role="tabpanel" aria-labelledby="contentTabNotifications" data-content-tab-panel="notifications">
+            <div class="stats-grid">
+                <article class="stats-card">
+                    <span>Total Broadcasts</span>
+                    <strong th:text="${notifications != null ? #lists.size(notifications) : 0}">0</strong>
+                </article>
+                <article class="stats-card">
+                    <span>This Month</span>
+                    <strong id="thisMonthCount">0</strong>
+                </article>
+                <article class="stats-card">
+                    <span>Audience</span>
+                    <strong class="text">All Students</strong>
+                </article>
+            </div>
+
+            <div class="content-grid">
+                <article class="panel send-panel">
+                    <div class="panel-head orange">
+                        <span class="icon"><i class="fas fa-paper-plane"></i></span>
+                        <div>
+                            <h2>Send New Notification</h2>
+                            <p>Compose and broadcast a message to all students.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form th:action="@{/owner/notifications/send}" method="post" id="notificationForm">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-heading"></i> Notification Title</label>
+                                <input type="text" name="title" class="form-control" placeholder="Enter notification title" required pattern=".*\S+.*" title="Title cannot be empty or just spaces" maxlength="100">
+                                <div class="form-hint"><i class="fas fa-circle-info"></i> Keep it short and clear (max 100 characters).</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-message"></i> Message</label>
+                                <textarea name="message" class="form-control" id="messageInput" placeholder="Type your notification message here" required minlength="1" maxlength="400"></textarea>
+                                <div class="char-count" id="charCount">0 / 400 characters</div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-users"></i> Target Audience</label>
+                                <input type="hidden" name="targetAudience" value="ALL_STUDENTS">
+                                <div class="audience-note">
+                                    <i class="fas fa-users"></i>
+                                    <div>
+                                        <div><strong>All Students</strong></div>
+                                        <div class="audience-note-detail">This notification will be sent to every registered student.</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary" id="sendBtn"><i class="fas fa-paper-plane"></i> Send Notification</button>
+                        </form>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-head gray">
+                        <span class="icon"><i class="fas fa-clock-rotate-left"></i></span>
+                        <div>
+                            <h2>Notification History</h2>
+                            <p>Review, update, or delete previous broadcasts.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div th:if="${notifications == null or #lists.isEmpty(notifications)}" class="empty-state">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No Notifications Yet</h3>
+                            <p>Use the form on the left to send your first notification.</p>
+                        </div>
+
+                        <div th:if="${notifications != null and !#lists.isEmpty(notifications)}" class="history-list">
+                            <article th:each="notif, iterStat : ${notifications}" class="history-item" th:attr="data-sent=${notif.sentTime != null ? #temporals.format(notif.sentTime, 'yyyy-MM-dd') : ''}">
+                                <div class="history-item-head">
+                                    <div>
+                                        <span class="history-badge" th:text="'Broadcast #' + ${iterStat.index + 1}">Broadcast #1</span>
+                                        <h3 class="history-title" th:text="${notif.title}">Notification Title</h3>
+                                    </div>
+                                    <span class="history-badge" th:text="${notif.targetAudience}">ALL_STUDENTS</span>
+                                </div>
+                                <p class="history-text" th:text="${notif.message}">Notification message content goes here.</p>
+                                <div class="history-meta">
+                                    <span><i class="fas fa-clock"></i><span th:text="${notif.sentTime != null ? #temporals.format(notif.sentTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">N/A</span></span>
+                                    <span><i class="fas fa-users"></i><span th:text="${notif.targetAudience}">All Students</span></span>
+                                </div>
+                                <div class="history-actions">
+                                    <a th:href="@{/owner/notifications/update/{id}(id=${notif.notificationId})}" class="btn-action update"><i class="fas fa-edit"></i> Update</a>
+                                    <button type="button" class="btn-action delete" th:data-url="@{/owner/notifications/delete/{id}(id=${notif.notificationId})}" onclick="openNotificationDeleteModal(this.getAttribute('data-url'))"><i class="fas fa-trash"></i> Delete</button>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="workspace-panel" id="contentPanelFaq" role="tabpanel" aria-labelledby="contentTabFaq" data-content-tab-panel="faq" hidden>
+            <div class="stats-grid">
+                <article class="stats-card">
+                    <span>Active Tips</span>
+                    <strong th:text="${tips != null ? #lists.size(tips) : 0}">0</strong>
+                </article>
+                <article class="stats-card">
+                    <span>Active FAQs</span>
+                    <strong th:text="${faqs != null ? #lists.size(faqs) : 0}">0</strong>
+                </article>
+                <article class="stats-card">
+                    <span>Content Workflow</span>
+                    <strong class="text">Live</strong>
+                </article>
+            </div>
+
+            <div class="mini-grid">
+                <article class="panel">
+                    <div class="panel-head green">
+                        <span class="icon"><i class="fas fa-lightbulb"></i></span>
+                        <div>
+                            <h2>Create Tip</h2>
+                            <p>Tips appear on the student FAQ page.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form th:action="@{/owner/faq/tip/create}" method="post">
+                            <div class="form-group">
+                                <label class="form-label">Tip Title</label>
+                                <input type="text" name="title" class="form-control" placeholder="Tip title" required maxlength="100">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Description</label>
+                                <textarea name="description" class="form-control" placeholder="Tip description" required maxlength="400"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Select Icon</label>
+                                <select name="iconClass" class="form-control" required title="Select tip icon">
+                                    <option value="fa-check-circle">Check Circle</option>
+                                    <option value="fa-paperclip">Paperclip (Attachment)</option>
+                                    <option value="fa-comments">Comments</option>
+                                    <option value="fa-shield-halved">Shield (Security)</option>
+                                    <option value="fa-lightbulb">Lightbulb</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Save Tip</button>
+                        </form>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-head">
+                        <span class="icon"><i class="fas fa-circle-question"></i></span>
+                        <div>
+                            <h2>Create FAQ</h2>
+                            <p>FAQs appear in the student help accordion.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <form th:action="@{/owner/faq/faq/create}" method="post">
+                            <div class="form-group">
+                                <label class="form-label">Question</label>
+                                <input type="text" name="question" class="form-control" placeholder="FAQ question" required maxlength="200">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Answer</label>
+                                <textarea name="answer" class="form-control" placeholder="FAQ answer" required maxlength="900"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Save FAQ</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+
+            <div class="content-grid">
+                <article class="panel">
+                    <div class="panel-head gray">
+                        <span class="icon"><i class="fas fa-list"></i></span>
+                        <div>
+                            <h2>Tips List</h2>
+                            <p>Manage current student guidance tips.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div th:if="${tips == null or #lists.isEmpty(tips)}" class="empty-state">
+                            <i class="fas fa-ghost"></i>
+                            <h3>No Tips Configured</h3>
+                            <p>Create a tip using the form above.</p>
+                        </div>
+
+                        <div th:if="${tips != null and !#lists.isEmpty(tips)}" class="history-list">
+                            <article th:each="tip : ${tips}" class="history-item">
+                                <div class="history-item-head">
+                                    <h3 class="history-title"><i th:class="'fas ' + ${tip.iconClass}"></i> <span th:text="${tip.title}">Tip</span></h3>
+                                </div>
+                                <p class="history-text" th:text="${tip.description}">Tip description.</p>
+                                <div class="history-actions">
+                                    <a th:href="@{/owner/faq/tip/update/{id}(id=${tip.tipId})}" class="btn-action update"><i class="fas fa-edit"></i> Update</a>
+                                    <form th:action="@{/owner/faq/tip/delete/{id}(id=${tip.tipId})}" method="post" class="tip-delete-form" onsubmit="return confirm('Delete this tip? This action cannot be undone.');">
+                                        <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel">
+                    <div class="panel-head gray">
+                        <span class="icon"><i class="fas fa-list-ul"></i></span>
+                        <div>
+                            <h2>FAQ List</h2>
+                            <p>Manage current student FAQ entries.</p>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <div th:if="${faqs == null or #lists.isEmpty(faqs)}" class="empty-state">
+                            <i class="fas fa-ghost"></i>
+                            <h3>No FAQs Configured</h3>
+                            <p>Create an FAQ using the form above.</p>
+                        </div>
+
+                        <div th:if="${faqs != null and !#lists.isEmpty(faqs)}" class="history-list">
+                            <article th:each="faq : ${faqs}" class="history-item">
+                                <div class="history-item-head">
+                                    <h3 class="history-title"><i class="fas fa-circle-question"></i> <span th:text="${faq.question}">Question</span></h3>
+                                </div>
+                                <p class="history-text" th:text="${faq.answer}">Answer</p>
+                                <div class="history-actions">
+                                    <a th:href="@{/owner/faq/faq/update/{id}(id=${faq.faqId})}" class="btn-action update"><i class="fas fa-edit"></i> Update</a>
+                                    <form th:action="@{/owner/faq/faq/delete/{id}(id=${faq.faqId})}" method="post" class="faq-delete-form" onsubmit="return confirm('Delete this FAQ? This action cannot be undone.');">
+                                        <button type="submit" class="btn-action delete"><i class="fas fa-trash"></i> Delete</button>
+                                    </form>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer>
+    <div class="footer-content">
+        <div class="footer-left">
+            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+            <div class="footer-text-area">
+                <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                <p class="footer-sub">Academy of Knowledge Bridge</p>
+            </div>
+        </div>
+        <div class="footer-right">
+            <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+        </div>
+    </div>
+</footer>
+
+<div class="modal-overlay" id="notificationDeleteModal">
+    <div class="custom-modal">
+        <div class="modal-icon"><i class="fas fa-exclamation-triangle"></i></div>
+        <h3 class="modal-title">Delete Notification?</h3>
+        <p class="modal-text">Are you sure you want to delete this notification? This action cannot be undone.</p>
+        <div class="modal-actions">
+            <button type="button" class="btn-modal cancel" onclick="closeNotificationDeleteModal()">Cancel</button>
+            <a href="#" class="btn-modal confirm" id="confirmNotificationDeleteBtn">Yes, Delete</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openNotificationDeleteModal(deleteUrl) {
+        const overlay = document.getElementById('notificationDeleteModal');
+        const confirmBtn = document.getElementById('confirmNotificationDeleteBtn');
+        confirmBtn.href = deleteUrl;
+        overlay.classList.add('active');
+    }
+
+    function closeNotificationDeleteModal() {
+        const overlay = document.getElementById('notificationDeleteModal');
+        overlay.classList.remove('active');
+    }
+</script>
+
+<script>
+    (function () {
+        const root = document.getElementById('contentWorkspaceRoot');
+        const tabButtons = Array.from(document.querySelectorAll('.workspace-tab-btn'));
+        const tabPanels = Array.from(document.querySelectorAll('.workspace-panel'));
+        const openNotificationsFromHero = document.getElementById('openNotificationsFromHero');
+
+        if (!root || !tabButtons.length || !tabPanels.length) {
+            return;
+        }
+
+        function activateTab(tabName, pushHash) {
+            tabButtons.forEach(function (button) {
+                const active = button.dataset.contentTabTarget === tabName;
+                button.classList.toggle('active', active);
+                button.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+
+            tabPanels.forEach(function (panel) {
+                panel.hidden = panel.dataset.contentTabPanel !== tabName;
+            });
+
+            if (pushHash) {
+                window.location.hash = tabName === 'faq' ? 'faq' : 'notifications';
+            }
+        }
+
+        tabButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                activateTab(button.dataset.contentTabTarget || 'notifications', true);
+            });
+        });
+
+        if (openNotificationsFromHero) {
+            openNotificationsFromHero.addEventListener('click', function () {
+                activateTab('notifications', true);
+            });
+        }
+
+        window.addEventListener('hashchange', function () {
+            const hashTab = (window.location.hash || '').replace('#', '');
+            if (hashTab === 'notifications' || hashTab === 'faq') {
+                activateTab(hashTab, false);
+            }
+        });
+
+        document.querySelectorAll('.workspace-flash').forEach(function (alertBox) {
+            setTimeout(function () {
+                alertBox.style.transition = 'opacity .45s ease, transform .45s ease';
+                alertBox.style.opacity = '0';
+                alertBox.style.transform = 'translateY(-8px)';
+                setTimeout(function () {
+                    alertBox.remove();
+                }, 450);
+            }, 5200);
+        });
+
+        const initialFromHash = (window.location.hash || '').replace('#', '');
+        const initialFromServer = (root.dataset.initialTab || 'notifications').trim().toLowerCase();
+        const initial = (initialFromHash === 'notifications' || initialFromHash === 'faq')
+            ? initialFromHash
+            : (initialFromServer === 'faq' ? 'faq' : 'notifications');
+
+        activateTab(initial, false);
+    })();
+</script>
+
+<script>
+    (function () {
+        const messageInput = document.getElementById('messageInput');
+        const charCount = document.getElementById('charCount');
+        const notificationForm = document.getElementById('notificationForm');
+        const sendBtn = document.getElementById('sendBtn');
+
+        if (messageInput && charCount) {
+            messageInput.addEventListener('input', function () {
+                const len = this.value.length;
+                charCount.textContent = len + ' / 400 characters';
+                charCount.className = 'char-count';
+                if (len > 350) {
+                    charCount.classList.add('warn');
+                }
+                if (len >= 400) {
+                    charCount.classList.add('over');
+                }
+            });
+        }
+
+        const monthEl = document.getElementById('thisMonthCount');
+        if (monthEl) {
+            let thisMonth = 0;
+            const now = new Date();
+            document.querySelectorAll('.history-item[data-sent]').forEach(function (item) {
+                const rawDate = (item.getAttribute('data-sent') || '').trim();
+                if (!rawDate) {
+                    return;
+                }
+                const date = new Date(rawDate + 'T00:00:00');
+                if (!Number.isNaN(date.getTime()) && date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear()) {
+                    thisMonth += 1;
+                }
+            });
+            monthEl.textContent = String(thisMonth);
+        }
+
+        if (notificationForm && sendBtn) {
+            notificationForm.addEventListener('submit', function () {
+                sendBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                sendBtn.style.opacity = '0.7';
+                sendBtn.style.pointerEvents = 'none';
+            });
+        }
+    })();
+</script>
+
+<script>
+    window.adminTourConfig = {
+        pageId: 'owner-content-workspace',
+        autoStart: false,
+        storageKey: 'akb_owner_content_workspace_tour_completed',
+        steps: [
+            {
+                selector: 'header .header-content',
+                title: 'Owner Navigation',
+                content: 'Use this navigation to move between dashboard, admin workspace, and content workspace.'
+            },
+            {
+                selector: '.workspace-hero',
+                title: 'Content Workspace Overview',
+                content: 'This area combines notification broadcasts and FAQ or tip management in one place.'
+            },
+            {
+                selector: '.workspace-tab-switcher',
+                title: 'Switch Between Sections',
+                content: 'Use these tabs to move between Notifications and FAQ or Tips management.'
+            },
+            {
+                selector: '#notificationForm',
+                title: 'Send Notification',
+                content: 'Create a broadcast with title and message to notify all students instantly.'
+            },
+            {
+                selector: '#contentPanelNotifications .history-list',
+                title: 'Notification History',
+                content: 'Review sent notifications and use Update or Delete actions when needed.'
+            },
+            {
+                selector: '#contentPanelFaq',
+                title: 'FAQ and Tips',
+                content: 'Create tips and FAQs, then update or remove existing entries from the same workspace.'
+            }
+        ]
+    };
+</script>
+<script src="/js/admin-tour.js"></script>
+</body>
+</html>

@@ -118,15 +118,21 @@ public class OwnerController {
     }
 
     @GetMapping("/admin/create-page")
-    public String showCreateAdminPage(HttpSession session) {
-        if (!isOwnerLoggedIn(session)) {
-            return "redirect:/login";
-        }
-        return "owner-create-admin";
+    public String showCreateAdminPage(HttpSession session, Model model) {
+        return showAdminWorkspace(session, model, "create");
     }
 
     @GetMapping("/admin/manage")
     public String showManageAdminsPage(HttpSession session, Model model) {
+        return showAdminWorkspace(session, model, "manage");
+    }
+
+    @GetMapping("/admin/workspace")
+    public String showAdminWorkspacePage(HttpSession session, Model model) {
+        return showAdminWorkspace(session, model, "create");
+    }
+
+    private String showAdminWorkspace(HttpSession session, Model model, String activeTab) {
         if (!isOwnerLoggedIn(session)) {
             return "redirect:/login";
         }
@@ -135,7 +141,8 @@ public class OwnerController {
                 .sorted(Comparator.comparing(Admin::getUserId))
                 .collect(Collectors.toList());
         model.addAttribute("admins", admins);
-        return "owner-manage-admins";
+        model.addAttribute("activeAdminTab", defaultText(activeTab, "manage"));
+        return "owner-admin-workspace";
     }
 
     @PostMapping("/admin/{userId}/update")
@@ -1188,14 +1195,25 @@ public class OwnerController {
     }
 
     private String normalizeStatusLabel(String status) {
+        if (!StringUtils.hasText(status)) {
+            return "Pending";
+        }
+
+        String normalized = status.trim();
+        if ("Meeting Scheduled".equalsIgnoreCase(normalized)) {
+            return "Meeting Scheduled";
+        }
+        if ("In Progress".equalsIgnoreCase(normalized)) {
+            return "In Progress";
+        }
+        if ("Pending".equalsIgnoreCase(normalized)) {
+            return "Pending";
+        }
         if (isResolvedStatus(status)) {
             return "Resolved";
         }
         if (isRejectedStatus(status)) {
             return "Rejected";
-        }
-        if (isPendingStatus(status)) {
-            return "Pending";
         }
         return defaultText(status, "Pending");
     }
@@ -1224,9 +1242,9 @@ public class OwnerController {
         if (!isOwnerLoggedIn(session)) {
             return "redirect:/login";
         }
-        List<Notification> broadcastNotifications = notificationService.getAllBroadcastNotifications();
-        model.addAttribute("notifications", broadcastNotifications);
-        return "owner-notifications";
+        populateContentWorkspaceModel(model);
+        model.addAttribute("activeContentTab", "notifications");
+        return "owner-content-workspace";
     }
 
     @PostMapping("/notifications/send")
@@ -1312,9 +1330,15 @@ public class OwnerController {
         if (!isOwnerLoggedIn(session)) {
             return "redirect:/login";
         }
+        populateContentWorkspaceModel(model);
+        model.addAttribute("activeContentTab", "faq");
+        return "owner-content-workspace";
+    }
+
+    private void populateContentWorkspaceModel(Model model) {
+        model.addAttribute("notifications", notificationService.getAllBroadcastNotifications());
         model.addAttribute("tips", faqManagementService.getAllTips());
         model.addAttribute("faqs", faqManagementService.getAllFaqs());
-        return "owner-faq";
     }
 
     @PostMapping("/faq/tip/create")
