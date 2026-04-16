@@ -312,8 +312,12 @@
         }
 
         .section-divider {
-            display: inline-block;
-            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            margin: 0 0 10px 0;
             border: 1px solid #d8e4ef;
             border-radius: 999px;
             background: #f8fbff;
@@ -321,6 +325,8 @@
             font-size: 11px;
             font-weight: 800;
             letter-spacing: 0.6px;
+            line-height: 1.2;
+            white-space: nowrap;
             padding: 6px 10px;
         }
 
@@ -1475,6 +1481,7 @@
         pageId: 'owner-admin-workspace',
         autoStart: false,
         storageKey: 'akb_owner_admin_workspace_tour_completed',
+        nextPage: '/owner/notifications#notifications',
         steps: [
             {
                 selector: 'header .header-content',
@@ -1493,16 +1500,19 @@
             },
             {
                 selector: '#stageEmail',
+                activateTabSelector: '#workspaceTabCreate',
                 title: 'Step 1: Verify Email',
                 content: 'Enter an admin email, send the verification code, and verify ownership before account creation.'
             },
             {
                 selector: '#stageCredentials',
+                activateTabSelector: '#workspaceTabCreate',
                 title: 'Step 2: Create Credentials',
                 content: 'After verification, set username and a strong password to create the new admin account.'
             },
             {
-                selector: '.admin-list',
+                selector: '#adminPanelManage .admin-list, #adminPanelManage .empty-state',
+                activateTabSelector: '#workspaceTabManage',
                 title: 'Manage Existing Admins',
                 content: 'Expand an admin card to update email, username, password, or delete the account.'
             }

@@ -48,7 +48,37 @@
         if (!cfg.nextPage) {
             return '';
         }
-        return cfg.nextPage + (cfg.nextPage.indexOf('?') >= 0 ? '&' : '?') + 'tour=1';
+        var target = String(cfg.nextPage);
+        var hashIndex = target.indexOf('#');
+        var hashPart = hashIndex >= 0 ? target.slice(hashIndex) : '';
+        var basePart = hashIndex >= 0 ? target.slice(0, hashIndex) : target;
+        var hasQuery = basePart.indexOf('?') >= 0;
+        return basePart + (hasQuery ? '&' : '?') + 'tour=1' + hashPart;
+    }
+
+    function activateStepContext(step) {
+        if (!step) {
+            return;
+        }
+
+        if (step.activateHash) {
+            var targetHash = String(step.activateHash).replace(/^#/, '');
+            var currentHash = String(window.location.hash || '').replace(/^#/, '');
+            if (targetHash) {
+                if (currentHash !== targetHash) {
+                    window.location.hash = targetHash;
+                } else {
+                    window.dispatchEvent(new Event('hashchange'));
+                }
+            }
+        }
+
+        if (step.activateTabSelector) {
+            var tabTrigger = q(step.activateTabSelector);
+            if (tabTrigger && typeof tabTrigger.click === 'function') {
+                tabTrigger.click();
+            }
+        }
     }
 
     function calcPosition(targetRect) {
@@ -95,6 +125,8 @@
             completeTour();
             return;
         }
+
+        activateStepContext(step);
 
         var target = q(step.selector);
         if (!target) {
