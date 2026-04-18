@@ -1175,18 +1175,27 @@
             },
             {
                 selector: '#notificationForm',
+                activateTabSelector: '#contentTabNotifications',
                 title: 'Send Notification',
                 content: 'Create a broadcast with title and message to notify all students instantly.'
             },
             {
                 selector: '#contentPanelNotifications .history-list',
+                activateTabSelector: '#contentTabNotifications',
                 title: 'Notification History',
                 content: 'Review sent notifications and use Update or Delete actions when needed.'
             },
             {
-                selector: '#contentPanelFaq',
-                title: 'FAQ and Tips',
-                content: 'Create tips and FAQs, then update or remove existing entries from the same workspace.'
+                selector: '#contentPanelFaq .mini-grid',
+                activateTabSelector: '#contentTabFaq',
+                title: 'FAQ and Tips Setup',
+                content: 'Use these forms to create both guidance tips and FAQ entries for students.'
+            },
+            {
+                selector: '#contentPanelFaq .content-grid',
+                activateTabSelector: '#contentTabFaq',
+                title: 'FAQ and Tips Records',
+                content: 'Review existing tips and FAQs, then update or delete entries from this section.'
             }
         ]
     };
