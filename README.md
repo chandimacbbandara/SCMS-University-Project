@@ -2,49 +2,125 @@
 
 # Student Concern Management System (SCMS)
 
-Role-based concern handling platform for Akademy of Knowledge Bridge.
+Role-based student concern handling platform for Akademy of Knowledge Bridge.
 
-<p>
-	<img src="https://img.shields.io/badge/Java-21-E76F00?style=for-the-badge&logo=openjdk&logoColor=white" alt="Java 21" />
-	<img src="https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white" alt="Spring Boot 4.0.2" />
-	<img src="https://img.shields.io/badge/Thymeleaf-Server%20Rendered-005F0F?style=for-the-badge" alt="Thymeleaf" />
-	<img src="https://img.shields.io/badge/SQL%20Server-Database-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white" alt="SQL Server" />
-	<img src="https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white" alt="Maven" />
-</p>
+[![Java](https://img.shields.io/badge/Java-21-E76F00?style=for-the-badge&logo=openjdk&logoColor=white)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![Thymeleaf](https://img.shields.io/badge/Thymeleaf-Server%20Rendered-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)](https://www.thymeleaf.org/)
+[![MySQL](https://img.shields.io/badge/MySQL-Aiven_Cloud-4479A1?style=for-the-badge&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![Gemini](https://img.shields.io/badge/Gemini-Moderation-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)](https://deepmind.google/technologies/gemini/)
+[![Maven](https://img.shields.io/badge/Maven-Build-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 
 </div>
 
 ## Overview
-SCMS supports end-to-end student concern handling with role-based flows for Students, Admins, and Owner users.
+SCMS is a full-stack web system for managing student concerns from submission to resolution. It includes role-based flows for Students, Admins, and Owner users, with AI-assisted moderation and priority prediction.
 
-Implemented modules include:
-- student registration with email OTP verification and admin approval
-- role-based login (student, admin, owner)
-- concern submission with evidence upload
-- draft concern workflow (save draft, edit draft, submit later)
-- concern lifecycle with status tracking and admin replies
-- physical meeting proposal and slot booking flow
-- feedback workflow with moderation and update/delete rules
-- student community module with rules acceptance and AI moderation
-- owner/admin dashboards and analytics APIs
-- notification center (direct + broadcast notifications)
+## Core Features Implemented
+- Registration with email OTP verification and admin approval flow
+- Role-based login for student, admin, and owner
+- Concern lifecycle: draft, submit, edit (pending), chat, meeting scheduling, completion
+- Linked concerns support for threaded concern history
+- Evidence upload handling via `/uploads/**`
+- Student community forum with rules acceptance, post/reply CRUD, moderation actions
+- AI moderation for community and feedback content with safe local fallback rules
+- AI concern priority prediction integrated into concern submit/update flows
+- Admin dashboard and education dashboard with filtering and analytics
+- Owner workspace for admin management, analytics/report APIs, notifications, FAQ/tips
+- Notification center with unread tracking and broadcast support
+- Feedback module tied to concern completion/replies
+
+## Team and Feature Contribution
+The following mapping is updated according to the TAF contribution tables.
+
+| Registration Number | Student Name | Name of Feature |
+|---|---|---|
+| IT24100086 | Vaishavi. I | Student Concern & Evidence Manager |
+| IT24100307 | Bandara I G C | Admin Dashboard & Inquiry Handling |
+| IT24100677 | Samarathunga S.D.D. | Identity & Access Management |
+| IT24100754 | Dilanya A.N.G.A | Resolution Quality & Feedback System |
+| IT24101392 | Wickramasekara.J.K.A.D.N. | Notification & Status Tracking Service |
+| IT24102060 | Umar Z.M.Z | Analytics & Decision Support Module |
+
+### Main Feature Responsibilities (TAF Section 8)
+1) IT24100086 - Student Concern & Evidence Manager
+- Create: Students submit new concerns and upload relevant screenshots/video.
+- Read: Students browse their own submission history before/after sending.
+- Update: Students can modify or clarify a pending concern if new details arise.
+- Delete: Students can withdraw a concern if the issue is resolved independently.
+
+2) IT24100307 - Admin Dashboard & Inquiry Handling
+- Create: Admins generate official responses and internal notes for concerns.
+- Read: Admins view the list of concerns sorted by the AI assigned priority levels.
+- Update: Admins edit response drafts or re-categorize ticket types.
+- Delete: Admins can remove duplicate or spam tickets from the dashboard.
+
+3) IT24100677 - Identity & Access Management
+- Create: New students register accounts and set up security credentials.
+- Read: Users view their profile details and account security logs.
+- Update: Users update personal info or reset forgotten passwords via secure tokens.
+- Delete: Admins or users can deactivate/remove accounts for security compliance.
+
+4) IT24100754 - Resolution Quality & Feedback System
+- Create: Students submit ratings (Good/Bad) and comments on the resolution quality.
+- Read: Admins view feedback reports to audit the effectiveness of the department.
+- Update: Students can revise their feedback if an initially bad resolution is corrected.
+- Delete: System clears old feedback data after a specific audit period.
+
+5) IT24101392 - Notification & Status Tracking Service
+- Create: System generates real-time alerts when status changes (Pending -> Resolved).
+- Read: Users track the live progress bar and timestamps history of their concern.
+- Update: Automated updates to notification preferences.
+- Delete: Users can clear their notification inbox or dismiss alerts.
+
+6) IT24102060 - Analytics & Decision Support Module
+- Create: Generate analytical reports (monthly/semester-wise) on student concerns by category, department, and urgency.
+- Read: Admins view dashboards showing trends such as most frequent issues, peak complaint periods, and resolution delays.
+- Update: System automatically updates analytics when new concerns or resolutions are added.
+- Delete: Old or archived analytical data can be purged after institutional policy retention periods.
+
+## AI/ML Contribution (TAF)
+Feature Name: Intelligent Urgency Classification & Priority Sorting Engine
+
+| Registration Number | Expected Individual Contribution to the AI/ML Feature |
+|---|---|
+| IT24100086 | Collects student management data and structures it into a consistent Excel/CSV dataset. |
+| IT24100307 | Cleans the dataset by fixing missing values, format errors, and duplicates. |
+| IT24100677 | Selects key features and prepares the final model-ready dataset. |
+| IT24100754 | Chooses an ML algorithm and trains the sentimental analysis prediction model. |
+| IT24101392 | Evaluates model accuracy and tunes parameters to improve performance. |
+| IT24102060 | Integrates the trained model into the Spring Boot system to provide a demand forecast. |
+
+### Current AI Implementation in This Repository
+1) Gemini moderation pipeline
+- Services: `CommunityModerationService`, `FeedbackModerationService`
+- Includes local moderation rules + Gemini fallback strategy for reliability.
+
+2) Concern priority model pipeline
+- Java bridge: `ConcernPriorityService`
+- Python inference: `ai-model/concern-priority/predict_priority.py`
+- Model artifact: `ai-model/concern-priority/model.safetensors`
 
 ## Tech Stack
 - Java 21
 - Spring Boot 4.0.2
 - Spring MVC + Thymeleaf
 - Spring Data JPA (Hibernate)
-- Microsoft SQL Server JDBC driver
+- MySQL Connector/J
 - Spring Mail (SMTP)
 - Spring Security Crypto (BCrypt)
-- Google Gemini API integration for moderation
-- Maven (with wrapper)
+- TensorFlow Java dependency (present in `pom.xml`)
+- Python AI stack (`torch`, `transformers`, `safetensors`, `scikit-learn`, `joblib`)
+- Maven Wrapper (`mvnw`)
 
 ## Project Structure
 ```text
 .
-├── pom.xml
-├── SCMS SQL.sql
+├── ai-model/
+│   └── concern-priority/
+│       ├── model.safetensors
+│       ├── predict_priority.py
+│       └── requirements.txt
 ├── src/
 │   ├── main/
 │   │   ├── java/Project/_6/demo/
@@ -59,238 +135,143 @@ Implemented modules include:
 │   │       ├── templates/
 │   │       └── static/
 │   └── test/
-└── remove_notif.py
+├── SCMS SQL.sql
+├── pom.xml
+├── remove_notif.py
+└── uploads/
 ```
 
-Key templates include:
-- student concern draft page: `student-concern-drafts.html`
-- owner FAQ management pages: `owner-faq*.html`
-- admin community moderation page: `admin-community-chat.html`
-
-## Runtime Schema Behavior
-The app includes startup migration/compatibility runners in `StudentConcernManagementSystemApplication`:
-- adds/aligns `ReplyID_FK` for `SCMS_Feedback`
-- syncs legacy `feedback` table from `SCMS_Feedback` when needed
-- ensures `Analytics_Report.EvidenceImageCount`
-- ensures concern-meeting tables/columns/indexes exist
-- aligns FAQ/Tips compatibility columns
-- removes legacy predefined admin account (`ADMIN001` / `admin@akb.edu`) when present
-
-The domain model currently uses:
-- `SCMS_Feedback` as the JPA feedback table
-- legacy `feedback` table compatibility sync for older environments
-- notification soft-hide flag (`IsHidden`) for student notification cleanup
-
-## ID Strategy Compatibility
-This project handles both database modes:
-- identity PK mode
-- non-identity PK mode (manual next-id assignment)
-
-For non-identity schemas, the service layer auto-assigns IDs for:
-- `User`
-- `Concern`
-- `Admin_reply`
-- `Notification`
-- `Analytics_Report`
+## Runtime Schema Compatibility
+On startup, `StudentConcernManagementSystemApplication` includes compatibility runners to align schema safely:
+- ensure `Admin_reply.Sender_Role`
+- ensure `SCMS_Feedback.ReplyID_FK`
+- synchronize legacy `feedback` compatibility paths
+- ensure `Analytics_Report.EvidenceImageCount`
+- ensure concern meeting tables and indexes:
+  - `Concern_Meeting_Proposal`
+  - `Concern_Meeting_Slot`
+- ensure linked concern reference:
+  - `Concern.Linked_ConcernID_FK`
+  - related index and FK
+- align FAQ/tips nullable compatibility columns
+- remove legacy predefined admin account (`ADMIN001` / `admin@akb.edu`) when detected
 
 ## Configuration
-Main config file: `src/main/resources/application.properties`
+Main config:
+- `src/main/resources/application.properties`
 
-Current defaults include:
-- server port `9090`
-- SQL Server datasource
-- session timeout `86400` seconds
-- max upload size `10MB`
-- upload path mapping `/uploads/** -> file:uploads/`
+Current runtime defaults include:
+- server port: `9090`
+- datasource: MySQL (Aiven URL pattern)
+- multipart upload limit: `10MB`
+- session timeout: `86400` seconds
+- Gemini moderation model config
+- concern priority AI script/model config
 
-Recommended production secret pattern:
+### Recommended Production Secret Pattern
 ```properties
-spring.datasource.password=${DB_PASSWORD}
-spring.mail.password=${MAIL_APP_PASSWORD}
-gemini.api.key=${GEMINI_API_KEY}
+SPRING_DATASOURCE_URL=jdbc:mysql://<host>:3306/<db>
+SPRING_DATASOURCE_USERNAME=<db_user>
+SPRING_DATASOURCE_PASSWORD=<db_password>
+
+SPRING_MAIL_USERNAME=<smtp_user>
+SPRING_MAIL_PASSWORD=<smtp_app_password>
+
+GEMINI_API_KEY=<gemini_key>
 ```
 
 ## Local Setup
-
 ### 1) Prerequisites
-- JDK 21
-- Maven or Maven Wrapper
-- SQL Server (local/remote/container)
-- SMTP credentials (for OTP and alerts)
-- Gemini API key (for AI moderation features)
+- JDK 21+
+- Maven (or use `./mvnw`)
+- MySQL database
+- Python 3.9+
+- SMTP credentials
+- Gemini API key
 
-### 2) Database Setup
-1. Create a dedicated SQL Server database (recommended: `scmsdb`).
-2. Run [SCMS SQL.sql](SCMS%20SQL.sql).
-3. Grant read/write permissions to the configured user.
+### 2) Database
+1. Create a database (example: `scmsdb`).
+2. Run `SCMS SQL.sql` as base schema.
+3. Update datasource configuration.
 
-Notes:
-- The script is useful as a base schema.
-- Startup migration runners may add/adjust extra columns/tables for compatibility.
+### 3) Optional AI Python Environment (Concern Priority)
+```bash
+cd ai-model/concern-priority
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-### 3) Build and Run
+### 4) Build and Run
 ```bash
 ./mvnw clean package
 ./mvnw spring-boot:run
 ```
 
-Or:
-```bash
-mvn clean package
-mvn spring-boot:run
-```
+Application URL:
+- `http://localhost:9090`
 
-App URL: `http://localhost:9090`
-
-## Linux/VPS Deployment (systemd)
-Typical production flow:
-1. Upload project zip to server.
-2. Extract to deployment folder.
-3. Build jar:
+## Linux Deployment (systemd)
+Typical flow:
+1. Build artifact:
 ```bash
 ./mvnw clean package -DskipTests
 ```
-4. Configure environment in `/etc/scms.env`:
-```properties
-SPRING_DATASOURCE_URL=jdbc:sqlserver://<host>:1433;databaseName=<db>;encrypt=true;trustServerCertificate=true;
-SPRING_DATASOURCE_USERNAME=<user>
-SPRING_DATASOURCE_PASSWORD=<password>
-```
-5. Run as a systemd service (`scms.service`) with auto-restart.
-
-Useful commands:
+2. Create env file (`/etc/scms.env`) with datasource/mail/gemini secrets.
+3. Configure `scms.service` with auto-restart and proper user permissions.
+4. Monitor service logs:
 ```bash
 sudo systemctl status scms --no-pager -l
 sudo systemctl restart scms
 tail -f /home/<user>/SCMS/app.log
 ```
 
-## Route Quick Map
-
+## Routes (Quick Map)
 ### Public/Auth
 - `GET /`
-- `GET /login`
-- `POST /login`
-- `GET /logout`
-- `GET /register`
-- `POST /register`
-- `POST /register/send-code`
-- `POST /register/verify-code`
-- `GET /forgot-password`
-- `POST /forgot-password/send-code`
-- `POST /forgot-password/verify-code`
-- `POST /forgot-password/reset`
+- `GET /login`, `POST /login`, `GET /logout`
+- `GET /register`, `POST /register`
+- OTP routes: `/register/send-code`, `/register/verify-code`
+- forgot-password routes: send/verify/reset
 - `GET /faq`
 
 ### Student
-- `GET /student/dashboard`
-- `GET /student/profile`
-- `POST /student/profile/update`
-- `POST /student/profile/change-password`
-- `GET /student/profile/photo`
-- `GET /student/photo/{userId}`
-- `GET /submit-concern`
-- `POST /submit-concern`
-- `GET /student/concern/{id}/edit`
-- `POST /student/concern/update`
-- `GET /student/concern-drafts`
-- `POST /student/concern/draft/submit`
-- `GET /student/concern-history`
-- `POST /student/concern/{id}/meeting/book`
-- `POST /student/concern/{id}/meeting/decline`
-- `POST /student/feedback`
-- `POST /student/feedback/update`
-- `POST /student/feedback/delete`
-- `POST /student/concern/delete`
+- dashboard/profile/photo endpoints
+- concern submission, edit, draft, history endpoints
+- student concern chat and completion endpoints
+- meeting book/decline endpoints
+- feedback create/update/delete endpoints
 
-### Student Community
-Base path: `/student/community`
-- `GET /student/community`
-- `GET /student/community/rules`
-- `POST /student/community/rules/accept`
-- `POST /student/community/posts`
-- `POST /student/community/posts/{postId}/update`
-- `POST /student/community/posts/{postId}/delete`
-- `POST /student/community/posts/{postId}/replies`
-- `POST /student/community/replies/{replyId}/update`
-- `POST /student/community/replies/{replyId}/delete`
-- `POST /student/community/moderate`
+### Student Community (`/student/community`)
+- rules, accept-rules
+- posts create/update/delete
+- replies create/update/delete
+- moderation endpoint
 
-### Admin
-Base path: `/admin`
-- `GET /admin/dashboard`
-- `GET /admin/edu-dashboard`
-- `GET /admin/feedback`
-- `GET /admin/student-review`
-- `POST /admin/student-review/{userId}/approve`
-- `POST /admin/student-review/{userId}/reject`
-- `POST /admin/student-review/{userId}/delete`
-- `GET /admin/student-review/{userId}/photo`
-- `GET /admin/concern/{id}`
-- `POST /admin/concern/{id}/meeting/propose`
-- `POST /admin/concern/{id}/reply`
-- `POST /admin/concern/{concernId}/reply/{replyId}/delete`
-- `POST /admin/concern/{concernId}/reply/{replyId}/update`
-- `POST /admin/concern/{id}/status`
-- `POST /admin/concern/{id}/category`
-- `POST /admin/concern/{id}/delete`
-- `GET /admin/community`
-- `POST /admin/community/post/{id}/delete`
-- `POST /admin/community/reply/{id}/delete`
-- `POST /admin/community/post/{id}/reply`
-- `POST /admin/community/post/{id}/replies`
-- `POST /admin/community/moderate`
+### Admin (`/admin`)
+- dashboard + edu dashboard
+- concern detail and lifecycle actions
+- reply create/update/delete
+- meeting proposal
+- community moderation and admin replies
 
-### Owner
-Base path: `/owner`
-- `GET /owner/dashboard`
-- `GET /owner/admin/create-page`
-- `GET /owner/admin/manage`
-- `POST /owner/admin/send-code`
-- `POST /owner/admin/verify-code`
-- `POST /owner/admin/create`
-- `POST /owner/admin/{userId}/update`
-- `POST /owner/admin/{userId}/delete`
-- `POST /owner/admin/{userId}/email/send-code`
-- `POST /owner/admin/{userId}/email/verify-code`
-- `POST /owner/report/create`
-- `POST /owner/report/delete/{id}`
-- `GET /owner/api/report/metrics`
-- `GET /owner/api/analytics/charts`
-- `POST /owner/api/concerns/rejected/delete-all`
-- `GET /owner/api/reports/monthly`
-- `GET /owner/api/concerns/count`
-- `GET /owner/api/resolution-time`
-- `GET /owner/api/admins`
-- `GET /owner/api/sentiment`
-- `POST /owner/api/report/refresh/{id}`
-- `POST /owner/api/reports/refresh-all`
-- `GET /owner/notifications`
-- `POST /owner/notifications/send`
-- `GET /owner/notifications/delete/{id}`
-- `GET /owner/notifications/update/{id}`
-- `POST /owner/notifications/update/{id}`
-- `GET /owner/faq`
-- `POST /owner/faq/tip/create`
-- `POST /owner/faq/tip/delete/{id}`
-- `GET /owner/faq/tip/update/{id}`
-- `POST /owner/faq/tip/update/{id}`
-- `POST /owner/faq/faq/create`
-- `POST /owner/faq/faq/delete/{id}`
-- `GET /owner/faq/faq/update/{id}`
-- `POST /owner/faq/faq/update/{id}`
+### Owner (`/owner`)
+- dashboard
+- admin workspace (create/manage/update/delete + OTP verification)
+- analytics/report APIs
+- notification CRUD/send
+- FAQ and tips CRUD
 
-### Notification API (JSON)
-Base path: `/api/notifications`
-- `GET /api/notifications`
-- `GET /api/notifications/unread-count`
-- `POST /api/notifications/{id}/read`
-- `POST /api/notifications/mark-all-read`
-- `DELETE /api/notifications/{id}`
+### Notification API (`/api/notifications`)
+- list
+- unread count
+- mark as read
+- mark all as read
+- delete
 
 ## Database Model (High Level)
-Core tables used by the app:
-- `[User]`
+Core tables currently mapped/used:
+- `Users`
 - `Student`
 - `Admin`
 - `Concern`
@@ -298,52 +279,46 @@ Core tables used by the app:
 - `SCMS_Feedback`
 - `Notification`
 - `Analytics_Report`
+- `Concern_Meeting_Proposal`
+- `Concern_Meeting_Slot`
 - `Student_Community_Post`
 - `Student_Community_Reply`
 - `Student_Community_Rules_Acceptance`
 - `Student_Community_Moderation_Log`
-- `Concern_Meeting_Proposal`
-- `Concern_Meeting_Slot`
 - `faqs`
 - `tips`
 
-## Moderation Logic
-Community and feedback moderation use layered checks:
-1. local validation (PII patterns, language gate, bad-word list, structure rules)
-2. Gemini moderation (with model and API-version fallback)
-3. moderation logs persisted in DB
-
 ## Testing
+Current automated tests are minimal:
+- `StudentConcernManagementSystemApplicationTests.contextLoads()`
+
+Run tests:
 ```bash
 ./mvnw test
 ```
 
-or
+## Security Notes (Important)
+Before production use:
+- remove hardcoded owner login credentials from controller layer
+- rotate all currently exposed credentials from history/config
+- move all secrets to environment variables or secret manager
+- enforce HTTPS via reverse proxy
+- add auth rate limits and abuse controls
+- harden upload validation (MIME/content checks)
+- review moderation and audit logs regularly
 
+## Useful Commands
 ```bash
-mvn test
+# compile without tests
+./mvnw -DskipTests compile
+
+# run tests
+./mvnw test
+
+# run app
+./mvnw spring-boot:run
 ```
 
-Current automated test coverage is minimal (`contextLoads` smoke test), so manual functional testing is still important.
+---
 
-## Security Notes
-Before production rollout:
-- remove hardcoded owner credentials from login flow
-- rotate all credentials/secrets currently present in config/history
-- move secrets to environment variables or secret manager
-- use a dedicated DB instead of system databases
-- enable HTTPS + reverse proxy
-- add rate limiting for auth/moderation endpoints
-- validate uploads with stricter server-side MIME/content checks
-- tune session timeout for production policies
-
-## Useful SQL Checks
-Use [SCMS SQL.sql](SCMS%20SQL.sql) verification/query packs for quick checks.
-
-Example:
-```sql
-SELECT TOP 10 ConcernID, Subject, Status, CreatedTime
-FROM Concern
-ORDER BY ConcernID DESC;
-```
-
+Built for Akademy of Knowledge Bridge.
