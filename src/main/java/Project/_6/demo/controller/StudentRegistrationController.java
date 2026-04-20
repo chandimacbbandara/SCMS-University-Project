@@ -7,8 +7,11 @@ import Project._6.demo.dto.StudentRegistrationDTO;
 import Project._6.demo.entity.Admin;
 import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
+import Project._6.demo.entity.ConcernMeetingProposal;
+import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Student;
+import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.EmailVerificationService;
 import Project._6.demo.service.FeedbackService;
@@ -29,6 +32,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import jakarta.servlet.http.HttpSession;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +46,7 @@ public class StudentRegistrationController {
     private final EmailVerificationService emailVerificationService;
     private final NotificationService notificationService;
     private final ConcernService concernService;
+    private final ConcernMeetingService concernMeetingService;
     private final FeedbackService feedbackService;
     private final FaqManagementService faqManagementService;
 
@@ -59,12 +64,14 @@ public class StudentRegistrationController {
                                          EmailVerificationService emailVerificationService,
                                          NotificationService notificationService,
                                          ConcernService concernService,
+                                         ConcernMeetingService concernMeetingService,
                                          FeedbackService feedbackService,
                                          FaqManagementService faqManagementService) {
         this.registrationService = registrationService;
         this.emailVerificationService = emailVerificationService;
         this.notificationService = notificationService;
         this.concernService = concernService;
+        this.concernMeetingService = concernMeetingService;
         this.feedbackService = feedbackService;
         this.faqManagementService = faqManagementService;
     }
@@ -328,9 +335,38 @@ public class StudentRegistrationController {
         List<Concern> concerns = concernService.getConcernsByStudentUserId(userId);
         long draftCount = concernService.countDraftConcernsByStudentUserId(userId);
         Map<Integer, List<AdminReply>> repliesMap = concernService.getRepliesMap(concerns);
+        Map<Integer, AdminReply> latestAdminReplyMap = new HashMap<>();
+        for (Concern concern : concerns) {
+            if (concern == null || concern.getConcernId() == null) {
+                continue;
+            }
+
+            AdminReply latestAdminReply = repliesMap
+                    .getOrDefault(concern.getConcernId(), List.of())
+                    .stream()
+                    .filter(reply -> reply != null && !isStudentMessage(reply))
+                    .max(Comparator.comparing(AdminReply::getReplyTime,
+                            Comparator.nullsLast(Comparator.naturalOrder())))
+                    .orElse(null);
+
+            if (latestAdminReply != null) {
+                latestAdminReplyMap.put(concern.getConcernId(), latestAdminReply);
+            }
+        }
+
+        Map<Integer, ConcernMeetingProposal> latestMeetingProposalMap = concernMeetingService.getLatestProposalMap(concerns);
+        List<Integer> latestProposalIds = latestMeetingProposalMap.values().stream()
+                .map(ConcernMeetingProposal::getProposalId)
+                .toList();
+        Map<Integer, List<ConcernMeetingSlot>> meetingSlotsMapByProposalId = concernMeetingService
+                .getSlotsMapByProposalIds(latestProposalIds);
+
         model.addAttribute("concerns", concerns);
         model.addAttribute("draftCount", draftCount);
         model.addAttribute("repliesMap", repliesMap);
+        model.addAttribute("latestAdminReplyMap", latestAdminReplyMap);
+        model.addAttribute("latestMeetingProposalMap", latestMeetingProposalMap);
+        model.addAttribute("meetingSlotsMapByProposalId", meetingSlotsMapByProposalId);
 
         return "student-dashboard";
     }
@@ -714,5 +750,11 @@ public class StudentRegistrationController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG);
         return new ResponseEntity<>(photo, headers, HttpStatus.OK);
+    }
+
+    private boolean isStudentMessage(AdminReply reply) {
+        return reply != null
+                && reply.getSenderRole() != null
+                && AdminReply.ROLE_STUDENT.equalsIgnoreCase(reply.getSenderRole().trim());
     }
 }
