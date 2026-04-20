@@ -1517,7 +1517,7 @@
                         <div class="stat-icon"><i class="fas fa-handshake"></i></div>
                         <div class="stat-info">
                             <div class="stat-label">Meetings Scheduled</div>
-                            <div class="stat-value" th:text="${#lists.size(concerns.?[status == 'Meeting Scheduled'])}">0</div>
+                            <div class="stat-value" th:text="${#lists.size(concerns.?[status == 'Meeting Scheduled' or ((status == 'Pending' or status == 'In Progress') and (meetingStatus == 'PENDING_STUDENT_SELECTION' or meetingStatus == 'BOOKED'))])}">0</div>
                         </div>
                     </div>
                     <div class="stat-card remix blue animate-in delay-3">
@@ -1642,7 +1642,12 @@
 
                     <div th:each="concern : ${concerns.?[status == 'Pending' or status == 'In Progress' or status == 'Meeting Scheduled']}"
                          class="concern-track-card remix"
-                         th:attr="data-status=${concern.status},data-search=${(concern.subject != null ? concern.subject : '') + ' ' + (concern.message != null ? concern.message : '') + ' ' + concern.status}">
+                         th:with="meetingProposal=${latestMeetingProposalMap[concern.concernId]},
+                                  meetingSlots=${meetingProposal != null ? meetingSlotsMapByProposalId[meetingProposal.proposalId] : null},
+                                  availableSlots=${meetingSlots != null ? meetingSlots.?[slotStatus == 'AVAILABLE'] : null},
+                                  latestAdminReply=${latestAdminReplyMap[concern.concernId]},
+                                  dashboardStatus=${(concern.status == 'In Progress' and concern.meetingStatus != null and (#strings.equalsIgnoreCase(concern.meetingStatus, 'PENDING_STUDENT_SELECTION') or #strings.equalsIgnoreCase(concern.meetingStatus, 'BOOKED') or #strings.equalsIgnoreCase(concern.meetingStatus, 'MEETING_COMPLETED'))) ? 'Meeting Scheduled' : concern.status}"
+                         th:attr="data-status=${dashboardStatus},data-search=${(concern.subject != null ? concern.subject : '') + ' ' + (concern.message != null ? concern.message : '') + ' ' + dashboardStatus + ' ' + (concern.meetingStatus != null ? concern.meetingStatus : '')}">
                         <div class="track-card-header">
                             <div>
                                 <div class="track-ref" th:text="'CON-' + ${concern.concernId}">CON-1</div>
@@ -1650,28 +1655,28 @@
                                 <p class="concern-preview" th:text="${concern.message != null ? concern.message : 'No message content available.'}">Concern preview</p>
                             </div>
                             <span class="track-status-badge"
-                                  th:classappend="${concern.status == 'Pending'} ? 'pending' : (${concern.status == 'In Progress'} ? 'in-progress' : (${concern.status == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
-                                  th:text="${concern.status}">Status</span>
+                                  th:classappend="${dashboardStatus == 'Pending'} ? 'pending' : (${dashboardStatus == 'In Progress'} ? 'in-progress' : (${dashboardStatus == 'Meeting Scheduled'} ? 'meeting-scheduled' : 'complete'))"
+                                  th:text="${dashboardStatus}">Status</span>
                         </div>
 
                         <div class="journey-track"
-                             th:style="'--journey-progress:' + (${concern.status == 'Pending'} ? '0' : (${concern.status == 'In Progress'} ? '0.33' : (${concern.status == 'Meeting Scheduled'} ? '0.66' : '1')))">
+                             th:style="'--journey-progress:' + (${dashboardStatus == 'Pending'} ? '0' : (${dashboardStatus == 'In Progress'} ? '0.33' : (${dashboardStatus == 'Meeting Scheduled'} ? '0.66' : '1')))">
                             <div class="journey-node done">
                                 <span class="node-dot"></span>
                                 <span class="node-label">Submitted</span>
                             </div>
                             <div class="journey-node"
-                                 th:classappend="${concern.status == 'In Progress'} ? ' active' : (${concern.status == 'Meeting Scheduled' or concern.status == 'Complete'} ? ' done' : '')">
+                                 th:classappend="${dashboardStatus == 'In Progress'} ? ' active' : (${dashboardStatus == 'Meeting Scheduled' or dashboardStatus == 'Complete'} ? ' done' : '')">
                                 <span class="node-dot"></span>
                                 <span class="node-label">In Review</span>
                             </div>
                             <div class="journey-node"
-                                 th:classappend="${concern.status == 'Meeting Scheduled'} ? ' active' : (${concern.status == 'Complete'} ? ' done' : '')">
+                                 th:classappend="${dashboardStatus == 'Meeting Scheduled'} ? ' active' : (${dashboardStatus == 'Complete'} ? ' done' : '')">
                                 <span class="node-dot"></span>
                                 <span class="node-label">Meeting</span>
                             </div>
                             <div class="journey-node"
-                                 th:classappend="${concern.status == 'Complete'} ? ' done' : ''">
+                                 th:classappend="${dashboardStatus == 'Complete'} ? ' done' : ''">
                                 <span class="node-dot"></span>
                                 <span class="node-label">Resolved</span>
                             </div>
@@ -1683,10 +1688,19 @@
                                 <span th:text="${#temporals.format(concern.createdTime, 'dd MMM yyyy, hh:mm a')}">01 Jan 2026, 09:00 AM</span>
                             </span>
                             <span class="track-date"
-                                  th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId])}"
-                                  th:with="latestReply=${repliesMap[concern.concernId][0]}">
+                                  th:if="${latestAdminReply != null}">
                                 <i class="fas fa-shield-halved"></i>
-                                <span th:text="${((latestReply.admin != null and latestReply.admin.staffId != null and !latestReply.admin.staffId.isEmpty()) ? latestReply.admin.staffId : 'Admin') + ' replied'}">Admin replied</span>
+                                <span th:text="${((latestAdminReply.admin != null and latestAdminReply.admin.staffId != null and !latestAdminReply.admin.staffId.isEmpty()) ? latestAdminReply.admin.staffId : 'Admin') + ' replied'}">Admin replied</span>
+                            </span>
+                            <span class="track-date"
+                                  th:if="${concern.meetingStatus != null and #strings.equalsIgnoreCase(concern.meetingStatus, 'PENDING_STUDENT_SELECTION')}">
+                                <i class="fas fa-calendar-check"></i>
+                                <span th:text="${(availableSlots != null ? #lists.size(availableSlots) : 0) + ' meeting slots available'}">0 meeting slots available</span>
+                            </span>
+                            <span class="track-date"
+                                  th:if="${concern.meetingStatus != null and #strings.equalsIgnoreCase(concern.meetingStatus, 'BOOKED') and concern.meetingBookedStartTime != null and concern.meetingBookedEndTime != null}">
+                                <i class="fas fa-handshake"></i>
+                                <span th:text="${'Meeting: ' + #temporals.format(concern.meetingBookedStartTime, 'dd MMM, HH:mm') + ' - ' + #temporals.format(concern.meetingBookedEndTime, 'HH:mm')}">Meeting: 01 Jan, 09:00 - 10:00</span>
                             </span>
                         </div>
 
@@ -1695,8 +1709,8 @@
                                 <i class="fas fa-arrow-up-right-from-square"></i>
                                 Open Full Timeline
                             </a>
-                            <a th:if="${repliesMap[concern.concernId] != null and !#lists.isEmpty(repliesMap[concern.concernId]) and repliesMap[concern.concernId][0].resolutionScreenshotPath != null}"
-                               th:href="@{'/uploads/' + ${repliesMap[concern.concernId][0].resolutionScreenshotPath}}"
+                            <a th:if="${latestAdminReply != null and latestAdminReply.resolutionScreenshotPath != null}"
+                               th:href="@{'/uploads/' + ${latestAdminReply.resolutionScreenshotPath}}"
                                target="_blank"
                                class="admin-attachment-pill secondary">
                                 <i class="fas fa-paperclip"></i>
