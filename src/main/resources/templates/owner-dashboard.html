@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
     <link rel="stylesheet" href="/CSS/main.css">
     <link rel="stylesheet" href="/CSS/admin-tour.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
@@ -268,10 +271,21 @@
             color: #fff;
         }
 
-        .quick-action-card:nth-child(1) .quick-action-icon { background: linear-gradient(135deg, #dc2626, #b91c1c); }
-        .quick-action-card:nth-child(2) .quick-action-icon { background: linear-gradient(135deg, #2563eb, #1d4ed8); }
-        .quick-action-card:nth-child(3) .quick-action-icon { background: linear-gradient(135deg, #0d9488, #0f766e); }
-        .quick-action-card:nth-child(4) .quick-action-icon { background: linear-gradient(135deg, #ea580c, #c2410c); }
+        .quick-action-card:nth-child(1) .quick-action-icon {
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+        }
+
+        .quick-action-card:nth-child(2) .quick-action-icon {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        .quick-action-card:nth-child(3) .quick-action-icon {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+        }
+
+        .quick-action-card:nth-child(4) .quick-action-icon {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+        }
 
         .quick-action-card h3 {
             font-size: 14px;
@@ -432,10 +446,21 @@
             background: linear-gradient(135deg, #334155, #0f172a);
         }
 
-        .stat-card:nth-child(1) .stat-icon { background: linear-gradient(135deg, #1d4ed8, #1e40af); }
-        .stat-card:nth-child(2) .stat-icon { background: linear-gradient(135deg, #c53030, #9b2c2c); }
-        .stat-card:nth-child(3) .stat-icon { background: linear-gradient(135deg, #15803d, #166534); }
-        .stat-card:nth-child(4) .stat-icon { background: linear-gradient(135deg, #0891b2, #0e7490); }
+        .stat-card:nth-child(1) .stat-icon {
+            background: linear-gradient(135deg, #1d4ed8, #1e40af);
+        }
+
+        .stat-card:nth-child(2) .stat-icon {
+            background: linear-gradient(135deg, #c53030, #9b2c2c);
+        }
+
+        .stat-card:nth-child(3) .stat-icon {
+            background: linear-gradient(135deg, #15803d, #166534);
+        }
+
+        .stat-card:nth-child(4) .stat-icon {
+            background: linear-gradient(135deg, #0891b2, #0e7490);
+        }
 
         .stat-label {
             display: block;
@@ -566,9 +591,17 @@
             color: #64748b;
         }
 
-        .status-pill.resolved strong { color: #15803d; }
-        .status-pill.pending strong { color: #c2410c; }
-        .status-pill.rejected strong { color: #be123c; }
+        .status-pill.resolved strong {
+            color: #15803d;
+        }
+
+        .status-pill.pending strong {
+            color: #c2410c;
+        }
+
+        .status-pill.rejected strong {
+            color: #be123c;
+        }
 
         .operations-grid {
             margin-bottom: 18px;
@@ -932,8 +965,13 @@
             font-size: 13px;
         }
 
-        .sentiment-stars .filled { color: #f59e0b; }
-        .sentiment-stars .empty { color: #cbd5e1; }
+        .sentiment-stars .filled {
+            color: #f59e0b;
+        }
+
+        .sentiment-stars .empty {
+            color: #cbd5e1;
+        }
 
         .sentiment-info {
             font-size: 11px;
@@ -1729,1293 +1767,1177 @@
         }
     </style>
 </head>
+
 <body>
-<header>
-    <div class="container header-content">
-        <div class="logo-area">
-            <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
-            <div class="logo-text">
-                <span>Academy of</span>
-                <span>Knowledge Bridge</span>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
             </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/owner/dashboard" class="nav-link active">Owner Dashboard</a></li>
+                    <li><a href="/owner/admin/workspace" class="nav-link">Admin Workspace</a></li>
+                    <li><a href="/owner/notifications" class="nav-link">Content Workspace</a></li>
+                    <li><a href="/owner/student-feedback" class="nav-link">Student Feedback</a></li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
         </div>
-        <nav>
-            <ul>
-                <li><a href="/" class="nav-link">Home</a></li>
-                <li><a href="/owner/dashboard" class="nav-link active">Owner Dashboard</a></li>
-                <li><a href="/owner/admin/workspace" class="nav-link">Admin Workspace</a></li>
-                <li><a href="/owner/notifications" class="nav-link">Content Workspace</a></li>
-                <li><a href="/logout" class="btn-red">Logout</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+    </header>
 
-<main>
-    <div class="owner-shell">
+    <main>
+        <div class="owner-shell">
 
-        <div class="flash-stack">
-            <div th:if="${successMessage}" class="flash-item success" role="status">
-                <i class="fas fa-circle-check"></i>
-                <span th:text="${successMessage}">Report created.</span>
-            </div>
-            <div th:if="${errorMessage}" class="flash-item error" role="alert">
-                <i class="fas fa-circle-exclamation"></i>
-                <span th:text="${errorMessage}">An error occurred.</span>
-            </div>
-        </div>
-
-        <section class="owner-hero">
-            <div class="hero-left">
-                <span class="hero-kicker"><i class="fas fa-crown"></i> Owner Workspace</span>
-                <h1 class="hero-title">Owner Dashboard</h1>
-                <p class="hero-sub">
-                    Monitor concern activity, review monthly records, create analytics reports, and export files for meetings in one clean workspace.
-                </p>
-                <div class="hero-actions">
-                    <a href="/owner/admin/workspace#create" class="hero-action primary"><i class="fas fa-user-plus"></i> Open Create Admin Tab</a>
-                    <a href="/owner/admin/workspace#manage" class="hero-action ghost"><i class="fas fa-user-gear"></i> Open Manage Admin Tab</a>
+            <div class="flash-stack">
+                <div th:if="${successMessage}" class="flash-item success" role="status">
+                    <i class="fas fa-circle-check"></i>
+                    <span th:text="${successMessage}">Report created.</span>
+                </div>
+                <div th:if="${errorMessage}" class="flash-item error" role="alert">
+                    <i class="fas fa-circle-exclamation"></i>
+                    <span th:text="${errorMessage}">An error occurred.</span>
                 </div>
             </div>
-            <div class="hero-right">
-                <div class="hero-info-card">
-                    <span>Reports In System</span>
-                    <strong th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
-                </div>
-                <div class="hero-info-card">
-                    <span>Current Report Scope</span>
-                    <strong>All Time</strong>
-                </div>
-            </div>
-        </section>
 
-        <section class="owner-tab-switcher" role="tablist" aria-label="Owner dashboard sections">
-            <button type="button" class="owner-tab-btn active" id="ownerTabAnalytics" role="tab" aria-controls="ownerPanelAnalytics" aria-selected="true" data-owner-tab-target="analytics">
-                <span class="owner-tab-head">
-                    <span class="owner-tab-index">01</span>
-                    <span class="owner-tab-shortcut">Shortcut 1</span>
-                </span>
-                <span class="owner-tab-title"><i class="fas fa-chart-column"></i> Live Analytics</span>
-                <p class="owner-tab-sub">Quick view of KPIs, category trends, and status distribution.</p>
-            </button>
-
-            <button type="button" class="owner-tab-btn" id="ownerTabMonthly" role="tab" aria-controls="ownerPanelMonthly" aria-selected="false" data-owner-tab-target="monthly">
-                <span class="owner-tab-head">
-                    <span class="owner-tab-index">02</span>
-                    <span class="owner-tab-shortcut">Shortcut 2</span>
-                </span>
-                <span class="owner-tab-title"><i class="fas fa-table-list"></i> Monthly Records and Export</span>
-                <p class="owner-tab-sub">Filter monthly concerns and download PDF or Excel reports.</p>
-            </button>
-
-            <button type="button" class="owner-tab-btn" id="ownerTabReports" role="tab" aria-controls="ownerPanelReports" aria-selected="false" data-owner-tab-target="reports">
-                <span class="owner-tab-head">
-                    <span class="owner-tab-index">03</span>
-                    <span class="owner-tab-shortcut">Shortcut 3</span>
-                </span>
-                <span class="owner-tab-title"><i class="fas fa-screwdriver-wrench"></i> Create and Manage Reports</span>
-                <p class="owner-tab-sub">Create new analytics snapshots and manage recent reports.</p>
-            </button>
-        </section>
-
-        <div class="owner-tab-panels">
-            <section class="owner-tab-panel" id="ownerPanelAnalytics" data-owner-tab-panel="analytics" role="tabpanel" aria-labelledby="ownerTabAnalytics">
-
-        <section class="quick-actions">
-            <a class="quick-action-card" href="/owner/admin/workspace#create">
-                <span class="quick-action-icon"><i class="fas fa-user-shield"></i></span>
-                <h3>Admin Provisioning</h3>
-                <p>Create verified admin accounts and expand operations safely.</p>
-            </a>
-            <a class="quick-action-card" href="/owner/admin/workspace#manage">
-                <span class="quick-action-icon"><i class="fas fa-users-gear"></i></span>
-                <h3>Admin Governance</h3>
-                <p>Review existing admin accounts and apply account-level updates.</p>
-            </a>
-            <a class="quick-action-card" href="/owner/notifications#notifications">
-                <span class="quick-action-icon"><i class="fas fa-bullhorn"></i></span>
-                <h3>Broadcast Center</h3>
-                <p>Publish messages to students quickly from one central place.</p>
-            </a>
-            <a class="quick-action-card" href="/owner/notifications#faq">
-                <span class="quick-action-icon"><i class="fas fa-circle-question"></i></span>
-                <h3>Knowledge Management</h3>
-                <p>Maintain FAQs and tips to reduce recurring concerns.</p>
-            </a>
-        </section>
-
-        <section class="owner-stats">
-            <article class="stat-card">
-                <span class="stat-icon"><i class="fas fa-file-lines"></i></span>
-                <div>
-                    <span class="stat-label">Reports Created</span>
-                    <strong class="stat-value" th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
-                </div>
-            </article>
-            <article class="stat-card">
-                <span class="stat-icon"><i class="fas fa-calendar-check"></i></span>
-                <div>
-                    <span class="stat-label">This Month</span>
-                    <strong class="stat-value" id="thisMonthCount">0</strong>
-                </div>
-            </article>
-            <article class="stat-card">
-                <span class="stat-icon"><i class="fas fa-triangle-exclamation"></i></span>
-                <div>
-                    <span class="stat-label">Live Concern Volume</span>
-                    <strong class="stat-value" id="liveConcernCount">0</strong>
-                </div>
-            </article>
-            <article class="stat-card">
-                <span class="stat-icon"><i class="fas fa-filter"></i></span>
-                <div>
-                    <span class="stat-label">Monthly Filter Scope</span>
-                    <strong class="stat-value small" id="monthlyFilterScope">All Categories</strong>
-                </div>
-            </article>
-        </section>
-
-        <section class="analytics-grid">
-            <article class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <h3><i class="fas fa-chart-column"></i> Category Distribution</h3>
-                        <p>See which categories currently receive the most concerns.</p>
-                    </div>
-                    <button type="button" class="btn-surface" id="refreshAnalyticsBtn"><i class="fas fa-rotate"></i> Refresh Data</button>
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="ownerCategoryChart"></canvas>
-                </div>
-            </article>
-
-            <article class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <h3><i class="fas fa-chart-pie"></i> Status Mix</h3>
-                        <p>View resolved, pending, and rejected concerns at a glance.</p>
-                    </div>
-                </div>
-                <div class="chart-wrap">
-                    <canvas id="ownerStatusChart"></canvas>
-                </div>
-                <div class="status-summary">
-                    <div class="status-pill resolved">
-                        <strong id="statusResolvedCount">0</strong>
-                        <span>Resolved</span>
-                    </div>
-                    <div class="status-pill pending">
-                        <strong id="statusPendingCount">0</strong>
-                        <span>Pending</span>
-                    </div>
-                    <div class="status-pill rejected">
-                        <strong id="statusRejectedCount">0</strong>
-                        <span>Rejected</span>
-                    </div>
-                </div>
-            </article>
-        </section>
-
-            </section>
-
-            <section class="owner-tab-panel" id="ownerPanelMonthly" data-owner-tab-panel="monthly" role="tabpanel" aria-labelledby="ownerTabMonthly" hidden>
-
-        <section class="operations-grid">
-            <article class="panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <h3><i class="fas fa-table-list"></i> Monthly Concern Records</h3>
-                        <p>Choose month, category, and priority to load detailed monthly concern records.</p>
-                    </div>
-                    <button type="button" class="btn-surface danger" id="deleteAllRejectedBtn">
-                        <i class="fas fa-trash-can"></i> Delete All Rejected
-                    </button>
-                </div>
-                <div class="panel-body">
-                    <div class="monthly-filter-grid">
-                        <div class="form-group tight">
-                            <label class="form-label" for="monthlyReportMonth">Select Month</label>
-                            <input type="date" id="monthlyReportMonth" class="form-control" title="Pick a date for monthly report">
-                        </div>
-                        <div class="form-group tight">
-                            <label class="form-label" for="monthlyReportCategory">Category</label>
-                            <select id="monthlyReportCategory" class="form-control" title="Select monthly report category">
-                                <option value="All Categories" selected>All Categories</option>
-                                <option value="Education (Creative and IT)">Education (Creative and IT)</option>
-                                <option value="Institute Problem">Institute Related Problem</option>
-                                <option value="Registration">Registration &amp; Enrollment</option>
-                                <option value="Administrative">Administrative Services</option>
-                                <option value="Financial">Financial &amp; Payments</option>
-                                <option value="Other">Other General Concern</option>
-                            </select>
-                        </div>
-                        <div class="form-group tight">
-                            <label class="form-label" for="monthlyReportPriority">Priority</label>
-                            <select id="monthlyReportPriority" class="form-control" title="Select monthly report priority">
-                                <option value="All Priorities" selected>All Priorities</option>
-                                <option value="High">High</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Low">Low</option>
-                                <option value="—">Unspecified</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <button type="button" class="btn-primary" id="generateMonthlyReportBtn">
-                        <i class="fas fa-file-lines"></i> Load Monthly Records
-                    </button>
-
-                    <div class="monthly-table-wrap">
-                        <table class="monthly-table">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Concern ID</th>
-                                    <th>Student ID</th>
-                                    <th>Student Name</th>
-                                    <th>Category</th>
-                                    <th>Priority</th>
-                                    <th>Status</th>
-                                    <th>Date</th>
-                                    <th>Concern</th>
-                                    <th>Latest Reply</th>
-                                </tr>
-                            </thead>
-                            <tbody id="monthlyReportTbody">
-                                <tr class="empty-row">
-                                    <td colspan="10">Generate a monthly report to view records.</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </article>
-        </section>
-
-        <section class="export-bottom-section">
-            <article class="panel export-bottom-panel">
-                <div class="panel-head">
-                    <div class="panel-title">
-                        <h3><i class="fas fa-file-arrow-down"></i> Export Monthly Report</h3>
-                        <p>Download the currently loaded monthly data as PDF or Excel.</p>
-                    </div>
-                </div>
-                <div class="panel-body">
-                    <p class="export-help">
-                        First load monthly records using filters above, then export a branded report for meetings or documentation.
+            <section class="owner-hero">
+                <div class="hero-left">
+                    <span class="hero-kicker"><i class="fas fa-crown"></i> Owner Workspace</span>
+                    <h1 class="hero-title">Owner Dashboard</h1>
+                    <p class="hero-sub">
+                        Monitor concern activity, review monthly records, create analytics reports, and export files for
+                        meetings in one clean workspace.
                     </p>
-                    <div class="export-actions-wrap">
-                        <div class="export-actions">
-                            <button type="button" class="btn-export pdf" id="exportPdfBtn"><i class="fas fa-file-pdf"></i> Export PDF</button>
-                            <button type="button" class="btn-export excel" id="exportExcelBtn"><i class="fas fa-file-excel"></i> Export Excel</button>
-                        </div>
-                        <div class="export-status" id="exportStatusText">Select filters and generate report to enable export.</div>
+                    <div class="hero-actions">
+                        <a href="/owner/admin/workspace#create" class="hero-action primary"><i
+                                class="fas fa-user-plus"></i> Open Create Admin Tab</a>
+                        <a href="/owner/admin/workspace#manage" class="hero-action ghost"><i
+                                class="fas fa-user-gear"></i> Open Manage Admin Tab</a>
                     </div>
                 </div>
-            </article>
-        </section>
-
+                <div class="hero-right">
+                    <div class="hero-info-card">
+                        <span>Reports In System</span>
+                        <strong th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
+                    </div>
+                    <div class="hero-info-card">
+                        <span>Current Report Scope</span>
+                        <strong>All Time</strong>
+                    </div>
+                </div>
             </section>
 
-            <section class="owner-tab-panel" id="ownerPanelReports" data-owner-tab-panel="reports" role="tabpanel" aria-labelledby="ownerTabReports" hidden>
+            <section class="owner-tab-switcher" role="tablist" aria-label="Owner dashboard sections">
+                <button type="button" class="owner-tab-btn active" id="ownerTabAnalytics" role="tab"
+                    aria-controls="ownerPanelAnalytics" aria-selected="true" data-owner-tab-target="analytics">
+                    <span class="owner-tab-head">
+                        <span class="owner-tab-index">01</span>
+                        <span class="owner-tab-shortcut">Shortcut 1</span>
+                    </span>
+                    <span class="owner-tab-title"><i class="fas fa-chart-column"></i> Live Analytics</span>
+                    <p class="owner-tab-sub">Quick view of KPIs, category trends, and status distribution.</p>
+                </button>
 
-        <section class="dashboard-grid">
-            <article class="panel">
-                <div class="card-header">
-                    <div>
-                        <h2><i class="fas fa-screwdriver-wrench"></i> Create Analytics Report</h2>
-                        <p>Choose an admin and category. Metrics are auto-filled from live concern and feedback data.</p>
-                    </div>
-                </div>
+                <button type="button" class="owner-tab-btn" id="ownerTabMonthly" role="tab"
+                    aria-controls="ownerPanelMonthly" aria-selected="false" data-owner-tab-target="monthly">
+                    <span class="owner-tab-head">
+                        <span class="owner-tab-index">02</span>
+                        <span class="owner-tab-shortcut">Shortcut 2</span>
+                    </span>
+                    <span class="owner-tab-title"><i class="fas fa-table-list"></i> Monthly Records and Export</span>
+                    <p class="owner-tab-sub">Filter monthly concerns and download PDF or Excel reports.</p>
+                </button>
 
-                <div class="card-body">
-                    <form th:action="@{/owner/report/create}" method="post" id="reportForm">
-                        <input type="hidden" name="timePeriod" value="All Time">
+                <button type="button" class="owner-tab-btn" id="ownerTabReports" role="tab"
+                    aria-controls="ownerPanelReports" aria-selected="false" data-owner-tab-target="reports">
+                    <span class="owner-tab-head">
+                        <span class="owner-tab-index">03</span>
+                        <span class="owner-tab-shortcut">Shortcut 3</span>
+                    </span>
+                    <span class="owner-tab-title"><i class="fas fa-screwdriver-wrench"></i> Create and Manage
+                        Reports</span>
+                    <p class="owner-tab-sub">Create new analytics snapshots and manage recent reports.</p>
+                </button>
+            </section>
 
-                        <div class="form-group">
-                            <label class="form-label" for="adminSelect">Choose Admin</label>
-                            <select name="adminIdFk" id="adminSelect" class="form-control" required title="Select admin">
-                                <option value="" selected>Loading admins...</option>
-                            </select>
-                            <div class="form-hint"><i class="fas fa-circle-info"></i> Metrics are linked to selected admin and category.</div>
-                        </div>
+            <div class="owner-tab-panels">
+                <section class="owner-tab-panel" id="ownerPanelAnalytics" data-owner-tab-panel="analytics"
+                    role="tabpanel" aria-labelledby="ownerTabAnalytics">
 
-                        <div class="form-group">
-                            <label class="form-label" for="categorySelect">Category Filter</label>
-                            <select name="mostFrequentCategory" id="categorySelect" class="form-control" required title="Select category">
-                                <option value="All Categories" selected>All Categories</option>
-                                <option value="Education (Creative and IT)">Education (Creative and IT)</option>
-                                <option value="Institute Problem">Institute Related Problem</option>
-                                <option value="Registration">Registration &amp; Enrollment</option>
-                                <option value="Administrative">Administrative Services</option>
-                                <option value="Financial">Financial &amp; Payments</option>
-                                <option value="Other">Other General Concern</option>
-                            </select>
-                        </div>
 
-                        <div class="metrics-grid">
-                            <div class="form-group metric-highlight">
-                                <label class="form-label" for="totalConcernsInput">Total Concerns</label>
-                                <input type="number" name="totalConcerns" id="totalConcernsInput" class="form-control readonly-field" readonly min="0" required placeholder="Select admin first">
-                                <div class="form-hint" id="totalConcernsInfo"><i class="fas fa-circle-info"></i> Auto-filled from concern data.</div>
+                    <section class="owner-stats">
+                        <article class="stat-card">
+                            <span class="stat-icon"><i class="fas fa-file-lines"></i></span>
+                            <div>
+                                <span class="stat-label">Reports Created</span>
+                                <strong class="stat-value"
+                                    th:text="${reports != null ? #lists.size(reports) : 0}">0</strong>
                             </div>
-                            <div class="form-group metric-highlight">
-                                <label class="form-label" for="avgResolutionInput">Avg Resolution Time (hrs)</label>
-                                <input type="number" name="avgResolutionTime" id="avgResolutionInput" class="form-control readonly-field" readonly min="0" step="0.01" required placeholder="Select admin first">
-                                <div class="form-hint" id="avgResolutionInfo"><i class="fas fa-circle-info"></i> Based on first admin reply time.</div>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-icon"><i class="fas fa-calendar-check"></i></span>
+                            <div>
+                                <span class="stat-label">This Month</span>
+                                <strong class="stat-value" id="thisMonthCount">0</strong>
                             </div>
-                        </div>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-icon"><i class="fas fa-triangle-exclamation"></i></span>
+                            <div>
+                                <span class="stat-label">Live Concern Volume</span>
+                                <strong class="stat-value" id="liveConcernCount">0</strong>
+                            </div>
+                        </article>
+                        <article class="stat-card">
+                            <span class="stat-icon"><i class="fas fa-filter"></i></span>
+                            <div>
+                                <span class="stat-label">Monthly Filter Scope</span>
+                                <strong class="stat-value small" id="monthlyFilterScope">All Categories</strong>
+                            </div>
+                        </article>
+                    </section>
 
-                        <div class="form-group">
-                            <label class="form-label" for="evidenceImageInput">Concern Images</label>
-                            <input type="number" name="evidenceImageCount" id="evidenceImageInput" class="form-control readonly-field" readonly min="0" required placeholder="Select admin first">
-                            <div class="form-hint" id="evidenceImageInfo"><i class="fas fa-circle-info"></i> Includes concerns that contain evidence images.</div>
-                        </div>
-
-                        <div class="form-group metric-highlight">
-                            <label class="form-label">Sentiment Score</label>
-                            <input type="hidden" name="sentimentTrendScore" id="sentimentInput" value="0.00">
-                            <div class="sentiment-panel spotlight" id="sentimentPanel">
-                                <strong class="sentiment-value" id="sentimentVal">-</strong>
-                                <div class="sentiment-meta">
-                                    <span class="label">Average Feedback Rating</span>
-                                    <div class="sentiment-stars" id="sentimentStars"></div>
-                                    <span class="sentiment-info" id="sentimentInfo">Select an admin to calculate sentiment.</span>
+                    <section class="analytics-grid">
+                        <article class="panel">
+                            <div class="panel-head">
+                                <div class="panel-title">
+                                    <h3><i class="fas fa-chart-column"></i> Category Distribution</h3>
+                                    <p>See which categories currently receive the most concerns.</p>
                                 </div>
+                                <button type="button" class="btn-surface" id="refreshAnalyticsBtn"><i
+                                        class="fas fa-rotate"></i> Refresh Data</button>
                             </div>
-                        </div>
+                            <div class="chart-wrap">
+                                <canvas id="ownerCategoryChart"></canvas>
+                            </div>
+                        </article>
 
-                        <button type="submit" class="btn-primary btn-block"><i class="fas fa-paper-plane"></i> Save Analytics Report</button>
-                    </form>
-                </div>
-            </article>
-
-            <article class="panel reports-panel">
-                <div class="card-header">
-                    <div>
-                        <h2><i class="fas fa-clock-rotate-left"></i> Recent Reports</h2>
-                        <p>Refresh values or remove older analytics snapshots from the timeline.</p>
-                    </div>
-                    <button type="button" class="btn-surface" id="refreshAllBtn"><i class="fas fa-arrows-rotate"></i> Refresh All</button>
-                </div>
-
-                <div class="card-body">
-                    <div th:if="${reports == null or #lists.isEmpty(reports)}" class="empty-reports">
-                        <i class="fas fa-folder-open"></i>
-                        <h4>No Reports Available</h4>
-                        <p>Create your first report from the left panel to start analytics tracking.</p>
-                    </div>
-
-                    <div th:if="${reports != null and !#lists.isEmpty(reports)}" class="reports-list">
-                        <article th:each="report : ${reports}" class="report-item"
-                                 th:attr="data-report-id=${report.reportId},data-created=${report.createdTime != null ? #temporals.format(report.createdTime, 'yyyy-MM-dd') : ''}">
-                            <div class="report-top">
-                                <div>
-                                    <span class="report-id"><i class="fas fa-hashtag"></i><span th:text="${report.reportId}">1</span></span>
-                                    <div class="report-time">
-                                        <i class="fas fa-calendar-days"></i>
-                                        <span th:text="${report.createdTime != null ? #temporals.format(report.createdTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01 Jan 2026, 11:20 AM</span>
-                                    </div>
-                                </div>
-
-                                <div class="report-actions">
-                                    <button type="button" class="btn-mini" th:onclick="|refreshSingleReport(this, ${report.reportId})|">
-                                        <i class="fas fa-rotate"></i> Refresh
-                                    </button>
-                                    <form th:action="@{/owner/report/delete/{id}(id=${report.reportId})}" method="post" onsubmit="return confirm('Delete this analytics report?');">
-                                        <button type="submit" class="btn-mini danger"><i class="fas fa-trash"></i> Delete</button>
-                                    </form>
+                        <article class="panel">
+                            <div class="panel-head">
+                                <div class="panel-title">
+                                    <h3><i class="fas fa-chart-pie"></i> Status Mix</h3>
+                                    <p>View resolved, pending, and rejected concerns at a glance.</p>
                                 </div>
                             </div>
-
-                            <div class="report-grid">
-                                <div class="report-field">
-                                    <span>Total Concerns</span>
-                                    <strong class="report-total-concerns" th:text="${report.totalConcerns != null ? report.totalConcerns : 0}">0</strong>
+                            <div class="chart-wrap">
+                                <canvas id="ownerStatusChart"></canvas>
+                            </div>
+                            <div class="status-summary">
+                                <div class="status-pill resolved">
+                                    <strong id="statusResolvedCount">0</strong>
+                                    <span>Resolved</span>
                                 </div>
-                                <div class="report-field">
-                                    <span>Avg Resolution</span>
-                                    <strong class="report-avg-resolution" th:text="${report.avgResolutionTime != null ? report.avgResolutionTime + ' hrs' : '0.00 hrs'}">0.00 hrs</strong>
+                                <div class="status-pill pending">
+                                    <strong id="statusPendingCount">0</strong>
+                                    <span>Pending</span>
                                 </div>
-                                <div class="report-field">
-                                    <span>Most Frequent Category</span>
-                                    <strong class="report-category" th:text="${report.mostFrequentCategory != null ? report.mostFrequentCategory : 'All Categories'}">All Categories</strong>
-                                </div>
-                                <div class="report-field">
-                                    <span>Sentiment Score</span>
-                                    <strong class="report-sentiment" th:text="${report.sentimentTrendScore != null ? report.sentimentTrendScore : '0.00'}">0.00</strong>
-                                </div>
-                                <div class="report-field">
-                                    <span>Concern Images</span>
-                                    <strong class="report-evidence-images" th:text="${report.evidenceImageCount != null ? report.evidenceImageCount : 0}">0</strong>
-                                </div>
-                                <div class="report-field">
-                                    <span>Admin</span>
-                                    <strong class="report-admin-name"
-                                            th:attr="data-admin-id=${report.adminIdFk}"
-                                            th:text="${report.adminIdFk != null ? report.adminIdFk : '-'}">-</strong>
+                                <div class="status-pill rejected">
+                                    <strong id="statusRejectedCount">0</strong>
+                                    <span>Rejected</span>
                                 </div>
                             </div>
                         </article>
-                    </div>
-                </div>
-            </article>
-        </section>
+                    </section>
 
-            </section>
+                </section>
+
+                <section class="owner-tab-panel" id="ownerPanelMonthly" data-owner-tab-panel="monthly" role="tabpanel"
+                    aria-labelledby="ownerTabMonthly" hidden>
+
+                    <section class="operations-grid">
+                        <article class="panel">
+                            <div class="panel-head">
+                                <div class="panel-title">
+                                    <h3><i class="fas fa-table-list"></i> Monthly Concern Records</h3>
+                                    <p>Choose month, category, and priority to load detailed monthly concern records.
+                                    </p>
+                                </div>
+                                <button type="button" class="btn-surface danger" id="deleteAllRejectedBtn">
+                                    <i class="fas fa-trash-can"></i> Delete All Rejected
+                                </button>
+                            </div>
+                            <div class="panel-body">
+                                <div class="monthly-filter-grid">
+                                    <div class="form-group tight">
+                                        <label class="form-label" for="monthlyReportMonth">Select Month</label>
+                                        <input type="date" id="monthlyReportMonth" class="form-control"
+                                            title="Pick a date for monthly report">
+                                    </div>
+                                    <div class="form-group tight">
+                                        <label class="form-label" for="monthlyReportCategory">Category</label>
+                                        <select id="monthlyReportCategory" class="form-control"
+                                            title="Select monthly report category">
+                                            <option value="All Categories" selected>All Categories</option>
+                                            <option value="Education (Creative and IT)">Education (Creative and IT)
+                                            </option>
+                                            <option value="Institute Problem">Institute Related Problem</option>
+                                            <option value="Registration">Registration &amp; Enrollment</option>
+                                            <option value="Administrative">Administrative Services</option>
+                                            <option value="Financial">Financial &amp; Payments</option>
+                                            <option value="Other">Other General Concern</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group tight">
+                                        <label class="form-label" for="monthlyReportPriority">Priority</label>
+                                        <select id="monthlyReportPriority" class="form-control"
+                                            title="Select monthly report priority">
+                                            <option value="All Priorities" selected>All Priorities</option>
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                            <option value="—">Unspecified</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <button type="button" class="btn-primary" id="generateMonthlyReportBtn">
+                                    <i class="fas fa-file-lines"></i> Load Monthly Records
+                                </button>
+
+                                <div class="monthly-table-wrap">
+                                    <table class="monthly-table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Concern ID</th>
+                                                <th>Student ID</th>
+                                                <th>Student Name</th>
+                                                <th>Category</th>
+                                                <th>Priority</th>
+                                                <th>Status</th>
+                                                <th>Date</th>
+                                                <th>Concern</th>
+                                                <th>Latest Reply</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="monthlyReportTbody">
+                                            <tr class="empty-row">
+                                                <td colspan="10">Generate a monthly report to view records.</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                    <section class="export-bottom-section">
+                        <article class="panel export-bottom-panel">
+                            <div class="panel-head">
+                                <div class="panel-title">
+                                    <h3><i class="fas fa-file-arrow-down"></i> Export Monthly Report</h3>
+                                    <p>Download the currently loaded monthly data as PDF or Excel.</p>
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <p class="export-help">
+                                    First load monthly records using filters above, then export a branded report for
+                                    meetings or documentation.
+                                </p>
+                                <div class="export-actions-wrap">
+                                    <div class="export-actions">
+                                        <button type="button" class="btn-export pdf" id="exportPdfBtn"><i
+                                                class="fas fa-file-pdf"></i> Export PDF</button>
+                                        <button type="button" class="btn-export excel" id="exportExcelBtn"><i
+                                                class="fas fa-file-excel"></i> Export Excel</button>
+                                    </div>
+                                    <div class="export-status" id="exportStatusText">Select filters and generate report
+                                        to enable export.</div>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                </section>
+
+                <section class="owner-tab-panel" id="ownerPanelReports" data-owner-tab-panel="reports" role="tabpanel"
+                    aria-labelledby="ownerTabReports" hidden>
+
+                    <section class="dashboard-grid">
+                        <article class="panel">
+                            <div class="card-header">
+                                <div>
+                                    <h2><i class="fas fa-screwdriver-wrench"></i> Create Analytics Report</h2>
+                                    <p>Choose an admin and category. Metrics are auto-filled from live concern and
+                                        feedback data.</p>
+                                </div>
+                            </div>
+
+                            <div class="card-body">
+                                <form th:action="@{/owner/report/create}" method="post" id="reportForm">
+                                    <input type="hidden" name="timePeriod" value="All Time">
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="adminSelect">Choose Admin</label>
+                                        <select name="adminIdFk" id="adminSelect" class="form-control" required
+                                            title="Select admin">
+                                            <option value="" selected>Loading admins...</option>
+                                        </select>
+                                        <div class="form-hint"><i class="fas fa-circle-info"></i> Metrics are linked to
+                                            selected admin and category.</div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="categorySelect">Category Filter</label>
+                                        <select name="mostFrequentCategory" id="categorySelect" class="form-control"
+                                            required title="Select category">
+                                            <option value="All Categories" selected>All Categories</option>
+                                            <option value="Education (Creative and IT)">Education (Creative and IT)
+                                            </option>
+                                            <option value="Institute Problem">Institute Related Problem</option>
+                                            <option value="Registration">Registration &amp; Enrollment</option>
+                                            <option value="Administrative">Administrative Services</option>
+                                            <option value="Financial">Financial &amp; Payments</option>
+                                            <option value="Other">Other General Concern</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="metrics-grid">
+                                        <div class="form-group metric-highlight">
+                                            <label class="form-label" for="totalConcernsInput">Total Concerns</label>
+                                            <input type="number" name="totalConcerns" id="totalConcernsInput"
+                                                class="form-control readonly-field" readonly min="0" required
+                                                placeholder="Select admin first">
+                                            <div class="form-hint" id="totalConcernsInfo"><i
+                                                    class="fas fa-circle-info"></i> Auto-filled from concern data.</div>
+                                        </div>
+                                        <div class="form-group metric-highlight">
+                                            <label class="form-label" for="avgResolutionInput">Avg Resolution Time
+                                                (hrs)</label>
+                                            <input type="number" name="avgResolutionTime" id="avgResolutionInput"
+                                                class="form-control readonly-field" readonly min="0" step="0.01"
+                                                required placeholder="Select admin first">
+                                            <div class="form-hint" id="avgResolutionInfo"><i
+                                                    class="fas fa-circle-info"></i> Based on first admin reply time.
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="evidenceImageInput">Concern Images</label>
+                                        <input type="number" name="evidenceImageCount" id="evidenceImageInput"
+                                            class="form-control readonly-field" readonly min="0" required
+                                            placeholder="Select admin first">
+                                        <div class="form-hint" id="evidenceImageInfo"><i class="fas fa-circle-info"></i>
+                                            Includes concerns that contain evidence images.</div>
+                                    </div>
+
+                                    <div class="form-group metric-highlight">
+                                        <label class="form-label">Sentiment Score</label>
+                                        <input type="hidden" name="sentimentTrendScore" id="sentimentInput"
+                                            value="0.00">
+                                        <div class="sentiment-panel spotlight" id="sentimentPanel">
+                                            <strong class="sentiment-value" id="sentimentVal">-</strong>
+                                            <div class="sentiment-meta">
+                                                <span class="label">Average Feedback Rating</span>
+                                                <div class="sentiment-stars" id="sentimentStars"></div>
+                                                <span class="sentiment-info" id="sentimentInfo">Select an admin to
+                                                    calculate sentiment.</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn-primary btn-block"><i
+                                            class="fas fa-paper-plane"></i> Save Analytics Report</button>
+                                </form>
+                            </div>
+                        </article>
+
+                        <article class="panel reports-panel">
+                            <div class="card-header">
+                                <div>
+                                    <h2><i class="fas fa-clock-rotate-left"></i> Recent Reports</h2>
+                                    <p>Refresh values or remove older analytics snapshots from the timeline.</p>
+                                </div>
+                                <button type="button" class="btn-surface" id="refreshAllBtn"><i
+                                        class="fas fa-arrows-rotate"></i> Refresh All</button>
+                            </div>
+
+                            <div class="card-body">
+                                <div th:if="${reports == null or #lists.isEmpty(reports)}" class="empty-reports">
+                                    <i class="fas fa-folder-open"></i>
+                                    <h4>No Reports Available</h4>
+                                    <p>Create your first report from the left panel to start analytics tracking.</p>
+                                </div>
+
+                                <div th:if="${reports != null and !#lists.isEmpty(reports)}" class="reports-list">
+                                    <article th:each="report : ${reports}" class="report-item"
+                                        th:attr="data-report-id=${report.reportId},data-created=${report.createdTime != null ? #temporals.format(report.createdTime, 'yyyy-MM-dd') : ''}">
+                                        <div class="report-top">
+                                            <div>
+                                                <span class="report-id"><i class="fas fa-hashtag"></i><span
+                                                        th:text="${report.reportId}">1</span></span>
+                                                <div class="report-time">
+                                                    <i class="fas fa-calendar-days"></i>
+                                                    <span
+                                                        th:text="${report.createdTime != null ? #temporals.format(report.createdTime, 'dd MMM yyyy, hh:mm a') : 'N/A'}">01
+                                                        Jan 2026, 11:20 AM</span>
+                                                </div>
+                                            </div>
+
+                                            <div class="report-actions">
+                                                <button type="button" class="btn-mini"
+                                                    th:onclick="|refreshSingleReport(this, ${report.reportId})|">
+                                                    <i class="fas fa-rotate"></i> Refresh
+                                                </button>
+                                                <form th:action="@{/owner/report/delete/{id}(id=${report.reportId})}"
+                                                    method="post"
+                                                    onsubmit="return confirm('Delete this analytics report?');">
+                                                    <button type="submit" class="btn-mini danger"><i
+                                                            class="fas fa-trash"></i> Delete</button>
+                                                </form>
+                                            </div>
+                                        </div>
+
+                                        <div class="report-grid">
+                                            <div class="report-field">
+                                                <span>Total Concerns</span>
+                                                <strong class="report-total-concerns"
+                                                    th:text="${report.totalConcerns != null ? report.totalConcerns : 0}">0</strong>
+                                            </div>
+                                            <div class="report-field">
+                                                <span>Avg Resolution</span>
+                                                <strong class="report-avg-resolution"
+                                                    th:text="${report.avgResolutionTime != null ? report.avgResolutionTime + ' hrs' : '0.00 hrs'}">0.00
+                                                    hrs</strong>
+                                            </div>
+                                            <div class="report-field">
+                                                <span>Most Frequent Category</span>
+                                                <strong class="report-category"
+                                                    th:text="${report.mostFrequentCategory != null ? report.mostFrequentCategory : 'All Categories'}">All
+                                                    Categories</strong>
+                                            </div>
+                                            <div class="report-field">
+                                                <span>Sentiment Score</span>
+                                                <strong class="report-sentiment"
+                                                    th:text="${report.sentimentTrendScore != null ? report.sentimentTrendScore : '0.00'}">0.00</strong>
+                                            </div>
+                                            <div class="report-field">
+                                                <span>Concern Images</span>
+                                                <strong class="report-evidence-images"
+                                                    th:text="${report.evidenceImageCount != null ? report.evidenceImageCount : 0}">0</strong>
+                                            </div>
+                                            <div class="report-field">
+                                                <span>Admin</span>
+                                                <strong class="report-admin-name"
+                                                    th:attr="data-admin-id=${report.adminIdFk}"
+                                                    th:text="${report.adminIdFk != null ? report.adminIdFk : '-'}">-</strong>
+                                            </div>
+                                        </div>
+                                    </article>
+                                </div>
+                            </div>
+                        </article>
+                    </section>
+
+                </section>
+            </div>
+
+            <div class="footer-wrap">
+                <span>Owner Dashboard - Academy of Knowledge Bridge</span>
+                <span>Operational intelligence for institute-level decisions</span>
+            </div>
         </div>
+    </main>
 
-        <div class="footer-wrap">
-            <span>Owner Dashboard - Academy of Knowledge Bridge</span>
-            <span>Operational intelligence for institute-level decisions</span>
-        </div>
-    </div>
-</main>
+    <script>
+        const adminSelect = document.getElementById("adminSelect");
+        const categorySelect = document.getElementById("categorySelect");
+        const totalConcernsInput = document.getElementById("totalConcernsInput");
+        const avgResolutionInput = document.getElementById("avgResolutionInput");
+        const evidenceImageInput = document.getElementById("evidenceImageInput");
+        const sentimentInput = document.getElementById("sentimentInput");
+        const sentimentVal = document.getElementById("sentimentVal");
+        const sentimentStars = document.getElementById("sentimentStars");
+        const sentimentInfo = document.getElementById("sentimentInfo");
 
-<script>
-    const adminSelect = document.getElementById("adminSelect");
-    const categorySelect = document.getElementById("categorySelect");
-    const totalConcernsInput = document.getElementById("totalConcernsInput");
-    const avgResolutionInput = document.getElementById("avgResolutionInput");
-    const evidenceImageInput = document.getElementById("evidenceImageInput");
-    const sentimentInput = document.getElementById("sentimentInput");
-    const sentimentVal = document.getElementById("sentimentVal");
-    const sentimentStars = document.getElementById("sentimentStars");
-    const sentimentInfo = document.getElementById("sentimentInfo");
+        const totalConcernsInfo = document.getElementById("totalConcernsInfo");
+        const avgResolutionInfo = document.getElementById("avgResolutionInfo");
+        const evidenceImageInfo = document.getElementById("evidenceImageInfo");
 
-    const totalConcernsInfo = document.getElementById("totalConcernsInfo");
-    const avgResolutionInfo = document.getElementById("avgResolutionInfo");
-    const evidenceImageInfo = document.getElementById("evidenceImageInfo");
+        const ownerCategoryChartCanvas = document.getElementById("ownerCategoryChart");
+        const ownerStatusChartCanvas = document.getElementById("ownerStatusChart");
+        const statusResolvedCount = document.getElementById("statusResolvedCount");
+        const statusPendingCount = document.getElementById("statusPendingCount");
+        const statusRejectedCount = document.getElementById("statusRejectedCount");
+        const liveConcernCount = document.getElementById("liveConcernCount");
 
-    const ownerCategoryChartCanvas = document.getElementById("ownerCategoryChart");
-    const ownerStatusChartCanvas = document.getElementById("ownerStatusChart");
-    const statusResolvedCount = document.getElementById("statusResolvedCount");
-    const statusPendingCount = document.getElementById("statusPendingCount");
-    const statusRejectedCount = document.getElementById("statusRejectedCount");
-    const liveConcernCount = document.getElementById("liveConcernCount");
+        const monthlyReportMonth = document.getElementById("monthlyReportMonth");
+        const monthlyReportCategory = document.getElementById("monthlyReportCategory");
+        const monthlyReportPriority = document.getElementById("monthlyReportPriority");
+        const monthlyFilterScope = document.getElementById("monthlyFilterScope");
+        const generateMonthlyReportBtn = document.getElementById("generateMonthlyReportBtn");
+        const monthlyReportTbody = document.getElementById("monthlyReportTbody");
 
-    const monthlyReportMonth = document.getElementById("monthlyReportMonth");
-    const monthlyReportCategory = document.getElementById("monthlyReportCategory");
-    const monthlyReportPriority = document.getElementById("monthlyReportPriority");
-    const monthlyFilterScope = document.getElementById("monthlyFilterScope");
-    const generateMonthlyReportBtn = document.getElementById("generateMonthlyReportBtn");
-    const monthlyReportTbody = document.getElementById("monthlyReportTbody");
+        const ownerTabButtons = Array.from(document.querySelectorAll(".owner-tab-btn"));
+        const ownerTabPanels = Array.from(document.querySelectorAll(".owner-tab-panel"));
 
-    const ownerTabButtons = Array.from(document.querySelectorAll(".owner-tab-btn"));
-    const ownerTabPanels = Array.from(document.querySelectorAll(".owner-tab-panel"));
+        const refreshAnalyticsBtn = document.getElementById("refreshAnalyticsBtn");
+        const refreshAllBtn = document.getElementById("refreshAllBtn");
+        const deleteAllRejectedBtn = document.getElementById("deleteAllRejectedBtn");
 
-    const refreshAnalyticsBtn = document.getElementById("refreshAnalyticsBtn");
-    const refreshAllBtn = document.getElementById("refreshAllBtn");
-    const deleteAllRejectedBtn = document.getElementById("deleteAllRejectedBtn");
+        const exportPdfBtn = document.getElementById("exportPdfBtn");
+        const exportExcelBtn = document.getElementById("exportExcelBtn");
+        const exportStatusText = document.getElementById("exportStatusText");
 
-    const exportPdfBtn = document.getElementById("exportPdfBtn");
-    const exportExcelBtn = document.getElementById("exportExcelBtn");
-    const exportStatusText = document.getElementById("exportStatusText");
+        let ownerCategoryChart = null;
+        let ownerStatusChart = null;
+        let monthlyReportRows = [];
+        let adminDirectory = new Map();
+        const ownerLogoPath = "/images/img1.jpeg";
+        let ownerLogoDataUrl = null;
 
-    let ownerCategoryChart = null;
-    let ownerStatusChart = null;
-    let monthlyReportRows = [];
-    let adminDirectory = new Map();
-    const ownerLogoPath = "/images/img1.jpeg";
-    let ownerLogoDataUrl = null;
-
-    function resizeOwnerCharts() {
-        if (ownerCategoryChart && typeof ownerCategoryChart.resize === "function") {
-            ownerCategoryChart.resize();
-        }
-        if (ownerStatusChart && typeof ownerStatusChart.resize === "function") {
-            ownerStatusChart.resize();
-        }
-    }
-
-    function activateOwnerTab(tabKey, shouldFocus) {
-        if (!ownerTabButtons.length || !ownerTabPanels.length) {
-            return;
-        }
-
-        let selectedButton = null;
-
-        ownerTabButtons.forEach(function(button) {
-            const isActive = button.dataset.ownerTabTarget === tabKey;
-            button.classList.toggle("active", isActive);
-            button.setAttribute("aria-selected", isActive ? "true" : "false");
-            if (isActive) {
-                selectedButton = button;
+        function resizeOwnerCharts() {
+            if (ownerCategoryChart && typeof ownerCategoryChart.resize === "function") {
+                ownerCategoryChart.resize();
             }
-        });
-
-        ownerTabPanels.forEach(function(panel) {
-            const isActive = panel.dataset.ownerTabPanel === tabKey;
-            panel.hidden = !isActive;
-        });
-
-        if (selectedButton && shouldFocus) {
-            selectedButton.focus();
+            if (ownerStatusChart && typeof ownerStatusChart.resize === "function") {
+                ownerStatusChart.resize();
+            }
         }
 
-        if (tabKey === "analytics") {
-            setTimeout(resizeOwnerCharts, 120);
-        }
-    }
+        function activateOwnerTab(tabKey, shouldFocus) {
+            if (!ownerTabButtons.length || !ownerTabPanels.length) {
+                return;
+            }
 
-    function initializeOwnerTabs() {
-        if (!ownerTabButtons.length || !ownerTabPanels.length) {
-            return;
-        }
+            let selectedButton = null;
 
-        ownerTabButtons.forEach(function(button) {
-            button.addEventListener("click", function() {
-                const targetTab = button.dataset.ownerTabTarget || "analytics";
-                activateOwnerTab(targetTab, false);
+            ownerTabButtons.forEach(function (button) {
+                const isActive = button.dataset.ownerTabTarget === tabKey;
+                button.classList.toggle("active", isActive);
+                button.setAttribute("aria-selected", isActive ? "true" : "false");
+                if (isActive) {
+                    selectedButton = button;
+                }
             });
-        });
 
-        document.addEventListener("keydown", function(event) {
-            if (event.altKey || event.ctrlKey || event.metaKey) {
-                return;
-            }
-
-            const target = event.target;
-            const tagName = target && target.tagName ? target.tagName.toUpperCase() : "";
-            if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT" || (target && target.isContentEditable)) {
-                return;
-            }
-
-            const keyToTab = {
-                "1": "analytics",
-                "2": "monthly",
-                "3": "reports"
-            };
-
-            const nextTab = keyToTab[event.key];
-            if (!nextTab) {
-                return;
-            }
-
-            event.preventDefault();
-            activateOwnerTab(nextTab, true);
-        });
-
-        const activeButton = ownerTabButtons.find(function(button) {
-            return button.classList.contains("active");
-        });
-        const initialTab = activeButton
-            ? activeButton.dataset.ownerTabTarget
-            : ownerTabButtons[0].dataset.ownerTabTarget;
-
-        activateOwnerTab(initialTab || "analytics", false);
-    }
-
-    function syncTabsWithTourHighlights() {
-        if (typeof MutationObserver !== "function" || !ownerTabPanels.length) {
-            return;
-        }
-
-        const observer = new MutationObserver(function(mutations) {
-            mutations.forEach(function(mutation) {
-                if (mutation.type !== "attributes" || mutation.attributeName !== "class") {
-                    return;
-                }
-
-                const target = mutation.target;
-                if (!target || !target.classList || !target.classList.contains("admin-tour-highlight")) {
-                    return;
-                }
-
-                const parentPanel = target.closest(".owner-tab-panel");
-                if (!parentPanel || !parentPanel.dataset.ownerTabPanel) {
-                    return;
-                }
-
-                activateOwnerTab(parentPanel.dataset.ownerTabPanel, false);
+            ownerTabPanels.forEach(function (panel) {
+                const isActive = panel.dataset.ownerTabPanel === tabKey;
+                panel.hidden = !isActive;
             });
-        });
 
-        observer.observe(document.body, {
-            subtree: true,
-            attributes: true,
-            attributeFilter: ["class"]
-        });
-    }
+            if (selectedButton && shouldFocus) {
+                selectedButton.focus();
+            }
 
-    function setExportStatus(text, isError) {
-        if (!exportStatusText) {
-            return;
+            if (tabKey === "analytics") {
+                setTimeout(resizeOwnerCharts, 120);
+            }
         }
-        exportStatusText.textContent = text;
-        exportStatusText.style.color = isError ? "#be123c" : "#334155";
-    }
 
-    function getSelectedMonthValue() {
-        const rawValue = monthlyReportMonth && typeof monthlyReportMonth.value === "string"
-            ? monthlyReportMonth.value.trim()
-            : "";
-        if (!rawValue) {
+        function initializeOwnerTabs() {
+            if (!ownerTabButtons.length || !ownerTabPanels.length) {
+                return;
+            }
+
+            ownerTabButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    const targetTab = button.dataset.ownerTabTarget || "analytics";
+                    activateOwnerTab(targetTab, false);
+                });
+            });
+
+            document.addEventListener("keydown", function (event) {
+                if (event.altKey || event.ctrlKey || event.metaKey) {
+                    return;
+                }
+
+                const target = event.target;
+                const tagName = target && target.tagName ? target.tagName.toUpperCase() : "";
+                if (tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT" || (target && target.isContentEditable)) {
+                    return;
+                }
+
+                const keyToTab = {
+                    "1": "analytics",
+                    "2": "monthly",
+                    "3": "reports"
+                };
+
+                const nextTab = keyToTab[event.key];
+                if (!nextTab) {
+                    return;
+                }
+
+                event.preventDefault();
+                activateOwnerTab(nextTab, true);
+            });
+
+            const activeButton = ownerTabButtons.find(function (button) {
+                return button.classList.contains("active");
+            });
+            const initialTab = activeButton
+                ? activeButton.dataset.ownerTabTarget
+                : ownerTabButtons[0].dataset.ownerTabTarget;
+
+            activateOwnerTab(initialTab || "analytics", false);
+        }
+
+        function syncTabsWithTourHighlights() {
+            if (typeof MutationObserver !== "function" || !ownerTabPanels.length) {
+                return;
+            }
+
+            const observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    if (mutation.type !== "attributes" || mutation.attributeName !== "class") {
+                        return;
+                    }
+
+                    const target = mutation.target;
+                    if (!target || !target.classList || !target.classList.contains("admin-tour-highlight")) {
+                        return;
+                    }
+
+                    const parentPanel = target.closest(".owner-tab-panel");
+                    if (!parentPanel || !parentPanel.dataset.ownerTabPanel) {
+                        return;
+                    }
+
+                    activateOwnerTab(parentPanel.dataset.ownerTabPanel, false);
+                });
+            });
+
+            observer.observe(document.body, {
+                subtree: true,
+                attributes: true,
+                attributeFilter: ["class"]
+            });
+        }
+
+        function setExportStatus(text, isError) {
+            if (!exportStatusText) {
+                return;
+            }
+            exportStatusText.textContent = text;
+            exportStatusText.style.color = isError ? "#be123c" : "#334155";
+        }
+
+        function getSelectedMonthValue() {
+            const rawValue = monthlyReportMonth && typeof monthlyReportMonth.value === "string"
+                ? monthlyReportMonth.value.trim()
+                : "";
+            if (!rawValue) {
+                return "";
+            }
+            if (/^\d{4}-\d{2}$/.test(rawValue)) {
+                return rawValue;
+            }
+            if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
+                return rawValue.slice(0, 7);
+            }
             return "";
         }
-        if (/^\d{4}-\d{2}$/.test(rawValue)) {
-            return rawValue;
-        }
-        if (/^\d{4}-\d{2}-\d{2}$/.test(rawValue)) {
-            return rawValue.slice(0, 7);
-        }
-        return "";
-    }
 
-    function getSelectedMonthLabel(monthValue) {
-        if (!monthValue || !/^\d{4}-\d{2}$/.test(monthValue)) {
-            return "Not Selected";
+        function getSelectedMonthLabel(monthValue) {
+            if (!monthValue || !/^\d{4}-\d{2}$/.test(monthValue)) {
+                return "Not Selected";
+            }
+            const parts = monthValue.split("-");
+            const monthDate = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+            return monthDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
         }
-        const parts = monthValue.split("-");
-        const monthDate = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
-        return monthDate.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-    }
 
-    function sanitizeFileValue(value) {
-        return String(value || "current-month").replace(/[^a-zA-Z0-9-_]/g, "-");
-    }
+        function sanitizeFileValue(value) {
+            return String(value || "current-month").replace(/[^a-zA-Z0-9-_]/g, "-");
+        }
 
-    async function ensureLogoDataUrl() {
-        if (ownerLogoDataUrl) {
+        async function ensureLogoDataUrl() {
+            if (ownerLogoDataUrl) {
+                return ownerLogoDataUrl;
+            }
+            const response = await fetch(ownerLogoPath);
+            if (!response.ok) {
+                throw new Error("Institute logo could not be loaded.");
+            }
+            const blob = await response.blob();
+            ownerLogoDataUrl = await new Promise(function (resolve, reject) {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    resolve(reader.result);
+                };
+                reader.onerror = function () {
+                    reject(new Error("Failed to read institute logo."));
+                };
+                reader.readAsDataURL(blob);
+            });
             return ownerLogoDataUrl;
         }
-        const response = await fetch(ownerLogoPath);
-        if (!response.ok) {
-            throw new Error("Institute logo could not be loaded.");
+
+        function escapeHtml(value) {
+            const text = value == null ? "" : String(value);
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/\"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
-        const blob = await response.blob();
-        ownerLogoDataUrl = await new Promise(function(resolve, reject) {
-            const reader = new FileReader();
-            reader.onload = function() {
-                resolve(reader.result);
-            };
-            reader.onerror = function() {
-                reject(new Error("Failed to read institute logo."));
-            };
-            reader.readAsDataURL(blob);
-        });
-        return ownerLogoDataUrl;
-    }
 
-    function escapeHtml(value) {
-        const text = value == null ? "" : String(value);
-        return text
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/\"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    function getStatusClass(status) {
-        const normalized = String(status || "").toLowerCase();
-        if (normalized.includes("resolv") || normalized.includes("complete")) {
-            return "resolved";
-        }
-        if (normalized.includes("reject") || normalized.includes("delete")) {
-            return "rejected";
-        }
-        return "pending";
-    }
-
-    function dismissFlashMessages() {
-        document.querySelectorAll(".flash-item").forEach(function(toast) {
-            setTimeout(function() {
-                toast.style.transition = "opacity .45s ease, transform .45s ease";
-                toast.style.opacity = "0";
-                toast.style.transform = "translateY(-8px)";
-                setTimeout(function() {
-                    toast.remove();
-                }, 450);
-            }, 5200);
-        });
-    }
-
-    function countThisMonthReports() {
-        const now = new Date();
-        let count = 0;
-        document.querySelectorAll(".report-item").forEach(function(item) {
-            const created = item.dataset.created;
-            if (!created) {
-                return;
+        function getStatusClass(status) {
+            const normalized = String(status || "").toLowerCase();
+            if (normalized.includes("resolv") || normalized.includes("complete")) {
+                return "resolved";
             }
-            const date = new Date(created + "T00:00:00");
-            if (!Number.isNaN(date.getTime())
-                    && date.getMonth() === now.getMonth()
-                    && date.getFullYear() === now.getFullYear()) {
-                count += 1;
+            if (normalized.includes("reject") || normalized.includes("delete")) {
+                return "rejected";
             }
-        });
-        const target = document.getElementById("thisMonthCount");
-        if (target) {
-            target.textContent = String(count);
+            return "pending";
         }
-    }
 
-    function resetMetrics() {
-        totalConcernsInput.value = "";
-        totalConcernsInput.placeholder = "Select admin first";
-        avgResolutionInput.value = "";
-        avgResolutionInput.placeholder = "Select admin first";
-        evidenceImageInput.value = "";
-        evidenceImageInput.placeholder = "Select admin first";
-        sentimentInput.value = "0.00";
-        sentimentVal.textContent = "-";
-        sentimentStars.innerHTML = "";
-        sentimentInfo.textContent = "Select an admin to calculate sentiment.";
-        totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Auto-filled from concern data.";
-        avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Based on first admin reply time.";
-        evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Includes concerns that contain evidence images.";
-    }
-
-    function setMetricsLoading() {
-        totalConcernsInput.placeholder = "Loading...";
-        avgResolutionInput.placeholder = "Loading...";
-        evidenceImageInput.placeholder = "Loading...";
-        totalConcernsInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating concern volume...";
-        avgResolutionInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating resolution speed...";
-        evidenceImageInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Counting evidence images...";
-        sentimentVal.textContent = "...";
-        sentimentStars.innerHTML = "";
-        sentimentInfo.textContent = "Loading sentiment...";
-    }
-
-    function renderSentiment(score, count, message) {
-        const safeScore = Number.isFinite(score) ? score : 0;
-        const safeCount = Number.isFinite(count) ? count : 0;
-        sentimentInput.value = safeScore.toFixed(2);
-        sentimentVal.textContent = safeScore.toFixed(2);
-
-        const rounded = Math.max(0, Math.min(5, Math.round(safeScore)));
-        let stars = "";
-        for (let i = 1; i <= 5; i += 1) {
-            stars += '<i class="fas fa-star ' + (i <= rounded ? "filled" : "empty") + '"></i>';
+        function dismissFlashMessages() {
+            document.querySelectorAll(".flash-item").forEach(function (toast) {
+                setTimeout(function () {
+                    toast.style.transition = "opacity .45s ease, transform .45s ease";
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateY(-8px)";
+                    setTimeout(function () {
+                        toast.remove();
+                    }, 450);
+                }, 5200);
+            });
         }
-        sentimentStars.innerHTML = stars;
 
-        if (!safeCount) {
-            sentimentInfo.textContent = message || "No feedback available for this admin.";
-            return;
-        }
-        sentimentInfo.textContent = "Based on " + safeCount + " feedback rating(s).";
-    }
-
-    function hydrateReportAdminNames() {
-        document.querySelectorAll(".report-admin-name").forEach(function(nameNode) {
-            const adminId = (nameNode.dataset.adminId || "").trim();
-            if (!adminId) {
-                nameNode.textContent = "-";
-                return;
-            }
-            if (adminDirectory.has(adminId)) {
-                nameNode.textContent = adminDirectory.get(adminId);
-            } else {
-                nameNode.textContent = "Admin #" + adminId;
-            }
-        });
-    }
-
-    function loadAdmins() {
-        fetch("/owner/api/admins")
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to load admins");
-                }
-                return response.json();
-            })
-            .then(function(admins) {
-                adminDirectory = new Map();
-                if (!Array.isArray(admins) || admins.length === 0) {
-                    adminSelect.innerHTML = "<option value=\"\" disabled selected>No admins found</option>";
-                    hydrateReportAdminNames();
-                    resetMetrics();
+        function countThisMonthReports() {
+            const now = new Date();
+            let count = 0;
+            document.querySelectorAll(".report-item").forEach(function (item) {
+                const created = item.dataset.created;
+                if (!created) {
                     return;
                 }
-
-                adminSelect.innerHTML = "<option value=\"\" selected>-- Select an Admin --</option>";
-                admins.forEach(function(admin) {
-                    const adminId = String(admin.userId || "");
-                    const fullName = admin.fullName || "Unnamed Admin";
-                    const staffId = admin.staffId || "N/A";
-                    const displayName = fullName + " (" + staffId + ")";
-                    adminDirectory.set(adminId, displayName);
-
-                    const option = document.createElement("option");
-                    option.value = admin.userId;
-                    option.textContent = displayName;
-                    adminSelect.appendChild(option);
-                });
-                hydrateReportAdminNames();
-                resetMetrics();
-            })
-            .catch(function() {
-                adminSelect.innerHTML = "<option value=\"\" disabled selected>Error loading admins</option>";
-                hydrateReportAdminNames();
-                resetMetrics();
+                const date = new Date(created + "T00:00:00");
+                if (!Number.isNaN(date.getTime())
+                    && date.getMonth() === now.getMonth()
+                    && date.getFullYear() === now.getFullYear()) {
+                    count += 1;
+                }
             });
-    }
-
-    function loadReportMetrics() {
-        const adminId = adminSelect.value;
-        const category = categorySelect.value || "All Categories";
-        if (!adminId) {
-            resetMetrics();
-            return;
-        }
-
-        setMetricsLoading();
-
-        const url = "/owner/api/report/metrics?adminId=" + encodeURIComponent(adminId)
-            + "&category=" + encodeURIComponent(category);
-
-        fetch(url)
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to load report metrics");
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                const totalConcerns = Number(data.totalConcerns || 0);
-                const avgHours = Number(data.avgHours || 0);
-                const resolvedCount = Number(data.resolvedCount || 0);
-                const evidenceImageCount = Number(data.evidenceImageCount || 0);
-                const sentimentScore = Number(data.sentimentScore || 0);
-                const sentimentCount = Number(data.sentimentCount || 0);
-
-                totalConcernsInput.value = String(totalConcerns);
-                avgResolutionInput.value = avgHours.toFixed(2);
-                evidenceImageInput.value = String(evidenceImageCount);
-
-                totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + totalConcerns + " concern(s) matched this selection.";
-                if (resolvedCount > 0) {
-                    avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + avgHours.toFixed(2) + " hours over " + resolvedCount + " resolved concern(s).";
-                } else {
-                    avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> No resolved concerns found in this selection.";
-                }
-                evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + evidenceImageCount + " concern(s) include evidence images.";
-
-                renderSentiment(sentimentScore, sentimentCount, data.message);
-            })
-            .catch(function(error) {
-                totalConcernsInput.value = "";
-                avgResolutionInput.value = "";
-                evidenceImageInput.value = "";
-                totalConcernsInput.placeholder = "Error";
-                avgResolutionInput.placeholder = "Error";
-                evidenceImageInput.placeholder = "Error";
-                totalConcernsInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
-                avgResolutionInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
-                evidenceImageInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
-                renderSentiment(0, 0, error.message);
-            });
-    }
-
-    function renderCategoryChart(labels, counts) {
-        if (!ownerCategoryChartCanvas) {
-            return;
-        }
-        if (ownerCategoryChart) {
-            ownerCategoryChart.destroy();
-        }
-
-        ownerCategoryChart = new Chart(ownerCategoryChartCanvas, {
-            type: "bar",
-            data: {
-                labels: labels.length ? labels : ["No Data"],
-                datasets: [{
-                    label: "Concerns",
-                    data: counts.length ? counts : [0],
-                    backgroundColor: [
-                        "#dc2626", "#0ea5e9", "#22c55e", "#f97316", "#1d4ed8", "#0f766e", "#475569"
-                    ],
-                    borderRadius: 8,
-                    maxBarThickness: 44
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: { precision: 0 }
-                    }
-                }
+            const target = document.getElementById("thisMonthCount");
+            if (target) {
+                target.textContent = String(count);
             }
-        });
-    }
-
-    function renderStatusChart(statusDistribution) {
-        if (!ownerStatusChartCanvas) {
-            return;
-        }
-        if (ownerStatusChart) {
-            ownerStatusChart.destroy();
         }
 
-        const resolved = Number(statusDistribution && statusDistribution.resolved || 0);
-        const pending = Number(statusDistribution && statusDistribution.pending || 0);
-        const rejected = Number(statusDistribution && statusDistribution.rejected || 0);
+        function resetMetrics() {
+            totalConcernsInput.value = "";
+            totalConcernsInput.placeholder = "Select admin first";
+            avgResolutionInput.value = "";
+            avgResolutionInput.placeholder = "Select admin first";
+            evidenceImageInput.value = "";
+            evidenceImageInput.placeholder = "Select admin first";
+            sentimentInput.value = "0.00";
+            sentimentVal.textContent = "-";
+            sentimentStars.innerHTML = "";
+            sentimentInfo.textContent = "Select an admin to calculate sentiment.";
+            totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Auto-filled from concern data.";
+            avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Based on first admin reply time.";
+            evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> Includes concerns that contain evidence images.";
+        }
 
-        ownerStatusChart = new Chart(ownerStatusChartCanvas, {
-            type: "doughnut",
-            data: {
-                labels: ["Resolved", "Pending", "Rejected"],
-                datasets: [{
-                    data: [resolved, pending, rejected],
-                    backgroundColor: ["#16a34a", "#ea580c", "#be123c"],
-                    borderWidth: 0,
-                    hoverOffset: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: "bottom",
-                        labels: {
-                            boxWidth: 12,
-                            padding: 16
+        function setMetricsLoading() {
+            totalConcernsInput.placeholder = "Loading...";
+            avgResolutionInput.placeholder = "Loading...";
+            evidenceImageInput.placeholder = "Loading...";
+            totalConcernsInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating concern volume...";
+            avgResolutionInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Calculating resolution speed...";
+            evidenceImageInfo.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Counting evidence images...";
+            sentimentVal.textContent = "...";
+            sentimentStars.innerHTML = "";
+            sentimentInfo.textContent = "Loading sentiment...";
+        }
+
+        function renderSentiment(score, count, message) {
+            const safeScore = Number.isFinite(score) ? score : 0;
+            const safeCount = Number.isFinite(count) ? count : 0;
+            sentimentInput.value = safeScore.toFixed(2);
+            sentimentVal.textContent = safeScore.toFixed(2);
+
+            const rounded = Math.max(0, Math.min(5, Math.round(safeScore)));
+            let stars = "";
+            for (let i = 1; i <= 5; i += 1) {
+                stars += '<i class="fas fa-star ' + (i <= rounded ? "filled" : "empty") + '"></i>';
+            }
+            sentimentStars.innerHTML = stars;
+
+            if (!safeCount) {
+                sentimentInfo.textContent = message || "No feedback available for this admin.";
+                return;
+            }
+            sentimentInfo.textContent = "Based on " + safeCount + " feedback rating(s).";
+        }
+
+        function hydrateReportAdminNames() {
+            document.querySelectorAll(".report-admin-name").forEach(function (nameNode) {
+                const adminId = (nameNode.dataset.adminId || "").trim();
+                if (!adminId) {
+                    nameNode.textContent = "-";
+                    return;
+                }
+                if (adminDirectory.has(adminId)) {
+                    nameNode.textContent = adminDirectory.get(adminId);
+                } else {
+                    nameNode.textContent = "Admin #" + adminId;
+                }
+            });
+        }
+
+        function loadAdmins() {
+            fetch("/owner/api/admins")
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to load admins");
+                    }
+                    return response.json();
+                })
+                .then(function (admins) {
+                    adminDirectory = new Map();
+                    if (!Array.isArray(admins) || admins.length === 0) {
+                        adminSelect.innerHTML = "<option value=\"\" disabled selected>No admins found</option>";
+                        hydrateReportAdminNames();
+                        resetMetrics();
+                        return;
+                    }
+
+                    adminSelect.innerHTML = "<option value=\"\" selected>-- Select an Admin --</option>";
+                    admins.forEach(function (admin) {
+                        const adminId = String(admin.userId || "");
+                        const fullName = admin.fullName || "Unnamed Admin";
+                        const staffId = admin.staffId || "N/A";
+                        const displayName = fullName + " (" + staffId + ")";
+                        adminDirectory.set(adminId, displayName);
+
+                        const option = document.createElement("option");
+                        option.value = admin.userId;
+                        option.textContent = displayName;
+                        adminSelect.appendChild(option);
+                    });
+                    hydrateReportAdminNames();
+                    resetMetrics();
+                })
+                .catch(function () {
+                    adminSelect.innerHTML = "<option value=\"\" disabled selected>Error loading admins</option>";
+                    hydrateReportAdminNames();
+                    resetMetrics();
+                });
+        }
+
+        function loadReportMetrics() {
+            const adminId = adminSelect.value;
+            const category = categorySelect.value || "All Categories";
+            if (!adminId) {
+                resetMetrics();
+                return;
+            }
+
+            setMetricsLoading();
+
+            const url = "/owner/api/report/metrics?adminId=" + encodeURIComponent(adminId)
+                + "&category=" + encodeURIComponent(category);
+
+            fetch(url)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to load report metrics");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    const totalConcerns = Number(data.totalConcerns || 0);
+                    const avgHours = Number(data.avgHours || 0);
+                    const resolvedCount = Number(data.resolvedCount || 0);
+                    const evidenceImageCount = Number(data.evidenceImageCount || 0);
+                    const sentimentScore = Number(data.sentimentScore || 0);
+                    const sentimentCount = Number(data.sentimentCount || 0);
+
+                    totalConcernsInput.value = String(totalConcerns);
+                    avgResolutionInput.value = avgHours.toFixed(2);
+                    evidenceImageInput.value = String(evidenceImageCount);
+
+                    totalConcernsInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + totalConcerns + " concern(s) matched this selection.";
+                    if (resolvedCount > 0) {
+                        avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + avgHours.toFixed(2) + " hours over " + resolvedCount + " resolved concern(s).";
+                    } else {
+                        avgResolutionInfo.innerHTML = "<i class=\"fas fa-circle-info\"></i> No resolved concerns found in this selection.";
+                    }
+                    evidenceImageInfo.innerHTML = "<i class=\"fas fa-circle-check\"></i> " + evidenceImageCount + " concern(s) include evidence images.";
+
+                    renderSentiment(sentimentScore, sentimentCount, data.message);
+                })
+                .catch(function (error) {
+                    totalConcernsInput.value = "";
+                    avgResolutionInput.value = "";
+                    evidenceImageInput.value = "";
+                    totalConcernsInput.placeholder = "Error";
+                    avgResolutionInput.placeholder = "Error";
+                    evidenceImageInput.placeholder = "Error";
+                    totalConcernsInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                    avgResolutionInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                    evidenceImageInfo.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed to calculate.";
+                    renderSentiment(0, 0, error.message);
+                });
+        }
+
+        function renderCategoryChart(labels, counts) {
+            if (!ownerCategoryChartCanvas) {
+                return;
+            }
+            if (ownerCategoryChart) {
+                ownerCategoryChart.destroy();
+            }
+
+            ownerCategoryChart = new Chart(ownerCategoryChartCanvas, {
+                type: "bar",
+                data: {
+                    labels: labels.length ? labels : ["No Data"],
+                    datasets: [{
+                        label: "Concerns",
+                        data: counts.length ? counts : [0],
+                        backgroundColor: [
+                            "#dc2626", "#0ea5e9", "#22c55e", "#f97316", "#1d4ed8", "#0f766e", "#475569"
+                        ],
+                        borderRadius: 8,
+                        maxBarThickness: 44
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
                         }
                     }
                 }
+            });
+        }
+
+        function renderStatusChart(statusDistribution) {
+            if (!ownerStatusChartCanvas) {
+                return;
             }
-        });
+            if (ownerStatusChart) {
+                ownerStatusChart.destroy();
+            }
 
-        if (statusResolvedCount) {
-            statusResolvedCount.textContent = String(resolved);
-        }
-        if (statusPendingCount) {
-            statusPendingCount.textContent = String(pending);
-        }
-        if (statusRejectedCount) {
-            statusRejectedCount.textContent = String(rejected);
-        }
-    }
+            const resolved = Number(statusDistribution && statusDistribution.resolved || 0);
+            const pending = Number(statusDistribution && statusDistribution.pending || 0);
+            const rejected = Number(statusDistribution && statusDistribution.rejected || 0);
 
-    function loadOwnerAnalyticsCharts() {
-        fetch("/owner/api/analytics/charts")
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to load analytics charts");
+            ownerStatusChart = new Chart(ownerStatusChartCanvas, {
+                type: "doughnut",
+                data: {
+                    labels: ["Resolved", "Pending", "Rejected"],
+                    datasets: [{
+                        data: [resolved, pending, rejected],
+                        backgroundColor: ["#16a34a", "#ea580c", "#be123c"],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+                            labels: {
+                                boxWidth: 12,
+                                padding: 16
+                            }
+                        }
+                    }
                 }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                const categoryLabels = Array.isArray(data.categoryLabels) ? data.categoryLabels : [];
-                const categoryCounts = Array.isArray(data.categoryCounts) ? data.categoryCounts : [];
-                renderCategoryChart(categoryLabels, categoryCounts);
-                renderStatusChart(data.statusDistribution || {});
-                if (liveConcernCount) {
-                    liveConcernCount.textContent = String(Number(data.totalConcerns || 0));
-                }
-            })
-            .catch(function(error) {
-                renderCategoryChart([], []);
-                renderStatusChart({ resolved: 0, pending: 0, rejected: 0 });
-                setExportStatus("Analytics refresh failed: " + error.message, true);
             });
-    }
 
-    function updateMonthlyFilterScopeLabel() {
-        if (!monthlyFilterScope) {
-            return;
-        }
-        const monthValue = getSelectedMonthValue();
-        const monthLabel = getSelectedMonthLabel(monthValue);
-        const category = monthlyReportCategory.value || "All Categories";
-        const priority = monthlyReportPriority.value || "All Priorities";
-        monthlyFilterScope.textContent = monthLabel + " / " + category + " / " + priority;
-    }
-
-    function renderMonthlyReportRows(rows) {
-        if (!monthlyReportTbody) {
-            return;
-        }
-        if (!Array.isArray(rows) || rows.length === 0) {
-            monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">No concerns found for selected filters.</td></tr>";
-            return;
+            if (statusResolvedCount) {
+                statusResolvedCount.textContent = String(resolved);
+            }
+            if (statusPendingCount) {
+                statusPendingCount.textContent = String(pending);
+            }
+            if (statusRejectedCount) {
+                statusRejectedCount.textContent = String(rejected);
+            }
         }
 
-        monthlyReportTbody.innerHTML = rows.map(function(row) {
-            const statusLabel = escapeHtml(row.status || "Pending");
-            const statusClass = getStatusClass(row.status || "Pending");
-
-            return "<tr>"
-                + "<td>" + escapeHtml(row.rowNo) + "</td>"
-                + "<td>" + escapeHtml(row.concernId) + "</td>"
-                + "<td>" + escapeHtml(row.studentId || "N/A") + "</td>"
-                + "<td>" + escapeHtml(row.studentName || "Unknown Student") + "</td>"
-                + "<td>" + escapeHtml(row.category || "N/A") + "</td>"
-                + "<td>" + escapeHtml(row.priority || "-") + "</td>"
-                + "<td><span class=\"status-badge " + statusClass + "\">" + statusLabel + "</span></td>"
-                + "<td>" + escapeHtml(row.date || "N/A") + "</td>"
-                + "<td>" + escapeHtml(row.concernMessage || "No message") + "</td>"
-                + "<td>" + escapeHtml(row.adminReply || "No reply yet") + "</td>"
-                + "</tr>";
-        }).join("");
-    }
-
-    function loadMonthlyReport() {
-        const month = getSelectedMonthValue();
-        const category = monthlyReportCategory.value || "All Categories";
-        const priority = monthlyReportPriority.value || "All Priorities";
-
-        updateMonthlyFilterScopeLabel();
-
-        if (!month) {
-            setExportStatus("Please pick a date first.", true);
-            return;
+        function loadOwnerAnalyticsCharts() {
+            fetch("/owner/api/analytics/charts")
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to load analytics charts");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    const categoryLabels = Array.isArray(data.categoryLabels) ? data.categoryLabels : [];
+                    const categoryCounts = Array.isArray(data.categoryCounts) ? data.categoryCounts : [];
+                    renderCategoryChart(categoryLabels, categoryCounts);
+                    renderStatusChart(data.statusDistribution || {});
+                    if (liveConcernCount) {
+                        liveConcernCount.textContent = String(Number(data.totalConcerns || 0));
+                    }
+                })
+                .catch(function (error) {
+                    renderCategoryChart([], []);
+                    renderStatusChart({ resolved: 0, pending: 0, rejected: 0 });
+                    setExportStatus("Analytics refresh failed: " + error.message, true);
+                });
         }
 
-        monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">Loading report rows...</td></tr>";
-
-        const url = "/owner/api/reports/monthly?month=" + encodeURIComponent(month)
-            + "&category=" + encodeURIComponent(category)
-            + "&priority=" + encodeURIComponent(priority);
-
-        fetch(url)
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to load monthly report");
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                monthlyReportRows = Array.isArray(data.rows) ? data.rows : [];
-                renderMonthlyReportRows(monthlyReportRows);
-
-                if (monthlyReportRows.length > 0) {
-                    setExportStatus("Monthly report ready. Export options are now available.", false);
-                } else {
-                    setExportStatus("No records for this filter selection.", false);
-                }
-            })
-            .catch(function(error) {
-                monthlyReportRows = [];
-                renderMonthlyReportRows([]);
-                setExportStatus("Monthly report generation failed: " + error.message, true);
-            });
-    }
-
-    async function exportMonthlyAsPdf() {
-        if (!monthlyReportRows.length) {
-            setExportStatus("Generate monthly report before exporting PDF.", true);
-            return;
+        function updateMonthlyFilterScopeLabel() {
+            if (!monthlyFilterScope) {
+                return;
+            }
+            const monthValue = getSelectedMonthValue();
+            const monthLabel = getSelectedMonthLabel(monthValue);
+            const category = monthlyReportCategory.value || "All Categories";
+            const priority = monthlyReportPriority.value || "All Priorities";
+            monthlyFilterScope.textContent = monthLabel + " / " + category + " / " + priority;
         }
 
-        if (!window.jspdf || !window.jspdf.jsPDF) {
-            setExportStatus("PDF library failed to load.", true);
-            return;
+        function renderMonthlyReportRows(rows) {
+            if (!monthlyReportTbody) {
+                return;
+            }
+            if (!Array.isArray(rows) || rows.length === 0) {
+                monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">No concerns found for selected filters.</td></tr>";
+                return;
+            }
+
+            monthlyReportTbody.innerHTML = rows.map(function (row) {
+                const statusLabel = escapeHtml(row.status || "Pending");
+                const statusClass = getStatusClass(row.status || "Pending");
+
+                return "<tr>"
+                    + "<td>" + escapeHtml(row.rowNo) + "</td>"
+                    + "<td>" + escapeHtml(row.concernId) + "</td>"
+                    + "<td>" + escapeHtml(row.studentId || "N/A") + "</td>"
+                    + "<td>" + escapeHtml(row.studentName || "Unknown Student") + "</td>"
+                    + "<td>" + escapeHtml(row.category || "N/A") + "</td>"
+                    + "<td>" + escapeHtml(row.priority || "-") + "</td>"
+                    + "<td><span class=\"status-badge " + statusClass + "\">" + statusLabel + "</span></td>"
+                    + "<td>" + escapeHtml(row.date || "N/A") + "</td>"
+                    + "<td>" + escapeHtml(row.concernMessage || "No message") + "</td>"
+                    + "<td>" + escapeHtml(row.adminReply || "No reply yet") + "</td>"
+                    + "</tr>";
+            }).join("");
         }
 
-        const monthValue = getSelectedMonthValue() || "current-month";
-        const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
-        const categoryLabel = monthlyReportCategory.value || "All Categories";
-        const priorityLabel = monthlyReportPriority.value || "All Priorities";
-        const fileMonth = sanitizeFileValue(monthValue);
+        function loadMonthlyReport() {
+            const month = getSelectedMonthValue();
+            const category = monthlyReportCategory.value || "All Categories";
+            const priority = monthlyReportPriority.value || "All Priorities";
 
-        try {
-            const jsPDF = window.jspdf.jsPDF;
-            const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
-            const pageWidth = doc.internal.pageSize.getWidth();
+            updateMonthlyFilterScopeLabel();
 
-            doc.setFillColor(15, 23, 42);
-            doc.roundedRect(20, 16, pageWidth - 40, 82, 12, 12, "F");
+            if (!month) {
+                setExportStatus("Please pick a date first.", true);
+                return;
+            }
+
+            monthlyReportTbody.innerHTML = "<tr class=\"empty-row\"><td colspan=\"10\">Loading report rows...</td></tr>";
+
+            const url = "/owner/api/reports/monthly?month=" + encodeURIComponent(month)
+                + "&category=" + encodeURIComponent(category)
+                + "&priority=" + encodeURIComponent(priority);
+
+            fetch(url)
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to load monthly report");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    monthlyReportRows = Array.isArray(data.rows) ? data.rows : [];
+                    renderMonthlyReportRows(monthlyReportRows);
+
+                    if (monthlyReportRows.length > 0) {
+                        setExportStatus("Monthly report ready. Export options are now available.", false);
+                    } else {
+                        setExportStatus("No records for this filter selection.", false);
+                    }
+                })
+                .catch(function (error) {
+                    monthlyReportRows = [];
+                    renderMonthlyReportRows([]);
+                    setExportStatus("Monthly report generation failed: " + error.message, true);
+                });
+        }
+
+        async function exportMonthlyAsPdf() {
+            if (!monthlyReportRows.length) {
+                setExportStatus("Generate monthly report before exporting PDF.", true);
+                return;
+            }
+
+            if (!window.jspdf || !window.jspdf.jsPDF) {
+                setExportStatus("PDF library failed to load.", true);
+                return;
+            }
+
+            const monthValue = getSelectedMonthValue() || "current-month";
+            const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
+            const categoryLabel = monthlyReportCategory.value || "All Categories";
+            const priorityLabel = monthlyReportPriority.value || "All Priorities";
+            const fileMonth = sanitizeFileValue(monthValue);
 
             try {
-                const logoData = await ensureLogoDataUrl();
-                const imageType = logoData.indexOf("image/png") > -1 ? "PNG" : "JPEG";
-                doc.addImage(logoData, imageType, 34, 27, 52, 52);
-            } catch (logoError) {
-                // Keep export working even if logo fails to load.
-            }
+                const jsPDF = window.jspdf.jsPDF;
+                const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
+                const pageWidth = doc.internal.pageSize.getWidth();
 
-            doc.setTextColor(255, 255, 255);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(17);
-            doc.text("Academy of Knowledge Bridge", 98, 44);
-            doc.setFontSize(13);
-            doc.text("Monthly Concern Intelligence Report", 98, 64);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(10);
-            doc.text("Generated: " + new Date().toLocaleString(), 98, 82);
-
-            doc.setTextColor(51, 65, 85);
-            doc.setFont("helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text("Month: " + monthLabel, 24, 116);
-            doc.text("Category: " + categoryLabel, 230, 116);
-            doc.text("Priority: " + priorityLabel, 500, 116);
-
-            const tableRows = monthlyReportRows.map(function(row) {
-                return [
-                    row.rowNo || "",
-                    row.concernId || "",
-                    row.studentId || "",
-                    row.studentName || "",
-                    row.category || "",
-                    row.priority || "",
-                    row.status || "",
-                    row.date || "",
-                    row.concernMessage || "",
-                    row.adminReply || ""
-                ];
-            });
-
-            const tableHead = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
-
-            if (typeof doc.autoTable === "function") {
-                doc.autoTable({
-                    startY: 124,
-                    margin: { left: 20, right: 20 },
-                    head: [tableHead],
-                    body: tableRows,
-                    theme: "grid",
-                    styles: {
-                        fontSize: 8,
-                        cellPadding: 4,
-                        valign: "top",
-                        textColor: [30, 41, 59]
-                    },
-                    headStyles: {
-                        fillColor: [31, 41, 55],
-                        textColor: [255, 255, 255],
-                        fontStyle: "bold",
-                        halign: "left"
-                    },
-                    alternateRowStyles: {
-                        fillColor: [248, 250, 252]
-                    },
-                    columnStyles: {
-                        0: { cellWidth: 22 },
-                        1: { cellWidth: 46 },
-                        2: { cellWidth: 48 },
-                        3: { cellWidth: 72 },
-                        4: { cellWidth: 74 },
-                        5: { cellWidth: 46 },
-                        6: { cellWidth: 54 },
-                        7: { cellWidth: 54 },
-                        8: { cellWidth: 165 },
-                        9: { cellWidth: 165 }
-                    }
-                });
-            }
-
-            const footerY = doc.internal.pageSize.getHeight() - 18;
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(9);
-            doc.setTextColor(100, 116, 139);
-            doc.text("Owner Dashboard Export", 24, footerY);
-            doc.text("Total Records: " + tableRows.length, pageWidth - 130, footerY);
-
-            doc.save("owner-monthly-report-" + fileMonth + ".pdf");
-            setExportStatus("Professional PDF exported successfully.", false);
-        } catch (error) {
-            setExportStatus("PDF export failed: " + error.message, true);
-        }
-    }
-
-    async function exportMonthlyAsExcel() {
-        if (!monthlyReportRows.length) {
-            setExportStatus("Generate monthly report before exporting Excel.", true);
-            return;
-        }
-
-        const monthValue = getSelectedMonthValue() || "current-month";
-        const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
-        const categoryLabel = monthlyReportCategory.value || "All Categories";
-        const priorityLabel = monthlyReportPriority.value || "All Priorities";
-        const fileMonth = sanitizeFileValue(monthValue);
-
-        try {
-            if (window.ExcelJS && typeof window.saveAs === "function") {
-                const workbook = new ExcelJS.Workbook();
-                workbook.creator = "Owner Dashboard";
-                workbook.created = new Date();
-
-                const worksheet = workbook.addWorksheet("Monthly Intelligence", {
-                    views: [{ state: "frozen", ySplit: 6 }]
-                });
+                doc.setFillColor(15, 23, 42);
+                doc.roundedRect(20, 16, pageWidth - 40, 82, 12, 12, "F");
 
                 try {
                     const logoData = await ensureLogoDataUrl();
-                    const logoExtension = logoData.indexOf("image/png") > -1 ? "png" : "jpeg";
-                    const logoImageId = workbook.addImage({
-                        base64: logoData,
-                        extension: logoExtension
-                    });
-                    worksheet.addImage(logoImageId, {
-                        tl: { col: 0, row: 0 },
-                        ext: { width: 96, height: 96 }
-                    });
+                    const imageType = logoData.indexOf("image/png") > -1 ? "PNG" : "JPEG";
+                    doc.addImage(logoData, imageType, 34, 27, 52, 52);
                 } catch (logoError) {
                     // Keep export working even if logo fails to load.
                 }
 
-                worksheet.mergeCells("C1:J1");
-                worksheet.getCell("C1").value = "Academy of Knowledge Bridge";
-                worksheet.getCell("C1").font = { name: "Calibri", size: 18, bold: true, color: { argb: "FF0F172A" } };
+                doc.setTextColor(255, 255, 255);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(17);
+                doc.text("Academy of Knowledge Bridge", 98, 44);
+                doc.setFontSize(13);
+                doc.text("Monthly Concern Intelligence Report", 98, 64);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(10);
+                doc.text("Generated: " + new Date().toLocaleString(), 98, 82);
 
-                worksheet.mergeCells("C2:J2");
-                worksheet.getCell("C2").value = "Monthly Concern Intelligence Report";
-                worksheet.getCell("C2").font = { name: "Calibri", size: 13, bold: true, color: { argb: "FF334155" } };
+                doc.setTextColor(51, 65, 85);
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(10);
+                doc.text("Month: " + monthLabel, 24, 116);
+                doc.text("Category: " + categoryLabel, 230, 116);
+                doc.text("Priority: " + priorityLabel, 500, 116);
 
-                worksheet.mergeCells("C3:J3");
-                worksheet.getCell("C3").value = "Month: " + monthLabel + " | Category: " + categoryLabel + " | Priority: " + priorityLabel;
-                worksheet.getCell("C3").font = { name: "Calibri", size: 10, color: { argb: "FF475569" } };
-
-                worksheet.mergeCells("C4:J4");
-                worksheet.getCell("C4").value = "Generated on " + new Date().toLocaleString();
-                worksheet.getCell("C4").font = { name: "Calibri", size: 10, italic: true, color: { argb: "FF64748B" } };
-
-                const headerRowNumber = 6;
-                const headerValues = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
-                const headerRow = worksheet.getRow(headerRowNumber);
-                headerRow.values = headerValues;
-                headerRow.height = 22;
-
-                headerRow.eachCell(function(cell) {
-                    cell.font = { name: "Calibri", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
-                    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F2937" } };
-                    cell.alignment = { vertical: "middle", horizontal: "center" };
-                    cell.border = {
-                        top: { style: "thin", color: { argb: "FFCBD5E1" } },
-                        left: { style: "thin", color: { argb: "FFCBD5E1" } },
-                        bottom: { style: "thin", color: { argb: "FFCBD5E1" } },
-                        right: { style: "thin", color: { argb: "FFCBD5E1" } }
-                    };
-                });
-
-                worksheet.getColumn(1).width = 6;
-                worksheet.getColumn(2).width = 12;
-                worksheet.getColumn(3).width = 14;
-                worksheet.getColumn(4).width = 23;
-                worksheet.getColumn(5).width = 24;
-                worksheet.getColumn(6).width = 12;
-                worksheet.getColumn(7).width = 12;
-                worksheet.getColumn(8).width = 14;
-                worksheet.getColumn(9).width = 44;
-                worksheet.getColumn(10).width = 44;
-
-                monthlyReportRows.forEach(function(row, index) {
-                    const excelRow = worksheet.getRow(headerRowNumber + 1 + index);
-                    excelRow.values = [
+                const tableRows = monthlyReportRows.map(function (row) {
+                    return [
                         row.rowNo || "",
                         row.concernId || "",
                         row.studentId || "",
@@ -3027,347 +2949,499 @@
                         row.concernMessage || "",
                         row.adminReply || ""
                     ];
-                    excelRow.height = 36;
+                });
 
-                    excelRow.eachCell(function(cell, colNumber) {
-                        cell.font = { name: "Calibri", size: 10, color: { argb: "FF1E293B" } };
-                        cell.alignment = {
-                            vertical: "top",
-                            horizontal: colNumber <= 3 ? "center" : "left",
-                            wrapText: colNumber >= 9
-                        };
-                        cell.border = {
-                            top: { style: "thin", color: { argb: "FFE2E8F0" } },
-                            left: { style: "thin", color: { argb: "FFE2E8F0" } },
-                            bottom: { style: "thin", color: { argb: "FFE2E8F0" } },
-                            right: { style: "thin", color: { argb: "FFE2E8F0" } }
-                        };
+                const tableHead = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
 
-                        if (index % 2 === 0) {
-                            cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8FAFC" } };
+                if (typeof doc.autoTable === "function") {
+                    doc.autoTable({
+                        startY: 124,
+                        margin: { left: 20, right: 20 },
+                        head: [tableHead],
+                        body: tableRows,
+                        theme: "grid",
+                        styles: {
+                            fontSize: 8,
+                            cellPadding: 4,
+                            valign: "top",
+                            textColor: [30, 41, 59]
+                        },
+                        headStyles: {
+                            fillColor: [31, 41, 55],
+                            textColor: [255, 255, 255],
+                            fontStyle: "bold",
+                            halign: "left"
+                        },
+                        alternateRowStyles: {
+                            fillColor: [248, 250, 252]
+                        },
+                        columnStyles: {
+                            0: { cellWidth: 22 },
+                            1: { cellWidth: 46 },
+                            2: { cellWidth: 48 },
+                            3: { cellWidth: 72 },
+                            4: { cellWidth: 74 },
+                            5: { cellWidth: 46 },
+                            6: { cellWidth: 54 },
+                            7: { cellWidth: 54 },
+                            8: { cellWidth: 165 },
+                            9: { cellWidth: 165 }
                         }
                     });
+                }
 
-                    const statusCell = excelRow.getCell(7);
-                    const normalizedStatus = String(row.status || "").toLowerCase();
-                    if (normalizedStatus.includes("resolv") || normalizedStatus.includes("complete")) {
-                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDCFCE7" } };
-                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF166534" } };
-                    } else if (normalizedStatus.includes("reject") || normalizedStatus.includes("delete")) {
-                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFE4E6" } };
-                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9F1239" } };
-                    } else {
-                        statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFEDD5" } };
-                        statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9A3412" } };
-                    }
-                });
+                const footerY = doc.internal.pageSize.getHeight() - 18;
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(9);
+                doc.setTextColor(100, 116, 139);
+                doc.text("Owner Dashboard Export", 24, footerY);
+                doc.text("Total Records: " + tableRows.length, pageWidth - 130, footerY);
 
-                worksheet.autoFilter = {
-                    from: { row: headerRowNumber, column: 1 },
-                    to: { row: headerRowNumber, column: 10 }
-                };
+                doc.save("owner-monthly-report-" + fileMonth + ".pdf");
+                setExportStatus("Professional PDF exported successfully.", false);
+            } catch (error) {
+                setExportStatus("PDF export failed: " + error.message, true);
+            }
+        }
 
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([
-                    buffer
-                ], {
-                    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                });
-                window.saveAs(blob, "owner-monthly-report-" + fileMonth + ".xlsx");
-                setExportStatus("Professional Excel exported successfully.", false);
+        async function exportMonthlyAsExcel() {
+            if (!monthlyReportRows.length) {
+                setExportStatus("Generate monthly report before exporting Excel.", true);
                 return;
             }
 
-            if (!window.XLSX) {
-                throw new Error("Excel export library failed to load.");
+            const monthValue = getSelectedMonthValue() || "current-month";
+            const monthLabel = getSelectedMonthLabel(getSelectedMonthValue());
+            const categoryLabel = monthlyReportCategory.value || "All Categories";
+            const priorityLabel = monthlyReportPriority.value || "All Priorities";
+            const fileMonth = sanitizeFileValue(monthValue);
+
+            try {
+                if (window.ExcelJS && typeof window.saveAs === "function") {
+                    const workbook = new ExcelJS.Workbook();
+                    workbook.creator = "Owner Dashboard";
+                    workbook.created = new Date();
+
+                    const worksheet = workbook.addWorksheet("Monthly Intelligence", {
+                        views: [{ state: "frozen", ySplit: 6 }]
+                    });
+
+                    try {
+                        const logoData = await ensureLogoDataUrl();
+                        const logoExtension = logoData.indexOf("image/png") > -1 ? "png" : "jpeg";
+                        const logoImageId = workbook.addImage({
+                            base64: logoData,
+                            extension: logoExtension
+                        });
+                        worksheet.addImage(logoImageId, {
+                            tl: { col: 0, row: 0 },
+                            ext: { width: 96, height: 96 }
+                        });
+                    } catch (logoError) {
+                        // Keep export working even if logo fails to load.
+                    }
+
+                    worksheet.mergeCells("C1:J1");
+                    worksheet.getCell("C1").value = "Academy of Knowledge Bridge";
+                    worksheet.getCell("C1").font = { name: "Calibri", size: 18, bold: true, color: { argb: "FF0F172A" } };
+
+                    worksheet.mergeCells("C2:J2");
+                    worksheet.getCell("C2").value = "Monthly Concern Intelligence Report";
+                    worksheet.getCell("C2").font = { name: "Calibri", size: 13, bold: true, color: { argb: "FF334155" } };
+
+                    worksheet.mergeCells("C3:J3");
+                    worksheet.getCell("C3").value = "Month: " + monthLabel + " | Category: " + categoryLabel + " | Priority: " + priorityLabel;
+                    worksheet.getCell("C3").font = { name: "Calibri", size: 10, color: { argb: "FF475569" } };
+
+                    worksheet.mergeCells("C4:J4");
+                    worksheet.getCell("C4").value = "Generated on " + new Date().toLocaleString();
+                    worksheet.getCell("C4").font = { name: "Calibri", size: 10, italic: true, color: { argb: "FF64748B" } };
+
+                    const headerRowNumber = 6;
+                    const headerValues = ["#", "Concern ID", "Student ID", "Student Name", "Category", "Priority", "Status", "Date", "Concern", "Latest Reply"];
+                    const headerRow = worksheet.getRow(headerRowNumber);
+                    headerRow.values = headerValues;
+                    headerRow.height = 22;
+
+                    headerRow.eachCell(function (cell) {
+                        cell.font = { name: "Calibri", size: 11, bold: true, color: { argb: "FFFFFFFF" } };
+                        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F2937" } };
+                        cell.alignment = { vertical: "middle", horizontal: "center" };
+                        cell.border = {
+                            top: { style: "thin", color: { argb: "FFCBD5E1" } },
+                            left: { style: "thin", color: { argb: "FFCBD5E1" } },
+                            bottom: { style: "thin", color: { argb: "FFCBD5E1" } },
+                            right: { style: "thin", color: { argb: "FFCBD5E1" } }
+                        };
+                    });
+
+                    worksheet.getColumn(1).width = 6;
+                    worksheet.getColumn(2).width = 12;
+                    worksheet.getColumn(3).width = 14;
+                    worksheet.getColumn(4).width = 23;
+                    worksheet.getColumn(5).width = 24;
+                    worksheet.getColumn(6).width = 12;
+                    worksheet.getColumn(7).width = 12;
+                    worksheet.getColumn(8).width = 14;
+                    worksheet.getColumn(9).width = 44;
+                    worksheet.getColumn(10).width = 44;
+
+                    monthlyReportRows.forEach(function (row, index) {
+                        const excelRow = worksheet.getRow(headerRowNumber + 1 + index);
+                        excelRow.values = [
+                            row.rowNo || "",
+                            row.concernId || "",
+                            row.studentId || "",
+                            row.studentName || "",
+                            row.category || "",
+                            row.priority || "",
+                            row.status || "",
+                            row.date || "",
+                            row.concernMessage || "",
+                            row.adminReply || ""
+                        ];
+                        excelRow.height = 36;
+
+                        excelRow.eachCell(function (cell, colNumber) {
+                            cell.font = { name: "Calibri", size: 10, color: { argb: "FF1E293B" } };
+                            cell.alignment = {
+                                vertical: "top",
+                                horizontal: colNumber <= 3 ? "center" : "left",
+                                wrapText: colNumber >= 9
+                            };
+                            cell.border = {
+                                top: { style: "thin", color: { argb: "FFE2E8F0" } },
+                                left: { style: "thin", color: { argb: "FFE2E8F0" } },
+                                bottom: { style: "thin", color: { argb: "FFE2E8F0" } },
+                                right: { style: "thin", color: { argb: "FFE2E8F0" } }
+                            };
+
+                            if (index % 2 === 0) {
+                                cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFF8FAFC" } };
+                            }
+                        });
+
+                        const statusCell = excelRow.getCell(7);
+                        const normalizedStatus = String(row.status || "").toLowerCase();
+                        if (normalizedStatus.includes("resolv") || normalizedStatus.includes("complete")) {
+                            statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFDCFCE7" } };
+                            statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF166534" } };
+                        } else if (normalizedStatus.includes("reject") || normalizedStatus.includes("delete")) {
+                            statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFE4E6" } };
+                            statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9F1239" } };
+                        } else {
+                            statusCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFFEDD5" } };
+                            statusCell.font = { name: "Calibri", size: 10, bold: true, color: { argb: "FF9A3412" } };
+                        }
+                    });
+
+                    worksheet.autoFilter = {
+                        from: { row: headerRowNumber, column: 1 },
+                        to: { row: headerRowNumber, column: 10 }
+                    };
+
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([
+                        buffer
+                    ], {
+                        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                    });
+                    window.saveAs(blob, "owner-monthly-report-" + fileMonth + ".xlsx");
+                    setExportStatus("Professional Excel exported successfully.", false);
+                    return;
+                }
+
+                if (!window.XLSX) {
+                    throw new Error("Excel export library failed to load.");
+                }
+
+                const fallbackRows = monthlyReportRows.map(function (row) {
+                    return {
+                        "#": row.rowNo,
+                        "Concern ID": row.concernId,
+                        "Student ID": row.studentId,
+                        "Student Name": row.studentName,
+                        "Category": row.category,
+                        "Priority": row.priority,
+                        "Status": row.status,
+                        "Date": row.date,
+                        "Concern": row.concernMessage,
+                        "Latest Reply": row.adminReply
+                    };
+                });
+
+                const fallbackSheet = XLSX.utils.json_to_sheet(fallbackRows);
+                const fallbackWorkbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(fallbackWorkbook, fallbackSheet, "MonthlyReport");
+                XLSX.writeFile(fallbackWorkbook, "owner-monthly-report-" + fileMonth + ".xlsx");
+                setExportStatus("Excel exported successfully.", false);
+            } catch (error) {
+                setExportStatus("Excel export failed: " + error.message, true);
+            }
+        }
+
+        function refreshSingleReport(button, reportId) {
+            if (!button || !reportId) {
+                return;
             }
 
-            const fallbackRows = monthlyReportRows.map(function(row) {
-                return {
-                    "#": row.rowNo,
-                    "Concern ID": row.concernId,
-                    "Student ID": row.studentId,
-                    "Student Name": row.studentName,
-                    "Category": row.category,
-                    "Priority": row.priority,
-                    "Status": row.status,
-                    "Date": row.date,
-                    "Concern": row.concernMessage,
-                    "Latest Reply": row.adminReply
-                };
-            });
+            button.classList.add("loading");
+            button.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
 
-            const fallbackSheet = XLSX.utils.json_to_sheet(fallbackRows);
-            const fallbackWorkbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(fallbackWorkbook, fallbackSheet, "MonthlyReport");
-            XLSX.writeFile(fallbackWorkbook, "owner-monthly-report-" + fileMonth + ".xlsx");
-            setExportStatus("Excel exported successfully.", false);
-        } catch (error) {
-            setExportStatus("Excel export failed: " + error.message, true);
+            fetch("/owner/api/report/refresh/" + reportId, { method: "POST" })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to refresh report");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    const reportItem = document.querySelector('.report-item[data-report-id="' + reportId + '"]');
+                    if (reportItem) {
+                        const totalEl = reportItem.querySelector(".report-total-concerns");
+                        const avgEl = reportItem.querySelector(".report-avg-resolution");
+                        const categoryEl = reportItem.querySelector(".report-category");
+                        const sentimentEl = reportItem.querySelector(".report-sentiment");
+                        const evidenceEl = reportItem.querySelector(".report-evidence-images");
+
+                        if (totalEl) {
+                            totalEl.textContent = String(data.totalConcerns || 0);
+                        }
+                        if (avgEl) {
+                            avgEl.textContent = String(data.avgResolutionTime || "0.00") + " hrs";
+                        }
+                        if (categoryEl) {
+                            categoryEl.textContent = String(data.mostFrequentCategory || "All Categories");
+                        }
+                        if (sentimentEl) {
+                            sentimentEl.textContent = String(data.sentimentTrendScore || "0.00");
+                        }
+                        if (evidenceEl) {
+                            evidenceEl.textContent = String(data.evidenceImageCount || 0);
+                        }
+
+                        reportItem.style.transition = "background .3s ease";
+                        reportItem.style.background = "#ecfdf3";
+                        setTimeout(function () {
+                            reportItem.style.background = "linear-gradient(145deg, #fff, #f8fbff)";
+                        }, 900);
+                    }
+
+                    button.classList.remove("loading");
+                    button.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated";
+                    setTimeout(function () {
+                        button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
+                    }, 1400);
+                })
+                .catch(function () {
+                    button.classList.remove("loading");
+                    button.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                    setTimeout(function () {
+                        button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
+                    }, 1400);
+                });
         }
-    }
 
-    function refreshSingleReport(button, reportId) {
-        if (!button || !reportId) {
-            return;
-        }
+        function refreshAllReports() {
+            if (!refreshAllBtn) {
+                return;
+            }
 
-        button.classList.add("loading");
-        button.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
+            refreshAllBtn.classList.add("loading");
+            refreshAllBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
 
-        fetch("/owner/api/report/refresh/" + reportId, { method: "POST" })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to refresh report");
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                const reportItem = document.querySelector('.report-item[data-report-id="' + reportId + '"]');
-                if (reportItem) {
-                    const totalEl = reportItem.querySelector(".report-total-concerns");
-                    const avgEl = reportItem.querySelector(".report-avg-resolution");
-                    const categoryEl = reportItem.querySelector(".report-category");
-                    const sentimentEl = reportItem.querySelector(".report-sentiment");
-                    const evidenceEl = reportItem.querySelector(".report-evidence-images");
-
-                    if (totalEl) {
-                        totalEl.textContent = String(data.totalConcerns || 0);
+            fetch("/owner/api/reports/refresh-all", { method: "POST" })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to refresh all reports");
                     }
-                    if (avgEl) {
-                        avgEl.textContent = String(data.avgResolutionTime || "0.00") + " hrs";
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
-                    if (categoryEl) {
-                        categoryEl.textContent = String(data.mostFrequentCategory || "All Categories");
-                    }
-                    if (sentimentEl) {
-                        sentimentEl.textContent = String(data.sentimentTrendScore || "0.00");
-                    }
-                    if (evidenceEl) {
-                        evidenceEl.textContent = String(data.evidenceImageCount || 0);
-                    }
-
-                    reportItem.style.transition = "background .3s ease";
-                    reportItem.style.background = "#ecfdf3";
-                    setTimeout(function() {
-                        reportItem.style.background = "linear-gradient(145deg, #fff, #f8fbff)";
+                    refreshAllBtn.classList.remove("loading");
+                    refreshAllBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated " + (data.updatedCount || 0);
+                    setTimeout(function () {
+                        window.location.reload();
                     }, 900);
-                }
-
-                button.classList.remove("loading");
-                button.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated";
-                setTimeout(function() {
-                    button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
-                }, 1400);
-            })
-            .catch(function() {
-                button.classList.remove("loading");
-                button.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
-                setTimeout(function() {
-                    button.innerHTML = "<i class=\"fas fa-rotate\"></i> Refresh";
-                }, 1400);
-            });
-    }
-
-    function refreshAllReports() {
-        if (!refreshAllBtn) {
-            return;
+                })
+                .catch(function () {
+                    refreshAllBtn.classList.remove("loading");
+                    refreshAllBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                    setTimeout(function () {
+                        refreshAllBtn.innerHTML = "<i class=\"fas fa-arrows-rotate\"></i> Refresh All";
+                    }, 1200);
+                });
         }
 
-        refreshAllBtn.classList.add("loading");
-        refreshAllBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Refreshing";
-
-        fetch("/owner/api/reports/refresh-all", { method: "POST" })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to refresh all reports");
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                refreshAllBtn.classList.remove("loading");
-                refreshAllBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Updated " + (data.updatedCount || 0);
-                setTimeout(function() {
-                    window.location.reload();
-                }, 900);
-            })
-            .catch(function() {
-                refreshAllBtn.classList.remove("loading");
-                refreshAllBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
-                setTimeout(function() {
-                    refreshAllBtn.innerHTML = "<i class=\"fas fa-arrows-rotate\"></i> Refresh All";
-                }, 1200);
-            });
-    }
-
-    function deleteAllRejectedConcerns() {
-        if (!deleteAllRejectedBtn) {
-            return;
-        }
-
-        const confirmed = window.confirm("Permanently delete all rejected concerns from the database? This action cannot be undone.");
-        if (!confirmed) {
-            return;
-        }
-
-        deleteAllRejectedBtn.disabled = true;
-        deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Deleting";
-
-        fetch("/owner/api/concerns/rejected/delete-all", { method: "POST" })
-            .then(function(response) {
-                if (!response.ok) {
-                    throw new Error("Failed to delete rejected concerns");
-                }
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                const deletedCount = Number(data.deletedCount || 0);
-                deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Deleted " + deletedCount;
-                setExportStatus(deletedCount + " rejected concern(s) permanently deleted.", false);
-
-                loadOwnerAnalyticsCharts();
-                loadMonthlyReport();
-            })
-            .catch(function(error) {
-                deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
-                setExportStatus("Delete rejected concerns failed: " + error.message, true);
-            })
-            .finally(function() {
-                setTimeout(function() {
-                    if (!deleteAllRejectedBtn) {
-                        return;
-                    }
-                    deleteAllRejectedBtn.disabled = false;
-                    deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-trash-can\"></i> Delete All Rejected";
-                }, 1300);
-            });
-    }
-
-    function initializeMonthlyDefaults() {
-        if (monthlyReportMonth && !monthlyReportMonth.value) {
-            const now = new Date();
-            const day = String(now.getDate()).padStart(2, "0");
-            const month = String(now.getMonth() + 1).padStart(2, "0");
-            monthlyReportMonth.value = now.getFullYear() + "-" + month + "-" + day;
-        }
-        updateMonthlyFilterScopeLabel();
-    }
-
-    function bindEvents() {
-        if (adminSelect) {
-            adminSelect.addEventListener("change", loadReportMetrics);
-        }
-        if (categorySelect) {
-            categorySelect.addEventListener("change", loadReportMetrics);
-        }
-        if (generateMonthlyReportBtn) {
-            generateMonthlyReportBtn.addEventListener("click", loadMonthlyReport);
-        }
-        if (monthlyReportCategory) {
-            monthlyReportCategory.addEventListener("change", updateMonthlyFilterScopeLabel);
-        }
-        if (monthlyReportPriority) {
-            monthlyReportPriority.addEventListener("change", updateMonthlyFilterScopeLabel);
-        }
-        if (monthlyReportMonth) {
-            monthlyReportMonth.addEventListener("change", updateMonthlyFilterScopeLabel);
-        }
-        if (refreshAnalyticsBtn) {
-            refreshAnalyticsBtn.addEventListener("click", loadOwnerAnalyticsCharts);
-        }
-        if (exportPdfBtn) {
-            exportPdfBtn.addEventListener("click", exportMonthlyAsPdf);
-        }
-        if (exportExcelBtn) {
-            exportExcelBtn.addEventListener("click", exportMonthlyAsExcel);
-        }
-        if (refreshAllBtn) {
-            refreshAllBtn.addEventListener("click", refreshAllReports);
-        }
-        if (deleteAllRejectedBtn) {
-            deleteAllRejectedBtn.addEventListener("click", deleteAllRejectedConcerns);
-        }
-    }
-
-    window.refreshSingleReport = refreshSingleReport;
-
-    dismissFlashMessages();
-    countThisMonthReports();
-    initializeMonthlyDefaults();
-    initializeOwnerTabs();
-    syncTabsWithTourHighlights();
-    bindEvents();
-    loadAdmins();
-    loadOwnerAnalyticsCharts();
-    loadMonthlyReport();
-    resetMetrics();
-</script>
-<script>
-    window.adminTourConfig = {
-        pageId: 'owner-dashboard',
-        autoStart: false,
-        storageKey: 'akb_owner_tour_completed',
-        nextPage: '/owner/admin/workspace#create',
-        steps: [
-            {
-                selector: 'header .header-content',
-                title: 'Owner Navigation',
-                content: 'Use this top navigation to move between Owner Dashboard, the Admin Workspace, and the Content Workspace.'
-            },
-            {
-                selector: '.owner-hero',
-                title: 'Executive Overview',
-                content: 'This hero area gives a strategic summary of reporting scope and key owner actions.'
-            },
-            {
-                selector: '.owner-stats',
-                title: 'KPI Snapshot',
-                content: 'These cards show report volume, monthly activity, and live concern totals.'
-            },
-            {
-                selector: '.analytics-grid',
-                title: 'Analytics Charts',
-                content: 'Review category distribution and status mix to understand concern trends quickly.'
-            },
-            {
-                selector: '#generateMonthlyReportBtn',
-                title: 'Generate Monthly Report',
-                content: 'Pick date, category, and priority, then generate records for exports and meetings.'
-            },
-            {
-                selector: '#deleteAllRejectedBtn',
-                title: 'Delete All Rejected',
-                content: 'Use this button to permanently clear rejected concerns from the database when needed.'
-            },
-            {
-                selector: '.export-bottom-panel',
-                title: 'Export Package',
-                content: 'Download the generated monthly report as PDF or Excel after filtering.'
-            },
-            {
-                selector: '#reportForm',
-                title: 'Create Analytics Report',
-                content: 'Select an admin and category to create a saved analytics snapshot.'
-            },
-            {
-                selector: '.reports-panel',
-                title: 'Recent Reports',
-                content: 'Refresh or delete report snapshots from this report timeline.'
+        function deleteAllRejectedConcerns() {
+            if (!deleteAllRejectedBtn) {
+                return;
             }
-        ]
-    };
-</script>
-<script src="/js/admin-tour.js"></script>
+
+            const confirmed = window.confirm("Permanently delete all rejected concerns from the database? This action cannot be undone.");
+            if (!confirmed) {
+                return;
+            }
+
+            deleteAllRejectedBtn.disabled = true;
+            deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i> Deleting";
+
+            fetch("/owner/api/concerns/rejected/delete-all", { method: "POST" })
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw new Error("Failed to delete rejected concerns");
+                    }
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+
+                    const deletedCount = Number(data.deletedCount || 0);
+                    deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-circle-check\"></i> Deleted " + deletedCount;
+                    setExportStatus(deletedCount + " rejected concern(s) permanently deleted.", false);
+
+                    loadOwnerAnalyticsCharts();
+                    loadMonthlyReport();
+                })
+                .catch(function (error) {
+                    deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-triangle-exclamation\"></i> Failed";
+                    setExportStatus("Delete rejected concerns failed: " + error.message, true);
+                })
+                .finally(function () {
+                    setTimeout(function () {
+                        if (!deleteAllRejectedBtn) {
+                            return;
+                        }
+                        deleteAllRejectedBtn.disabled = false;
+                        deleteAllRejectedBtn.innerHTML = "<i class=\"fas fa-trash-can\"></i> Delete All Rejected";
+                    }, 1300);
+                });
+        }
+
+        function initializeMonthlyDefaults() {
+            if (monthlyReportMonth && !monthlyReportMonth.value) {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, "0");
+                const month = String(now.getMonth() + 1).padStart(2, "0");
+                monthlyReportMonth.value = now.getFullYear() + "-" + month + "-" + day;
+            }
+            updateMonthlyFilterScopeLabel();
+        }
+
+        function bindEvents() {
+            if (adminSelect) {
+                adminSelect.addEventListener("change", loadReportMetrics);
+            }
+            if (categorySelect) {
+                categorySelect.addEventListener("change", loadReportMetrics);
+            }
+            if (generateMonthlyReportBtn) {
+                generateMonthlyReportBtn.addEventListener("click", loadMonthlyReport);
+            }
+            if (monthlyReportCategory) {
+                monthlyReportCategory.addEventListener("change", updateMonthlyFilterScopeLabel);
+            }
+            if (monthlyReportPriority) {
+                monthlyReportPriority.addEventListener("change", updateMonthlyFilterScopeLabel);
+            }
+            if (monthlyReportMonth) {
+                monthlyReportMonth.addEventListener("change", updateMonthlyFilterScopeLabel);
+            }
+            if (refreshAnalyticsBtn) {
+                refreshAnalyticsBtn.addEventListener("click", loadOwnerAnalyticsCharts);
+            }
+            if (exportPdfBtn) {
+                exportPdfBtn.addEventListener("click", exportMonthlyAsPdf);
+            }
+            if (exportExcelBtn) {
+                exportExcelBtn.addEventListener("click", exportMonthlyAsExcel);
+            }
+            if (refreshAllBtn) {
+                refreshAllBtn.addEventListener("click", refreshAllReports);
+            }
+            if (deleteAllRejectedBtn) {
+                deleteAllRejectedBtn.addEventListener("click", deleteAllRejectedConcerns);
+            }
+        }
+
+        window.refreshSingleReport = refreshSingleReport;
+
+        dismissFlashMessages();
+        countThisMonthReports();
+        initializeMonthlyDefaults();
+        initializeOwnerTabs();
+        syncTabsWithTourHighlights();
+        bindEvents();
+        loadAdmins();
+        loadOwnerAnalyticsCharts();
+        loadMonthlyReport();
+        resetMetrics();
+    </script>
+    <script>
+        window.adminTourConfig = {
+            pageId: 'owner-dashboard',
+            autoStart: false,
+            storageKey: 'akb_owner_tour_completed',
+            nextPage: '/owner/admin/workspace#create',
+            steps: [
+                {
+                    selector: 'header .header-content',
+                    title: 'Owner Navigation',
+                    content: 'Use this top navigation to move between Owner Dashboard, Admin Workspace, Content Workspace, and Student Feedback.'
+                },
+                {
+                    selector: '.owner-hero',
+                    title: 'Executive Overview',
+                    content: 'This hero area gives a strategic summary of reporting scope and key owner actions.'
+                },
+                {
+                    selector: '.owner-stats',
+                    title: 'KPI Snapshot',
+                    content: 'These cards show report volume, monthly activity, and live concern totals.'
+                },
+                {
+                    selector: '.analytics-grid',
+                    title: 'Analytics Charts',
+                    content: 'Review category distribution and status mix to understand concern trends quickly.'
+                },
+                {
+                    selector: '#generateMonthlyReportBtn',
+                    title: 'Generate Monthly Report',
+                    content: 'Pick date, category, and priority, then generate records for exports and meetings.'
+                },
+                {
+                    selector: '#deleteAllRejectedBtn',
+                    title: 'Delete All Rejected',
+                    content: 'Use this button to permanently clear rejected concerns from the database when needed.'
+                },
+                {
+                    selector: '.export-bottom-panel',
+                    title: 'Export Package',
+                    content: 'Download the generated monthly report as PDF or Excel after filtering.'
+                },
+                {
+                    selector: '#reportForm',
+                    title: 'Create Analytics Report',
+                    content: 'Select an admin and category to create a saved analytics snapshot.'
+                },
+                {
+                    selector: '.reports-panel',
+                    title: 'Recent Reports',
+                    content: 'Refresh or delete report snapshots from this report timeline.'
+                }
+            ]
+        };
+    </script>
+    <script src="/js/admin-tour.js"></script>
 </body>
+
 </html>

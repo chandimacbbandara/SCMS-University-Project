@@ -8,10 +8,12 @@ import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Notification;
+import Project._6.demo.entity.OverallFeedback;
 import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
+import Project._6.demo.service.OverallFeedbackService;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,15 +32,18 @@ public class ConcernController {
     private final ConcernMeetingService concernMeetingService;
     private final FeedbackService feedbackService;
     private final NotificationService notificationService;
+    private final OverallFeedbackService overallFeedbackService;
 
     public ConcernController(ConcernService concernService,
                              ConcernMeetingService concernMeetingService,
                              FeedbackService feedbackService,
-                             NotificationService notificationService) {
+                             NotificationService notificationService,
+                             OverallFeedbackService overallFeedbackService) {
         this.concernService = concernService;
         this.concernMeetingService = concernMeetingService;
         this.feedbackService = feedbackService;
         this.notificationService = notificationService;
+        this.overallFeedbackService = overallFeedbackService;
     }
 
     // Serve the concern submission form
@@ -463,5 +468,103 @@ public class ConcernController {
 
         return redirectUrl;
     }
-}
 
+    // ========================
+    // OVERALL FEEDBACK
+    // ========================
+
+    @GetMapping("/student/overall-feedback")
+    public String showOverallFeedbackPage(@RequestParam(value = "sort", required = false) String sort,
+                                          HttpSession session,
+                                          Model model) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        boolean alreadySubmitted = overallFeedbackService.hasStudentSubmitted(userId);
+        OverallFeedback myFeedback = overallFeedbackService.getStudentFeedback(userId).orElse(null);
+        List<OverallFeedback> allFeedback = overallFeedbackService.getAllFeedback(sort);
+
+        model.addAttribute("alreadySubmitted", alreadySubmitted);
+        model.addAttribute("myFeedback", myFeedback);
+        model.addAttribute("allFeedback", allFeedback);
+        model.addAttribute("currentSort", sort != null ? sort : "newest");
+        addNotificationAttributes(model, userId);
+
+        return "student-overall-feedback";
+    }
+
+    @PostMapping("/student/overall-feedback")
+    public String submitOverallFeedback(@RequestParam("rating") Integer rating,
+                                        @RequestParam("comment") String comment,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            overallFeedbackService.submitFeedback(userId, rating, comment);
+            redirectAttributes.addFlashAttribute("feedbackSuccess", "Thank you! Your overall feedback has been submitted successfully.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
+        return "redirect:/student/overall-feedback";
+    }
+
+    @PostMapping("/student/overall-feedback/update")
+    public String updateOverallFeedback(@RequestParam("rating") Integer rating,
+                                        @RequestParam("comment") String comment,
+                                        HttpSession session,
+                                        RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            overallFeedbackService.updateFeedback(userId, rating, comment);
+            redirectAttributes.addFlashAttribute("feedbackSuccess", "Your feedback has been successfully updated.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
+        return "redirect:/student/overall-feedback";
+    }
+
+    @PostMapping("/student/overall-feedback/delete")
+    public String deleteOverallFeedback(HttpSession session, RedirectAttributes redirectAttributes) {
+        if (session.getAttribute("loggedInStudent") == null) {
+            return "redirect:/login";
+        }
+
+        Integer userId = (Integer) session.getAttribute("studentUserId");
+        if (userId == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            overallFeedbackService.deleteFeedback(userId);
+            redirectAttributes.addFlashAttribute("feedbackSuccess", "Your feedback has been successfully deleted.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("feedbackError", e.getMessage());
+        }
+
+        return "redirect:/student/overall-feedback";
+    }
+}

@@ -15,6 +15,9 @@ public interface ConcernRepository extends JpaRepository<Concern, Integer> {
     List<Concern> findByStudent_UserId(Integer userId);
     Optional<Concern> findByConcernIdAndStudent_UserId(Integer concernId, Integer userId);
     List<Concern> findAllByOrderByCreatedTimeDesc();
+
+    @Query("SELECT c.category, c.status FROM Concern c WHERE c.status != 'Draft' OR c.status IS NULL")
+    List<Object[]> findAllAnalyticsData();
     List<Concern> findByStatusOrderByCreatedTimeDesc(String status);
     long countByStatus(String status);
 

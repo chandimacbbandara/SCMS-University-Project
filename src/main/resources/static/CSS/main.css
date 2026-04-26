@@ -123,6 +123,7 @@ header ul {
     padding: 9px 14px;
     border-radius: 999px;
     transition: color 0.3s ease, background-color 0.3s ease;
+    white-space: nowrap;
 }
 
 .nav-link:hover {

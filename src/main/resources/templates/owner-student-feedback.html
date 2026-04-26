@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Feedback - Owner Panel</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --owner-primary: #1a237e;
+            --owner-primary-light: #3949ab;
+            --owner-accent: #e53935;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--owner-primary);
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .animate-in {
+            animation: fadeSlideUp 0.7s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        .delay-1 {
+            animation-delay: .1s;
+        }
+
+        .delay-2 {
+            animation-delay: .2s;
+        }
+
+        .page-container {
+            max-width: 1000px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Page Header ===== */
+        .page-hero {
+            background: linear-gradient(135deg, var(--owner-primary) 0%, var(--owner-primary-light) 60%, #5c6bc0 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 50px rgba(26, 35, 126, 0.3);
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .page-hero .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero h1 {
+            font-size: 28px;
+            font-weight: 900;
+            margin: 0 0 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-hero p {
+            font-size: 14px;
+            opacity: 0.85;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .page-hero .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            transition: color 0.2s;
+        }
+
+        .page-hero .back-link:hover {
+            color: #fff;
+        }
+
+        /* Summary Stats */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 22px 24px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+
+        .stat-card:nth-child(1)::before {
+            background: var(--owner-primary);
+        }
+
+        .stat-card:nth-child(2)::before {
+            background: #f59e0b;
+        }
+
+        .stat-card:nth-child(3)::before {
+            background: #43a047;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 900;
+            color: var(--text-dark);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-light);
+        }
+
+        /* Sort Controls */
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .feedback-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-header h2 i {
+            color: var(--owner-primary);
+            font-size: 18px;
+            background: rgba(26, 35, 126, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            border: 1px solid #dce2ee;
+            background: #fff;
+            color: #5a647d;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--owner-primary);
+            color: var(--owner-primary);
+            background: rgba(26, 35, 126, 0.04);
+        }
+
+        .sort-btn.active {
+            background: linear-gradient(135deg, rgba(26, 35, 126, 0.14), rgba(57, 73, 171, 0.12));
+            border-color: rgba(26, 35, 126, 0.25);
+            color: var(--owner-primary);
+        }
+
+        /* ===== Feedback Cards ===== */
+        .feedback-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .fb-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 24px 26px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22, 1, .36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fb-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--owner-primary), var(--owner-primary-light));
+            border-radius: 4px 0 0 4px;
+        }
+
+        .fb-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .fb-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .fb-card-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fb-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--owner-primary), var(--owner-primary-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .fb-author-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .fb-author-date {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .fb-card-stars {
+            display: flex;
+            gap: 3px;
+            font-size: 18px;
+            color: #f59e0b;
+        }
+
+        .fb-card-comment {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 0 16px;
+            }
+
+            .page-hero {
+                padding: 24px;
+            }
+
+            .page-hero h1 {
+                font-size: 22px;
+            }
+
+            .stats-strip {
+                grid-template-columns: 1fr;
+            }
+
+            .feedback-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .fb-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/owner/dashboard" class="nav-link">Owner Dashboard</a></li>
+                    <li><a href="/owner/admin/workspace" class="nav-link">Admin Workspace</a></li>
+                    <li><a href="/owner/notifications" class="nav-link">Content Workspace</a></li>
+                    <li><a href="/owner/student-feedback" class="nav-link active">Student Feedback</a></li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- Page Hero -->
+        <div class="page-hero animate-in">
+            <div class="hero-content">
+                <a href="/owner/dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Back to Owner
+                    Dashboard</a>
+                <h1><i class="fas fa-star"></i> Student Overall Feedback</h1>
+                <p>Review all student feedback about the Student Concern Management System. Use this information to
+                    understand student satisfaction and improve the platform.</p>
+            </div>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="stats-strip animate-in delay-1" th:if="${allFeedback != null and !#lists.isEmpty(allFeedback)}">
+            <div class="stat-card">
+                <div class="stat-value" th:text="${#lists.size(allFeedback)}">0</div>
+                <div class="stat-label">Total Feedback</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${avgRating}">0</div>
+                <div class="stat-label">Avg Rating (out of 5)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" th:text="${highCount}">0</div>
+                <div class="stat-label">Positive (4-5 Stars)</div>
+            </div>
+        </div>
+
+        <!-- Sort Controls & Feedback List -->
+        <div class="animate-in delay-2">
+            <div class="feedback-header">
+                <h2><i class="fas fa-list-ul"></i> All Student Feedback</h2>
+                <div class="sort-controls">
+                    <a th:href="@{/owner/student-feedback(sort='newest')}"
+                        th:classappend="${currentSort == 'newest' ? ' active' : ''}" class="sort-btn">Newest</a>
+                    <a th:href="@{/owner/student-feedback(sort='oldest')}"
+                        th:classappend="${currentSort == 'oldest' ? ' active' : ''}" class="sort-btn">Oldest</a>
+                    <a th:href="@{/owner/student-feedback(sort='rating-high')}"
+                        th:classappend="${currentSort == 'rating-high' ? ' active' : ''}" class="sort-btn">Highest
+                        Rating</a>
+                    <a th:href="@{/owner/student-feedback(sort='rating-low')}"
+                        th:classappend="${currentSort == 'rating-low' ? ' active' : ''}" class="sort-btn">Lowest
+                        Rating</a>
+                </div>
+            </div>
+
+            <div class="feedback-list" th:if="${allFeedback != null and !#lists.isEmpty(allFeedback)}">
+                <div class="fb-card" th:each="fb : ${allFeedback}">
+                    <div class="fb-card-header">
+                        <div class="fb-card-author">
+                            <div class="fb-avatar"
+                                th:text="${fb.studentName != null and !fb.studentName.isEmpty() ? fb.studentName.substring(0,1).toUpperCase() : 'S'}">
+                                S</div>
+                            <div>
+                                <div class="fb-author-name"
+                                    th:text="${fb.studentName != null ? fb.studentName : 'Unknown Student'}">Student
+                                    Name</div>
+                                <div class="fb-author-date"
+                                    th:text="${#temporals.format(fb.submittedAt, 'dd MMM yyyy, hh:mm a')}">Date</div>
+                            </div>
+                        </div>
+                        <div class="fb-card-stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                th:text="${i <= fb.rating ? '★' : '☆'}">★</span>
+                        </div>
+                    </div>
+                    <p class="fb-card-comment" th:text="${fb.comment}">Feedback comment here.</p>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${allFeedback == null or #lists.isEmpty(allFeedback)}">
+                <i class="fas fa-comment-slash"></i>
+                <p>No student feedback has been submitted yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+
+</html>

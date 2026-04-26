@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overall Feedback - Academy of Knowledge Bridge</title>
+    <link rel="stylesheet" href="/CSS/main.css">
+    <link rel="stylesheet" href="/CSS/student-theme.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #e53935;
+            --primary-dark: #c62828;
+            --primary-deeper: #b71c1c;
+            --primary-light: #ff6f60;
+            --primary-bg: rgba(229, 57, 53, 0.08);
+            --accent-green: #43a047;
+            --accent-blue: #1e88e5;
+            --accent-orange: #ef6c00;
+            --accent-teal: #009688;
+            --bg-body: #f0f2f5;
+            --bg-white: #ffffff;
+            --card-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+            --card-shadow-hover: 0 12px 40px rgba(0, 0, 0, 0.12);
+            --text-dark: #1a1a2e;
+            --text-mid: #555;
+            --text-light: #888;
+            --border: #e8e8e8;
+            --radius-sm: 12px;
+            --radius-md: 18px;
+            --radius-lg: 24px;
+        }
+
+        body {
+            background: var(--bg-body);
+            font-family: 'Inter', -apple-system, system-ui, sans-serif;
+            color: var(--text-dark);
+        }
+
+        ::-webkit-scrollbar {
+            width: 7px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f0f0f0;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary);
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .animate-in {
+            animation: fadeSlideUp 0.7s cubic-bezier(.22, 1, .36, 1) both;
+        }
+
+        .delay-1 {
+            animation-delay: .1s;
+        }
+
+        .delay-2 {
+            animation-delay: .2s;
+        }
+
+        .delay-3 {
+            animation-delay: .3s;
+        }
+
+        .page-container {
+            max-width: 900px;
+            margin: 32px auto;
+            padding: 0 24px;
+        }
+
+        /* ===== Page Header ===== */
+        .page-hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 40%, var(--primary-deeper) 100%);
+            background-size: 200% 200%;
+            animation: gradientShift 8s ease infinite;
+            color: #fff;
+            border-radius: var(--radius-lg);
+            padding: 32px 36px;
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 16px 50px rgba(229, 57, 53, 0.3);
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 260px;
+            height: 260px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 65%);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .page-hero .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-hero h1 {
+            font-size: 28px;
+            font-weight: 900;
+            margin: 0 0 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .page-hero p {
+            font-size: 14px;
+            opacity: 0.85;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .page-hero .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            transition: color 0.2s;
+        }
+
+        .page-hero .back-link:hover {
+            color: #fff;
+        }
+
+        /* ===== Alerts ===== */
+        .alert {
+            padding: 16px 22px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 22px;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeSlideUp 0.5s ease both;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(232, 245, 233, 0.95), rgba(200, 230, 201, 0.95));
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+
+        .alert-error {
+            background: linear-gradient(135deg, rgba(255, 235, 238, 0.95), rgba(255, 205, 210, 0.95));
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+
+        /* ===== Feedback Form ===== */
+        .feedback-form-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 32px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feedback-form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent-teal), var(--accent-blue), var(--primary));
+        }
+
+        .feedback-form-card h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0 0 6px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-form-card h2 i {
+            color: var(--accent-teal);
+            font-size: 18px;
+            background: rgba(0, 150, 136, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feedback-form-card .form-subtitle {
+            font-size: 13px;
+            color: var(--text-light);
+            margin: 0 0 24px;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 18px;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+        .star-rating input {
+            display: none;
+        }
+
+        .star-rating label {
+            font-size: 36px;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .star-rating label:hover,
+        .star-rating label:hover~label,
+        .star-rating input:checked~label {
+            color: #f59e0b;
+            transform: scale(1.1);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-mid);
+            margin-bottom: 8px;
+        }
+
+        .form-group textarea {
+            width: 100%;
+            border: 1.5px solid #e3e7f0;
+            border-radius: var(--radius-sm);
+            background: #f8faff;
+            padding: 14px 16px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: all 0.25s;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(229, 57, 53, 0.08);
+        }
+
+        .char-count {
+            text-align: right;
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            font-size: 14px;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 0 12px 28px rgba(229, 57, 53, 0.3);
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 34px rgba(229, 57, 53, 0.4);
+        }
+
+        /* Already submitted banner */
+        .already-submitted {
+            background: linear-gradient(135deg, rgba(232, 245, 233, 0.95), rgba(200, 230, 201, 0.95));
+            border: 1px solid #a5d6a7;
+            border-radius: var(--radius-md);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .already-submitted i {
+            font-size: 28px;
+            color: #2e7d32;
+        }
+
+        .already-submitted .submitted-info h3 {
+            font-size: 16px;
+            font-weight: 800;
+            color: #2e7d32;
+            margin: 0 0 4px;
+        }
+
+        .already-submitted .submitted-info p {
+            font-size: 13px;
+            color: #388e3c;
+            margin: 0;
+        }
+
+        .already-submitted .my-rating {
+            margin-left: auto;
+            display: flex;
+            gap: 3px;
+            font-size: 22px;
+            color: #f59e0b;
+        }
+
+        /* ===== Sort Controls ===== */
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .feedback-header h2 {
+            font-size: 20px;
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-header h2 i {
+            color: var(--accent-blue);
+            font-size: 18px;
+            background: rgba(30, 136, 229, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .sort-btn {
+            border: 1px solid #dce2ee;
+            background: #fff;
+            color: #5a647d;
+            border-radius: 999px;
+            padding: 8px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .sort-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: rgba(229, 57, 53, 0.04);
+        }
+
+        .sort-btn.active {
+            background: linear-gradient(135deg, rgba(229, 57, 53, 0.14), rgba(198, 40, 40, 0.12));
+            border-color: rgba(229, 57, 53, 0.25);
+            color: var(--primary);
+        }
+
+        /* ===== Feedback Cards ===== */
+        .feedback-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .fb-card {
+            background: var(--bg-white);
+            border-radius: var(--radius-md);
+            padding: 24px 26px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s cubic-bezier(.22, 1, .36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fb-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--accent-teal), var(--accent-blue));
+            border-radius: 4px 0 0 4px;
+        }
+
+        .fb-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--card-shadow-hover);
+        }
+
+        .fb-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .fb-card-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .fb-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .fb-author-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .fb-author-date {
+            font-size: 11px;
+            color: var(--text-light);
+            margin-top: 2px;
+        }
+
+        .fb-card-stars {
+            display: flex;
+            gap: 3px;
+            font-size: 18px;
+            color: #f59e0b;
+        }
+
+        .fb-card-comment {
+            font-size: 14px;
+            color: #334155;
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        .fb-card.mine {
+            border-color: rgba(0, 150, 136, 0.3);
+            background: linear-gradient(180deg, #f0fffe, #ffffff);
+        }
+
+        .fb-card.mine::before {
+            background: linear-gradient(180deg, var(--accent-teal), #26a69a);
+        }
+
+        .mine-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 150, 136, 0.12);
+            color: #00796b;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            margin-left: 8px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 48px 20px;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 14px;
+            color: #ddd;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .page-container {
+                padding: 0 16px;
+            }
+
+            .page-hero {
+                padding: 24px;
+            }
+
+            .page-hero h1 {
+                font-size: 22px;
+            }
+
+            .feedback-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .fb-card-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .already-submitted {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .already-submitted .my-rating {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="student-theme">
+    <header>
+        <div class="container header-content">
+            <div class="logo-area">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Institute Logo" class="brand-logo">
+                <div class="logo-text">
+                    <span>Academy of</span>
+                    <span>Knowledge Bridge</span>
+                </div>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="/" class="nav-link">Home</a></li>
+                    <li><a href="/student/dashboard" class="nav-link">Dashboard</a></li>
+                    <li><a href="/submit-concern" class="nav-link">Report Issue</a></li>
+                    <li><a href="/student/concern-drafts" class="nav-link">My Drafts</a></li>
+                    <li><a href="/student/community" class="nav-link">Community Talk</a></li>
+                    <li><a href="/student/overall-feedback" class="nav-link active">Feedback</a></li>
+                    <li><a href="/student/concern-history" class="nav-link">My History</a></li>
+                    <li><a href="/faq" class="nav-link">FAQ</a></li>
+                    <li>
+                        <a href="/student/profile" class="nav-profile-btn" aria-label="Student Profile" title="Student Profile">
+                            <img th:src="@{'/student/photo/' + ${session.studentUserId}}"
+                                 src="/images/img1.jpeg"
+                                 alt="Profile"
+                                 onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-flex';">
+                            <span class="nav-profile-fallback">S</span>
+                        </a>
+                    </li>
+                    <li>
+                        <div class="nav-bell" id="notifBellBtn">
+                            <i class="fas fa-bell"></i>
+                            <span class="bell-badge" id="bellBadge"
+                                  th:text="${unreadCount != null ? unreadCount : 0}"
+                                  th:classappend="${unreadCount == null or unreadCount == 0} ? 'hidden' : ''">0</span>
+                        </div>
+                    </li>
+                    <li><a href="/logout" class="btn-red">Logout</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <!-- Page Hero -->
+        <div class="page-hero animate-in">
+            <div class="hero-content">
+                <a href="/student/dashboard" class="back-link"><i class="fas fa-arrow-left"></i> Back to Dashboard</a>
+                <h1><i class="fas fa-star"></i> Overall System Feedback</h1>
+                <p>Share your experience with the Student Concern Management System. Your feedback helps us improve the
+                    platform for everyone.</p>
+            </div>
+        </div>
+
+        <!-- Success / Error Alerts -->
+        <div class="alert alert-success animate-in" th:if="${feedbackSuccess}">
+            <i class="fas fa-check-circle"></i>
+            <span th:text="${feedbackSuccess}">Success</span>
+        </div>
+        <div class="alert alert-error animate-in" th:if="${feedbackError}">
+            <i class="fas fa-exclamation-circle"></i>
+            <span th:text="${feedbackError}">Error</span>
+        </div>
+
+        <!-- Already Submitted Banner -->
+        <div class="already-submitted animate-in delay-1" id="alreadySubmittedBanner" th:if="${alreadySubmitted and myFeedback != null}">
+            <i class="fas fa-circle-check"></i>
+            <div class="submitted-info">
+                <h3>You've already shared your feedback</h3>
+                <p th:text="'Submitted on ' + ${#temporals.format(myFeedback.submittedAt, 'dd MMM yyyy, hh:mm a')}">
+                    Submitted on date</p>
+                <div style="margin-top: 12px; display: flex; gap: 10px;">
+                    <button type="button" class="btn-outline-dark" onclick="toggleEditFeedback()" style="padding: 6px 14px; font-size: 12px; border-color: rgba(46, 125, 50, 0.5); color: #2e7d32; background: rgba(255,255,255,0.7);">Edit</button>
+                    <form th:action="@{/student/overall-feedback/delete}" method="post" onsubmit="return confirm('Are you sure you want to delete your overall feedback?');" style="display: inline;">
+                        <button type="submit" class="btn-red" style="padding: 6px 14px; font-size: 12px;">Delete</button>
+                    </form>
+                </div>
+            </div>
+            <div class="my-rating">
+                <span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${i <= myFeedback.rating ? '★' : '☆'}">★</span>
+            </div>
+        </div>
+
+        <!-- Update Feedback Form (Hidden by default) -->
+        <div class="feedback-form-card animate-in delay-1" id="updateFeedbackFormCard" style="display: none;" th:if="${alreadySubmitted and myFeedback != null}">
+            <h2><i class="fas fa-edit"></i> Update Your Feedback</h2>
+            <p class="form-subtitle">Update your overall experience rating and comment.</p>
+
+            <form th:action="@{/student/overall-feedback/update}" method="post" id="updateFeedbackForm">
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="update_star5" name="rating" value="5" th:checked="${myFeedback.rating == 5}"><label for="update_star5" title="5 stars">★</label>
+                        <input type="radio" id="update_star4" name="rating" value="4" th:checked="${myFeedback.rating == 4}"><label for="update_star4" title="4 stars">★</label>
+                        <input type="radio" id="update_star3" name="rating" value="3" th:checked="${myFeedback.rating == 3}"><label for="update_star3" title="3 stars">★</label>
+                        <input type="radio" id="update_star2" name="rating" value="2" th:checked="${myFeedback.rating == 2}"><label for="update_star2" title="2 stars">★</label>
+                        <input type="radio" id="update_star1" name="rating" value="1" th:checked="${myFeedback.rating == 1}"><label for="update_star1" title="1 star">★</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Comment</label>
+                    <textarea name="comment" id="updateCommentField"
+                        placeholder="Share your thoughts about the overall system experience..." maxlength="500"
+                        required th:text="${myFeedback.comment}"></textarea>
+                    <div class="char-count"><span id="updateCharCount" th:text="${#strings.length(myFeedback.comment)}">0</span> / 500 characters</div>
+                </div>
+
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <button type="submit" class="submit-btn" style="flex: 2;">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <button type="button" class="btn-outline-dark" onclick="toggleEditFeedback()" style="flex: 1; padding: 12px; text-align: center; border-radius: 999px;">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Feedback Submission Form (only if not submitted yet) -->
+        <div class="feedback-form-card animate-in delay-1" th:if="${!alreadySubmitted}">
+            <h2><i class="fas fa-pen-fancy"></i> Submit Your Feedback</h2>
+            <p class="form-subtitle">Rate your overall experience and leave a comment. Each student may submit only one
+                overall feedback.</p>
+
+            <form th:action="@{/student/overall-feedback}" method="post" id="feedbackForm">
+                <div class="form-group">
+                    <label>Your Rating</label>
+                    <div class="star-rating">
+                        <input type="radio" id="star5" name="rating" value="5"><label for="star5"
+                            title="5 stars">★</label>
+                        <input type="radio" id="star4" name="rating" value="4"><label for="star4"
+                            title="4 stars">★</label>
+                        <input type="radio" id="star3" name="rating" value="3"><label for="star3"
+                            title="3 stars">★</label>
+                        <input type="radio" id="star2" name="rating" value="2"><label for="star2"
+                            title="2 stars">★</label>
+                        <input type="radio" id="star1" name="rating" value="1"><label for="star1"
+                            title="1 star">★</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Your Comment</label>
+                    <textarea name="comment" id="commentField"
+                        placeholder="Share your thoughts about the overall system experience..." maxlength="500"
+                        required></textarea>
+                    <div class="char-count"><span id="charCount">0</span> / 500 characters</div>
+                </div>
+
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                </button>
+            </form>
+        </div>
+
+        <!-- All Feedback Section -->
+        <div class="animate-in delay-2">
+            <div class="feedback-header">
+                <h2><i class="fas fa-comments"></i> Student Feedback Wall</h2>
+                <div class="sort-controls">
+                    <a th:href="@{/student/overall-feedback(sort='newest')}"
+                        th:classappend="${currentSort == 'newest' ? ' active' : ''}" class="sort-btn">Newest</a>
+                    <a th:href="@{/student/overall-feedback(sort='oldest')}"
+                        th:classappend="${currentSort == 'oldest' ? ' active' : ''}" class="sort-btn">Oldest</a>
+                    <a th:href="@{/student/overall-feedback(sort='rating-high')}"
+                        th:classappend="${currentSort == 'rating-high' ? ' active' : ''}" class="sort-btn">Highest
+                        Rating</a>
+                    <a th:href="@{/student/overall-feedback(sort='rating-low')}"
+                        th:classappend="${currentSort == 'rating-low' ? ' active' : ''}" class="sort-btn">Lowest
+                        Rating</a>
+                </div>
+            </div>
+
+            <div class="feedback-list" th:if="${allFeedback != null and !#lists.isEmpty(allFeedback)}">
+                <div th:each="fb : ${allFeedback}"
+                    th:classappend="${myFeedback != null and fb.id == myFeedback.id ? ' mine' : ''}" class="fb-card">
+                    <div class="fb-card-header">
+                        <div class="fb-card-author">
+                            <div class="fb-avatar"
+                                th:text="${fb.studentName != null and !fb.studentName.isEmpty() ? fb.studentName.substring(0,1).toUpperCase() : 'S'}">
+                                S</div>
+                            <div>
+                                <div class="fb-author-name">
+                                    <span
+                                        th:text="${fb.studentName != null ? fb.studentName : 'Anonymous Student'}">Student
+                                        Name</span>
+                                    <span class="mine-badge" th:if="${myFeedback != null and fb.id == myFeedback.id}"><i
+                                            class="fas fa-user"></i> You</span>
+                                </div>
+                                <div class="fb-author-date"
+                                    th:text="${#temporals.format(fb.submittedAt, 'dd MMM yyyy, hh:mm a')}">Date</div>
+                            </div>
+                        </div>
+                        <div class="fb-card-stars">
+                            <span th:each="i : ${#numbers.sequence(1, 5)}"
+                                th:text="${i <= fb.rating ? '★' : '☆'}">★</span>
+                        </div>
+                    </div>
+                    <p class="fb-card-comment" th:text="${fb.comment}">Feedback comment here.</p>
+                </div>
+            </div>
+
+            <div class="empty-state" th:if="${allFeedback == null or #lists.isEmpty(allFeedback)}">
+                <i class="fas fa-comment-slash"></i>
+                <p>No feedback has been submitted yet. Be the first to share your experience!</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-left">
+                <img th:src="@{/images/img1.jpeg}" src="/images/img1.jpeg" alt="Academy Logo" class="footer-logo">
+                <div class="footer-text-area">
+                    <h4 class="footer-brand">AKB CREATIVE SOLUTION</h4>
+                    <p class="footer-sub">Academy of Knowledge Bridge</p>
+                </div>
+            </div>
+            <div class="footer-right">
+                <p>&copy; 2026 Academy of Knowledge Bridge. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Character counter
+        const commentField = document.getElementById('commentField');
+        const charCount = document.getElementById('charCount');
+        if (commentField && charCount) {
+            commentField.addEventListener('input', function () {
+                charCount.textContent = this.value.length;
+            });
+        }
+        
+        // Update form character counter
+        const updateCommentField = document.getElementById('updateCommentField');
+        const updateCharCount = document.getElementById('updateCharCount');
+        if (updateCommentField && updateCharCount) {
+            updateCommentField.addEventListener('input', function () {
+                updateCharCount.textContent = this.value.length;
+            });
+        }
+
+        // Form validation
+        const form = document.getElementById('feedbackForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const ratingChecked = document.querySelector('input[name="rating"]:checked');
+                if (!ratingChecked) {
+                    e.preventDefault();
+                    alert('Please select a star rating before submitting.');
+                    return;
+                }
+                const comment = document.getElementById('commentField').value.trim();
+                if (comment.length < 10) {
+                    e.preventDefault();
+                    alert('Comment must be at least 10 characters.');
+                }
+            });
+        }
+        
+        // Update Form validation
+        const updateForm = document.getElementById('updateFeedbackForm');
+        if (updateForm) {
+            updateForm.addEventListener('submit', function (e) {
+                const comment = document.getElementById('updateCommentField').value.trim();
+                if (comment.length < 10) {
+                    e.preventDefault();
+                    alert('Comment must be at least 10 characters.');
+                }
+            });
+        }
+
+        // Toggle Edit Form
+        function toggleEditFeedback() {
+            const banner = document.getElementById('alreadySubmittedBanner');
+            const formCard = document.getElementById('updateFeedbackFormCard');
+            if (banner.style.display === 'none') {
+                banner.style.display = 'flex';
+                formCard.style.display = 'none';
+            } else {
+                banner.style.display = 'none';
+                formCard.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+
+</html>
