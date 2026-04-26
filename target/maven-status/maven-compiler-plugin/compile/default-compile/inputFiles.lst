@@ -27,6 +27,7 @@
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Faq.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Feedback.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Notification.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/OverallFeedback.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/Student.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/StudentCommunityModerationLog.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/entity/StudentCommunityPost.java
@@ -43,6 +44,7 @@
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/FaqRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/FeedbackRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/NotificationRepository.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/OverallFeedbackRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/StudentCommunityModerationLogRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/StudentCommunityPostRepository.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/repository/StudentCommunityReplyRepository.java
@@ -61,5 +63,6 @@
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/FeedbackModerationService.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/FeedbackService.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/NotificationService.java
+/home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/OverallFeedbackService.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/StudentCommunityService.java
 /home/chandima-bandara/Desktop/SCMS/src/main/java/Project/_6/demo/service/StudentRegistrationService.java

@@ -803,28 +803,28 @@
         </div>
     </section>
 
-    <section class="feedback reveal" id="feedback" th:if="${bestFeedbackList != null and !#lists.isEmpty(bestFeedbackList)}">
+    <section class="feedback reveal" id="top-feedback" th:if="${topFeedback != null and !#lists.isEmpty(topFeedback)}">
         <div class="home-wrap">
             <div class="section-divider"></div>
             <p class="section-subtitle">STUDENT VOICES</p>
-            <h3>Best Student Feedback</h3>
+            <h3>Top Student Feedback</h3>
             <div class="section-underline"></div>
 
-            <div class="feedback-controls" th:if="${#lists.size(bestFeedbackList) > 1}">
+            <div class="feedback-controls" th:if="${#lists.size(topFeedback) > 1}">
                 <button type="button" id="feedbackPrev" aria-label="Previous feedback">&lt;</button>
                 <button type="button" id="feedbackNext" aria-label="Next feedback">&gt;</button>
             </div>
 
             <div class="feedback-window">
                 <div class="feedback-grid" id="feedbackTrack">
-                    <article class="feedback-card" th:each="feedback : ${bestFeedbackList}">
-                        <div class="feedback-stars" th:with="starCount=${feedback.rating != null ? feedback.rating : 0}">
+                    <article class="feedback-card" th:each="fb : ${topFeedback}">
+                        <div class="feedback-stars" th:with="starCount=${fb.rating != null ? fb.rating : 0}">
                             <span th:each="i : ${#numbers.sequence(1, 5)}" th:text="${i <= starCount ? '★' : '☆'}">★</span>
                             <small th:text="'(' + ${starCount} + '/5)'">(5/5)</small>
                         </div>
-                        <p class="feedback-comment" th:text="${feedback.comments}">Excellent support and quick resolution.</p>
+                        <p class="feedback-comment" th:text="${fb.comment}">Great platform for raising concerns.</p>
                         <div class="feedback-meta">
-                            <span th:text="${feedback.concern != null and feedback.concern.category != null ? feedback.concern.category : 'General'}">Category</span>
+                            <span th:text="${fb.studentName != null ? fb.studentName : 'Student'}">Student Name</span>
                         </div>
                     </article>
                 </div>

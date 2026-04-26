@@ -190,6 +190,18 @@ public class ConcernService {
         return map;
     }
 
+    /**
+     * Get the top N most recent non-draft concerns for the home page.
+     */
+    public List<Concern> getTopRecentConcerns(int limit) {
+        int safeLimit = Math.max(1, limit);
+        return concernRepository.findAllByOrderByCreatedTimeDesc().stream()
+                .filter(concern -> concern != null && concern.getStatus() != null)
+                .filter(concern -> !isHiddenFromStudentViews(concern.getStatus().trim()))
+                .limit(safeLimit)
+                .toList();
+    }
+
     @Transactional
     public AdminReply addStudentChatMessage(Integer concernId, Integer studentUserId, String message) {
         Concern concern = concernRepository.findByConcernIdAndStudent_UserId(concernId, studentUserId)

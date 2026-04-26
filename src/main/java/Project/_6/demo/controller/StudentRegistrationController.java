@@ -11,6 +11,7 @@ import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
 import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Student;
+import Project._6.demo.entity.OverallFeedback;
 import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.EmailVerificationService;
@@ -18,6 +19,7 @@ import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentRegistrationService;
 import Project._6.demo.service.FaqManagementService;
+import Project._6.demo.service.OverallFeedbackService;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,7 @@ public class StudentRegistrationController {
     private final ConcernMeetingService concernMeetingService;
     private final FeedbackService feedbackService;
     private final FaqManagementService faqManagementService;
+    private final OverallFeedbackService overallFeedbackService;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final String REG_VERIFY_EMAIL = "regVerifyEmail";
@@ -66,7 +69,8 @@ public class StudentRegistrationController {
                                          ConcernService concernService,
                                          ConcernMeetingService concernMeetingService,
                                          FeedbackService feedbackService,
-                                         FaqManagementService faqManagementService) {
+                                         FaqManagementService faqManagementService,
+                                         OverallFeedbackService overallFeedbackService) {
         this.registrationService = registrationService;
         this.emailVerificationService = emailVerificationService;
         this.notificationService = notificationService;
@@ -74,6 +78,7 @@ public class StudentRegistrationController {
         this.concernMeetingService = concernMeetingService;
         this.feedbackService = feedbackService;
         this.faqManagementService = faqManagementService;
+        this.overallFeedbackService = overallFeedbackService;
     }
 
     /**
@@ -81,8 +86,9 @@ public class StudentRegistrationController {
      */
     @GetMapping("/")
     public String showIndex(Model model) {
-        List<Feedback> bestFeedbackList = feedbackService.getTopPositiveFeedbackForHome(5);
-        model.addAttribute("bestFeedbackList", bestFeedbackList);
+        // Top 5 overall student feedback for the home page
+        List<OverallFeedback> topFeedback = overallFeedbackService.getTopFeedbackForHome(5);
+        model.addAttribute("topFeedback", topFeedback);
         return "index";
     }
 

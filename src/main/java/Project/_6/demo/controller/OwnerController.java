@@ -21,6 +21,8 @@ import Project._6.demo.service.FaqManagementService;
 import Project._6.demo.entity.Tip;
 import Project._6.demo.entity.Faq;
 import Project._6.demo.service.NotificationService;
+import Project._6.demo.entity.OverallFeedback;
+import Project._6.demo.service.OverallFeedbackService;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -60,6 +62,7 @@ public class OwnerController {
     private final EmailVerificationService emailVerificationService;
     private final PasswordEncoder passwordEncoder;
     private final FaqManagementService faqManagementService;
+    private final OverallFeedbackService overallFeedbackService;
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
     private static final Pattern STRONG_PASSWORD_PATTERN = Pattern.compile("^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[^A-Za-z0-9])\\S{12,}$");
@@ -89,7 +92,8 @@ public class OwnerController {
                            NotificationService notificationService,
                            EmailVerificationService emailVerificationService,
                            PasswordEncoder passwordEncoder,
-                           FaqManagementService faqManagementService) {
+                           FaqManagementService faqManagementService,
+                           OverallFeedbackService overallFeedbackService) {
         this.analyticsReportService = analyticsReportService;
                 this.adminService = adminService;
         this.analyticsReportRepository = analyticsReportRepository;
@@ -102,6 +106,7 @@ public class OwnerController {
         this.emailVerificationService = emailVerificationService;
         this.passwordEncoder = passwordEncoder;
         this.faqManagementService = faqManagementService;
+        this.overallFeedbackService = overallFeedbackService;
     }
 
     @GetMapping("/dashboard")
@@ -667,14 +672,29 @@ public class OwnerController {
             return result;
         }
 
-        List<Concern> concerns = concernRepository.findAllByOrderByCreatedTimeDesc().stream()
-                .filter(concern -> !isDraftStatus(concern.getStatus()))
-                .collect(Collectors.toList());
+        List<Object[]> analyticsData = concernRepository.findAllAnalyticsData();
 
-        Map<String, Long> categoryDistribution = concerns.stream()
-                .map(Concern::getCategory)
-                .filter(StringUtils::hasText)
-                .collect(Collectors.groupingBy(cat -> cat, Collectors.counting()));
+        Map<String, Long> categoryDistribution = new LinkedHashMap<>();
+        long resolvedCount = 0;
+        long pendingCount = 0;
+        long rejectedCount = 0;
+
+        for (Object[] row : analyticsData) {
+            String cat = (String) row[0];
+            String stat = (String) row[1];
+
+            if (StringUtils.hasText(cat)) {
+                categoryDistribution.put(cat, categoryDistribution.getOrDefault(cat, 0L) + 1);
+            }
+
+            if (isResolvedStatus(stat)) {
+                resolvedCount++;
+            } else if (isRejectedStatus(stat)) {
+                rejectedCount++;
+            } else if (isPendingStatus(stat)) {
+                pendingCount++;
+            }
+        }
 
         List<Map.Entry<String, Long>> sortedCategoryEntries = categoryDistribution.entrySet().stream()
                 .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
@@ -687,10 +707,6 @@ public class OwnerController {
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toList());
 
-        long resolvedCount = concerns.stream().filter(c -> isResolvedStatus(c.getStatus())).count();
-        long pendingCount = concerns.stream().filter(c -> isPendingStatus(c.getStatus())).count();
-        long rejectedCount = concerns.stream().filter(c -> isRejectedStatus(c.getStatus())).count();
-
         result.put("categoryLabels", categoryLabels);
         result.put("categoryCounts", categoryCounts);
 
@@ -699,7 +715,7 @@ public class OwnerController {
         statusDistribution.put("pending", pendingCount);
         statusDistribution.put("rejected", rejectedCount);
         result.put("statusDistribution", statusDistribution);
-        result.put("totalConcerns", concerns.size());
+        result.put("totalConcerns", analyticsData.size());
 
         return result;
     }
@@ -1455,6 +1471,34 @@ public class OwnerController {
             redirectAttributes.addFlashAttribute("errorMessage", "Error: " + e.getMessage());
         }
         return "redirect:/owner/faq";
+    }
+
+    // ========================
+    // STUDENT OVERALL FEEDBACK VIEW
+    // ========================
+
+    @GetMapping("/student-feedback")
+    public String showStudentOverallFeedback(@RequestParam(value = "sort", required = false) String sort,
+                                             HttpSession session,
+                                             Model model) {
+        if (!isOwnerLoggedIn(session)) {
+            return "redirect:/login";
+        }
+
+        List<OverallFeedback> allFeedback = overallFeedbackService.getAllFeedback(sort);
+        model.addAttribute("allFeedback", allFeedback);
+        model.addAttribute("currentSort", sort != null ? sort : "newest");
+
+        double avgRating = 0.0;
+        long highCount = 0;
+        if (allFeedback != null && !allFeedback.isEmpty()) {
+            avgRating = Math.round(allFeedback.stream().mapToInt(Project._6.demo.entity.OverallFeedback::getRating).average().orElse(0) * 10.0) / 10.0;
+            highCount = allFeedback.stream().filter(f -> f.getRating() >= 4).count();
+        }
+        model.addAttribute("avgRating", avgRating);
+        model.addAttribute("highCount", highCount);
+
+        return "owner-student-feedback";
     }
 
     private boolean isOwnerLoggedIn(HttpSession session) {
