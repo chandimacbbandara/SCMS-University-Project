@@ -26,9 +26,11 @@ SCMS is a full-stack web system for managing student concerns from submission to
 - AI moderation for community and feedback content with safe local fallback rules
 - AI concern priority prediction integrated into concern submit/update flows
 - Admin dashboard and education dashboard with filtering and analytics
-- Owner workspace for admin management, analytics/report APIs, notifications, FAQ/tips
+- Owner workspace for admin management, fast analytics/report APIs, notifications, FAQ/tips
 - Notification center with unread tracking and broadcast support
 - Feedback module tied to concern completion/replies
+- Centralized Overall Student Feedback portal with individual submission, editing, and sorting
+- Dynamic Homepage displaying Top 5 Student Concerns based on recent submissions
 
 ## Team and Feature Contribution
 The following mapping is updated according to the TAF contribution tables.
@@ -241,6 +243,7 @@ tail -f /home/<user>/SCMS/app.log
 - student concern chat and completion endpoints
 - meeting book/decline endpoints
 - feedback create/update/delete endpoints
+- overall feedback view/submit/update/delete endpoints (`/student/overall-feedback`)
 
 ### Student Community (`/student/community`)
 - rules, accept-rules
@@ -261,6 +264,7 @@ tail -f /home/<user>/SCMS/app.log
 - analytics/report APIs
 - notification CRUD/send
 - FAQ and tips CRUD
+- student feedback portal (`/owner/student-feedback`)
 
 ### Notification API (`/api/notifications`)
 - list
@@ -277,6 +281,7 @@ Core tables currently mapped/used:
 - `Concern`
 - `Admin_reply`
 - `SCMS_Feedback`
+- `OverallFeedback`
 - `Notification`
 - `Analytics_Report`
 - `Concern_Meeting_Proposal`
