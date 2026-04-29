@@ -1,7 +1,6 @@
 package Project._6.demo.service;
 
 import Project._6.demo.entity.OverallFeedback;
-import Project._6.demo.entity.Student;
 import Project._6.demo.repository.OverallFeedbackRepository;
 import Project._6.demo.repository.StudentRepository;
 

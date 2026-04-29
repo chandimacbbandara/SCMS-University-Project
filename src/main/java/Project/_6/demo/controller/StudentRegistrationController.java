@@ -9,13 +9,11 @@ import Project._6.demo.entity.AdminReply;
 import Project._6.demo.entity.Concern;
 import Project._6.demo.entity.ConcernMeetingProposal;
 import Project._6.demo.entity.ConcernMeetingSlot;
-import Project._6.demo.entity.Feedback;
 import Project._6.demo.entity.Student;
 import Project._6.demo.entity.OverallFeedback;
 import Project._6.demo.service.ConcernMeetingService;
 import Project._6.demo.service.ConcernService;
 import Project._6.demo.service.EmailVerificationService;
-import Project._6.demo.service.FeedbackService;
 import Project._6.demo.service.NotificationService;
 import Project._6.demo.service.StudentRegistrationService;
 import Project._6.demo.service.FaqManagementService;
@@ -49,7 +47,6 @@ public class StudentRegistrationController {
     private final NotificationService notificationService;
     private final ConcernService concernService;
     private final ConcernMeetingService concernMeetingService;
-    private final FeedbackService feedbackService;
     private final FaqManagementService faqManagementService;
     private final OverallFeedbackService overallFeedbackService;
 
@@ -68,7 +65,6 @@ public class StudentRegistrationController {
                                          NotificationService notificationService,
                                          ConcernService concernService,
                                          ConcernMeetingService concernMeetingService,
-                                         FeedbackService feedbackService,
                                          FaqManagementService faqManagementService,
                                          OverallFeedbackService overallFeedbackService) {
         this.registrationService = registrationService;
@@ -76,7 +72,6 @@ public class StudentRegistrationController {
         this.notificationService = notificationService;
         this.concernService = concernService;
         this.concernMeetingService = concernMeetingService;
-        this.feedbackService = feedbackService;
         this.faqManagementService = faqManagementService;
         this.overallFeedbackService = overallFeedbackService;
     }
