@@ -13,24 +13,47 @@ Role-based student concern handling platform for Akademy of Knowledge Bridge.
 
 </div>
 
-## Overview
-SCMS is a full-stack web system for managing student concerns from submission to resolution. It includes role-based flows for Students, Admins, and Owner users, with AI-assisted moderation and priority prediction.
+## Quick Snapshot
+SCMS is a full-stack web system for managing student concerns from submission to resolution. It supports Students, Admins, and Owner users, with AI-assisted moderation and AI-based priority prediction.
 
-## Core Features Implemented
-- Registration with email OTP verification and admin approval flow
+- Primary goal: faster, safer, and transparent concern handling
+- UI: server-rendered Thymeleaf pages
+- DB: MySQL
+- Build: Maven
+
+## What You Can Do
+### Students
+- Register with email OTP and admin approval
+- Submit concerns with evidence uploads
+- Edit drafts, chat, schedule meetings, close concerns
+- Join the community forum (posts, replies, moderation rules)
+- Provide resolution feedback and overall feedback
+
+### Admins
+- Review and prioritize concerns
+- Reply, chat, and schedule meetings
+- Moderate community content
+- Use dashboard analytics
+
+### Owner
+- Manage admins
+- Monitor analytics and reports
+- Manage FAQs, tips, and notifications
+
+## Core Features
 - Role-based login for student, admin, and owner
 - Concern lifecycle: draft, submit, edit (pending), chat, meeting scheduling, completion
-- Linked concerns support for threaded concern history
+- Linked concerns for threaded history
 - Evidence upload handling via `/uploads/**`
-- Student community forum with rules acceptance, post/reply CRUD, moderation actions
+- Student community forum with moderation and rules acceptance
 - AI moderation for community and feedback content with safe local fallback rules
-- AI concern priority prediction integrated into concern submit/update flows
+- AI concern priority prediction integrated into submit/update flows
 - Admin dashboard and education dashboard with filtering and analytics
-- Owner workspace for admin management, fast analytics/report APIs, notifications, FAQ/tips
+- Owner workspace for admin management, analytics/report APIs, notifications, FAQ/tips
 - Notification center with unread tracking and broadcast support
 - Feedback module tied to concern completion/replies
-- Centralized Overall Student Feedback portal with individual submission, editing, and sorting
-- Dynamic Homepage displaying Top 5 Student Concerns based on recent submissions
+- Overall student feedback portal (submit, edit, sort)
+- Dynamic homepage showing top 5 recent concerns
 
 ## Team and Feature Contribution
 The following mapping is updated according to the TAF contribution tables.

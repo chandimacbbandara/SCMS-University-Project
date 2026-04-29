@@ -3,6 +3,7 @@ Project/_6/demo/entity/Faq.class
 Project/_6/demo/repository/StudentCommunityModerationLogRepository.class
 Project/_6/demo/dto/CommunityModerationResultDTO.class
 Project/_6/demo/StudentConcernManagementSystemApplication.class
+Project/_6/demo/repository/OverallFeedbackRepository.class
 Project/_6/demo/service/EmailVerificationService.class
 Project/_6/demo/entity/Tip.class
 Project/_6/demo/service/ConcernMeetingService$SlotWindow.class
@@ -20,6 +21,7 @@ Project/_6/demo/service/ConcernPriorityService.class
 Project/_6/demo/repository/StudentCommunityReplyRepository.class
 Project/_6/demo/repository/AdminReplyRepository.class
 Project/_6/demo/controller/AdminController.class
+Project/_6/demo/entity/OverallFeedback.class
 Project/_6/demo/service/AdminService.class
 Project/_6/demo/entity/AdminReply.class
 Project/_6/demo/dto/LoginDTO.class
@@ -53,6 +55,7 @@ Project/_6/demo/dto/CommunityPostDTO.class
 Project/_6/demo/repository/ConcernMeetingSlotRepository.class
 Project/_6/demo/repository/NotificationRepository.class
 Project/_6/demo/controller/ConcernController.class
+Project/_6/demo/service/OverallFeedbackService.class
 Project/_6/demo/dto/CommunityModerationRequestDTO.class
 Project/_6/demo/entity/ConcernMeetingSlot.class
 Project/_6/demo/service/FeedbackModerationService.class
