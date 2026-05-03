@@ -394,6 +394,8 @@ public class OwnerController {
         return ResponseEntity.ok(result);
     }
 
+    // Handles creation of analytics reports by validating input,
+    // computing report metrics, and saving the finalized report
     @PostMapping("/report/create")
     public String createReport(@ModelAttribute AnalyticsReportDTO reportDTO,
                                HttpSession session,
